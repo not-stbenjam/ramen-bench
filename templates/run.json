@@ -1,0 +1,72 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "vendor/model/variation",
+  "vendor": {
+    "slug": "vendor",
+    "displayName": "Vendor"
+  },
+  "model": {
+    "slug": "model",
+    "displayName": "Model",
+    "providerModelId": "vendor/model"
+  },
+  "variation": {
+    "slug": "variation",
+    "displayName": "Variation",
+    "reasoningEffort": "other",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Harness",
+    "version": "",
+    "runtime": "",
+    "invocation": ""
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json",
+    "rawTranscript": "transcript.jsonl"
+  },
+  "timing": {
+    "startedAt": "2026-09-02T00:00:00Z",
+    "completedAt": "2026-09-02T00:00:00Z",
+    "wallDurationMs": 0,
+    "apiDurationMs": 0
+  },
+  "usage": {
+    "tokens": {
+      "input": 0,
+      "cachedInput": 0,
+      "cacheCreationInput": 0,
+      "reasoning": 0,
+      "output": 0,
+      "total": 0
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0,
+      "cachedInput": 0,
+      "cacheCreationInput": 0,
+      "output": 0,
+      "other": 0,
+      "total": 0,
+      "estimated": false
+    },
+    "requests": 0,
+    "turns": 0,
+    "toolCalls": 0,
+    "providerReported": false,
+    "raw": {}
+  },
+  "resultStats": {
+    "bytes": 0,
+    "lines": 0
+  },
+  "provenance": {
+    "generatedAt": "2026-09-02T00:00:00Z",
+    "sourceCommit": "",
+    "pricingSource": ""
+  },
+  "notes": ""
+}

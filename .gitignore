@@ -1,0 +1,7 @@
+.DS_Store
+Thumbs.db
+node_modules/
+api/.dev.vars
+api/.env
+api/.wrangler/
+api/wrangler.jsonc

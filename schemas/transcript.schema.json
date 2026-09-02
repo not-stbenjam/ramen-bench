@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
+  "title": "Ramen Bench public session transcript",
+  "description": "A normalized, secret-free record of messages and tool activity. Hidden chain-of-thought must not be included.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "runId", "events"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "runId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*$"
+    },
+    "sessionId": { "type": "string" },
+    "sourceFormat": {
+      "description": "Harness format from which this public transcript was normalized.",
+      "type": "string"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/message" },
+          { "$ref": "#/$defs/toolCall" },
+          { "$ref": "#/$defs/toolResult" },
+          { "$ref": "#/$defs/note" },
+          { "$ref": "#/$defs/error" }
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "baseEvent": {
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "message": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "role", "content"],
+          "properties": {
+            "type": { "const": "message" },
+            "role": { "enum": ["system", "user", "assistant"] },
+            "content": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" },
+            "tokens": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "input": { "type": "integer", "minimum": 0 },
+                "output": { "type": "integer", "minimum": 0 }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "toolCall": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "id", "tool", "input"],
+          "properties": {
+            "type": { "const": "tool_call" },
+            "id": { "type": "string" },
+            "tool": { "type": "string" },
+            "input": {},
+            "timestamp": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    },
+    "toolResult": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "callId", "output"],
+          "properties": {
+            "type": { "const": "tool_result" },
+            "callId": { "type": "string" },
+            "status": { "enum": ["success", "error"] },
+            "output": {},
+            "timestamp": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    },
+    "note": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "content"],
+          "properties": {
+            "type": { "const": "note" },
+            "content": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    },
+    "error": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "message"],
+          "properties": {
+            "type": { "const": "error" },
+            "message": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    }
+  }
+}

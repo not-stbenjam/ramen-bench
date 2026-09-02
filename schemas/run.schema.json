@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "title": "Ramen Bench run",
+  "description": "Metadata and usage accounting for one model variation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "vendor",
+    "model",
+    "variation",
+    "harness",
+    "artifacts",
+    "timing",
+    "usage"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "id": {
+      "description": "Stable vendor/model/variation identifier; it should match the containing directory.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*$"
+    },
+    "vendor": { "$ref": "#/$defs/namedSlug" },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "displayName"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "displayName": { "type": "string", "minLength": 1 },
+        "providerModelId": {
+          "description": "Exact model identifier sent to the provider.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "variation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "displayName"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "displayName": { "type": "string", "minLength": 1 },
+        "reasoningEffort": {
+          "type": "string",
+          "enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "other"]
+        },
+        "parameters": {
+          "description": "Other model or harness settings that distinguish this run.",
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string" },
+        "runtime": { "type": "string" },
+        "invocation": {
+          "description": "A safe, secret-free description of how the harness was invoked.",
+          "type": "string"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "transcript"],
+      "properties": {
+        "result": { "type": "string", "default": "index.html" },
+        "transcript": { "type": "string", "default": "transcript.json" },
+        "rawTranscript": {
+          "description": "Optional untouched export from the harness.",
+          "type": "string"
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startedAt", "completedAt", "wallDurationMs"],
+      "properties": {
+        "startedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "wallDurationMs": { "type": "integer", "minimum": 0 },
+        "apiDurationMs": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokens", "cost"],
+      "properties": {
+        "tokens": { "$ref": "#/$defs/tokens" },
+        "cost": { "$ref": "#/$defs/cost" },
+        "requests": { "type": "integer", "minimum": 0 },
+        "turns": { "type": "integer", "minimum": 0 },
+        "toolCalls": { "type": "integer", "minimum": 0 },
+        "providerReported": {
+          "description": "True when usage came directly from provider or harness accounting; false when reconstructed.",
+          "type": "boolean"
+        },
+        "raw": {
+          "description": "Optional provider-specific usage fields retained without interpretation.",
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "resultStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bytes": { "type": "integer", "minimum": 0 },
+        "lines": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "sourceCommit": { "type": "string" },
+        "pricingSource": { "type": "string" }
+      }
+    },
+    "notes": { "type": "string" }
+  },
+  "$defs": {
+    "namedSlug": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "displayName"],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "displayName": { "type": "string", "minLength": 1 }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input", "output", "total"],
+      "properties": {
+        "input": { "type": "integer", "minimum": 0 },
+        "cachedInput": { "type": "integer", "minimum": 0, "default": 0 },
+        "cacheCreationInput": { "type": "integer", "minimum": 0, "default": 0 },
+        "reasoning": { "type": "integer", "minimum": 0, "default": 0 },
+        "output": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currency", "total"],
+      "properties": {
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$", "default": "USD" },
+        "input": { "type": "number", "minimum": 0, "default": 0 },
+        "cachedInput": { "type": "number", "minimum": 0, "default": 0 },
+        "cacheCreationInput": { "type": "number", "minimum": 0, "default": 0 },
+        "output": { "type": "number", "minimum": 0, "default": 0 },
+        "other": { "type": "number", "minimum": 0, "default": 0 },
+        "total": { "type": "number", "minimum": 0 },
+        "estimated": { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

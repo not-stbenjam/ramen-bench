@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Ramen Bench compares how AI coding models interpret the same creative ramen prompt."
+    >
+    <meta name="theme-color" content="#120e0b">
+    <title>Ramen Bench</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="site.config.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <button class="mobile-menu" id="mobile-menu" type="button" aria-controls="sidebar" aria-expanded="false">
+      <span class="sr-only">Open model menu</span>
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M4 7h16M4 12h16M4 17h16"></path>
+      </svg>
+    </button>
+    <button class="sidebar-scrim" id="sidebar-scrim" type="button" tabindex="-1" aria-label="Close model menu"></button>
+
+    <aside class="sidebar" id="sidebar" aria-label="Benchmark controls">
+      <a class="brand" href="#" aria-label="Ramen Bench home">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="steam steam-one"></span>
+          <span class="steam steam-two"></span>
+          <span class="bowl"></span>
+        </span>
+        <span class="brand-copy">
+          <strong>Ramen Bench</strong>
+        </span>
+      </a>
+
+      <nav class="utility-actions" aria-label="Project information">
+        <button type="button" data-dialog="about-dialog">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7.5v.01"></path></svg>
+          About
+        </button>
+        <button type="button" data-dialog="prompt-dialog">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 1.3 4.1L17 9l-3.7 1.9L12 15l-1.3-4.1L7 9l3.7-1.9L12 3ZM5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15Zm14-3 .8 2.2 2.2.8-2.2.8L19 18l-.8-2.2L16 15l2.2-.8L19 12Z"></path></svg>
+          Prompt
+        </button>
+        <button type="button" data-dialog="leaderboard-dialog">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4Z"></path><path d="M8 6H4v2a4 4 0 0 0 4 4m8-6h4v2a4 4 0 0 1-4 4M12 13v4m-4 3h8"></path></svg>
+          Leaders
+        </button>
+        <a href="https://github.com/not-stbenjam/ramen-bench" target="_blank" rel="noopener noreferrer">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-6 0C5.8.1 4.7.5 4.7.5A5 5 0 0 0 4.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 9 18v4"></path><path d="M9 19c-3 .9-3-1.5-4-2"></path></svg>
+          GitHub
+        </a>
+      </nav>
+
+      <div class="mode-switch" role="group" aria-label="View mode">
+        <button id="single-mode" class="active" type="button" aria-pressed="true">Single</button>
+        <button id="grid-mode" type="button" aria-pressed="false">Grid</button>
+      </div>
+
+      <div class="filters">
+        <label class="search-control">
+          <span class="sr-only">Search models</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+          <input id="model-search" type="search" placeholder="Search models…" autocomplete="off">
+        </label>
+        <div class="filter-row">
+          <label>
+            <span class="sr-only">Filter by creator</span>
+            <select id="creator-filter">
+              <option value="">Creator</option>
+            </select>
+          </label>
+          <label>
+            <span class="sr-only">Filter by harness</span>
+            <select id="harness-filter">
+              <option value="">Harness</option>
+            </select>
+          </label>
+        </div>
+        <div class="filter-meta">
+          <span id="filter-count" aria-live="polite"></span>
+          <button id="clear-filters" type="button" hidden>Clear</button>
+        </div>
+      </div>
+
+      <div class="model-list" id="model-list" aria-live="polite"></div>
+      <p class="grid-hint" id="grid-hint" aria-live="polite">Choose up to four bowls</p>
+    </aside>
+
+    <main class="viewer mode-single" id="viewer">
+      <button class="nav-arrow previous" id="previous-model" type="button" aria-label="Previous model">‹</button>
+      <button class="nav-arrow next" id="next-model" type="button" aria-label="Next model">›</button>
+      <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+        <div class="welcome-glow" aria-hidden="true"></div>
+        <div class="welcome-bowl" aria-hidden="true">
+          <span class="welcome-steam steam-left"></span>
+          <span class="welcome-steam steam-center"></span>
+          <span class="welcome-steam steam-right"></span>
+          <span class="welcome-rim"></span>
+          <span class="welcome-dish"></span>
+        </div>
+        <p class="eyebrow">The kitchen is warming up</p>
+        <h1 id="welcome-title">Ready for the first bowl.</h1>
+        <p>Add run manifests to <code>registry.json</code> and their single-file results will appear here.</p>
+        <button type="button" data-dialog="prompt-dialog">Read the shared prompt</button>
+      </section>
+      <div class="frames" id="frames"></div>
+    </main>
+
+    <dialog class="modal" id="prompt-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="modal-kicker">The shared brief</span>
+          <h2>Prompt</h2>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close prompt">×</button>
+      </div>
+      <div class="modal-body">
+        <pre id="prompt-text">Create a single-file HTML page (index.html) with all CSS and JavaScript inline and zero external assets. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.</pre>
+        <button class="copy-prompt" id="copy-prompt" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"></path></svg>
+          <span>Copy prompt</span>
+        </button>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="about-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="modal-kicker">About the bench</span>
+          <h2>Same recipe. Different cooks.</h2>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close about dialog">×</button>
+      </div>
+      <div class="modal-body prose">
+        <p>Ramen Bench gives AI coding models one identical creative prompt: build a polished, interactive bowl of vegan ramen in a single HTML file.</p>
+        <p>Browse models in the sidebar, rate your favorites, or switch to grid view to compare up to four interpretations at once.</p>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="leaderboard-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="modal-kicker">Your ratings</span>
+          <h2>Leaderboard</h2>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close leaderboard">×</button>
+      </div>
+      <div class="modal-body leaderboard" id="leaderboard"></div>
+    </dialog>
+
+    <dialog class="modal transcript-modal" id="transcript-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="modal-kicker">Run record</span>
+          <h2 id="transcript-title">Session transcript</h2>
+        </div>
+        <button class="modal-close" type="button" aria-label="Close transcript">×</button>
+      </div>
+      <div class="modal-body transcript-body" id="transcript-body"></div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

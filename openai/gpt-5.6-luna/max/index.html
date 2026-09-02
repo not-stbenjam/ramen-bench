@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080b0d" />
+    <title>Quiet Bowl — Vegetarian Ramen</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --night: #080b0d;
+        --ember: #e9a757;
+        --cream: #f6e7c3;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        min-height: 100svh;
+        overflow: hidden;
+        background: var(--night);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .stage {
+        position: relative;
+        isolation: isolate;
+        display: grid;
+        min-height: 100svh;
+        place-items: center;
+        overflow: hidden;
+        background:
+          radial-gradient(ellipse at 50% 44%, rgba(117, 66, 35, 0.27) 0%, rgba(47, 31, 24, 0.16) 27%, transparent 55%),
+          radial-gradient(ellipse at 50% 112%, #241810 0%, #0d1112 44%, #07090b 79%);
+      }
+
+      .stage::before {
+        position: absolute;
+        inset: -20%;
+        z-index: -2;
+        content: "";
+        background:
+          radial-gradient(circle at 50% 37%, rgba(255, 213, 142, 0.13), transparent 24%),
+          radial-gradient(circle at 23% 18%, rgba(73, 104, 107, 0.08), transparent 22%),
+          radial-gradient(circle at 79% 72%, rgba(198, 100, 46, 0.06), transparent 28%);
+        filter: blur(28px);
+        pointer-events: none;
+      }
+
+      .stage::after {
+        position: absolute;
+        right: -16vw;
+        bottom: -21vw;
+        left: -16vw;
+        z-index: -1;
+        height: 45vh;
+        content: "";
+        border-radius: 50%;
+        background: rgba(200, 112, 48, 0.09);
+        filter: blur(78px);
+        pointer-events: none;
+      }
+
+      .bowl-scene {
+        position: relative;
+        width: min(94vw, 820px);
+        aspect-ratio: 800 / 720;
+        margin-top: 1.5vh;
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .bowl-scene::before {
+        position: absolute;
+        right: 12%;
+        bottom: 6%;
+        left: 12%;
+        height: 20%;
+        content: "";
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.44);
+        filter: blur(34px);
+        opacity: 0.78;
+        transform: translateY(9%);
+        transition: opacity 700ms ease, transform 700ms ease;
+        pointer-events: none;
+      }
+
+      .bowl-scene:hover::before,
+      .bowl-scene.is-awakened::before {
+        opacity: 0.6;
+        transform: translateY(15%) scaleX(0.94);
+      }
+
+      .ramen-art {
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        transform: translateY(0);
+        transition: transform 900ms cubic-bezier(0.2, 0.75, 0.25, 1);
+      }
+
+      .bowl-scene:hover .ramen-art,
+      .bowl-scene.is-awakened .ramen-art {
+        transform: translateY(-5px);
+      }
+
+      .bowl-scene:focus-visible {
+        outline: 1px solid rgba(248, 211, 151, 0.58);
+        outline-offset: 10px;
+        border-radius: 50%;
+      }
+
+      .bowl-shadow {
+        fill: #000;
+        opacity: 0.5;
+        filter: url(#softShadow);
+      }
+
+      .bowl-body {
+        fill: url(#bowlBody);
+        stroke: rgba(114, 132, 132, 0.28);
+        stroke-width: 3;
+      }
+
+      .bowl-body-highlight {
+        fill: none;
+        stroke: rgba(178, 192, 184, 0.18);
+        stroke-linecap: round;
+        stroke-width: 5;
+      }
+
+      .bowl-rim {
+        fill: url(#bowlRim);
+        stroke: rgba(142, 157, 151, 0.35);
+        stroke-width: 3;
+      }
+
+      .broth {
+        fill: url(#broth);
+        stroke: rgba(244, 173, 86, 0.42);
+        stroke-width: 3;
+      }
+
+      .broth-depth {
+        fill: url(#brothDepth);
+        opacity: 0.6;
+      }
+
+      .broth-sheen {
+        fill: none;
+        stroke: rgba(255, 223, 153, 0.44);
+        stroke-linecap: round;
+        stroke-width: 4;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: shimmer 5.2s ease-in-out infinite;
+      }
+
+      .broth-sheen--soft {
+        stroke: rgba(255, 191, 104, 0.2);
+        stroke-width: 11;
+        filter: url(#softBlur);
+        animation-delay: -2.1s;
+      }
+
+      .noodle {
+        fill: none;
+        stroke: url(#noodle);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 9;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: noodleSway 4.5s ease-in-out infinite;
+      }
+
+      .noodle--fine {
+        stroke: rgba(255, 231, 164, 0.75);
+        stroke-width: 4;
+      }
+
+      .noodle--deep {
+        stroke: rgba(196, 108, 47, 0.74);
+        stroke-width: 7;
+      }
+
+      .noodle:nth-of-type(2n) {
+        animation-delay: -1.4s;
+      }
+
+      .noodle:nth-of-type(3n) {
+        animation-delay: -2.6s;
+      }
+
+      .topping-float {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: toppingFloat 5.5s ease-in-out infinite;
+      }
+
+      .topping-float--late {
+        animation-delay: -2.8s;
+      }
+
+      .bok-choy-leaf {
+        fill: url(#bokChoy);
+        stroke: rgba(181, 199, 137, 0.58);
+        stroke-width: 2;
+      }
+
+      .bok-choy-stem {
+        fill: #d9d997;
+        opacity: 0.88;
+      }
+
+      .tofu {
+        fill: url(#tofu);
+        stroke: rgba(248, 202, 121, 0.54);
+        stroke-width: 2;
+      }
+
+      .tofu-edge {
+        fill: none;
+        stroke: rgba(255, 231, 163, 0.55);
+        stroke-linecap: round;
+        stroke-width: 3;
+      }
+
+      .mushroom-cap {
+        fill: url(#mushroom);
+        stroke: rgba(232, 167, 102, 0.5);
+        stroke-width: 2;
+      }
+
+      .mushroom-gill {
+        fill: none;
+        stroke: rgba(250, 205, 143, 0.38);
+        stroke-linecap: round;
+        stroke-width: 2;
+      }
+
+      .corn {
+        fill: #f4c94e;
+        stroke: rgba(255, 236, 150, 0.48);
+        stroke-width: 2;
+      }
+
+      .scallion {
+        fill: rgba(218, 235, 159, 0.88);
+        stroke: rgba(105, 137, 79, 0.78);
+        stroke-width: 3;
+      }
+
+      .nori {
+        fill: url(#nori);
+        stroke: rgba(95, 151, 120, 0.5);
+        stroke-width: 2;
+      }
+
+      .chili {
+        fill: #d95836;
+        stroke: rgba(255, 174, 99, 0.45);
+        stroke-width: 2;
+      }
+
+      .ripple-ring {
+        fill: none;
+        stroke: rgba(255, 222, 150, 0.72);
+        stroke-linecap: round;
+        stroke-width: 4;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      .steam-path {
+        fill: none;
+        stroke: rgba(251, 232, 194, 0.3);
+        stroke-linecap: round;
+        stroke-width: 8;
+        transform-box: fill-box;
+        transform-origin: center bottom;
+        animation: steamFloat 6.4s ease-in-out infinite;
+      }
+
+      .steam-path--thin {
+        stroke: rgba(255, 233, 196, 0.21);
+        stroke-width: 4;
+      }
+
+      .steam-path--one {
+        animation-delay: -2.8s;
+      }
+
+      .steam-path--two {
+        animation-delay: -4.3s;
+      }
+
+      .steam-path--three {
+        animation-delay: -1.2s;
+      }
+
+      .bowl-scene:hover .steam-path,
+      .bowl-scene.is-awakened .steam-path {
+        animation-name: steamAwakened;
+        animation-duration: 2.8s;
+      }
+
+      .bowl-scene:hover .ripple-ring {
+        animation: ripple 2.2s ease-out infinite;
+      }
+
+      .bowl-scene:hover .ripple-ring--second {
+        animation-delay: 0.72s;
+      }
+
+      .bowl-scene.is-awakened .ripple-ring {
+        animation: ripple 1.25s ease-out both;
+      }
+
+      .bowl-scene.is-awakened .ripple-ring--second {
+        animation-delay: 0.24s;
+      }
+
+      @keyframes steamFloat {
+        0%,
+        100% {
+          opacity: 0.08;
+          transform: translate3d(0, 10px, 0) scaleX(0.92);
+        }
+        50% {
+          opacity: 0.29;
+          transform: translate3d(7px, -11px, 0) scaleX(1.04);
+        }
+      }
+
+      @keyframes steamAwakened {
+        0%,
+        100% {
+          opacity: 0.16;
+          transform: translate3d(0, 8px, 0) scaleX(0.94);
+        }
+        50% {
+          opacity: 0.54;
+          transform: translate3d(12px, -15px, 0) scaleX(1.09);
+        }
+      }
+
+      @keyframes shimmer {
+        0%,
+        100% {
+          opacity: 0.22;
+          transform: translateX(-5px) scaleX(0.92);
+        }
+        50% {
+          opacity: 0.76;
+          transform: translateX(7px) scaleX(1.08);
+        }
+      }
+
+      @keyframes noodleSway {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) rotate(0deg);
+        }
+        50% {
+          transform: translate3d(1px, -1px, 0) rotate(0.45deg);
+        }
+      }
+
+      @keyframes toppingFloat {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) rotate(0deg);
+        }
+        50% {
+          transform: translate3d(1px, -1.5px, 0) rotate(-0.7deg);
+        }
+      }
+
+      @keyframes ripple {
+        0% {
+          opacity: 0.55;
+          transform: scale(0.38);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.28);
+        }
+      }
+
+      @media (max-width: 540px) {
+        .bowl-scene {
+          width: 116vw;
+          margin-top: 2vh;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.001ms !important;
+        }
+
+        .bowl-scene:hover .ripple-ring,
+        .bowl-scene.is-awakened .ripple-ring {
+          opacity: 0.28;
+          transform: scale(0.9);
+        }
+
+        .bowl-scene:hover .steam-path,
+        .bowl-scene.is-awakened .steam-path {
+          opacity: 0.4;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage" aria-label="A warm bowl of vegetarian ramen">
+      <div
+        class="bowl-scene"
+        tabindex="0"
+        role="button"
+        aria-keyshortcuts="Enter Space"
+        aria-label="A beautiful bowl of vegetarian ramen with noodles, tofu, mushrooms, bok choy, corn, scallions, and steam"
+      >
+        <svg class="ramen-art" viewBox="0 0 800 720" role="presentation" aria-hidden="true">
+          <defs>
+            <linearGradient id="bowlBody" x1="0" y1="0" x2="0.2" y2="1">
+              <stop offset="0" stop-color="#3a484a" />
+              <stop offset="0.32" stop-color="#202b2e" />
+              <stop offset="0.76" stop-color="#12191c" />
+              <stop offset="1" stop-color="#090d10" />
+            </linearGradient>
+            <linearGradient id="bowlRim" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#455256" />
+              <stop offset="0.34" stop-color="#293538" />
+              <stop offset="1" stop-color="#11191c" />
+            </linearGradient>
+            <radialGradient id="broth" cx="48%" cy="37%" r="68%">
+              <stop offset="0" stop-color="#efa959" />
+              <stop offset="0.3" stop-color="#ca7136" />
+              <stop offset="0.72" stop-color="#873c29" />
+              <stop offset="1" stop-color="#562420" />
+            </radialGradient>
+            <radialGradient id="brothDepth" cx="50%" cy="10%" r="90%">
+              <stop offset="0" stop-color="#ffca72" stop-opacity="0.35" />
+              <stop offset="0.42" stop-color="#7b3024" stop-opacity="0.1" />
+              <stop offset="1" stop-color="#240d12" stop-opacity="0.58" />
+            </radialGradient>
+            <linearGradient id="noodle" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fff1ba" />
+              <stop offset="0.38" stop-color="#f6d27c" />
+              <stop offset="1" stop-color="#ca7e37" />
+            </linearGradient>
+            <linearGradient id="bokChoy" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#b5c778" />
+              <stop offset="0.5" stop-color="#668d5b" />
+              <stop offset="1" stop-color="#284d3d" />
+            </linearGradient>
+            <linearGradient id="tofu" x1="0" y1="0" x2="0.9" y2="1">
+              <stop offset="0" stop-color="#ffe2a0" />
+              <stop offset="0.54" stop-color="#e7a95b" />
+              <stop offset="1" stop-color="#a95a32" />
+            </linearGradient>
+            <radialGradient id="mushroom" cx="42%" cy="22%" r="80%">
+              <stop offset="0" stop-color="#e1a86e" />
+              <stop offset="0.55" stop-color="#9a5b3c" />
+              <stop offset="1" stop-color="#4a2927" />
+            </radialGradient>
+            <linearGradient id="nori" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#244a40" />
+              <stop offset="0.55" stop-color="#14352f" />
+              <stop offset="1" stop-color="#0d211f" />
+            </linearGradient>
+            <filter id="softShadow" x="-30%" y="-80%" width="160%" height="260%">
+              <feGaussianBlur stdDeviation="17" />
+            </filter>
+            <filter id="softBlur" x="-30%" y="-200%" width="160%" height="500%">
+              <feGaussianBlur stdDeviation="8" />
+            </filter>
+            <clipPath id="ramenClip">
+              <ellipse cx="400" cy="355" rx="251" ry="101" />
+            </clipPath>
+          </defs>
+
+          <g class="steam" aria-hidden="true">
+            <path class="steam-path steam-path--one" d="M273 321 C243 284 308 252 278 214 C251 180 294 149 276 111" />
+            <path class="steam-path steam-path--two" d="M395 298 C431 262 374 224 407 184 C435 150 408 119 432 82" />
+            <path class="steam-path steam-path--three" d="M509 321 C542 287 487 261 519 223 C550 187 524 156 547 124" />
+            <path class="steam-path steam-path--thin steam-path--one" d="M339 304 C318 271 355 247 341 220 C326 192 352 170 346 143" />
+            <path class="steam-path steam-path--thin steam-path--three" d="M459 308 C480 276 451 248 474 218 C494 191 475 168 490 145" />
+          </g>
+
+          <ellipse class="bowl-shadow" cx="400" cy="638" rx="286" ry="32" />
+
+          <path class="bowl-body" d="M126 355 C132 481 199 584 313 616 C361 630 439 630 487 616 C601 584 668 481 674 355 Z" />
+          <path class="bowl-body-highlight" d="M171 450 C193 529 246 577 318 596" />
+          <path class="bowl-body-highlight" d="M629 449 C607 526 554 574 486 596" opacity="0.35" />
+
+          <ellipse class="bowl-rim" cx="400" cy="356" rx="280" ry="125" />
+          <ellipse class="broth" cx="400" cy="355" rx="251" ry="101" />
+
+          <g clip-path="url(#ramenClip)">
+            <ellipse class="broth-depth" cx="400" cy="357" rx="248" ry="98" />
+
+            <path class="broth-sheen broth-sheen--soft" d="M225 327 C289 291 341 314 397 299 C454 284 510 303 567 326" />
+            <path class="broth-sheen" d="M246 321 C289 303 328 314 363 305" />
+            <path class="broth-sheen" d="M444 315 C483 303 522 315 550 329" />
+
+            <g aria-hidden="true">
+              <path class="noodle noodle--deep" d="M167 353 C217 309 263 383 306 346 C348 310 386 382 431 344 C478 305 529 377 601 334" />
+              <path class="noodle" d="M177 376 C232 341 272 396 318 362 C362 329 393 397 442 359 C487 325 537 385 605 350" />
+              <path class="noodle noodle--fine" d="M194 332 C247 307 278 352 323 329 C367 307 403 350 447 327 C491 304 525 352 578 336" />
+              <path class="noodle" d="M196 402 C238 370 281 419 326 389 C375 356 405 421 451 385 C499 347 542 407 589 374" />
+              <path class="noodle noodle--deep" d="M219 421 C260 390 295 431 336 409 C381 385 420 432 462 402 C505 371 541 420 574 402" />
+              <path class="noodle" d="M241 294 C284 332 315 298 349 319 C386 343 411 292 449 317 C487 345 527 303 563 331" />
+              <path class="noodle noodle--fine" d="M229 365 C273 341 302 379 346 350 C383 325 417 377 455 348 C496 318 528 359 573 344" />
+              <path class="noodle" d="M270 440 C306 406 337 446 373 423 C411 398 442 449 479 421 C515 393 544 429 568 421" />
+            </g>
+
+            <path class="nori topping-float--late" d="M542 252 L582 271 L577 379 L542 366 Z" />
+            <path class="nori" d="M550 273 L575 286 L571 338 L548 328 Z" opacity="0.56" />
+
+            <g class="topping-float" aria-hidden="true">
+              <path class="bok-choy-leaf" d="M195 358 C176 331 177 291 201 274 C222 290 226 326 215 357 C207 371 199 369 195 358 Z" />
+              <path class="bok-choy-leaf" d="M211 357 C211 321 230 285 257 278 C266 310 253 344 230 364 C222 370 214 366 211 357 Z" />
+              <path class="bok-choy-stem" d="M203 365 C198 337 201 305 202 284 C208 308 213 334 215 365 Z" />
+              <path class="bok-choy-stem" d="M219 365 C227 332 241 302 254 285 C245 318 237 345 230 368 Z" />
+            </g>
+
+            <g class="topping-float topping-float--late" aria-hidden="true">
+              <path class="tofu" d="M282 298 L326 283 L351 306 L307 325 Z" />
+              <path class="tofu" d="M282 298 L307 325 L303 370 L278 344 Z" />
+              <path class="tofu" d="M307 325 L351 306 L347 351 L303 370 Z" />
+              <path class="tofu-edge" d="M290 301 L324 290 L340 305" />
+              <path class="tofu-edge" d="M314 333 L341 320 L339 342" opacity="0.5" />
+            </g>
+
+            <g class="topping-float" aria-hidden="true">
+              <path class="mushroom-cap" d="M487 342 C488 310 516 288 546 293 C576 298 589 322 586 346 Z" />
+              <path class="mushroom-gill" d="M508 327 C522 315 547 313 567 326" />
+              <path class="mushroom-gill" d="M502 337 C523 329 551 330 577 340" />
+              <path fill="#d68e58" d="M516 338 L560 338 L553 374 C541 385 526 383 518 371 Z" />
+              <path fill="none" stroke="rgba(255, 211, 153, 0.35)" stroke-linecap="round" stroke-width="3" d="M529 348 L527 373 M545 348 L546 374" />
+            </g>
+
+            <g aria-hidden="true">
+              <circle class="corn" cx="349" cy="394" r="10" />
+              <circle class="corn" cx="371" cy="404" r="10" />
+              <circle class="corn" cx="393" cy="395" r="10" />
+              <circle class="corn" cx="416" cy="404" r="10" />
+              <circle class="corn" cx="438" cy="395" r="10" />
+              <circle class="corn" cx="460" cy="404" r="10" />
+              <circle class="corn" cx="481" cy="394" r="10" />
+            </g>
+
+            <g class="topping-float topping-float--late" aria-hidden="true">
+              <circle class="scallion" cx="303" cy="384" r="11" />
+              <circle class="scallion" cx="303" cy="384" r="4" fill="#8b5b35" stroke="none" />
+              <circle class="scallion" cx="521" cy="383" r="12" />
+              <circle class="scallion" cx="521" cy="383" r="4" fill="#8b5b35" stroke="none" />
+              <circle class="scallion" cx="463" cy="346" r="9" />
+              <circle class="scallion" cx="463" cy="346" r="3" fill="#8b5b35" stroke="none" />
+            </g>
+
+            <path class="chili topping-float" d="M374 341 C389 326 409 329 421 340 C409 352 391 357 374 341 Z" />
+            <path class="chili" d="M431 373 C449 357 467 360 477 371 C462 383 445 387 431 373 Z" opacity="0.8" />
+
+            <ellipse class="ripple-ring" cx="400" cy="356" rx="93" ry="33" />
+            <ellipse class="ripple-ring ripple-ring--second" cx="400" cy="356" rx="93" ry="33" />
+          </g>
+
+          <path d="M141 365 C159 437 255 474 400 476 C545 474 641 437 659 365" fill="none" stroke="rgba(247, 205, 139, 0.24)" stroke-linecap="round" stroke-width="5" />
+          <path d="M185 422 C233 452 303 466 400 468 C497 466 567 452 615 422" fill="none" stroke="rgba(5, 9, 11, 0.35)" stroke-linecap="round" stroke-width="9" />
+        </svg>
+      </div>
+    </main>
+
+    <script>
+      (() => {
+        const scene = document.querySelector('.bowl-scene');
+        let wakeTimer;
+
+        const awaken = () => {
+          scene.classList.remove('is-awakened');
+          // Restart the short ripple animation when the bowl is touched again.
+          void scene.offsetWidth;
+          scene.classList.add('is-awakened');
+          window.clearTimeout(wakeTimer);
+          wakeTimer = window.setTimeout(() => scene.classList.remove('is-awakened'), 1450);
+        };
+
+        scene.addEventListener('pointerdown', awaken, { passive: true });
+        scene.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            awaken();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

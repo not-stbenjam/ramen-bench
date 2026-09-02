@@ -1,0 +1,32 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
+  "schemaVersion": 1,
+  "runId": "vendor/model/variation",
+  "sessionId": "",
+  "sourceFormat": "",
+  "events": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": "The benchmark prompt goes here."
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The model's public response goes here."
+    },
+    {
+      "type": "tool_call",
+      "id": "call-1",
+      "tool": "example_tool",
+      "input": {}
+    },
+    {
+      "type": "tool_result",
+      "callId": "call-1",
+      "status": "success",
+      "output": "Example tool output"
+    }
+  ],
+  "metadata": {}
+}
