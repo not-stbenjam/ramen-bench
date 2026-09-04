@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Steaming Vegan Ramen</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --steam-tilt: 0deg;
+      --steam-shift: 0px;
+      --warmth: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #07080f;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    body {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+    }
+
+    .atmosphere {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 60% 15%, #2a1122 0%, rgba(42, 17, 34, 0) 45%),
+        radial-gradient(circle at 25% 70%, #1a2a3b 0%, rgba(26, 42, 59, 0) 42%),
+        radial-gradient(circle at 80% 80%, #0e1a2e 0%, rgba(14, 26, 46, 0) 40%),
+        linear-gradient(140deg, #090c16 0%, #05060c 52%, #020204 100%);
+      z-index: -2;
+      filter: saturate(110%) contrast(110%);
+    }
+
+    #glow {
+      position: absolute;
+      width: 72vmin;
+      height: 72vmin;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 132, 51, 0.18) 0%, rgba(255, 94, 26, 0.11) 28%, rgba(255, 50, 10, 0) 62%);
+      filter: blur(18px);
+      transform: translateY(8vh);
+      animation: pulse 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    canvas {
+      width: min(92vw, min(1000px, 92vh * 1.1));
+      aspect-ratio: 16 / 9;
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.45));
+      cursor: none;
+      touch-action: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1) translateY(8vh); opacity: 0.55; }
+      50% { transform: scale(1.08) translateY(9vh); opacity: 0.9; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      #glow {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="atmosphere"></div>
+  <div id="glow"></div>
+  <canvas id="scene" aria-hidden="true"></canvas>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById('scene');
+      const ctx = canvas.getContext('2d');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const state = {
+        cx: 0,
+        cy: 0,
+        targetCx: 0,
+        targetCy: 0,
+        t: 0,
+        width: 0,
+        height: 0,
+        dpr: Math.max(1, Math.min(2, window.devicePixelRatio || 1)),
+        steam: [],
+        warmth: 1,
+      };
+
+      const config = {
+        noodleCount: 95,
+        steamCount: 28,
+        bubbleCount: 14,
+        steamDrift: 0,
+        steamSpread: 0,
+      };
+
+      function resize() {
+        const rectW = Math.min(window.innerWidth * 0.92, 1000);
+        const rectH = Math.min(window.innerHeight * 0.82, rectW * 0.5625);
+        state.width = Math.max(320, rectW);
+        state.height = Math.max(240, rectH);
+
+        const parentScale = Math.min(window.innerWidth / state.width, window.innerHeight / state.height);
+        const w = state.width * Math.min(parentScale, 1);
+        const h = state.height * Math.min(parentScale, 1);
+
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        const dpr = state.dpr;
+        canvas.width = Math.floor(state.width * dpr);
+        canvas.height = Math.floor(state.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        state.cx = state.width * 0.5;
+        state.cy = state.height * 0.78;
+        state.targetCx = state.cx;
+        state.targetCy = state.cy;
+
+        initParticles();
+      }
+
+      function initParticles() {
+        state.steam = [];
+        for (let i = 0; i < config.steamCount; i++) {
+          state.steam.push({
+            x: rand(state.width * 0.37, state.width * 0.63),
+            y: rand(state.height * 0.25, state.height * 0.58),
+            r: rand(7, 16),
+            sp: rand(0.35, 0.95),
+            life: rand(0, 180),
+            drift: rand(-1, 1),
+            phase: rand(0, Math.PI * 2),
+            sway: rand(0.4, 1.6),
+          });
+        }
+      }
+
+      function rand(min, max) { return min + Math.random() * (max - min); }
+
+      function drawPlate() {
+        const cx = state.cx;
+        const cy = state.cy;
+        const wobble = Math.sin(state.t * 0.8) * 1.2;
+        const tilt = ((state.targetCx - state.cx) / state.width) * 6;
+        const bowlY = cy + 0.008 * state.height * state.warmth;
+        const bowlW = Math.min(state.width, state.height * 1.25) * 0.74;
+        const bowlH = state.height * 0.33;
+
+        // shadow
+        const g = ctx.createRadialGradient(cx, bowlY + 42, 18, cx, bowlY + 42, bowlW * 0.62);
+        g.addColorStop(0, 'rgba(7, 8, 14, 0.18)');
+        g.addColorStop(1, 'rgba(7, 8, 14, 0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(cx + tilt * 2, bowlY + 20 + wobble, bowlW * 0.44, bowlH * 0.12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // bowl rim
+        ctx.save();
+        ctx.translate(cx + tilt, bowly() + wobble);
+        ctx.rotate(tilt * 0.01);
+        const rimW = bowlW * 0.42;
+        const rimH = bowlH * 0.19;
+        const rimGrad = ctx.createLinearGradient(-rimW, -rimH, rimW, rimH);
+        rimGrad.addColorStop(0, '#2f2a1f');
+        rimGrad.addColorStop(0.5, '#6d4d2f');
+        rimGrad.addColorStop(1, '#3a2515');
+        ctx.fillStyle = rimGrad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rimW, rimH, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // rim lip
+        ctx.fillStyle = 'rgba(255, 219, 168, 0.12)';
+        ctx.beginPath();
+        ctx.ellipse(0, -1.2, rimW, rimH * 0.68, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // broth / soup body
+        const bodyH = bowlH * 0.55;
+        const bodyW = bowlW * 0.42;
+        const brothGrad = ctx.createRadialGradient(-1.5 * bowlW / 14, -bodyH * 0.45, bodyW * 0.2, 0, -bodyH * 0.2, bodyW);
+        brothGrad.addColorStop(0, '#ffbb6b');
+        brothGrad.addColorStop(0.35, '#e26e34');
+        brothGrad.addColorStop(1, '#7a3f20');
+        ctx.fillStyle = brothGrad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, bodyW, bodyH, 0, 0, Math.PI);
+        ctx.fill();
+
+        // broth skin + waves
+        ctx.globalAlpha = 0.55;
+        const waveAmp = 6 + state.warmth * 2;
+        ctx.strokeStyle = 'rgba(255, 200, 126, 0.35)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 4; i++) {
+          const yy = -bodyH * (0.75 - i * 0.14);
+          ctx.beginPath();
+          ctx.moveTo(-bodyW + 8, yy);
+          for (let x = -bodyW + 8; x <= bodyW - 8; x += 14) {
+            const wave = Math.sin((x / 20) + state.t * 0.7 + i) * waveAmp;
+            ctx.quadraticCurveTo(x + 6, yy + wave * 0.4, x + 12, yy + wave);
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        // noodles
+        for (let i = 0; i < config.noodleCount; i++) {
+          const p = i / config.noodleCount;
+          const width = bodyW * 1.85;
+          const y = -bodyH * (0.75 - p * 0.55);
+          const amp = 7 + 7 * Math.sin(state.t * 1.4 + p * 5);
+          const thickness = 1.4 + (1 - p) * 0.9;
+          ctx.strokeStyle = `rgba(${230 - p * 18}, ${152 - p * 5}, ${108 - p * 1}, ${0.45 + p * 0.2})`;
+          ctx.lineWidth = thickness;
+          ctx.beginPath();
+          const x0 = -width * 0.48 + (Math.random() * 3 - 1.5);
+          const x1 = width * 0.48 + (Math.random() * 3 - 1.5);
+          ctx.moveTo(x0, y + Math.sin(state.t * 0.5 + i) * 0.8);
+          const ctrlX = (x0 + x1) * 0.48 + Math.sin(state.t * 0.9 + i * 0.7) * amp;
+          const ctrlY = y - 12 - Math.cos(state.t + i * 0.12) * amp * 0.5;
+          ctx.quadraticCurveTo(ctrlX + tilt * 0.18, ctrlY, x1, y + Math.cos(state.t * 0.8 + i) * 0.8);
+          ctx.stroke();
+        }
+
+        // tofu cubes
+        const blocks = [[-64, -8, 14], [-18, -20, 11], [22, -2, 10], [52, -14, 13], [-34, 13, 9], [14, 14, 8]];
+        blocks.forEach(([bx, by, s], idx) => {
+          const pulse = 1 + Math.sin(state.t * 1.2 + idx) * 0.05;
+          ctx.fillStyle = `rgba(253, 243, 206, ${0.6 + idx * 0.03})`;
+          ctx.beginPath();
+          const sx = bx * 1.4 + tilt * 3;
+          const sy = by;
+          ctx.roundRect(cx + sx * 0.85 - s * 1.8 + tilt * 2, bowlY + sy - 90 + wobble, s * 1.4 * pulse, s * 1.35 * pulse, 3);
+          ctx.fill();
+        });
+
+        // toppings
+        const sprouts = [
+          [ -52, -38, 12, '#7dd8a4' ],
+          [ -10, -42, 10, '#eabf8a' ],
+          [ 28, -34, 8, '#6caa8e' ],
+          [ 66, -48, 11, '#d9ab6f' ],
+          [ 82, -35, 9, '#f5d7aa' ]
+        ];
+        sprouts.forEach(([bx, by, s, color], idx) => {
+          const ox = tilt * 3.2 + Math.sin(state.t + idx) * 1;
+          const oy = Math.cos(state.t * 1.1 + idx) * 0.9;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.ellipse(bx + ox, by + oy - 90 + wobble, s * 0.9, s * 0.45, -0.8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(bx + ox + 1.5, by - 1 + oy - 90 + wobble, s * 0.33, s * 0.72, -0.8, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // bowl body
+        ctx.restore();
+        const outer = bowlW * 0.42;
+        const inner = bowlW * 0.34;
+        const bodyGrad = ctx.createLinearGradient(cx - outer, bowlY, cx + outer, bowlY + 2);
+        bodyGrad.addColorStop(0, '#281a12');
+        bodyGrad.addColorStop(0.4, '#523524');
+        bodyGrad.addColorStop(1, '#322216');
+        ctx.fillStyle = bodyGrad;
+        ctx.beginPath();
+        ctx.ellipse(cx + tilt * 0.5, bowlY + 2, outer, bowlH * 0.27, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 232, 205, 0.08)';
+        ctx.beginPath();
+        ctx.ellipse(cx + tilt * 0.5, bowlY + 2, inner, bowlH * 0.19, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // bowl rim highlight
+        const hot = Math.max(0.6, Math.min(1.25, state.warmth));
+        ctx.strokeStyle = `rgba(255, 200, 150, ${0.2 * hot})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(cx + tilt * 0.6, bowlY - bowlH * 0.03, outer, bowlH * 0.19, 0, Math.PI, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      function bowly() { return state.cy + Math.sin(state.t * 0.8) * 0.6; }
+
+      function drawSteam() {
+        for (let i = 0; i < state.steam.length; i++) {
+          const p = state.steam[i];
+          p.life -= 1;
+          if (p.life <= 0) {
+            p.life = 180;
+            p.x = rand(state.width * 0.37, state.width * 0.63);
+            p.y = rand(state.height * 0.22, state.height * 0.58);
+            p.r = rand(7, 16);
+            p.sp = rand(0.35, 0.95);
+            p.drift = rand(-1, 1);
+            p.sway = rand(0.4, 1.6);
+          }
+
+          const rise = 0.35;
+          p.y -= p.sp + rise;
+          p.x += (p.drift + Math.sin((state.t + p.phase) * 0.9 + i) * 0.1) + state.warmth * 0.14 + config.steamDrift;
+
+          const alpha = Math.max(0, Math.min(0.85, (p.life / 180) * 0.85));
+          const w = p.r + Math.sin(state.t + p.phase) * 1.5;
+          const grad = ctx.createLinearGradient(p.x, p.y + p.r * 2, p.x, p.y - 80);
+          const warmth = Math.min(1.1, 0.9 + state.warmth * 0.2);
+          grad.addColorStop(0, `rgba(255, 250, 234, ${0.01 * warmth})`);
+          grad.addColorStop(0.15, `rgba(255, 236, 210, ${alpha * 0.32})`);
+          grad.addColorStop(1, `rgba(255, 248, 225, ${alpha * 0.66})`);
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.ellipse(
+            p.x + Math.sin(p.phase + state.t * 0.8) * p.sway * 4 + config.steamSpread,
+            p.y - 18 - (180 - p.life) * 0.25,
+            w * 0.6,
+            p.r * 1.25,
+            Math.sin(state.t * 0.7 + p.phase) * 0.5,
+            0,
+            Math.PI * 2,
+          );
+          ctx.fill();
+
+          // curvy line core
+          ctx.strokeStyle = `rgba(255, 232, 199, ${alpha * 0.45})`;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          const sy = p.y - (180 - p.life) * 0.25;
+          const sx = p.x + Math.sin(state.t * 0.8 + p.phase) * p.sway * 3;
+          ctx.moveTo(sx, p.y);
+          ctx.bezierCurveTo(
+            sx + p.sway * 8,
+            sy - 8,
+            sx - p.sway * 8,
+            sy - 20,
+            sx,
+            sy - 34,
+          );
+          ctx.stroke();
+        }
+      }
+
+      function drawBubbles() {
+        const cx = state.cx;
+        const cy = state.cy + 0;
+        const bowlW = state.width * 0.42 * 0.74;
+        const bodyH = state.height * 0.33 * 0.55;
+        for (let i = 0; i < config.bubbleCount; i++) {
+          const phase = i * 0.72;
+          const x = cx + Math.sin(state.t * 0.8 + phase) * bowlW * 0.35;
+          const y = cy + Math.cos(state.t * 0.7 + phase) * 8 - bodyH * 0.55 - (state.t * 2 % (bodyH * 0.9));
+          const yy = ((state.t * 0.8 + phase) % 1);
+          const py = y + yy * bodyH * 0.5;
+          ctx.fillStyle = `rgba(255, 214, 166, ${0.08 + 0.04 * Math.sin(phase)})`;
+          ctx.beginPath();
+          ctx.arc(x, py, 1.5 + (i % 3) * 0.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function draw() {
+        const w = state.width;
+        const h = state.height;
+        state.t += reduced ? 0.008 : 0.016;
+
+        state.cx += (state.targetCx - state.cx) * 0.06;
+        state.cy += (state.targetCy - state.cy) * 0.06;
+
+        state.warmth += (1 + (0.4 + Math.hypot(state.targetCx - w * 0.5, state.targetCy - h * 0.78) / 280 * 0.4) - state.warmth) * 0.035;
+
+        const ox = ((state.targetCx / w) - 0.5) * 10;
+        const oy = ((state.targetCy / h) - 0.5) * 4;
+
+        const base = ctx.createRadialGradient(w * 0.5, h * 0.62, h * 0.08, w * 0.5, h * 0.62, h * 0.85);
+        base.addColorStop(0, '#0f1320');
+        base.addColorStop(1, '#05060a');
+        ctx.fillStyle = base;
+        ctx.fillRect(0, 0, w, h);
+
+        const drift = (Math.sin(state.t * 0.45) + Math.cos(state.t * 0.23)) * 3 * state.warmth;
+        const drift2 = (Math.cos(state.t * 0.35) - Math.sin(state.t * 0.17)) * 1.5 * state.warmth;
+        config.steamDrift = drift + ox;
+        config.steamSpread = ox * 0.9;
+
+        // ambient heat shimmer circles on surface
+        for (let i = 0; i < 11; i++) {
+          const yy = h * 0.58 + (i * 9);
+          const amp = 12 + state.warmth * 10;
+          ctx.strokeStyle = `rgba(${255}, ${164 + i * 2}, ${105}, ${0.06})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(w * 0.5 + ox * 0.2 + drift2, yy, (i % 3) * 5 + 2 + Math.sin(state.t + i) * 0.8, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        drawSteam();
+        drawPlate();
+        drawBubbles();
+
+        // subtle rim glint
+        const heat = ctx.createRadialGradient(w * 0.5 + ox, h * 0.74, 6, w * 0.5 + ox, h * 0.74, state.warmth * 120);
+        heat.addColorStop(0, `rgba(255, 173, 84, ${0.19 * state.warmth})`);
+        heat.addColorStop(1, 'rgba(255, 173, 84, 0)');
+        ctx.fillStyle = heat;
+        ctx.fillRect(0, 0, w, h);
+
+        if (!reduced) requestAnimationFrame(draw);
+      }
+
+      function onMouseMove(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const sx = (x / rect.width) * state.width;
+        const sy = (y / rect.height) * state.height;
+        state.targetCx = sx;
+        state.targetCy = sy;
+      }
+
+      function onLeave() {
+        state.targetCx = state.width * 0.5;
+        state.targetCy = state.height * 0.78;
+      }
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseleave', onLeave);
+      window.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        if (!t) return;
+        onMouseMove({ clientX: t.clientX, clientY: t.clientY });
+      }, { passive: true });
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      if (!reduced) {
+        draw();
+      } else {
+        for (let i = 0; i < 60; i++) draw();
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Vegan Ramen</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      background: #080705;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #080705;
+    }
+
+    body {
+      min-width: 280px;
+      min-height: 360px;
+      isolation: isolate;
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 55%, rgba(104, 44, 19, .22) 0%, rgba(49, 24, 14, .13) 23%, transparent 54%),
+        radial-gradient(ellipse at 50% 103%, rgba(187, 78, 22, .11) 0%, transparent 52%),
+        linear-gradient(160deg, #0e0e0c 0%, #090807 45%, #050504 100%);
+    }
+
+    .scene::before,
+    .scene::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+    }
+
+    .scene::before {
+      z-index: 1;
+      opacity: .38;
+      background:
+        radial-gradient(ellipse at 50% 58%, transparent 0 28%, rgba(1, 1, 1, .17) 65%, rgba(0, 0, 0, .7) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, .16), transparent 31%, transparent 69%, rgba(0, 0, 0, .42));
+      mix-blend-mode: multiply;
+    }
+
+    .scene::after {
+      z-index: 3;
+      opacity: .12;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(255, 255, 255, .05) 0 1px, transparent 1.6px),
+        radial-gradient(circle at 77% 67%, rgba(255, 255, 255, .035) 0 1px, transparent 1.8px);
+      background-size: 113px 137px, 149px 173px;
+      mix-blend-mode: soft-light;
+    }
+
+    canvas {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .scene::after {
+        opacity: .08;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene" aria-label="A steaming bowl of vegan ramen">
+    <canvas id="ramen-scene" aria-hidden="true"></canvas>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('ramen-scene');
+      const ctx = canvas.getContext('2d');
+      const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
+      const TAU = Math.PI * 2;
+      let width = 0;
+      let height = 0;
+      let pixelRatio = 1;
+      let reducedMotion = reduceQuery.matches;
+      let frameId = 0;
+      let lastTime = 0;
+
+      const steam = Array.from({ length: 11 }, (_, index) => ({
+        phase: index * 1.71 + .4,
+        x: (index - 5) * .071 + Math.sin(index * 3.7) * .016,
+        height: .2 + (index % 4) * .045,
+        width: .065 + (index % 3) * .018,
+        speed: .18 + (index % 5) * .022,
+        alpha: .10 + (index % 4) * .018
+      }));
+
+      const noodles = Array.from({ length: 21 }, (_, index) => ({
+        x: -0.91 + (index / 20) * 1.82,
+        y: -.10 + Math.sin(index * 2.6) * .12,
+        bend: .05 + (index % 5) * .019,
+        phase: index * .83,
+        length: .48 + (index % 4) * .08
+      }));
+
+      function clamp(value, minimum, maximum) {
+        return Math.max(minimum, Math.min(maximum, value));
+      }
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(width * pixelRatio);
+        canvas.height = Math.floor(height * pixelRatio);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        render(reducedMotion ? 0 : lastTime);
+      }
+
+      function ellipsePath(x, y, radiusX, radiusY) {
+        ctx.beginPath();
+        ctx.ellipse(x, y, radiusX, radiusY, 0, 0, TAU);
+      }
+
+      function roundRectPath(x, y, w, h, radius) {
+        const r = Math.min(radius, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+
+      function drawBackgroundGlow(cx, bowlTop, rimWidth) {
+        const glow = ctx.createRadialGradient(cx, bowlTop + rimWidth * .12, 0, cx, bowlTop + rimWidth * .12, rimWidth * 1.18);
+        glow.addColorStop(0, 'rgba(223, 103, 37, .12)');
+        glow.addColorStop(.25, 'rgba(168, 61, 22, .065)');
+        glow.addColorStop(.68, 'rgba(76, 28, 13, .018)');
+        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, width, height);
+
+        const topLight = ctx.createRadialGradient(cx - rimWidth * .1, bowlTop - rimWidth * .32, 0, cx, bowlTop, rimWidth * .72);
+        topLight.addColorStop(0, 'rgba(255, 172, 92, .04)');
+        topLight.addColorStop(1, 'rgba(255, 117, 39, 0)');
+        ctx.fillStyle = topLight;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      function drawSteam(cx, bowlTop, rimWidth, time) {
+        const baseY = bowlTop - rimWidth * .02;
+        steam.forEach((wisp, index) => {
+          const phase = reducedMotion ? wisp.phase : wisp.phase + time * wisp.speed;
+          const progress = reducedMotion ? .24 : (phase % 1.55) / 1.55;
+          const x = cx + wisp.x * rimWidth + Math.sin(phase * 3.1 + index) * rimWidth * .026;
+          const h = rimWidth * wisp.height;
+          const drift = rimWidth * wisp.width * Math.sin(phase * 2.2 + index * .7);
+          const topY = baseY - h * (.68 + progress * .42);
+          const opacity = wisp.alpha * (reducedMotion ? .72 : (.55 + Math.sin(phase * 2.7) * .16));
+
+          ctx.save();
+          ctx.lineCap = 'round';
+          ctx.lineWidth = rimWidth * (.022 + (index % 3) * .004);
+          ctx.shadowColor = 'rgba(255, 212, 165, .25)';
+          ctx.shadowBlur = rimWidth * .06;
+          ctx.strokeStyle = 'rgba(255, 223, 187, ' + clamp(opacity, .02, .2) + ')';
+          ctx.beginPath();
+          ctx.moveTo(x, baseY);
+          ctx.bezierCurveTo(
+            x - drift * .68, baseY - h * .25,
+            x + drift * 1.2, baseY - h * .40,
+            x + drift * .38, baseY - h * .58
+          );
+          ctx.bezierCurveTo(
+            x - drift * .52, baseY - h * .77,
+            x + drift * 1.1, baseY - h * .84,
+            x + drift, topY
+          );
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+
+      function drawShadow(cx, bowlTop, rimWidth) {
+        const shadowY = bowlTop + rimWidth * .47;
+        const shadow = ctx.createRadialGradient(cx, shadowY, rimWidth * .08, cx, shadowY, rimWidth * .75);
+        shadow.addColorStop(0, 'rgba(0, 0, 0, .64)');
+        shadow.addColorStop(.55, 'rgba(0, 0, 0, .32)');
+        shadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = shadow;
+        ellipsePath(cx, shadowY, rimWidth * .78, rimWidth * .24);
+        ctx.fill();
+
+        const warmth = ctx.createRadialGradient(cx, shadowY - rimWidth * .04, 0, cx, shadowY, rimWidth * .6);
+        warmth.addColorStop(0, 'rgba(215, 86, 26, .12)');
+        warmth.addColorStop(1, 'rgba(215, 86, 26, 0)');
+        ctx.fillStyle = warmth;
+        ellipsePath(cx, shadowY, rimWidth * .64, rimWidth * .14);
+        ctx.fill();
+      }
+
+      function drawNoodles(cx, brothY, brothRX, brothRY, rimWidth, time) {
+        ctx.save();
+        ellipsePath(cx, brothY, brothRX, brothRY);
+        ctx.clip();
+        ctx.lineCap = 'round';
+        noodles.forEach((noodle, index) => {
+          const sway = reducedMotion ? 0 : Math.sin(time * 1.25 + noodle.phase) * rimWidth * .012;
+          const x = cx + noodle.x * brothRX + sway;
+          const y = brothY + noodle.y * brothRY;
+          const length = rimWidth * noodle.length;
+          const bend = rimWidth * noodle.bend;
+          ctx.lineWidth = rimWidth * (.012 + (index % 3) * .002);
+          ctx.strokeStyle = index % 4 === 0 ? 'rgba(255, 208, 112, .92)' : 'rgba(240, 175, 76, .78)';
+          ctx.beginPath();
+          ctx.moveTo(x - length * .53, y + Math.sin(index * 1.7) * rimWidth * .012);
+          ctx.bezierCurveTo(
+            x - length * .18, y - bend,
+            x + length * .14, y + bend * .88,
+            x + length * .53, y + Math.sin(index * 2.3) * rimWidth * .014
+          );
+          ctx.stroke();
+        });
+
+        // A few darker curls give the noodles depth against the glowing broth.
+        ctx.lineWidth = rimWidth * .009;
+        ctx.strokeStyle = 'rgba(117, 49, 17, .54)';
+        for (let index = 0; index < 8; index++) {
+          const x = cx + (-.72 + index * .19) * brothRX;
+          const y = brothY + (-.08 + (index % 4) * .075) * brothRY;
+          ctx.beginPath();
+          ctx.moveTo(x - rimWidth * .12, y);
+          ctx.quadraticCurveTo(x, y - rimWidth * .07, x + rimWidth * .12, y + rimWidth * .012);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawTofu(x, y, size, rotation) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        const tofu = ctx.createLinearGradient(-size, -size, size, size);
+        tofu.addColorStop(0, '#f1c67d');
+        tofu.addColorStop(.55, '#d99a4d');
+        tofu.addColorStop(1, '#a9632b');
+        ctx.fillStyle = tofu;
+        roundRectPath(-size, -size * .62, size * 2, size * 1.24, size * .18);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 229, 164, .36)';
+        ctx.lineWidth = size * .075;
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255, 223, 141, .27)';
+        ctx.fillRect(-size * .6, -size * .34, size * .44, size * .1);
+        ctx.restore();
+      }
+
+      function drawMushroom(x, y, size, rotation) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        const stem = ctx.createLinearGradient(-size * .3, 0, size * .34, 0);
+        stem.addColorStop(0, '#e8bf83');
+        stem.addColorStop(1, '#a76e3d');
+        ctx.fillStyle = stem;
+        ctx.beginPath();
+        ctx.ellipse(0, size * .31, size * .26, size * .42, 0, 0, TAU);
+        ctx.fill();
+        const cap = ctx.createRadialGradient(-size * .2, -size * .18, size * .05, 0, 0, size * .72);
+        cap.addColorStop(0, '#e8b879');
+        cap.addColorStop(.5, '#a96135');
+        cap.addColorStop(1, '#64301e');
+        ctx.fillStyle = cap;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, size * .64, size * .3, 0, Math.PI, TAU);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(249, 203, 133, .24)';
+        ctx.lineWidth = size * .035;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawGreens(cx, brothY, rimWidth, time) {
+        const sway = reducedMotion ? 0 : Math.sin(time * .9) * rimWidth * .008;
+        // Bok choy, tucked to the left so the bowl still reads as one silhouette.
+        ctx.save();
+        ctx.translate(cx - rimWidth * .27 + sway, brothY + rimWidth * .02);
+        ctx.rotate(-.24);
+        const leaf = ctx.createLinearGradient(0, -rimWidth * .21, rimWidth * .13, rimWidth * .15);
+        leaf.addColorStop(0, '#a5b65d');
+        leaf.addColorStop(.55, '#4b7139');
+        leaf.addColorStop(1, '#203d29');
+        ctx.fillStyle = leaf;
+        for (let index = 0; index < 4; index++) {
+          ctx.beginPath();
+          ctx.ellipse(index * rimWidth * .065, -rimWidth * (.04 + (index % 2) * .025), rimWidth * .075, rimWidth * .22, -.17 + index * .1, 0, TAU);
+          ctx.fill();
+        }
+        ctx.strokeStyle = 'rgba(221, 220, 133, .44)';
+        ctx.lineWidth = rimWidth * .014;
+        ctx.beginPath();
+        ctx.moveTo(rimWidth * .03, rimWidth * .16);
+        ctx.lineTo(rimWidth * .03, -rimWidth * .18);
+        ctx.stroke();
+        ctx.restore();
+
+        // Charred corn kernels.
+        ctx.fillStyle = '#e7b94f';
+        for (let index = 0; index < 7; index++) {
+          const angle = -.15 + index * .2;
+          const x = cx + Math.cos(angle) * rimWidth * .31;
+          const y = brothY + Math.sin(angle) * rimWidth * .115;
+          ellipsePath(x, y, rimWidth * .034, rimWidth * .042);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(129, 65, 17, .52)';
+          ctx.lineWidth = rimWidth * .007;
+          ctx.stroke();
+        }
+
+        drawMushroom(cx + rimWidth * .3 + sway, brothY - rimWidth * .035, rimWidth * .115, -.12);
+        drawMushroom(cx + rimWidth * .41 + sway, brothY + rimWidth * .08, rimWidth * .092, .16);
+        drawTofu(cx - rimWidth * .05 + sway, brothY - rimWidth * .17, rimWidth * .12, -.13);
+        drawTofu(cx + rimWidth * .16 + sway, brothY + rimWidth * .11, rimWidth * .105, .16);
+
+        // Scallions catch the light with two small, vivid arcs.
+        ctx.save();
+        ctx.strokeStyle = '#9dbb65';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = rimWidth * .018;
+        [[-.2, -.21, -.03, -.37], [.01, .2, .2, .04], [.18, -.05, .39, -.2]].forEach((line) => {
+          ctx.beginPath();
+          ctx.moveTo(cx + line[0] * rimWidth, brothY + line[1] * rimWidth);
+          ctx.quadraticCurveTo(cx + (line[0] + .06) * rimWidth, brothY + (line[1] - .06) * rimWidth, cx + line[2] * rimWidth, brothY + line[3] * rimWidth);
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+
+      function drawBowl(cx, bowlTop, rimWidth, time) {
+        const rimHeight = rimWidth * .205;
+        const bodyBottom = bowlTop + rimWidth * .55;
+        const brothY = bowlTop + rimHeight * .06;
+        const brothRX = rimWidth * .435;
+        const brothRY = rimHeight * .41;
+
+        ctx.save();
+        ctx.translate(pointer.x * rimWidth * .018, pointer.y * rimWidth * .012);
+
+        // The earthenware body.
+        const body = ctx.createLinearGradient(cx, bowlTop, cx, bodyBottom);
+        body.addColorStop(0, '#73351f');
+        body.addColorStop(.23, '#55261b');
+        body.addColorStop(.72, '#2b1815');
+        body.addColorStop(1, '#170f0e');
+        ctx.fillStyle = body;
+        ctx.beginPath();
+        ctx.moveTo(cx - rimWidth * .49, bowlTop + rimHeight * .02);
+        ctx.bezierCurveTo(cx - rimWidth * .47, bowlTop + rimHeight * .7, cx - rimWidth * .39, bodyBottom - rimWidth * .02, cx, bodyBottom);
+        ctx.bezierCurveTo(cx + rimWidth * .39, bodyBottom - rimWidth * .02, cx + rimWidth * .47, bowlTop + rimHeight * .7, cx + rimWidth * .49, bowlTop + rimHeight * .02);
+        ctx.closePath();
+        ctx.fill();
+
+        const bodyGlow = ctx.createLinearGradient(cx - rimWidth * .42, bowlTop, cx + rimWidth * .12, bodyBottom);
+        bodyGlow.addColorStop(0, 'rgba(225, 104, 49, .19)');
+        bodyGlow.addColorStop(.46, 'rgba(145, 54, 27, .08)');
+        bodyGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = bodyGlow;
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(246, 138, 72, .24)';
+        ctx.lineWidth = rimWidth * .012;
+        ctx.beginPath();
+        ctx.moveTo(cx - rimWidth * .458, bowlTop + rimHeight * .18);
+        ctx.bezierCurveTo(cx - rimWidth * .42, bowlTop + rimHeight * .7, cx - rimWidth * .32, bodyBottom - rimWidth * .06, cx - rimWidth * .04, bodyBottom - rimWidth * .028);
+        ctx.stroke();
+
+        // A quiet reflection on the bowl's lower curve.
+        ctx.strokeStyle = 'rgba(255, 187, 112, .14)';
+        ctx.lineWidth = rimWidth * .022;
+        ctx.beginPath();
+        ctx.bezierCurveTo(cx - rimWidth * .21, bodyBottom - rimWidth * .07, cx + rimWidth * .1, bodyBottom - rimWidth * .035, cx + rimWidth * .28, bodyBottom - rimWidth * .16);
+        ctx.stroke();
+
+        // Thick ceramic rim.
+        const rim = ctx.createRadialGradient(cx - rimWidth * .15, bowlTop - rimHeight * .1, 0, cx, bowlTop, rimWidth * .6);
+        rim.addColorStop(0, '#aa5a32');
+        rim.addColorStop(.48, '#74341f');
+        rim.addColorStop(1, '#321819');
+        ctx.fillStyle = rim;
+        ellipsePath(cx, bowlTop, rimWidth * .515, rimHeight * .59);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(239, 130, 69, .31)';
+        ctx.lineWidth = rimWidth * .014;
+        ctx.stroke();
+
+        // Broth, with a soft hot center.
+        const broth = ctx.createRadialGradient(cx - rimWidth * .14, brothY - brothRY * .38, rimWidth * .04, cx, brothY, brothRX * 1.18);
+        broth.addColorStop(0, '#c96a25');
+        broth.addColorStop(.33, '#a94618');
+        broth.addColorStop(.75, '#672516');
+        broth.addColorStop(1, '#351517');
+        ctx.fillStyle = broth;
+        ellipsePath(cx, brothY, brothRX, brothRY);
+        ctx.fill();
+
+        ctx.save();
+        ellipsePath(cx, brothY, brothRX, brothRY);
+        ctx.clip();
+        const soupGlow = ctx.createRadialGradient(cx - rimWidth * .18, brothY - brothRY * .48, 0, cx, brothY, brothRX);
+        soupGlow.addColorStop(0, 'rgba(255, 206, 127, .21)');
+        soupGlow.addColorStop(.5, 'rgba(255, 130, 34, .035)');
+        soupGlow.addColorStop(1, 'rgba(24, 5, 4, .2)');
+        ctx.fillStyle = soupGlow;
+        ctx.fillRect(cx - brothRX, brothY - brothRY, brothRX * 2, brothRY * 2);
+        ctx.restore();
+
+        drawNoodles(cx, brothY, brothRX, brothRY, rimWidth, time);
+        drawGreens(cx, brothY, rimWidth, time);
+
+        // Rim highlight foreground, to seat the ingredients inside the bowl.
+        ctx.strokeStyle = 'rgba(255, 176, 99, .24)';
+        ctx.lineWidth = rimWidth * .017;
+        ctx.beginPath();
+        ctx.ellipse(cx, bowlTop - rimHeight * .008, rimWidth * .474, rimHeight * .475, 0, .08, Math.PI - .08);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(21, 9, 8, .64)';
+        ctx.lineWidth = rimWidth * .025;
+        ctx.beginPath();
+        ctx.ellipse(cx, bowlTop + rimHeight * .018, rimWidth * .466, rimHeight * .446, 0, 0, TAU);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(230, 119, 63, .21)';
+        ctx.lineWidth = rimWidth * .009;
+        ctx.beginPath();
+        ctx.ellipse(cx, bowlTop - rimHeight * .008, rimWidth * .49, rimHeight * .53, 0, .12, Math.PI - .12);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function draw(time) {
+        ctx.clearRect(0, 0, width, height);
+
+        const rimWidth = clamp(Math.min(width * .78, height * .70), 250, 570);
+        const cx = width * .5 + pointer.x * Math.min(width * .032, 25);
+        const bowlTop = height * .54 + pointer.y * Math.min(height * .018, 15);
+        const adjustedWidth = rimWidth;
+
+        drawBackgroundGlow(cx, bowlTop, adjustedWidth);
+        drawShadow(cx, bowlTop, adjustedWidth);
+        drawSteam(cx, bowlTop, adjustedWidth, time);
+        drawBowl(cx, bowlTop, adjustedWidth, time);
+
+        // Tiny warm reflection under the silhouette anchors it in the dark.
+        const reflection = ctx.createRadialGradient(cx, bowlTop + adjustedWidth * .58, 0, cx, bowlTop + adjustedWidth * .58, adjustedWidth * .48);
+        reflection.addColorStop(0, 'rgba(182, 63, 20, .07)');
+        reflection.addColorStop(1, 'rgba(182, 63, 20, 0)');
+        ctx.fillStyle = reflection;
+        ellipsePath(cx, bowlTop + adjustedWidth * .58, adjustedWidth * .5, adjustedWidth * .08);
+        ctx.fill();
+      }
+
+      function render(time) {
+        draw(time * .001);
+      }
+
+      function animate(time) {
+        if (!lastTime) lastTime = time;
+        const elapsed = Math.min(time - lastTime, 50);
+        lastTime = time;
+        pointer.x += (pointer.targetX - pointer.x) * Math.min(1, elapsed * .008);
+        pointer.y += (pointer.targetY - pointer.y) * Math.min(1, elapsed * .008);
+        render(time);
+        frameId = window.requestAnimationFrame(animate);
+      }
+
+      function setPointer(event) {
+        pointer.targetX = (event.clientX / width - .5) * 2;
+        pointer.targetY = (event.clientY / height - .5) * 2;
+      }
+
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('pointermove', setPointer, { passive: true });
+      window.addEventListener('pointerleave', () => {
+        pointer.targetX = 0;
+        pointer.targetY = 0;
+      }, { passive: true });
+      reduceQuery.addEventListener('change', (event) => {
+        reducedMotion = event.matches;
+        if (reducedMotion) {
+          window.cancelAnimationFrame(frameId);
+          pointer.x = 0;
+          pointer.y = 0;
+          render(0);
+        } else {
+          lastTime = 0;
+          frameId = window.requestAnimationFrame(animate);
+        }
+      });
+
+      resize();
+      if (!reducedMotion) {
+        frameId = window.requestAnimationFrame(animate);
+      }
+    })();
+  </script>
+</body>
+</html>

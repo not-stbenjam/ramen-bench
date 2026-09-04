@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#090b0b">
+  <title>Vegan ramen</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #080a0a;
+    }
+
+    body {
+      min-height: 100svh;
+      touch-action: none;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(115deg, rgba(255,255,255,.018), transparent 24%, rgba(0,0,0,.05) 78%),
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.28) 100%);
+      mix-blend-mode: soft-light;
+    }
+
+  </style>
+</head>
+<body>
+  <canvas id="scene" role="img" aria-label="A steaming bowl of vegan ramen in a quiet, dark room"></canvas>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('scene');
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
+      const TAU = Math.PI * 2;
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let reducedMotion = reducedQuery.matches;
+      let animationFrame = 0;
+      let lastTime = 0;
+
+      const pointer = {
+        x: 0, y: 0,
+        tx: 0, ty: 0,
+        lightX: 0
+      };
+
+      const rand = mulberry32(271828);
+      const ceramicSpecks = Array.from({ length: 95 }, () => ({
+        x: rand(), y: rand(), r: .3 + rand() * .8, a: .025 + rand() * .055
+      }));
+      const brothFlecks = Array.from({ length: 42 }, () => ({
+        x: rand() * 2 - 1,
+        y: rand() * 2 - 1,
+        r: .5 + rand() * 1.4,
+        phase: rand() * TAU,
+        kind: rand()
+      })).filter(p => p.x * p.x + p.y * p.y < 1);
+      const scallions = Array.from({ length: 23 }, () => ({
+        x: (rand() * 2 - 1) * .25,
+        y: (rand() * 2 - 1) * .35,
+        rx: .008 + rand() * .008,
+        ry: .004 + rand() * .004,
+        rot: (rand() - .5) * 1.8,
+        shade: rand()
+      }));
+      const oilDrops = Array.from({ length: 18 }, () => ({
+        x: (rand() * 2 - 1) * .38,
+        y: (rand() * 2 - 1) * .47,
+        r: .004 + rand() * .008,
+        phase: rand() * TAU
+      }));
+
+      function mulberry32(seed) {
+        return function () {
+          let t = seed += 0x6D2B79F5;
+          t = Math.imul(t ^ t >>> 15, t | 1);
+          t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+
+      function resize() {
+        width = innerWidth;
+        height = innerHeight;
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        if (reducedMotion) render(7200);
+      }
+
+      function ellipsePath(x, y, rx, ry) {
+        ctx.beginPath();
+        ctx.ellipse(x, y, rx, ry, 0, 0, TAU);
+      }
+
+      function glowEllipse(x, y, rx, ry, color, blur, alpha = 1) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.filter = `blur(${blur}px)`;
+        ctx.fillStyle = color;
+        ellipsePath(x, y, rx, ry);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawBackground(cx, cy, bowlWidth) {
+        const lightX = cx + pointer.lightX * width * .08;
+        const wall = ctx.createRadialGradient(
+          lightX, cy - bowlWidth * .28, 0,
+          lightX, cy - bowlWidth * .18, Math.max(width, height) * .72
+        );
+        wall.addColorStop(0, '#25251d');
+        wall.addColorStop(.18, '#181a16');
+        wall.addColorStop(.52, '#0e1110');
+        wall.addColorStop(1, '#060808');
+        ctx.fillStyle = wall;
+        ctx.fillRect(0, 0, width, height);
+
+        const warmth = ctx.createRadialGradient(
+          lightX, cy - bowlWidth * .05, 0,
+          lightX, cy - bowlWidth * .05, bowlWidth * .72
+        );
+        warmth.addColorStop(0, 'rgba(236, 119, 45, .13)');
+        warmth.addColorStop(.38, 'rgba(151, 70, 31, .045)');
+        warmth.addColorStop(1, 'rgba(35, 24, 15, 0)');
+        ctx.fillStyle = warmth;
+        ctx.fillRect(0, 0, width, height);
+
+        const tableY = cy + bowlWidth * .25;
+        const table = ctx.createLinearGradient(0, tableY - bowlWidth * .04, 0, height);
+        table.addColorStop(0, 'rgba(8, 10, 9, 0)');
+        table.addColorStop(.12, 'rgba(6, 8, 7, .55)');
+        table.addColorStop(1, '#050606');
+        ctx.fillStyle = table;
+        ctx.fillRect(0, tableY - bowlWidth * .04, width, height - tableY + bowlWidth * .04);
+
+        // Quiet pools of bounced amber beneath the bowl.
+        glowEllipse(cx, tableY + bowlWidth * .16, bowlWidth * .48, bowlWidth * .075,
+          'rgba(174, 73, 30, .16)', bowlWidth * .055, 1);
+      }
+
+      function drawSteam(bw, t, lean) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.lineCap = 'round';
+
+        const tendrils = [
+          { x: -.27, phase: .4, h: .48, drift: .035, width: .006, alpha: .22 },
+          { x: -.14, phase: 2.2, h: .63, drift: .055, width: .008, alpha: .30 },
+          { x: -.02, phase: 4.0, h: .53, drift: .047, width: .006, alpha: .20 },
+          { x: .09, phase: 1.3, h: .69, drift: .06, width: .008, alpha: .31 },
+          { x: .22, phase: 5.1, h: .50, drift: .04, width: .006, alpha: .22 },
+          { x: .31, phase: 3.2, h: .38, drift: .03, width: .004, alpha: .15 }
+        ];
+
+        for (const s of tendrils) {
+          const pulse = .7 + .3 * Math.sin(t * .72 + s.phase);
+          const rise = ((t * .028 + s.phase * .17) % .18) - .09;
+          const baseX = s.x * bw;
+          const topY = -s.h * bw;
+          const wave1 = Math.sin(t * .43 + s.phase) * s.drift * bw;
+          const wave2 = Math.sin(t * .64 + s.phase * 1.7) * s.drift * bw;
+          const wind = lean * bw * .04;
+
+          const path = new Path2D();
+          path.moveTo(baseX, -.065 * bw + rise * bw * .08);
+          path.bezierCurveTo(
+            baseX - wave1 * .7, -.18 * bw,
+            baseX + wave2 + wind * .35, -.27 * bw,
+            baseX + wave1 * .55 + wind * .6, topY * .62
+          );
+          path.bezierCurveTo(
+            baseX - wave2 * .55 + wind * .85, topY * .76,
+            baseX + wave1 + wind, topY * .91,
+            baseX + wave2 * .5 + wind * 1.15, topY
+          );
+
+          ctx.save();
+          ctx.globalAlpha = s.alpha * pulse * .55;
+          ctx.filter = `blur(${Math.max(3, bw * .012)}px)`;
+          ctx.strokeStyle = 'rgba(255, 228, 198, .72)';
+          ctx.lineWidth = s.width * bw * 3;
+          ctx.stroke(path);
+          ctx.restore();
+
+          ctx.save();
+          ctx.globalAlpha = s.alpha * pulse;
+          ctx.filter = `blur(${Math.max(1, bw * .003)}px)`;
+          const steamGradient = ctx.createLinearGradient(0, -.05 * bw, 0, topY);
+          steamGradient.addColorStop(0, 'rgba(255, 239, 217, .68)');
+          steamGradient.addColorStop(.58, 'rgba(220, 228, 215, .48)');
+          steamGradient.addColorStop(1, 'rgba(190, 205, 196, 0)');
+          ctx.strokeStyle = steamGradient;
+          ctx.lineWidth = Math.max(1, s.width * bw);
+          ctx.stroke(path);
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawBowlShadow(bw) {
+        ctx.save();
+        ctx.globalAlpha = .82;
+        ctx.filter = `blur(${Math.max(10, bw * .042)}px)`;
+        ctx.fillStyle = '#000';
+        ellipsePath(0, bw * .39, bw * .45, bw * .075);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawBowlBody(bw) {
+        const rx = bw * .49;
+        const rimY = 0;
+        const bottomY = bw * .37;
+
+        // Foot, barely visible below the ceramic body.
+        const foot = ctx.createLinearGradient(0, bottomY - bw * .02, 0, bottomY + bw * .055);
+        foot.addColorStop(0, '#090d0d');
+        foot.addColorStop(.55, '#151b1a');
+        foot.addColorStop(1, '#050707');
+        ctx.fillStyle = foot;
+        ctx.beginPath();
+        ctx.ellipse(0, bottomY + bw * .012, bw * .205, bw * .047, 0, 0, Math.PI);
+        ctx.lineTo(-bw * .16, bottomY + bw * .055);
+        ctx.quadraticCurveTo(0, bottomY + bw * .08, bw * .16, bottomY + bw * .055);
+        ctx.lineTo(bw * .205, bottomY + bw * .012);
+        ctx.fill();
+
+        // Deep charcoal ceramic with a warm reflection from the broth.
+        const body = ctx.createLinearGradient(-rx, bw * .02, rx, bottomY);
+        body.addColorStop(0, '#111918');
+        body.addColorStop(.18, '#27302c');
+        body.addColorStop(.43, '#171e1c');
+        body.addColorStop(.68, '#101514');
+        body.addColorStop(.9, '#222824');
+        body.addColorStop(1, '#090d0c');
+        ctx.fillStyle = body;
+        ctx.beginPath();
+        ctx.moveTo(-rx, rimY);
+        ctx.bezierCurveTo(-rx * .98, bw * .13, -bw * .37, bw * .30, -bw * .20, bottomY);
+        ctx.bezierCurveTo(-bw * .10, bw * .42, bw * .10, bw * .42, bw * .20, bottomY);
+        ctx.bezierCurveTo(bw * .37, bw * .30, rx * .98, bw * .13, rx, rimY);
+        ctx.closePath();
+        ctx.fill();
+
+        const shade = ctx.createLinearGradient(0, 0, 0, bottomY);
+        shade.addColorStop(0, 'rgba(0,0,0,.02)');
+        shade.addColorStop(.62, 'rgba(0,0,0,.14)');
+        shade.addColorStop(1, 'rgba(0,0,0,.56)');
+        ctx.fillStyle = shade;
+        ctx.fill();
+
+        // Soft ceramic sheen on the near curve.
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.strokeStyle = 'rgba(158, 182, 165, .12)';
+        ctx.lineWidth = bw * .018;
+        ctx.lineCap = 'round';
+        ctx.filter = `blur(${bw * .009}px)`;
+        ctx.beginPath();
+        ctx.moveTo(-bw * .39, bw * .12);
+        ctx.bezierCurveTo(-bw * .32, bw * .25, -bw * .24, bw * .31, -bw * .13, bw * .35);
+        ctx.stroke();
+        ctx.restore();
+
+        // Fine glaze variation, deterministic so it never flickers.
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(-rx, rimY);
+        ctx.bezierCurveTo(-rx * .98, bw * .13, -bw * .37, bw * .30, -bw * .20, bottomY);
+        ctx.bezierCurveTo(-bw * .10, bw * .42, bw * .10, bw * .42, bw * .20, bottomY);
+        ctx.bezierCurveTo(bw * .37, bw * .30, rx * .98, bw * .13, rx, rimY);
+        ctx.closePath();
+        ctx.clip();
+        for (const dot of ceramicSpecks) {
+          ctx.fillStyle = `rgba(218, 228, 211, ${dot.a})`;
+          ctx.beginPath();
+          ctx.arc((dot.x - .5) * bw, dot.y * bw * .39, dot.r * bw / 520, 0, TAU);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawNori(bw) {
+        ctx.save();
+        ctx.translate(bw * .235, -bw * .125);
+        ctx.rotate(.09);
+        const g = ctx.createLinearGradient(-bw * .08, 0, bw * .08, 0);
+        g.addColorStop(0, '#081511');
+        g.addColorStop(.45, '#163025');
+        g.addColorStop(1, '#07110e');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(-bw * .082, bw * .08);
+        ctx.lineTo(-bw * .072, -bw * .20);
+        ctx.quadraticCurveTo(-bw * .01, -bw * .224, bw * .073, -bw * .196);
+        ctx.lineTo(bw * .084, bw * .08);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.globalAlpha = .22;
+        ctx.strokeStyle = '#6d8b6d';
+        ctx.lineWidth = Math.max(.6, bw * .0012);
+        for (let i = -3; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i * bw * .019, -bw * .2);
+          ctx.lineTo(i * bw * .021, bw * .07);
+          ctx.stroke();
+        }
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-bw * .07, -bw * (.16 - i * .05));
+          ctx.lineTo(bw * .072, -bw * (.16 - i * .05));
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawBrothAndToppings(bw, t) {
+        const rx = bw * .475;
+        const ry = bw * .145;
+
+        // Heavy rolled rim.
+        const rim = ctx.createLinearGradient(0, -ry, 0, ry);
+        rim.addColorStop(0, '#3c4942');
+        rim.addColorStop(.38, '#202b27');
+        rim.addColorStop(.72, '#0d1312');
+        rim.addColorStop(1, '#313b35');
+        ctx.fillStyle = rim;
+        ellipsePath(0, 0, bw * .505, bw * .169);
+        ctx.fill();
+
+        drawNori(bw);
+
+        // Broth: layered gradients give it an oily, deep miso warmth.
+        const broth = ctx.createRadialGradient(-bw * .09, -bw * .055, bw * .015, 0, 0, rx);
+        broth.addColorStop(0, '#b7682d');
+        broth.addColorStop(.22, '#82401f');
+        broth.addColorStop(.58, '#4c2519');
+        broth.addColorStop(1, '#1b1712');
+        ctx.fillStyle = broth;
+        ellipsePath(0, 0, rx, ry);
+        ctx.fill();
+
+        ctx.save();
+        ellipsePath(0, 0, rx, ry);
+        ctx.clip();
+
+        // Slow, concentric surface movement.
+        ctx.save();
+        ctx.globalAlpha = .12;
+        ctx.strokeStyle = '#f0a052';
+        ctx.lineWidth = Math.max(.7, bw * .0015);
+        for (let i = 0; i < 3; i++) {
+          const swell = .5 + .5 * Math.sin(t * .8 + i * 1.8);
+          ctx.beginPath();
+          ctx.ellipse(
+            bw * (-.08 + i * .11), bw * (-.016 + i * .008),
+            bw * (.08 + i * .035 + swell * .012),
+            bw * (.015 + i * .007 + swell * .003),
+            -.08, 0, TAU
+          );
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        drawNoodles(bw, t);
+        drawBokChoy(bw);
+        drawMushrooms(bw);
+        drawTofu(bw);
+
+        // Small broth solids and spice catch the low light.
+        for (const f of brothFlecks) {
+          const x = f.x * rx * .88;
+          const y = f.y * ry * .76;
+          ctx.fillStyle = f.kind > .52 ? 'rgba(244,187,96,.24)' : 'rgba(32,17,11,.34)';
+          ctx.beginPath();
+          ctx.arc(x, y, f.r * bw / 540, 0, TAU);
+          ctx.fill();
+        }
+
+        for (const d of oilDrops) {
+          const shimmer = .65 + .35 * Math.sin(t * .65 + d.phase);
+          const x = d.x * bw;
+          const y = d.y * ry;
+          ctx.fillStyle = `rgba(230, 82, 24, ${.22 * shimmer})`;
+          ctx.strokeStyle = `rgba(255, 151, 51, ${.42 * shimmer})`;
+          ctx.lineWidth = Math.max(.5, bw * .001);
+          ctx.beginPath();
+          ctx.ellipse(x, y, d.r * bw, d.r * bw * .38, 0, 0, TAU);
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        drawScallions(bw);
+        ctx.restore();
+
+        // Rim light and front lip.
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(161, 183, 169, .32)';
+        ctx.lineWidth = bw * .006;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, bw * .498, bw * .161, 0, Math.PI * 1.07, Math.PI * 1.88);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(6, 9, 8, .7)';
+        ctx.lineWidth = bw * .011;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, bw * .493, bw * .157, 0, .04 * Math.PI, .96 * Math.PI);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawNoodles(bw, t) {
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        const noodles = [
+          [-.35,-.03, -.19,-.11, .02,-.075, .18,.01],
+          [-.29,.045, -.14,-.04, .05,-.055, .29,-.018],
+          [-.24,.075, -.10,.015, .13,-.008, .33,.038],
+          [-.20,.095, -.02,.042, .16,.027, .31,.068],
+          [-.37,.015, -.23,.085, -.05,.105, .13,.045],
+          [-.16,-.085, -.03,-.12, .11,-.092, .25,-.055],
+          [-.08,.105, .04,.065, .16,.055, .27,.086]
+        ];
+        const shift = Math.sin(t * .53) * bw * .0015;
+        for (let i = 0; i < noodles.length; i++) {
+          const n = noodles[i];
+          ctx.strokeStyle = 'rgba(70, 35, 13, .42)';
+          ctx.lineWidth = bw * .012;
+          ctx.beginPath();
+          ctx.moveTo(n[0] * bw, n[1] * bw + shift);
+          ctx.bezierCurveTo(n[2] * bw, n[3] * bw, n[4] * bw, n[5] * bw, n[6] * bw, n[7] * bw);
+          ctx.stroke();
+          ctx.strokeStyle = i % 2 ? '#ddad60' : '#edc375';
+          ctx.lineWidth = bw * .007;
+          ctx.stroke();
+          ctx.strokeStyle = 'rgba(255, 228, 155, .34)';
+          ctx.lineWidth = bw * .0018;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawBokChoy(bw) {
+        ctx.save();
+        ctx.translate(-bw * .245, -bw * .018);
+        ctx.rotate(-.14);
+
+        // Pale stems.
+        for (let i = 0; i < 3; i++) {
+          ctx.save();
+          ctx.rotate((i - 1) * .20);
+          const stem = ctx.createLinearGradient(-bw * .02, 0, bw * .055, 0);
+          stem.addColorStop(0, '#87a65f');
+          stem.addColorStop(.5, '#d1d893');
+          stem.addColorStop(1, '#687c46');
+          ctx.fillStyle = stem;
+          ctx.beginPath();
+          ctx.moveTo(-bw * .018, bw * .088);
+          ctx.quadraticCurveTo(-bw * .01, .01, -bw * .048, -bw * .085);
+          ctx.quadraticCurveTo(0, -bw * .102, bw * .045, -bw * .082);
+          ctx.quadraticCurveTo(bw * .022, 0, bw * .03, bw * .088);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Ruffled leaves.
+        const leaves = [
+          { x: -.047, y: -.078, r: -.42 },
+          { x: .006, y: -.095, r: .02 },
+          { x: .055, y: -.072, r: .46 }
+        ];
+        for (const leaf of leaves) {
+          ctx.save();
+          ctx.translate(leaf.x * bw, leaf.y * bw);
+          ctx.rotate(leaf.r);
+          const green = ctx.createRadialGradient(-bw * .025, -bw * .02, 0, 0, 0, bw * .09);
+          green.addColorStop(0, '#8fb83e');
+          green.addColorStop(.45, '#3e762c');
+          green.addColorStop(1, '#183c20');
+          ctx.fillStyle = green;
+          ctx.beginPath();
+          ctx.moveTo(0, bw * .05);
+          ctx.bezierCurveTo(-bw * .075, bw * .02, -bw * .075, -bw * .075, 0, -bw * .09);
+          ctx.bezierCurveTo(bw * .08, -bw * .066, bw * .075, bw * .02, 0, bw * .05);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(187, 211, 91, .38)';
+          ctx.lineWidth = bw * .002;
+          ctx.beginPath();
+          ctx.moveTo(0, bw * .045);
+          ctx.lineTo(0, -bw * .072);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawMushrooms(bw) {
+        const mushrooms = [
+          { x: .095, y: -.045, s: 1, r: -.14 },
+          { x: .205, y: .018, s: .83, r: .16 }
+        ];
+        for (const m of mushrooms) {
+          ctx.save();
+          ctx.translate(m.x * bw, m.y * bw);
+          ctx.rotate(m.r);
+          ctx.scale(m.s, m.s * .48);
+          const cap = ctx.createRadialGradient(-bw * .018, -bw * .02, 0, 0, 0, bw * .09);
+          cap.addColorStop(0, '#a6754f');
+          cap.addColorStop(.3, '#6e442f');
+          cap.addColorStop(.72, '#38251e');
+          cap.addColorStop(1, '#1d1715');
+          ctx.fillStyle = cap;
+          ctx.beginPath();
+          ctx.arc(0, 0, bw * .085, 0, TAU);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(226, 184, 134, .25)';
+          ctx.lineWidth = bw * .004;
+          for (let i = 0; i < 5; i++) {
+            const a = i * TAU / 5 + .25;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(Math.cos(a) * bw * .067, Math.sin(a) * bw * .067);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      }
+
+      function drawTofu(bw) {
+        const cubes = [
+          { x: -.055, y: -.035, s: .066, r: -.08 },
+          { x: .035, y: .052, s: .058, r: .12 }
+        ];
+        for (const c of cubes) {
+          ctx.save();
+          ctx.translate(c.x * bw, c.y * bw);
+          ctx.rotate(c.r);
+          const size = c.s * bw;
+          ctx.fillStyle = '#bf8a4e';
+          ctx.fillRect(-size, -size * .36, size * 2, size * .72);
+          ctx.fillStyle = '#e2ad65';
+          ctx.beginPath();
+          ctx.moveTo(-size, -size * .36);
+          ctx.lineTo(-size * .58, -size * .72);
+          ctx.lineTo(size * 1.06, -size * .52);
+          ctx.lineTo(size, -size * .36);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = '#89552e';
+          ctx.beginPath();
+          ctx.moveTo(size, -size * .36);
+          ctx.lineTo(size * 1.06, -size * .52);
+          ctx.lineTo(size * 1.05, size * .22);
+          ctx.lineTo(size, size * .36);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function drawScallions(bw) {
+        for (const s of scallions) {
+          ctx.save();
+          ctx.translate(s.x * bw, s.y * bw * .33);
+          ctx.rotate(s.rot);
+          ctx.scale(1, .55);
+          ctx.fillStyle = s.shade > .5 ? '#8fb94f' : '#5f9238';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, s.rx * bw, s.ry * bw, 0, 0, TAU);
+          ctx.fill();
+          ctx.fillStyle = '#223a1c';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, s.rx * bw * .48, s.ry * bw * .45, 0, 0, TAU);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function render(timeMs = 0) {
+        const t = timeMs * .001;
+        lastTime = timeMs;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+
+        const landscape = width > height;
+        const bw = Math.min(width * (landscape ? .64 : .88), height * (landscape ? .78 : .54), 690);
+        const cx = width * .5;
+        const cy = height * (landscape ? .61 : .62);
+
+        if (!reducedMotion) {
+          pointer.x += (pointer.tx - pointer.x) * .042;
+          pointer.y += (pointer.ty - pointer.y) * .042;
+          pointer.lightX += (pointer.tx - pointer.lightX) * .025;
+        } else {
+          pointer.x = pointer.y = pointer.lightX = 0;
+        }
+
+        drawBackground(cx, cy, bw);
+
+        const breathe = reducedMotion ? 0 : Math.sin(t * .78) * Math.min(1.8, bw * .0025);
+        const shiftX = pointer.x * Math.min(13, bw * .018);
+        const shiftY = pointer.y * Math.min(5, bw * .007) + breathe;
+
+        ctx.save();
+        ctx.translate(cx + shiftX, cy + shiftY);
+        drawSteam(bw, t, pointer.x);
+        drawBowlShadow(bw);
+        drawBowlBody(bw);
+        drawBrothAndToppings(bw, t);
+        ctx.restore();
+
+        // A near-invisible film grain keeps large gradients from feeling digital.
+        ctx.save();
+        ctx.globalAlpha = .045;
+        ctx.fillStyle = '#d8cdbb';
+        const grainSize = Math.max(3, Math.floor(Math.min(width, height) / 180));
+        const offset = reducedMotion ? 3 : Math.floor(t * 7) % grainSize;
+        for (let y = offset; y < height; y += grainSize * 3) {
+          for (let x = (y * 13) % (grainSize * 7); x < width; x += grainSize * 7) {
+            ctx.fillRect(x, y, .55, .55);
+          }
+        }
+        ctx.restore();
+
+        if (!reducedMotion) animationFrame = requestAnimationFrame(render);
+      }
+
+      function onPointerMove(event) {
+        if (reducedMotion) return;
+        pointer.tx = Math.max(-1, Math.min(1, (event.clientX / width - .5) * 2));
+        pointer.ty = Math.max(-1, Math.min(1, (event.clientY / height - .5) * 2));
+      }
+
+      function onMotionPreferenceChange(event) {
+        reducedMotion = event.matches;
+        cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+        pointer.tx = pointer.ty = 0;
+        render(reducedMotion ? 7200 : performance.now());
+      }
+
+      addEventListener('resize', resize, { passive: true });
+      addEventListener('pointermove', onPointerMove, { passive: true });
+      addEventListener('pointerleave', () => { pointer.tx = pointer.ty = 0; }, { passive: true });
+      reducedQuery.addEventListener('change', onMotionPreferenceChange);
+
+      resize();
+      if (!reducedMotion) animationFrame = requestAnimationFrame(render);
+    })();
+  </script>
+</body>
+</html>

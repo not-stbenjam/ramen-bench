@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vegan Ramen</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --mx: 0;
+      --my: 0;
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      --breath: 0;
+      --glow: rgba(255, 131, 60, 0.42);
+      --broth: #9e4f22;
+      --broth-light: #ef9e50;
+      --bowl-front: #161923;
+      --bowl-rim: #2c3140;
+      --noodle: #f2c56d;
+      --green: #55b56c;
+      --pink: #d77b92;
+      --mushroom: #b78966;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #06070a;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, sans-serif;
+      perspective: 1100px;
+      cursor: none;
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at calc(50% + (var(--mx) * 10%)) calc(42% + (var(--my) * 8%)), rgba(255, 122, 47, 0.18), transparent 21rem),
+        radial-gradient(circle at 50% 64%, rgba(117, 58, 33, 0.36), transparent 27rem),
+        radial-gradient(circle at 50% 108%, rgba(20, 24, 31, 0.96), rgba(5, 6, 9, 0.98) 39rem, #020306 100%);
+    }
+
+    .scene::before {
+      content: "";
+      position: absolute;
+      inset: -20vmax;
+      z-index: -3;
+      background:
+        radial-gradient(circle at 38% 44%, rgba(255, 199, 126, 0.07), transparent 0.24rem),
+        radial-gradient(circle at 65% 28%, rgba(255, 174, 101, 0.06), transparent 0.18rem),
+        radial-gradient(circle at 57% 60%, rgba(249, 123, 66, 0.05), transparent 0.22rem),
+        radial-gradient(circle at 32% 68%, rgba(255, 255, 255, 0.035), transparent 0.18rem);
+      background-size: 18rem 18rem, 23rem 23rem, 16rem 16rem, 20rem 20rem;
+      opacity: 0.6;
+      transform: translate3d(calc(var(--mx) * -1rem), calc(var(--my) * -1rem), 0);
+    }
+
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 50%, transparent 0 44%, rgba(0, 0, 0, 0.58) 85%, rgba(0, 0, 0, 0.9) 100%),
+        linear-gradient(to bottom, rgba(255, 146, 80, 0.09), transparent 37%, rgba(0, 0, 0, 0.64));
+    }
+
+    .ramen {
+      position: relative;
+      width: min(78vw, 44rem);
+      aspect-ratio: 1 / 0.74;
+      display: grid;
+      place-items: center;
+      transform-style: preserve-3d;
+      transform:
+        translate3d(calc(var(--mx) * 1.7rem), calc(var(--my) * 0.9rem), 0)
+        rotateX(var(--tilt-x))
+        rotateY(var(--tilt-y));
+      filter: drop-shadow(0 4rem 3.5rem rgba(0, 0, 0, 0.82));
+    }
+
+    .warmth {
+      position: absolute;
+      width: 78%;
+      height: 58%;
+      top: 5%;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 50% 57%, rgba(255, 168, 77, calc(0.18 + var(--breath) * 0.09)), transparent 58%),
+        radial-gradient(ellipse at 51% 41%, rgba(255, 91, 39, calc(0.12 + var(--breath) * 0.07)), transparent 72%);
+      filter: blur(1.8rem);
+      transform: translateZ(-4rem);
+    }
+
+    .steam-field {
+      position: absolute;
+      width: 62%;
+      height: 58%;
+      top: -17%;
+      left: 19%;
+      pointer-events: none;
+      overflow: visible;
+      transform: translateZ(6rem);
+      mix-blend-mode: screen;
+    }
+
+    .steam {
+      position: absolute;
+      bottom: 0;
+      left: var(--x);
+      width: var(--w);
+      height: var(--h);
+      border-radius: 50%;
+      opacity: var(--o);
+      filter: blur(var(--b));
+      transform-origin: 50% 100%;
+      background:
+        radial-gradient(ellipse at 45% 18%, rgba(255, 236, 206, 0.72), rgba(255, 178, 116, 0.2) 42%, transparent 68%);
+      animation: rise var(--d) cubic-bezier(0.28, 0.02, 0.3, 1) infinite;
+      animation-delay: var(--delay);
+    }
+
+    @keyframes rise {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 1.4rem, 0) scale(0.55) rotate(-5deg);
+      }
+      16% {
+        opacity: calc(var(--o) * 0.96);
+      }
+      58% {
+        opacity: calc(var(--o) * 0.55);
+        transform: translate3d(calc(var(--drift) * 0.45), -9rem, 0) scale(1.08) rotate(5deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--drift), -18rem, 0) scale(1.7) rotate(15deg);
+      }
+    }
+
+    .bowl {
+      position: absolute;
+      width: 86%;
+      height: 58%;
+      bottom: 9%;
+      transform-style: preserve-3d;
+    }
+
+    .rim {
+      position: absolute;
+      left: 5%;
+      top: 0;
+      width: 90%;
+      height: 47%;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 50% 44%, transparent 0 43%, rgba(255, 214, 151, 0.12) 44% 45%, transparent 46%),
+        radial-gradient(ellipse at 50% 48%, var(--broth-light) 0 19%, #c8692a 36%, var(--broth) 61%, #5e2818 78%, transparent 79%),
+        linear-gradient(145deg, #4a5161, var(--bowl-rim) 51%, #10131b);
+      box-shadow:
+        inset 0 1.2rem 1.4rem rgba(255, 255, 255, 0.11),
+        inset 0 -1rem 2rem rgba(0, 0, 0, 0.5),
+        0 1rem 1.8rem rgba(0, 0, 0, 0.42);
+      overflow: hidden;
+      transform: translateZ(4rem);
+    }
+
+    .rim::before {
+      content: "";
+      position: absolute;
+      inset: 12% 13% 15%;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at calc(46% + (var(--mx) * 3%)) calc(36% + (var(--my) * 4%)), rgba(255, 245, 190, 0.32), transparent 17%),
+        radial-gradient(ellipse at 58% 62%, rgba(96, 33, 23, 0.36), transparent 53%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 157, 65, calc(0.32 + var(--breath) * 0.15)), rgba(168, 70, 24, 0.94) 45%, rgba(86, 34, 23, 0.88) 100%);
+      box-shadow: inset 0 0 2.2rem rgba(94, 30, 14, 0.9);
+      animation: brothPulse 4s ease-in-out infinite;
+    }
+
+    .rim::after {
+      content: "";
+      position: absolute;
+      inset: 7% 7% 8%;
+      border-radius: 50%;
+      border: 0.32rem solid rgba(255, 221, 166, 0.13);
+      box-shadow: inset 0 0.55rem 0.8rem rgba(255, 204, 139, 0.12);
+    }
+
+    @keyframes brothPulse {
+      0%, 100% { transform: scale(1); filter: saturate(1); }
+      50% { transform: scale(1.018); filter: saturate(1.18); }
+    }
+
+    .bowl-shell {
+      position: absolute;
+      left: 11%;
+      top: 19%;
+      width: 78%;
+      height: 75%;
+      border-radius: 14% 14% 48% 48% / 15% 15% 78% 78%;
+      background:
+        radial-gradient(ellipse at 50% -14%, rgba(255, 255, 255, 0.28), transparent 31%),
+        radial-gradient(ellipse at 29% 47%, rgba(255, 126, 72, 0.12), transparent 37%),
+        linear-gradient(92deg, #0d1017 0%, #222735 15%, #343a4b 28%, var(--bowl-front) 56%, #0a0c12 100%);
+      box-shadow:
+        inset 0 1.5rem 1.6rem rgba(255, 255, 255, 0.08),
+        inset 0 -2.4rem 2.8rem rgba(0, 0, 0, 0.7),
+        0 1.4rem 1.8rem rgba(0, 0, 0, 0.56);
+      transform: translateZ(0);
+      overflow: hidden;
+    }
+
+    .bowl-shell::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 22%;
+      width: 48%;
+      height: 18%;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 160, 76, 0.16), transparent 62%);
+    }
+
+    .bowl-shell::after {
+      content: "";
+      position: absolute;
+      left: 17%;
+      right: 17%;
+      bottom: 5%;
+      height: 12%;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.24);
+      filter: blur(0.35rem);
+    }
+
+    .noodles,
+    .ingredients {
+      position: absolute;
+      inset: 8% 15% 42%;
+      border-radius: 50%;
+      transform: translateZ(7rem);
+      pointer-events: none;
+    }
+
+    .noodle {
+      position: absolute;
+      border: clamp(0.16rem, 0.42vw, 0.28rem) solid transparent;
+      border-top-color: var(--noodle);
+      border-left-color: rgba(242, 197, 109, 0.92);
+      border-radius: 50%;
+      filter: drop-shadow(0 0.08rem 0.04rem rgba(83, 38, 12, 0.7));
+      animation: noodleFloat var(--d) ease-in-out infinite;
+      animation-delay: var(--delay);
+      transform: rotate(var(--r));
+    }
+
+    .noodle:nth-child(1) { width: 42%; height: 30%; left: 17%; top: 34%; --r: 6deg; --d: 5.8s; --delay: -1s; }
+    .noodle:nth-child(2) { width: 38%; height: 26%; left: 34%; top: 24%; --r: -13deg; --d: 6.5s; --delay: -3s; }
+    .noodle:nth-child(3) { width: 34%; height: 22%; left: 42%; top: 48%; --r: 18deg; --d: 5.2s; --delay: -2.2s; }
+    .noodle:nth-child(4) { width: 28%; height: 18%; left: 23%; top: 51%; --r: -26deg; --d: 6s; --delay: -4s; }
+    .noodle:nth-child(5) { width: 52%; height: 30%; left: 22%; top: 37%; --r: 2deg; --d: 7s; --delay: -1.9s; }
+    .noodle:nth-child(6) { width: 26%; height: 18%; left: 54%; top: 31%; --r: 31deg; --d: 5.5s; --delay: -0.7s; }
+
+    @keyframes noodleFloat {
+      0%, 100% { translate: 0 0; }
+      50% { translate: calc(var(--mx) * 0.18rem) -0.28rem; }
+    }
+
+    .leaf {
+      position: absolute;
+      width: 12%;
+      height: 23%;
+      border-radius: 80% 10% 80% 12%;
+      background:
+        linear-gradient(130deg, rgba(255, 255, 255, 0.28), transparent 30%),
+        linear-gradient(145deg, #77d485, #319752 68%, #176233);
+      box-shadow: inset -0.15rem -0.2rem 0.3rem rgba(0, 0, 0, 0.26);
+      animation: bob 5.2s ease-in-out infinite;
+    }
+
+    .leaf::before {
+      content: "";
+      position: absolute;
+      inset: 12% 47% 9% 46%;
+      border-radius: 999px;
+      background: rgba(255, 250, 197, 0.28);
+      transform: rotate(-12deg);
+    }
+
+    .leaf.one { left: 27%; top: 17%; rotate: -47deg; animation-delay: -1s; }
+    .leaf.two { left: 60%; top: 24%; rotate: 29deg; animation-delay: -2.8s; }
+    .leaf.three { left: 44%; top: 55%; rotate: 88deg; animation-delay: -4s; }
+
+    .mushroom {
+      position: absolute;
+      width: 14%;
+      height: 18%;
+      border-radius: 50% 50% 44% 44%;
+      background:
+        radial-gradient(circle at 28% 28%, rgba(255, 239, 206, 0.9) 0 8%, transparent 9%),
+        radial-gradient(circle at 56% 22%, rgba(255, 239, 206, 0.76) 0 7%, transparent 8%),
+        linear-gradient(150deg, #d7aa81, var(--mushroom) 56%, #6c422d);
+      box-shadow: inset -0.4rem -0.4rem 0.5rem rgba(0, 0, 0, 0.24);
+      animation: bob 5.8s ease-in-out infinite;
+    }
+
+    .mushroom::after {
+      content: "";
+      position: absolute;
+      left: 28%;
+      right: 28%;
+      bottom: -38%;
+      height: 55%;
+      border-radius: 0 0 42% 42%;
+      background: linear-gradient(#e7c29c, #a67652);
+    }
+
+    .mushroom.one { left: 35%; top: 16%; rotate: -13deg; animation-delay: -2s; }
+    .mushroom.two { left: 57%; top: 48%; rotate: 22deg; animation-delay: -3.6s; }
+
+    .radish {
+      position: absolute;
+      width: 13%;
+      height: 13%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 245, 238, 0.96) 0 34%, transparent 35%),
+        radial-gradient(circle at 52% 50%, transparent 0 46%, rgba(174, 40, 77, 0.8) 47% 57%, transparent 58%),
+        linear-gradient(135deg, #ffb5bd, var(--pink));
+      box-shadow: inset -0.25rem -0.3rem 0.45rem rgba(100, 11, 43, 0.25);
+      animation: bob 6.2s ease-in-out infinite;
+    }
+
+    .radish.one { left: 47%; top: 20%; animation-delay: -1.4s; }
+    .radish.two { left: 30%; top: 48%; scale: 0.82; animation-delay: -4.5s; }
+
+    .corn {
+      position: absolute;
+      width: 18%;
+      height: 13%;
+      left: 50%;
+      top: 37%;
+      border-radius: 45%;
+      background:
+        radial-gradient(circle at 15% 35%, #ffe082 0 11%, transparent 12%),
+        radial-gradient(circle at 36% 35%, #ffd25c 0 11%, transparent 12%),
+        radial-gradient(circle at 58% 35%, #fff09d 0 11%, transparent 12%),
+        radial-gradient(circle at 79% 35%, #ffc742 0 11%, transparent 12%),
+        radial-gradient(circle at 25% 66%, #ffd765 0 11%, transparent 12%),
+        radial-gradient(circle at 49% 66%, #ffbd31 0 11%, transparent 12%),
+        radial-gradient(circle at 72% 66%, #ffe887 0 11%, transparent 12%);
+      animation: bob 5.6s ease-in-out infinite;
+      animation-delay: -0.6s;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(calc(var(--mx) * 0.16rem), -0.36rem, 0); }
+    }
+
+    .oil {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 205, 96, 0.28);
+      filter: blur(0.02rem);
+      animation: shimmer 4.5s ease-in-out infinite;
+    }
+
+    .oil.one { width: 6%; height: 4%; left: 39%; top: 37%; animation-delay: -1s; }
+    .oil.two { width: 4%; height: 3%; left: 56%; top: 30%; animation-delay: -2s; }
+    .oil.three { width: 5%; height: 3.6%; left: 52%; top: 57%; animation-delay: -3.2s; }
+
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.28; transform: scale(0.9); }
+      50% { opacity: 0.74; transform: scale(1.16); }
+    }
+
+    .shadow {
+      position: absolute;
+      left: 20%;
+      right: 20%;
+      bottom: 4%;
+      height: 17%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.8), transparent 72%);
+      filter: blur(1rem);
+      transform: translateZ(-8rem);
+    }
+
+    .glint {
+      position: absolute;
+      left: 22%;
+      top: 7%;
+      width: 31%;
+      height: 10%;
+      border-radius: 50%;
+      background: linear-gradient(90deg, transparent, rgba(255, 241, 209, 0.38), transparent);
+      filter: blur(0.22rem);
+      transform: rotate(-5deg) translateZ(8rem);
+      opacity: calc(0.34 + var(--breath) * 0.22);
+      pointer-events: none;
+    }
+
+    .heat-haze {
+      position: absolute;
+      width: 54%;
+      height: 30%;
+      top: 15%;
+      border-radius: 50%;
+      background:
+        repeating-radial-gradient(ellipse at 50% 60%, rgba(255, 214, 155, 0.06) 0 0.08rem, transparent 0.09rem 0.75rem);
+      filter: blur(0.35rem);
+      opacity: calc(0.22 + var(--breath) * 0.18);
+      transform: translateZ(9rem);
+      animation: haze 7s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes haze {
+      from { background-position: 0 0; }
+      to { background-position: 2rem -3rem; }
+    }
+
+    @media (max-width: 680px) {
+      .ramen {
+        width: min(94vw, 34rem);
+      }
+
+      .steam-field {
+        top: -22%;
+        width: 70%;
+        left: 15%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+
+      body {
+        cursor: default;
+      }
+
+      .ramen {
+        transform: none;
+      }
+
+      .steam {
+        opacity: 0.18;
+        transform: translateY(-4rem) scale(1.1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene" aria-label="A steaming bowl of vegan ramen in warm darkness">
+    <div class="ramen" aria-hidden="true">
+      <div class="warmth"></div>
+      <div class="steam-field">
+        <i class="steam" style="--x:12%;--w:6rem;--h:14rem;--o:.26;--b:.65rem;--d:7.4s;--delay:-6.8s;--drift:-4rem"></i>
+        <i class="steam" style="--x:25%;--w:5rem;--h:12rem;--o:.3;--b:.58rem;--d:6.2s;--delay:-3.7s;--drift:2rem"></i>
+        <i class="steam" style="--x:40%;--w:7rem;--h:16rem;--o:.24;--b:.8rem;--d:8.1s;--delay:-5s;--drift:-1.5rem"></i>
+        <i class="steam" style="--x:57%;--w:5.6rem;--h:13rem;--o:.28;--b:.6rem;--d:6.8s;--delay:-2s;--drift:3.8rem"></i>
+        <i class="steam" style="--x:70%;--w:4.8rem;--h:11rem;--o:.2;--b:.7rem;--d:7.7s;--delay:-4.4s;--drift:-2.6rem"></i>
+      </div>
+      <div class="shadow"></div>
+      <div class="bowl">
+        <div class="bowl-shell"></div>
+        <div class="rim">
+          <div class="noodles">
+            <i class="noodle"></i>
+            <i class="noodle"></i>
+            <i class="noodle"></i>
+            <i class="noodle"></i>
+            <i class="noodle"></i>
+            <i class="noodle"></i>
+          </div>
+          <div class="ingredients">
+            <i class="leaf one"></i>
+            <i class="leaf two"></i>
+            <i class="leaf three"></i>
+            <i class="mushroom one"></i>
+            <i class="mushroom two"></i>
+            <i class="radish one"></i>
+            <i class="radish two"></i>
+            <i class="corn"></i>
+            <i class="oil one"></i>
+            <i class="oil two"></i>
+            <i class="oil three"></i>
+          </div>
+        </div>
+      </div>
+      <div class="glint"></div>
+      <div class="heat-haze"></div>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const target = { x: 0, y: 0 };
+      const current = { x: 0, y: 0 };
+      let frame = 0;
+      let rafId = 0;
+
+      const setTarget = (clientX, clientY) => {
+        const x = (clientX / window.innerWidth - 0.5) * 2;
+        const y = (clientY / window.innerHeight - 0.5) * 2;
+        target.x = Math.max(-1, Math.min(1, x));
+        target.y = Math.max(-1, Math.min(1, y));
+      };
+
+      const animate = () => {
+        current.x += (target.x - current.x) * 0.075;
+        current.y += (target.y - current.y) * 0.075;
+        frame += 0.012;
+
+        const breath = (Math.sin(frame) + 1) / 2;
+        root.style.setProperty("--mx", current.x.toFixed(4));
+        root.style.setProperty("--my", current.y.toFixed(4));
+        root.style.setProperty("--tilt-x", `${(-current.y * 4).toFixed(3)}deg`);
+        root.style.setProperty("--tilt-y", `${(current.x * 5).toFixed(3)}deg`);
+        root.style.setProperty("--breath", breath.toFixed(4));
+        rafId = requestAnimationFrame(animate);
+      };
+
+      const start = () => {
+        if (!reduceMotion.matches && !rafId) {
+          rafId = requestAnimationFrame(animate);
+        }
+      };
+
+      const stop = () => {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+        root.style.setProperty("--mx", "0");
+        root.style.setProperty("--my", "0");
+        root.style.setProperty("--tilt-x", "0deg");
+        root.style.setProperty("--tilt-y", "0deg");
+        root.style.setProperty("--breath", "0.45");
+      };
+
+      window.addEventListener("pointermove", (event) => {
+        if (!reduceMotion.matches) {
+          setTarget(event.clientX, event.clientY);
+        }
+      }, { passive: true });
+
+      window.addEventListener("pointerleave", () => {
+        target.x = 0;
+        target.y = 0;
+      });
+
+      reduceMotion.addEventListener("change", () => {
+        if (reduceMotion.matches) {
+          stop();
+        } else {
+          start();
+        }
+      });
+
+      if (reduceMotion.matches) {
+        stop();
+      } else {
+        start();
+      }
+    })();
+  </script>
+</body>
+</html>

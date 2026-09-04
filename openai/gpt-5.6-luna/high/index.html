@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ramen</title>
+  <style>
+    :root { color-scheme: dark; background: #080708; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #080708; }
+    body { min-height: 100svh; }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  </style>
+</head>
+<body>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('scene');
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const TAU = Math.PI * 2;
+      const pointer = { x: 0.5, y: 0.48, tx: 0.5, ty: 0.48 };
+      const state = { w: 0, h: 0, dpr: 1, scale: 1, cx: 0, cy: 0, t: 0, last: 0 };
+
+      const steam = [
+        { x: -0.26, height: 0.36, width: 0.050, phase: 0.2, speed: 0.72, alpha: 0.38 },
+        { x: -0.12, height: 0.48, width: 0.062, phase: 2.7, speed: 0.52, alpha: 0.29 },
+        { x: 0.02, height: 0.40, width: 0.054, phase: 4.3, speed: 0.64, alpha: 0.36 },
+        { x: 0.17, height: 0.53, width: 0.067, phase: 1.4, speed: 0.47, alpha: 0.27 },
+        { x: 0.30, height: 0.31, width: 0.042, phase: 5.1, speed: 0.86, alpha: 0.32 }
+      ];
+
+      const noodles = [
+        [-0.38, -0.03, -0.15, 0.20, 0.06, 0.13, 0.36, -0.04],
+        [-0.30, 0.06, -0.05, -0.16, 0.19, 0.20, 0.38, 0.02],
+        [-0.20, -0.14, -0.01, 0.12, 0.23, -0.12, 0.39, 0.05],
+        [-0.08, 0.14, 0.05, -0.06, 0.30, -0.02, 0.40, 0.14],
+        [0.03, -0.11, 0.13, 0.15, 0.27, 0.19, 0.39, -0.04],
+        [0.13, 0.15, 0.21, -0.06, 0.06, -0.16, -0.35, 0.05],
+        [0.30, -0.08, 0.22, 0.16, -0.14, 0.16, -0.34, -0.04],
+        [-0.39, 0.10, -0.15, -0.15, 0.11, -0.19, 0.34, 0.10],
+        [-0.27, -0.14, -0.05, 0.12, 0.24, 0.00, 0.36, 0.16]
+      ];
+
+      function resize() {
+        state.w = window.innerWidth;
+        state.h = window.innerHeight;
+        state.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(state.w * state.dpr);
+        canvas.height = Math.round(state.h * state.dpr);
+        state.scale = Math.min(state.w, state.h);
+        state.cx = state.w * 0.5;
+        state.cy = state.h * 0.59;
+        draw(state.t);
+      }
+
+      function pointerMove(event) {
+        pointer.tx = Math.max(0, Math.min(1, event.clientX / state.w));
+        pointer.ty = Math.max(0, Math.min(1, event.clientY / state.h));
+        if (reduceMotion.matches) draw(state.t);
+      }
+
+      function setPointer(event) { pointerMove(event); }
+
+      function ellipse(x, y, rx, ry, fill, rotation = 0) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, TAU);
+        if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+        ctx.restore();
+      }
+
+      function roundedPath(points, close = false) {
+        ctx.beginPath();
+        ctx.moveTo(points[0], points[1]);
+        for (let i = 2; i < points.length; i += 6) {
+          ctx.bezierCurveTo(points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5]);
+        }
+        if (close) ctx.closePath();
+      }
+
+      function glow(x, y, radius, color, opacity = 1) {
+        const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        g.addColorStop(0, color.replace(')', `, ${opacity})`).replace('rgb(', 'rgba('));
+        g.addColorStop(1, color.replace(')', ', 0)').replace('rgb(', 'rgba('));
+        ctx.fillStyle = g;
+        ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+      }
+
+      function drawBackground() {
+        const { w, h } = state;
+        const bg = ctx.createLinearGradient(0, 0, 0, h);
+        bg.addColorStop(0, '#08080b');
+        bg.addColorStop(0.46, '#110d10');
+        bg.addColorStop(0.77, '#191116');
+        bg.addColorStop(1, '#0b080a');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, w, h);
+
+        const ambientX = state.cx + (pointer.x - 0.5) * state.scale * 0.14;
+        const ambientY = state.h * 0.52 + (pointer.y - 0.48) * state.scale * 0.08;
+        const aura = ctx.createRadialGradient(ambientX, ambientY, 0, ambientX, ambientY, state.scale * 0.72);
+        aura.addColorStop(0, 'rgba(161, 55, 29, .17)');
+        aura.addColorStop(.33, 'rgba(106, 35, 25, .09)');
+        aura.addColorStop(1, 'rgba(16, 8, 12, 0)');
+        ctx.fillStyle = aura;
+        ctx.fillRect(0, 0, w, h);
+
+        // Almost imperceptible pools of warm reflected light on the table.
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        const tableLight = ctx.createRadialGradient(state.cx, state.h * .82, 0, state.cx, state.h * .82, state.scale * .52);
+        tableLight.addColorStop(0, 'rgba(130, 45, 24, .095)');
+        tableLight.addColorStop(1, 'rgba(130, 45, 24, 0)');
+        ctx.fillStyle = tableLight;
+        ctx.fillRect(0, state.h * .52, w, h * .48);
+        ctx.restore();
+
+        const vignette = ctx.createRadialGradient(w * .5, h * .5, state.scale * .20, w * .5, h * .5, Math.max(w, h) * .72);
+        vignette.addColorStop(0, 'rgba(0,0,0,0)');
+        vignette.addColorStop(.72, 'rgba(0,0,0,.08)');
+        vignette.addColorStop(1, 'rgba(0,0,0,.60)');
+        ctx.fillStyle = vignette;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      function drawSteam(t, bowlX, bowlY, bowlW) {
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.globalCompositeOperation = 'screen';
+        steam.forEach((s, i) => {
+          const x = bowlX + s.x * bowlW;
+          const h = s.height * state.scale;
+          const sway = reduceMotion.matches ? 0 : Math.sin(t * s.speed + s.phase) * state.scale * .025;
+          const sway2 = reduceMotion.matches ? 0 : Math.cos(t * s.speed * .71 + s.phase) * state.scale * .018;
+          const y = bowlY - state.scale * .035;
+          const gradient = ctx.createLinearGradient(x, y, x + sway, y - h);
+          gradient.addColorStop(0, `rgba(255, 208, 163, ${s.alpha * .03})`);
+          gradient.addColorStop(.22, `rgba(255, 205, 164, ${s.alpha})`);
+          gradient.addColorStop(.72, `rgba(242, 185, 151, ${s.alpha * .36})`);
+          gradient.addColorStop(1, 'rgba(226, 176, 155, 0)');
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = Math.max(1.5, state.scale * .010);
+          ctx.shadowColor = `rgba(255, 159, 107, ${s.alpha * .45})`;
+          ctx.shadowBlur = state.scale * .045;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.bezierCurveTo(x - sway2, y - h * .19, x + sway + sway2, y - h * .34, x + sway * .4, y - h * .51);
+          ctx.bezierCurveTo(x - sway - sway2, y - h * .70, x + sway + sway2, y - h * .82, x + sway, y - h);
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+
+      function drawBowl(t) {
+        const unit = state.scale;
+        const bowlW = Math.min(unit * .87, state.w * .78);
+        const bowlH = bowlW * .54;
+        const x = state.cx + (pointer.x - .5) * unit * .035;
+        const y = state.cy + (pointer.y - .48) * unit * .018;
+        const rimY = y - bowlH * .20;
+
+        // Grounding shadow.
+        ctx.save();
+        ctx.filter = `blur(${unit * .035}px)`;
+        ellipse(x, y + bowlH * .48, bowlW * .48, bowlH * .13, 'rgba(0, 0, 0, .8)');
+        ctx.restore();
+
+        // Warm halo hugging the ceramic.
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        const halo = ctx.createRadialGradient(x, y + bowlH * .10, bowlW * .12, x, y + bowlH * .10, bowlW * .66);
+        halo.addColorStop(0, 'rgba(170, 50, 25, .22)');
+        halo.addColorStop(.55, 'rgba(104, 29, 22, .06)');
+        halo.addColorStop(1, 'rgba(80, 20, 18, 0)');
+        ctx.fillStyle = halo;
+        ctx.fillRect(x - bowlW * .7, y - bowlH * .7, bowlW * 1.4, bowlH * 1.7);
+        ctx.restore();
+
+        // Bowl body.
+        const body = ctx.createLinearGradient(x, rimY, x, y + bowlH * .48);
+        body.addColorStop(0, '#59151a');
+        body.addColorStop(.18, '#7e1e1b');
+        body.addColorStop(.54, '#481017');
+        body.addColorStop(1, '#1f0a11');
+        ctx.beginPath();
+        ctx.moveTo(x - bowlW * .49, rimY);
+        ctx.bezierCurveTo(x - bowlW * .47, y + bowlH * .20, x - bowlW * .33, y + bowlH * .43, x, y + bowlH * .49);
+        ctx.bezierCurveTo(x + bowlW * .34, y + bowlH * .43, x + bowlW * .47, y + bowlH * .20, x + bowlW * .49, rimY);
+        ctx.closePath();
+        ctx.fillStyle = body;
+        ctx.fill();
+
+        // Soft ceramic reflection.
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        const sheen = ctx.createLinearGradient(x - bowlW * .40, 0, x + bowlW * .30, 0);
+        sheen.addColorStop(0, 'rgba(255, 138, 95, 0)');
+        sheen.addColorStop(.34, 'rgba(255, 143, 105, .16)');
+        sheen.addColorStop(.52, 'rgba(255, 143, 105, .03)');
+        sheen.addColorStop(1, 'rgba(255, 143, 105, 0)');
+        ctx.fillStyle = sheen;
+        ctx.beginPath();
+        ctx.ellipse(x - bowlW * .12, y + bowlH * .13, bowlW * .26, bowlH * .30, -.08, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+
+        // Rim and broth.
+        ellipse(x, rimY, bowlW * .515, bowlH * .245, '#260b0d');
+        const broth = ctx.createRadialGradient(x - bowlW * .15, rimY - bowlH * .08, 0, x, rimY, bowlW * .55);
+        broth.addColorStop(0, '#db6b28');
+        broth.addColorStop(.26, '#b7471d');
+        broth.addColorStop(.72, '#76201a');
+        broth.addColorStop(1, '#330c12');
+        ellipse(x, rimY - bowlH * .015, bowlW * .475, bowlH * .198, broth);
+
+        // Oil glints.
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        for (let i = 0; i < 14; i++) {
+          const a = i * 2.37 + .4;
+          const rr = bowlW * (.12 + ((i * 17) % 29) / 100);
+          const ox = x + Math.cos(a) * rr;
+          const oy = rimY - bowlH * .01 + Math.sin(a) * bowlH * .075;
+          ellipse(ox, oy, bowlW * (.006 + (i % 3) * .002), bowlH * .012, `rgba(255, 186, 82, ${.18 + (i % 4) * .05})`, a);
+        }
+        ctx.restore();
+
+        // Noodles, each one with a quiet, living drift.
+        ctx.save();
+        ctx.lineCap = 'round';
+        noodles.forEach((n, i) => {
+          const drift = reduceMotion.matches ? 0 : Math.sin(t * (.45 + i * .035) + i) * bowlW * .004;
+          ctx.beginPath();
+          ctx.moveTo(x + n[0] * bowlW, rimY + n[1] * bowlH);
+          ctx.bezierCurveTo(
+            x + n[2] * bowlW + drift, rimY + n[3] * bowlH,
+            x + n[4] * bowlW - drift, rimY + n[5] * bowlH,
+            x + n[6] * bowlW, rimY + n[7] * bowlH
+          );
+          ctx.strokeStyle = i % 3 === 0 ? 'rgba(255, 205, 100, .86)' : 'rgba(245, 178, 74, .72)';
+          ctx.lineWidth = bowlW * .012;
+          ctx.shadowColor = 'rgba(255, 123, 38, .30)';
+          ctx.shadowBlur = bowlW * .012;
+          ctx.stroke();
+        });
+        ctx.restore();
+
+        // Mushrooms: earthy, curved caps.
+        const mushrooms = [
+          [-.26, -.03, .055, -.14], [-.10, -.10, .052, .08], [.24, -.07, .063, -.08], [.33, .06, .047, .14]
+        ];
+        mushrooms.forEach((m, i) => {
+          const mx = x + m[0] * bowlW, my = rimY + m[1] * bowlH;
+          ctx.save();
+          ctx.translate(mx, my);
+          ctx.rotate(m[3]);
+          ctx.fillStyle = i % 2 ? '#e4a36a' : '#c7774b';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, m[2] * bowlW, m[2] * bowlH * .46, 0, Math.PI, TAU);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(92, 38, 27, .7)';
+          ctx.fillRect(-m[2] * bowlW * .11, 0, m[2] * bowlW * .22, m[2] * bowlH * .30);
+          ctx.restore();
+        });
+
+        // Tofu cubes.
+        [[-.13, .05, -.10], [.10, -.005, .12], [.20, .10, -.12]].forEach((p, i) => {
+          const tx = x + p[0] * bowlW, ty = rimY + p[1] * bowlH;
+          ctx.save();
+          ctx.translate(tx, ty);
+          ctx.rotate(p[2]);
+          const tofu = ctx.createLinearGradient(-bowlW * .03, -bowlH * .03, bowlW * .035, bowlH * .035);
+          tofu.addColorStop(0, '#ffe7a4'); tofu.addColorStop(1, '#c98243');
+          ctx.fillStyle = tofu;
+          ctx.beginPath();
+          ctx.roundRect(-bowlW * .045, -bowlH * .045, bowlW * .09, bowlH * .09, bowlW * .012);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255, 221, 145, .48)'; ctx.lineWidth = bowlW * .004; ctx.stroke();
+          ctx.restore();
+        });
+
+        // Bok choy leaves.
+        [[-.34, .025, -.18], [.39, -.005, .15]].forEach((p, i) => {
+          const lx = x + p[0] * bowlW, ly = rimY + p[1] * bowlH;
+          ctx.save(); ctx.translate(lx, ly); ctx.rotate(p[2]);
+          ctx.fillStyle = i ? '#4e7f43' : '#668b4d';
+          ctx.beginPath(); ctx.ellipse(0, 0, bowlW * .08, bowlH * .055, 0, 0, TAU); ctx.fill();
+          ctx.strokeStyle = 'rgba(197, 205, 108, .7)'; ctx.lineWidth = bowlW * .012;
+          ctx.beginPath(); ctx.moveTo(-bowlW * .06, 0); ctx.quadraticCurveTo(0, -bowlH * .008, bowlW * .06, 0); ctx.stroke();
+          ctx.restore();
+        });
+
+        // Corn and scallions.
+        ctx.save();
+        for (let i = 0; i < 13; i++) {
+          const a = i * 2.11 + .2, r = bowlW * (.20 + (i % 4) * .047);
+          const cx = x + Math.cos(a) * r, cy = rimY + Math.sin(a) * bowlH * .10;
+          ellipse(cx, cy, bowlW * .018, bowlW * .014, i % 3 ? '#e8b34a' : '#f4ca63', a);
+        }
+        ctx.strokeStyle = '#a8bd70'; ctx.lineWidth = bowlW * .009; ctx.lineCap = 'round';
+        [[-.08,.06,.08,-.11],[.04,.07,.14,-.08],[-.18,.02,-.10,-.10],[.25,.04,.19,-.09]].forEach(p => {
+          ctx.beginPath(); ctx.moveTo(x + p[0]*bowlW, rimY + p[1]*bowlH); ctx.lineTo(x + p[2]*bowlW, rimY + p[3]*bowlH); ctx.stroke();
+        });
+        ctx.restore();
+
+        // Crisp highlight along the front lip.
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.strokeStyle = 'rgba(233, 81, 49, .42)'; ctx.lineWidth = bowlW * .010; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.ellipse(x, rimY + bowlH * .005, bowlW * .50, bowlH * .235, 0, .18, Math.PI - .15);
+        ctx.stroke();
+        ctx.restore();
+
+        return { x, y: rimY, w: bowlW };
+      }
+
+      function draw(t) {
+        const { w, h, dpr } = state;
+        if (!w || !h) return;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        pointer.x += (pointer.tx - pointer.x) * (reduceMotion.matches ? 1 : .055);
+        pointer.y += (pointer.ty - pointer.y) * (reduceMotion.matches ? 1 : .055);
+        drawBackground();
+
+        const bowlPreviewW = Math.min(state.scale * .87, state.w * .78);
+        drawSteam(t, state.cx + (pointer.x - .5) * state.scale * .035, state.cy + (pointer.y - .48) * state.scale * .018 - bowlPreviewW * .54 * .20, bowlPreviewW);
+        drawBowl(t);
+      }
+
+      function frame(now) {
+        const delta = Math.min((now - state.last) / 1000 || 0, .05);
+        state.last = now;
+        state.t += delta;
+        draw(state.t);
+        if (!reduceMotion.matches) requestAnimationFrame(frame);
+      }
+
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('pointermove', setPointer, { passive: true });
+      reduceMotion.addEventListener?.('change', () => {
+        state.last = performance.now();
+        if (reduceMotion.matches) draw(state.t);
+        else requestAnimationFrame(frame);
+      });
+      resize();
+      if (!reduceMotion.matches) requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

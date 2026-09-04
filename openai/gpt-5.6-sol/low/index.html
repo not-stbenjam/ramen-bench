@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070707">
+  <title>Vegan Ramen</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #070707; }
+    body { touch-action: none; }
+    canvas { display: block; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <canvas id="scene" aria-label="A steaming bowl of vegan ramen in a warm, dark room"></canvas>
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.querySelector('#scene');
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+      const pointer = { x: 0, y: 0, tx: 0, ty: 0, active: false };
+      let width = 0, height = 0, dpr = 1, last = performance.now(), raf = 0;
+      let steam = [];
+
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const ellipse = (x, y, rx, ry, fill, stroke, line = 1) => {
+        ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+        if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+        if (stroke) { ctx.lineWidth = line; ctx.strokeStyle = stroke; ctx.stroke(); }
+      };
+
+      function resize() {
+        width = innerWidth; height = innerHeight;
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        steam = Array.from({ length: reduced.matches ? 8 : 24 }, (_, i) => makeSteam(i / 24));
+        draw(performance.now(), true);
+      }
+
+      function makeSteam(progress = Math.random()) {
+        return {
+          x: (Math.random() - .5) * .5,
+          y: progress,
+          speed: .055 + Math.random() * .055,
+          sway: .7 + Math.random() * 1.5,
+          phase: Math.random() * Math.PI * 2,
+          size: .025 + Math.random() * .05,
+          alpha: .08 + Math.random() * .16
+        };
+      }
+
+      function path(points, close = true) {
+        ctx.beginPath(); ctx.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+        if (close) ctx.closePath();
+      }
+
+      function leaf(x, y, s, rot, color) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+        ctx.beginPath();
+        ctx.moveTo(0, s * .6);
+        ctx.bezierCurveTo(-s * .75, s * .15, -s * .62, -s * .7, 0, -s);
+        ctx.bezierCurveTo(s * .62, -s * .7, s * .75, s * .15, 0, s * .6);
+        const g = ctx.createLinearGradient(0, -s, 0, s);
+        g.addColorStop(0, color); g.addColorStop(1, '#15351e');
+        ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = 'rgba(197,226,138,.38)'; ctx.lineWidth = Math.max(1, s * .035);
+        ctx.beginPath(); ctx.moveTo(0, s * .7); ctx.lineTo(0, -s * .75); ctx.stroke();
+        ctx.restore();
+      }
+
+      function mushroom(x, y, s, rot) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+        ctx.fillStyle = '#d6b58b'; ctx.fillRect(-s * .09, 0, s * .18, s * .58);
+        ctx.beginPath(); ctx.arc(0, 0, s * .38, Math.PI, 0); ctx.closePath();
+        const g = ctx.createLinearGradient(0, -s * .4, 0, s * .1);
+        g.addColorStop(0, '#8a5637'); g.addColorStop(1, '#3a2119');
+        ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,218,170,.16)'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.restore();
+      }
+
+      function tofu(x, y, s, rot) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+        ctx.fillStyle = '#e2aa51'; ctx.fillRect(-s/2, -s/2, s, s);
+        ctx.fillStyle = '#f5ce7a'; path([[-s/2,-s/2],[-s*.29,-s*.68],[s*.66,-s*.53],[s/2,-s/2]]); ctx.fill();
+        ctx.fillStyle = 'rgba(95,43,14,.35)';
+        [[-.25,-.15],[.18,.08],[.04,.33]].forEach(p => ellipse(p[0]*s,p[1]*s,s*.035,s*.025,'rgba(84,39,16,.4)'));
+        ctx.restore();
+      }
+
+      function draw(now, force = false) {
+        const dt = Math.min((now - last) / 1000, .05); last = now;
+        const motion = reduced.matches ? 0 : 1;
+        pointer.x += (pointer.tx - pointer.x) * (force ? 1 : .045);
+        pointer.y += (pointer.ty - pointer.y) * (force ? 1 : .045);
+        const t = now / 1000;
+        const S = Math.min(width / 920, height / 760);
+        const cx = width / 2 + pointer.x * 13 * S;
+        const cy = height * .58 + pointer.y * 6 * S;
+        const bw = 310 * S, bh = 112 * S;
+
+        // Room, warm pool of light, and table plane.
+        let g = ctx.createRadialGradient(cx, cy - 100*S, 10, cx, cy - 80*S, Math.max(width, height)*.72);
+        g.addColorStop(0, '#2c1b0e'); g.addColorStop(.24, '#17100b'); g.addColorStop(.7, '#080808'); g.addColorStop(1, '#030405');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, width, height);
+        const tableY = cy + 120*S;
+        g = ctx.createLinearGradient(0, tableY - 50*S, 0, height);
+        g.addColorStop(0, 'rgba(36,23,15,0)'); g.addColorStop(.18, '#100c09'); g.addColorStop(1, '#050505');
+        ctx.fillStyle = g; ctx.fillRect(0, tableY - 50*S, width, height-tableY+50*S);
+
+        // Halo and grounded shadow.
+        g = ctx.createRadialGradient(cx, cy-35*S, 5, cx, cy-35*S, 390*S);
+        g.addColorStop(0, 'rgba(255,141,45,.14)'); g.addColorStop(1, 'rgba(255,100,20,0)');
+        ctx.fillStyle = g; ctx.fillRect(cx-410*S,cy-400*S,820*S,760*S);
+        ctx.save(); ctx.filter = `blur(${18*S}px)`;
+        ellipse(cx, cy+155*S, bw*.9, 39*S, 'rgba(0,0,0,.86)'); ctx.restore();
+
+        // Back half of the bowl and rim.
+        g = ctx.createLinearGradient(cx, cy-bh, cx, cy+bh*1.8);
+        g.addColorStop(0, '#312f2b'); g.addColorStop(.48, '#151719'); g.addColorStop(.82, '#090b0d'); g.addColorStop(1, '#24201a');
+        path([[cx-bw,cy-28*S],[cx-bw*.78,cy+112*S],[cx-bw*.47,cy+168*S],[cx,cy+184*S],[cx+bw*.47,cy+168*S],[cx+bw*.78,cy+112*S],[cx+bw,cy-28*S]]);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,205,132,.16)'; ctx.lineWidth = 2*S; ctx.stroke();
+        ellipse(cx, cy-28*S, bw, bh, '#121516', 'rgba(240,205,150,.3)', 5*S);
+        ellipse(cx, cy-30*S, bw-17*S, bh-15*S, '#5a2815');
+
+        // Broth surface.
+        g = ctx.createRadialGradient(cx-80*S, cy-65*S, 10*S, cx, cy-25*S, bw);
+        g.addColorStop(0, '#c06926'); g.addColorStop(.3, '#853914'); g.addColorStop(.72, '#491d0d'); g.addColorStop(1, '#26110b');
+        ellipse(cx, cy-31*S, bw-22*S, bh-19*S, g);
+        ctx.save(); ctx.globalCompositeOperation = 'screen';
+        ellipse(cx-64*S,cy-67*S,134*S,29*S,'rgba(255,172,72,.08)'); ctx.restore();
+
+        // Noodle ribbons under toppings.
+        ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = '#e0ae58'; ctx.lineWidth = 5*S;
+        for (let i = 0; i < 11; i++) {
+          const yy = cy - 69*S + i*10*S;
+          ctx.beginPath(); ctx.moveTo(cx-190*S, yy);
+          ctx.bezierCurveTo(cx-85*S, yy+35*S*Math.sin(i), cx+70*S, yy-28*S*Math.cos(i*.8), cx+190*S, yy+4*S);
+          ctx.stroke();
+          ctx.strokeStyle = i%2 ? '#c88d3d' : '#e0ae58';
+        }
+        ctx.restore();
+
+        // Ingredients arranged as one abundant focal cluster.
+        const bob = Math.sin(t*.8)*1.2*S*motion;
+        ctx.save(); ctx.translate(pointer.x*-5*S, pointer.y*-3*S + bob);
+        leaf(cx-165*S,cy-72*S,54*S,-.65,'#4f7d3c');
+        leaf(cx-112*S,cy-91*S,47*S,-.12,'#6b943f');
+        leaf(cx-204*S,cy-33*S,43*S,-1.02,'#426d35');
+        mushroom(cx+137*S,cy-88*S,74*S,.17);
+        mushroom(cx+202*S,cy-47*S,60*S,.78);
+        mushroom(cx+75*S,cy-70*S,54*S,-.38);
+        tofu(cx-21*S,cy-76*S,62*S,-.16);
+        tofu(cx+40*S,cy-41*S,52*S,.2);
+        tofu(cx-64*S,cy-22*S,48*S,.13);
+        // Radish slices.
+        [[-7,-119,37],[89,-112,31]].forEach(([x,y,s]) => {
+          ellipse(cx+x*S,cy+y*S,s*S,s*.56*S,'#f0dbcc','#a13938',3*S);
+          ellipse(cx+x*S,cy+y*S,s*.42*S,s*.2*S,'rgba(198,68,57,.55)');
+        });
+        // Scallions and chili oil.
+        [[-135,-35],[25,-105],[113,-25],[-72,-111],[165,-75]].forEach(([x,y],i) => {
+          ellipse(cx+x*S,cy+y*S,(10+i%2*3)*S,(5+i%2*2)*S,'#91bb54','#d0df7a',1*S);
+          ellipse(cx+x*S,cy+y*S,4*S,2*S,'#294f27');
+        });
+        [[-98,-54],[58,-80],[122,-57],[4,-9]].forEach(([x,y]) => ellipse(cx+x*S,cy+y*S,8*S,4*S,'rgba(213,48,17,.75)'));
+        ctx.restore();
+
+        // Front rim catches the light and makes ingredients sit inside the vessel.
+        ctx.beginPath(); ctx.ellipse(cx,cy-27*S,bw,bh,0,0,Math.PI); ctx.lineWidth=7*S;
+        g=ctx.createLinearGradient(cx-bw,0,cx+bw,0); g.addColorStop(0,'#121416');g.addColorStop(.48,'#9a6b3f');g.addColorStop(.55,'#bb8650');g.addColorStop(1,'#151719');
+        ctx.strokeStyle=g;ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(cx,cy-23*S,bw-8*S,bh-7*S,0,.06,Math.PI-.06); ctx.strokeStyle='rgba(255,205,137,.22)';ctx.lineWidth=2*S;ctx.stroke();
+
+        // Steam drifts toward the cursor, drawn last so it glows against darkness.
+        ctx.save(); ctx.globalCompositeOperation = 'screen';
+        steam.forEach((p, i) => {
+          if (motion) { p.y += dt*p.speed; if (p.y > 1) Object.assign(p, makeSteam(0)); }
+          const rise = p.y;
+          const sx = cx + p.x*bw + Math.sin(t*p.sway+p.phase+rise*5)*28*S + pointer.x*28*S*rise;
+          const sy = cy - 105*S - rise*285*S;
+          const a = p.alpha*Math.sin(Math.PI*rise);
+          ctx.filter = `blur(${(10+rise*15)*S}px)`;
+          const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,p.size*bw);
+          sg.addColorStop(0,`rgba(255,232,197,${a})`);sg.addColorStop(1,'rgba(255,220,180,0)');
+          ellipse(sx,sy,p.size*bw,p.size*bw*1.7,sg);
+        });
+        ctx.restore(); ctx.filter='none';
+
+        // Vignette and almost-imperceptible film grain.
+        g=ctx.createRadialGradient(width/2,height*.48,Math.min(width,height)*.25,width/2,height*.48,Math.max(width,height)*.72);
+        g.addColorStop(.45,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.72)');ctx.fillStyle=g;ctx.fillRect(0,0,width,height);
+        ctx.fillStyle='rgba(255,255,255,.012)';
+        for(let i=0;i<90;i++){const n=(i*7919+(now/180|0)*104729)%99991;ctx.fillRect((n%997)/997*width,((n*47)%991)/991*height,1,1);}
+
+        if (!reduced.matches) raf=requestAnimationFrame(draw);
+      }
+
+      addEventListener('pointermove', e => {
+        pointer.tx = clamp((e.clientX/width-.5)*2,-1,1);
+        pointer.ty = clamp((e.clientY/height-.5)*2,-1,1);
+        pointer.active = true;
+        if (reduced.matches) draw(performance.now(), true);
+      }, { passive: true });
+      addEventListener('pointerleave', () => { pointer.tx=pointer.ty=0; });
+      addEventListener('resize', resize, { passive: true });
+      reduced.addEventListener('change', () => { cancelAnimationFrame(raf); resize(); });
+      resize();
+    })();
+  </script>
+</body>
+</html>

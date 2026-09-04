@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#100e0b">
+<title>Warmth</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#100e0b}body{min-height:100svh}main{position:relative;width:100%;height:100%;isolation:isolate;background:radial-gradient(ellipse at 50% 49%,#35291b55 0, #19150f44 35%,transparent 65%),linear-gradient(#0d0d0b,#18130e)}main:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' opacity='.35' d='M0 0h180v180H0z'/%3E%3C/svg%3E")}svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.scene{transform-origin:500px 470px}.steam{fill:none;stroke:#ffe7c3;stroke-linecap:round;filter:url(#steamBlur);opacity:0;animation:drift 7s infinite ease-out}.steam:nth-child(2){animation-delay:-2.6s;animation-duration:8s}.steam:nth-child(3){animation-delay:-4.7s;animation-duration:9s}.steam:nth-child(4){animation-delay:-1.2s;animation-duration:7.8s}.steam:nth-child(5){animation-delay:-5.5s;animation-duration:10s}@keyframes drift{0%{opacity:0;transform:translate(0,28px) scaleX(.8)}25%{opacity:.17}65%{opacity:.09}100%{opacity:0;transform:translate(20px,-115px) scaleX(1.16)}}.heat{animation:breathe 6s ease-in-out infinite}@keyframes breathe{50%{opacity:.65}}@media(max-aspect-ratio:3/4){svg{width:155%;left:-27.5%}}@media(prefers-reduced-motion:reduce){.steam{animation:none;opacity:.075}.heat{animation:none}}
+</style>
+</head>
+<body>
+<main aria-label="A steaming bowl of vegan ramen in warm, quiet darkness">
+<svg viewBox="0 0 1000 800" role="img" aria-labelledby="scene-title" preserveAspectRatio="xMidYMid meet">
+<title id="scene-title">Golden broth, noodles, shiitake mushrooms, tofu, and fresh greens in a handmade ceramic bowl</title>
+<defs>
+<radialGradient id="halo"><stop stop-color="#c98537" stop-opacity=".14"/><stop offset="1" stop-color="#b97131" stop-opacity="0"/></radialGradient>
+<linearGradient id="ceramic" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#b3a18a"/><stop offset=".25" stop-color="#e2d0af"/><stop offset=".5" stop-color="#b8a17f"/><stop offset=".8" stop-color="#74644e"/><stop offset="1" stop-color="#3b342b"/></linearGradient>
+<linearGradient id="rim" x2="0" y2="1"><stop stop-color="#d6c5a2"/><stop offset=".45" stop-color="#f1dcad"/><stop offset="1" stop-color="#7d6748"/></linearGradient>
+<radialGradient id="broth" cx=".42" cy=".35" r=".65"><stop stop-color="#c67a24"/><stop offset=".65" stop-color="#955018"/><stop offset="1" stop-color="#452812"/></radialGradient>
+<linearGradient id="leaf" x2="1" y2="1"><stop stop-color="#93aa46"/><stop offset=".42" stop-color="#557c30"/><stop offset="1" stop-color="#203c1d"/></linearGradient>
+<linearGradient id="tofu" x2=".7" y2="1"><stop stop-color="#fae0a0"/><stop offset=".6" stop-color="#dba94e"/><stop offset="1" stop-color="#935422"/></linearGradient>
+<radialGradient id="cap" cx=".35" cy=".2"><stop stop-color="#a06a3d"/><stop offset=".6" stop-color="#704022"/><stop offset="1" stop-color="#352315"/></radialGradient>
+<filter id="shadow"><feGaussianBlur stdDeviation="17"/></filter>
+<filter id="steamBlur"><feGaussianBlur stdDeviation="6"/></filter>
+<filter id="texture"><feTurbulence type="fractalNoise" baseFrequency=".48" numOctaves="3" seed="12" result="noise"/><feComposite in="noise" in2="SourceGraphic" operator="in" result="grain"/><feBlend in="SourceGraphic" in2="grain" mode="soft-light"/></filter>
+<clipPath id="soupClip"><ellipse cx="500" cy="417" rx="222" ry="88"/></clipPath>
+</defs>
+<ellipse class="heat" cx="500" cy="475" rx="385" ry="290" fill="url(#halo)"/>
+<ellipse cx="506" cy="629" rx="251" ry="30" fill="#000" opacity=".6" filter="url(#shadow)"/>
+<ellipse cx="501" cy="638" rx="125" ry="6" fill="#ab7130" opacity=".065" filter="url(#steamBlur)"/>
+<g class="scene" id="scene">
+<ellipse cx="500" cy="601" rx="80" ry="22" fill="#40392e"/>
+<path d="M425 591L430 612Q501 637 573 611L578 591" fill="url(#ceramic)"/>
+<path d="M257 416C267 501 308 570 389 597Q500 647 613 596C689 561 733 495 743 416Z" fill="url(#ceramic)"/>
+<path d="M272 457C311 540 396 588 496 593" fill="none" stroke="#f5e6c5" stroke-width="2" opacity=".16"/>
+<path d="M283 486Q500 642 713 484" fill="none" stroke="#544937" stroke-width="2" opacity=".2"/>
+<g id="speckles"></g>
+<ellipse cx="500" cy="414" rx="245" ry="108" fill="url(#rim)"/>
+<ellipse cx="500" cy="413" rx="230" ry="95" fill="#4a321e"/>
+<ellipse cx="500" cy="417" rx="222" ry="88" fill="url(#broth)"/>
+<g clip-path="url(#soupClip)">
+<g id="oil"></g>
+<g id="noodles" fill="none" stroke-linecap="round"></g>
+<g transform="translate(352 353) rotate(-22)">
+<path d="M13 87C-19 61 -35 8 -8 -8C9 -18 26 10 28 29C31 -9 65 -20 73 7C87 42 53 77 25 95Z" fill="url(#leaf)"/>
+<path d="M20 86Q19 32 3 1M21 65L-13 24M22 48L45 8M23 81L60 36" fill="none" stroke="#abc36a" stroke-width="2" opacity=".55"/>
+<path d="M19 100Q26 69 30 43" fill="none" stroke="#c6d797" stroke-width="12"/>
+</g>
+<g transform="translate(399 357) rotate(17)"><path d="M0 64C-37 32 -22 -22 2 -13C22 -37 60 -14 49 17C40 43 22 57 0 64" fill="url(#leaf)"/><path d="M-2 70L18 -9M8 35L-12 8M12 22L35 3" stroke="#a9bd62" stroke-width="2" fill="none" opacity=".6"/></g>
+<g transform="translate(602 371) rotate(14)"><path d="M-45 -21L24 -30L49 3L-21 19Z" fill="url(#tofu)"/><path d="M-21 19L49 3L45 26L-22 43Z" fill="#a5682c"/><path d="M-45 -21L-21 19L-22 43L-48 0Z" fill="#ddad5d"/><path d="M-35 -16L21 -23M-24 -3L30 -11M-15 9L38 0" stroke="#895124" stroke-width="4" opacity=".6"/></g>
+<g transform="translate(660 413) rotate(26)"><path d="M-36 -22L18 -27L35 5L-20 15Z" fill="url(#tofu)"/><path d="M-20 15L35 5L32 26L-22 34Z" fill="#a46a32"/><path d="M-36 -22L-20 15L-22 34L-38 -2Z" fill="#d7a457"/><path d="M-27 -16L16 -20M-22 -4L23 -9M-14 7L28 2" stroke="#955624" stroke-width="3" opacity=".65"/></g>
+<g transform="translate(358 439) rotate(-19)"><path d="M-43 4Q-3 -16 43 4L34 17Q0 37 -36 17Z" fill="#ccad79"/><path d="M-32 12L-17 18M-20 8L-7 23M-6 6L2 25M8 7L14 23M23 9L24 20" stroke="#755334" stroke-width="2"/><path d="M-45 5C-44 -45 34 -53 45 4Q7 24 -45 5" fill="url(#cap)"/><path d="M-18 -24L16 -4M9 -31L-8 -2" stroke="#c49b68" stroke-width="5" stroke-linecap="round"/></g>
+<g transform="translate(411 477) rotate(12) scale(.82)"><path d="M-44 0Q0 -12 45 0L35 22Q0 34 -35 20Z" fill="#c4a273"/><path d="M-45 4C-44 -46 35 -50 45 3Q5 24 -45 4" fill="url(#cap)"/><path d="M-20 -24L15 -5M8 -29L-10 -2" stroke="#c49b68" stroke-width="5" stroke-linecap="round"/></g>
+<g id="garnish"></g>
+</g>
+<ellipse cx="500" cy="414" rx="240" ry="104" fill="none" stroke="#fff1cd" stroke-width="1.7" opacity=".4"/>
+<path d="M274 449Q305 484 363 497" fill="none" stroke="#fff0c8" stroke-width="3" opacity=".4" stroke-linecap="round"/>
+<g style="pointer-events:none">
+<path class="steam" d="M428 365C385 319 474 294 438 248S432 188 453 163" stroke-width="17"/>
+<path class="steam" d="M511 365C557 320 470 292 514 244S547 186 518 151" stroke-width="21"/>
+<path class="steam" d="M581 375C547 332 615 307 582 269S566 223 592 193" stroke-width="13"/>
+<path class="steam" d="M463 367C493 331 445 300 479 262S483 211 469 185" stroke-width="10"/>
+<path class="steam" d="M541 374C518 337 575 300 547 262S536 204 555 178" stroke-width="15"/>
+</g>
+</g>
+</svg>
+</main>
+<script>
+(()=>{
+const ns='http://www.w3.org/2000/svg';let seed=72;
+const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+function add(parent,tag,attrs){const el=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,v);document.getElementById(parent).appendChild(el);return el}
+for(let i=0;i<95;i++){const x=287+random()*426,y=335+random()*165,r=1+random()*4;add('oil','ellipse',{cx:x,cy:y,rx:r,ry:r*.45,fill:random()>.5?'#f6b94e':'#55290d',opacity:.18+random()*.28})}
+for(let i=0;i<30;i++){const y=380+i*3.1,x=448+Math.sin(i*.85)*13;const d=`M ${x-17} ${y+12} C ${x-58} ${y-24}, ${x+115} ${y-31}, ${x+131} ${y-2} S ${x-1} ${y+33}, ${x+11} ${y+8} S ${x+99} ${y-8}, ${x+93} ${y+13}`;add('noodles','path',{d,stroke:'#613810','stroke-width':6.5});add('noodles','path',{d,stroke:i%3===0?'#e4b761':'#d5a04a','stroke-width':3.8});}
+for(let i=0;i<64;i++){const x=459+random()*128,y=393+random()*72;if(i<28){add('garnish','ellipse',{cx:x,cy:y,rx:4+random()*3,ry:2.6,fill:'#294621',stroke:i%2?'#97b953':'#71953d','stroke-width':2.5,transform:`rotate(${random()*150} ${x} ${y})`})}else{add('garnish','ellipse',{cx:335+random()*329,cy:373+random()*113,rx:2.2,ry:.9,fill:i%3?'#e8cc8e':'#30241a',transform:`rotate(${random()*180} ${x} ${y})`})}}
+for(let i=0;i<330;i++){let x=285+random()*427,y=465+random()*143;const half=218*Math.sqrt(Math.max(0,1-((y-423)/194)**2));if(Math.abs(x-500)<half&&y>514-65*((x-500)/220)**2)add('speckles','circle',{cx:x,cy:y,r:random()*.95+.2,fill:'#423a2d',opacity:random()*.28});}
+const scene=document.getElementById('scene'),media=matchMedia('(prefers-reduced-motion: reduce)');let tx=0,ty=0,x=0,y=0,frame=0;
+function animate(){x+=(tx-x)*.045;y+=(ty-y)*.045;scene.style.transform=`translate(${x*7}px,${y*4}px) rotate(${x*.65}deg)`;if(Math.abs(tx-x)+Math.abs(ty-y)>.001)frame=requestAnimationFrame(animate);else frame=0}
+function move(e){if(media.matches)return;tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2;if(!frame)frame=requestAnimationFrame(animate)}
+window.addEventListener('pointermove',move,{passive:true});document.addEventListener('pointerleave',()=>{tx=ty=0;if(!media.matches&&!frame)frame=requestAnimationFrame(animate)});media.addEventListener('change',()=>{if(media.matches){cancelAnimationFrame(frame);frame=0;x=y=tx=ty=0;scene.style.transform='none'}});
+})();
+</script>
+</body>
+</html>

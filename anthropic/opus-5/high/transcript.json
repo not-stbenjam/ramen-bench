@@ -1,0 +1,21 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
+  "schemaVersion": 1,
+  "runId": "anthropic/opus-5/high",
+  "sourceFormat": "codex-exec-public-summary",
+  "events": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": "Create a single-file HTML page (index.html) with all CSS and JavaScript inline and zero external assets. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.",
+      "timestamp": "2026-09-04T22:39:46Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Created the requested single-file ramen scene in index.html.",
+      "timestamp": "2026-09-04T22:39:46Z"
+    }
+  ],
+  "metadata": {}
+}

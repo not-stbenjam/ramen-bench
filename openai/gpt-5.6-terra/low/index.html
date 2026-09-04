@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ramen</title>
+<style>
+  :root { color-scheme: dark; --px: 0; --py: 0; }
+  * { box-sizing: border-box; }
+  html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#080b0a; }
+  body { display:grid; place-items:center; }
+  .scene {
+    position:relative; isolation:isolate; width:100%; height:100%; overflow:hidden;
+    background:
+      radial-gradient(ellipse at 50% 69%, #4b2412 0%, #21150e 21%, transparent 48%),
+      radial-gradient(ellipse at 50% 44%, #19302a 0%, #0e1715 30%, #080b0a 70%);
+  }
+  .scene::before, .scene::after { content:""; position:absolute; pointer-events:none; }
+  .scene::before { inset:-20%; opacity:.46; background:repeating-radial-gradient(ellipse at center, transparent 0 3px, rgba(236,199,124,.022) 4px 5px); mix-blend-mode:screen; }
+  .scene::after { inset:0; z-index:9; background:radial-gradient(ellipse at center, transparent 22%, rgba(0,0,0,.42) 85%); }
+  .warmth { position:absolute; width:min(72vw,780px); height:min(58vw,590px); left:50%; top:48%; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(ellipse, rgba(249,121,37,.16), rgba(219,64,14,.07) 33%, transparent 69%); filter:blur(16px); animation:breathe 7s ease-in-out infinite; }
+  .table { position:absolute; width:150vmax; height:54%; left:50%; bottom:-31%; transform:translateX(calc(-50% + var(--px))); border-radius:50% 50% 0 0; background:radial-gradient(ellipse at 50% 0%, #3f2419, #1c1411 48%, #0e0d0c 76%); box-shadow:0 -20px 60px rgba(0,0,0,.6); }
+  .bowl-wrap { position:absolute; left:50%; top:54%; width:min(72vw,650px); aspect-ratio:1.24; transform:translate(calc(-50% + var(--px)), calc(-50% + var(--py))); transition:transform .25s cubic-bezier(.2,.8,.2,1); filter:drop-shadow(0 40px 25px rgba(0,0,0,.6)); z-index:3; }
+  .bowl { position:absolute; inset:17% 0 0; overflow:hidden; border-radius:10% 10% 46% 46% / 8% 8% 64% 64%; background:linear-gradient(105deg,#742d19 0%,#c76532 16%,#7e2919 42%,#3b1513 74%,#190d0d 100%); border:2px solid rgba(248,158,93,.35); box-shadow:inset 18px 6px 30px rgba(255,182,109,.22), inset -28px -15px 34px rgba(13,3,3,.52), 0 4px 0 #140b0b; }
+  .bowl::before { content:""; position:absolute; left:5%; right:5%; bottom:10%; height:32%; border-radius:50%; background:linear-gradient(180deg, transparent, rgba(34,5,3,.24)); box-shadow:inset 0 8px 15px rgba(255,181,108,.1); }
+  .bowl::after { content:""; position:absolute; left:39%; bottom:5%; width:23%; height:10%; border-radius:0 0 50% 50%; background:#2a1110; box-shadow:0 5px 5px #090606; }
+  .rim { position:absolute; z-index:4; left:2%; right:2%; top:7%; height:45%; border-radius:50%; background:linear-gradient(180deg,#eea060,#8f3921 13%,#2a100d 19%,#17110c 23%,#6e2e1e 27%,#d3783c 37%,#592114 47%,#190d0b 55%); box-shadow:0 -3px 15px rgba(255,188,110,.3), inset 0 7px 7px rgba(255,207,135,.31); }
+  .broth { position:absolute; z-index:5; left:6%; right:6%; top:13%; height:32%; overflow:hidden; border-radius:50%; background:radial-gradient(ellipse at 47% 45%,#f2a449 0%,#d05b25 34%,#7e2c16 72%,#32110c 100%); box-shadow:inset 0 0 24px #491307, inset 0 7px 12px rgba(255,207,115,.42); }
+  .broth::before { content:""; position:absolute; inset:8%; border-radius:50%; opacity:.42; background:repeating-radial-gradient(ellipse at 50% 60%, transparent 0 13px, rgba(255,224,139,.15) 14px 15px); animation:ripple 6s ease-in-out infinite; }
+  .noodles { position:absolute; z-index:6; left:17%; right:16%; top:20%; height:20%; border-radius:50%; background:repeating-radial-gradient(ellipse at 50% 70%, transparent 0 7px, #f7d67a 8px 12px, #b87328 13px 15px); transform:rotate(-4deg); opacity:.95; filter:drop-shadow(1px 3px 1px #70300e); }
+  .noodles::after { content:""; position:absolute; inset:5% 2%; border-radius:50%; border-top:5px solid #f7d67a; border-bottom:4px solid #d28d34; transform:rotate(12deg); }
+  .topping { position:absolute; z-index:7; border-radius:50%; box-shadow:inset -5px -5px 5px rgba(0,0,0,.2), 1px 3px 5px rgba(42,8,0,.5); }
+  .tofu { width:13%; aspect-ratio:1; top:23%; left:36%; border-radius:30% 37% 28% 34%; background:linear-gradient(135deg,#f6db8a,#cc8b37); transform:rotate(22deg); }
+  .mushroom { width:16%; height:10%; top:25%; left:56%; background:linear-gradient(155deg,#e9ae61,#88421f); border-radius:90% 90% 30% 30%; transform:rotate(-20deg); }
+  .mushroom::after { content:""; position:absolute; left:38%; top:59%; height:82%; width:23%; border-radius:0 0 40% 40%; background:#f0c87a; }
+  .greens { width:17%; height:11%; top:19%; left:25%; background:#3d7841; border-radius:100% 0 100% 0; transform:rotate(28deg); box-shadow:10px 7px 0 #275839, 20px -1px 0 #4e8e4b; }
+  .chili { width:6%; height:6%; top:29%; left:70%; background:#b92815; box-shadow:-19px -10px 0 #d5451e, -8px 13px 0 #a91e15, 10px -17px 0 #e75a27; }
+  .scallion { position:absolute; z-index:8; width:4%; height:18%; top:14%; left:65%; border-radius:100%; background:linear-gradient(90deg,#b9dc72,#427f43); transform:rotate(30deg); box-shadow:-25px 24px 0 -3px #8ebe5e, -47px 12px 0 -2px #6d9c50; }
+  .steam { position:absolute; z-index:2; left:50%; bottom:53%; width:50%; height:48%; transform:translateX(-50%); filter:blur(9px); opacity:.72; }
+  .steam i { position:absolute; bottom:0; width:18%; height:82%; border-radius:48% 52% 45% 55%; border-left:clamp(7px,1.3vw,14px) solid rgba(255,228,189,.42); animation:steam 5.5s ease-in-out infinite; }
+  .steam i:nth-child(1){left:7%; height:62%; animation-delay:-1.2s}.steam i:nth-child(2){left:30%;height:91%;animation-delay:-3.7s}.steam i:nth-child(3){left:56%;height:73%;animation-delay:-2s}.steam i:nth-child(4){left:78%;height:89%;animation-delay:-4.4s}
+  .spark { position:absolute; z-index:2; width:4px; height:4px; border-radius:50%; background:#ffc36c; box-shadow:0 0 12px 4px rgba(255,135,39,.5); animation:spark 4s ease-in infinite; }
+  .spark:nth-of-type(1){left:26%;top:48%;animation-delay:-1s}.spark:nth-of-type(2){left:73%;top:52%;animation-delay:-2.7s}.spark:nth-of-type(3){left:60%;top:34%;animation-delay:-.5s}
+  @keyframes steam { 0%,100% {transform:translate(0,15%) scale(.75);opacity:0} 18%{opacity:.7} 55%{transform:translate(20px,-35%) rotate(8deg) scale(1);opacity:.42} 80%{opacity:0} }
+  @keyframes breathe {50%{transform:translate(-50%,-50%) scale(1.12);opacity:.72}} @keyframes ripple {50%{transform:scale(.89);opacity:.18}} @keyframes spark {0%,100%{transform:translateY(15px);opacity:0}35%{opacity:.8}80%{transform:translateY(-55px);opacity:0}}
+  @media (max-width:600px){.bowl-wrap{width:105vw;top:58%}.steam{bottom:48%;height:44%}.warmth{width:120vw}.table{height:47%}}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.bowl-wrap{transform:translate(-50%,-50%)!important}}
+</style>
+</head>
+<body>
+<main class="scene" aria-label="A steaming bowl of vegan ramen">
+  <div class="warmth"></div><div class="table"></div>
+  <div class="steam" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="spark"></div><div class="spark"></div><div class="spark"></div>
+  <div class="bowl-wrap"><div class="bowl"></div><div class="rim"></div><div class="broth"></div><div class="noodles"></div><div class="topping tofu"></div><div class="topping mushroom"></div><div class="topping greens"></div><div class="topping chili"></div><div class="scallion"></div></div>
+</main>
+<script>
+  const scene = document.querySelector('.scene');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  scene.addEventListener('pointermove', e => {
+    if (reduced.matches) return;
+    const x = (e.clientX / innerWidth - .5), y = (e.clientY / innerHeight - .5);
+    scene.style.setProperty('--px', `${x * 15}px`);
+    scene.style.setProperty('--py', `${y * 9}px`);
+  });
+  scene.addEventListener('pointerleave', () => { scene.style.setProperty('--px','0px'); scene.style.setProperty('--py','0px'); });
+</script>
+</body>
+</html>

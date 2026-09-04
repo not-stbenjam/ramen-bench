@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <style>
+    :root {
+      color-scheme: dark;
+      background: #080605;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 56%, rgba(163, 71, 26, 0.22), transparent 34%),
+        radial-gradient(circle at 50% 22%, rgba(66, 56, 47, 0.26), transparent 38%),
+        linear-gradient(180deg, #100d0c 0%, #050404 76%, #020202 100%);
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html,
+      body,
+      canvas {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene" role="img" aria-label="A steaming bowl of vegan ramen in warm darkness"></canvas>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('scene');
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const reduceMotionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+
+      let w = 0;
+      let h = 0;
+      let dpr = 1;
+      let frameId = 0;
+      let start = performance.now();
+      let reducedMotion = reduceMotionQuery.matches;
+      let mouseActive = false;
+      let pointer = { x: 0, y: 0 };
+      let eased = { x: 0, y: 0 };
+      let lastMove = 0;
+
+      const steam = [];
+      const motes = [];
+      const noodles = [];
+      const scallions = [];
+      const sesame = [];
+
+      function seeded(seed) {
+        let value = seed >>> 0;
+        return () => {
+          value = (value * 1664525 + 1013904223) >>> 0;
+          return value / 4294967296;
+        };
+      }
+
+      const random = seeded(11851);
+
+      function rand(min, max) {
+        return min + (max - min) * random();
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function ellipsePath(cx, cy, rx, ry) {
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      }
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = Math.max(1, window.innerWidth);
+        h = Math.max(1, window.innerHeight);
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        draw(reducedMotion ? 0 : (performance.now() - start) / 1000);
+      }
+
+      function resetParticles() {
+        steam.length = 0;
+        motes.length = 0;
+        noodles.length = 0;
+        scallions.length = 0;
+        sesame.length = 0;
+
+        for (let i = 0; i < 34; i += 1) {
+          steam.push({
+            seed: rand(0, 1000),
+            x: rand(-0.56, 0.56),
+            y: rand(0, 1),
+            speed: rand(0.045, 0.105),
+            width: rand(0.06, 0.18),
+            height: rand(0.28, 0.62),
+            alpha: rand(0.08, 0.26),
+            curl: rand(0.8, 1.9),
+            phase: rand(0, Math.PI * 2)
+          });
+        }
+
+        for (let i = 0; i < 42; i += 1) {
+          motes.push({
+            x: rand(-1.3, 1.3),
+            y: rand(-0.85, 0.7),
+            r: rand(0.002, 0.008),
+            alpha: rand(0.04, 0.16),
+            phase: rand(0, Math.PI * 2),
+            speed: rand(0.05, 0.22)
+          });
+        }
+
+        for (let i = 0; i < 28; i += 1) {
+          noodles.push({
+            x: rand(-0.54, 0.54),
+            y: rand(-0.15, 0.13),
+            length: rand(0.22, 0.48),
+            amp: rand(0.018, 0.045),
+            turns: rand(1.6, 3.2),
+            angle: rand(-0.24, 0.24),
+            phase: rand(0, Math.PI * 2),
+            width: rand(0.006, 0.014)
+          });
+        }
+
+        for (let i = 0; i < 44; i += 1) {
+          const a = rand(0, Math.PI * 2);
+          const radius = Math.sqrt(rand(0, 1));
+          scallions.push({
+            x: Math.cos(a) * radius * rand(0.03, 0.54),
+            y: Math.sin(a) * radius * rand(0.01, 0.2),
+            r: rand(0.012, 0.027),
+            angle: rand(0, Math.PI),
+            color: random() > 0.48 ? '#8ebf5d' : '#5d9c50',
+            phase: rand(0, Math.PI * 2)
+          });
+        }
+
+        for (let i = 0; i < 52; i += 1) {
+          const a = rand(0, Math.PI * 2);
+          const radius = Math.sqrt(rand(0, 1));
+          sesame.push({
+            x: Math.cos(a) * radius * rand(0.03, 0.5),
+            y: Math.sin(a) * radius * rand(0.01, 0.18),
+            r: rand(0.004, 0.011),
+            alpha: rand(0.35, 0.75),
+            phase: rand(0, Math.PI * 2)
+          });
+        }
+      }
+
+      function setPointer(clientX, clientY) {
+        const nx = (clientX / Math.max(w, 1) - 0.5) * 2;
+        const ny = (clientY / Math.max(h, 1) - 0.5) * 2;
+        pointer.x = clamp(nx, -1, 1);
+        pointer.y = clamp(ny, -1, 1);
+        mouseActive = true;
+        lastMove = performance.now();
+        if (reducedMotion) {
+          eased.x = pointer.x * 0.35;
+          eased.y = pointer.y * 0.35;
+          draw(0);
+        }
+      }
+
+      function clearPointer() {
+        mouseActive = false;
+      }
+
+      function background(t, s) {
+        const glow = 0.82 + Math.sin(t * 1.1) * 0.08;
+        const warmX = w * (0.5 + eased.x * 0.035);
+        const warmY = h * (0.49 + eased.y * 0.018);
+
+        const bg = ctx.createLinearGradient(0, 0, 0, h);
+        bg.addColorStop(0, '#15110f');
+        bg.addColorStop(0.45, '#0a0807');
+        bg.addColorStop(1, '#020202');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, w, h);
+
+        let g = ctx.createRadialGradient(warmX, warmY, s * 0.08, warmX, warmY, s * 1.18);
+        g.addColorStop(0, `rgba(248, 143, 63, ${0.29 * glow})`);
+        g.addColorStop(0.26, `rgba(167, 64, 30, ${0.17 * glow})`);
+        g.addColorStop(0.6, 'rgba(44, 31, 24, 0.11)');
+        g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        g = ctx.createRadialGradient(w * 0.5, h * 0.48, s * 0.35, w * 0.5, h * 0.48, Math.max(w, h) * 0.72);
+        g.addColorStop(0, 'rgba(0,0,0,0)');
+        g.addColorStop(0.68, 'rgba(0,0,0,0.28)');
+        g.addColorStop(1, 'rgba(0,0,0,0.82)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        for (const mote of motes) {
+          const drift = reducedMotion ? 0 : Math.sin(t * mote.speed + mote.phase) * 0.035;
+          const x = w * 0.5 + (mote.x + drift + eased.x * 0.04) * s;
+          const y = h * 0.47 + (mote.y - (reducedMotion ? 0 : (t * mote.speed * 0.035) % 0.12)) * s;
+          ctx.fillStyle = `rgba(252, 174, 91, ${mote.alpha})`;
+          ellipsePath(x, y, mote.r * s, mote.r * s);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawSteam(cx, cy, s, t) {
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.globalCompositeOperation = 'screen';
+
+        for (const p of steam) {
+          const progress = reducedMotion ? p.y : (p.y + t * p.speed) % 1;
+          const rise = progress * p.height * s;
+          const fade = Math.sin(progress * Math.PI);
+          const side = p.x + Math.sin(t * p.curl + p.phase) * 0.035 + eased.x * 0.09 * progress;
+          const baseX = cx + side * s;
+          const baseY = cy - s * 0.21 - rise;
+          const curl = Math.sin(progress * Math.PI * 2 + p.phase + t * 0.42) * p.width * s;
+          const lean = eased.x * s * 0.12 * (0.2 + progress);
+
+          const grad = ctx.createLinearGradient(baseX, baseY + s * 0.16, baseX + curl + lean, baseY - p.height * s * 0.18);
+          grad.addColorStop(0, `rgba(255, 224, 176, 0)`);
+          grad.addColorStop(0.22, `rgba(255, 224, 176, ${p.alpha * fade * 0.36})`);
+          grad.addColorStop(0.58, `rgba(244, 239, 221, ${p.alpha * fade})`);
+          grad.addColorStop(1, 'rgba(244, 239, 221, 0)');
+
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = Math.max(1, p.width * s * (0.32 + progress * 0.45));
+          ctx.beginPath();
+          ctx.moveTo(baseX, baseY + s * 0.18);
+          ctx.bezierCurveTo(
+            baseX - curl * 0.9 + lean * 0.15,
+            baseY + s * 0.04,
+            baseX + curl * 1.35 + lean * 0.65,
+            baseY - p.height * s * 0.18,
+            baseX + curl * 0.25 + lean,
+            baseY - p.height * s * 0.36
+          );
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawNoodles(cx, cy, rx, ry, s, t, sway) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx * 0.93, ry * 0.72, 0, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.lineCap = 'round';
+
+        for (const noodle of noodles) {
+          const wave = reducedMotion ? 0 : Math.sin(t * 1.4 + noodle.phase) * noodle.amp * s;
+          const x0 = cx + noodle.x * s + sway * 0.14;
+          const y0 = cy + noodle.y * s;
+          const length = noodle.length * s;
+          const segments = 18;
+
+          ctx.beginPath();
+          for (let i = 0; i <= segments; i += 1) {
+            const u = i / segments;
+            const local = (u - 0.5) * length;
+            const wiggle = Math.sin(u * Math.PI * noodle.turns + noodle.phase + t * 0.32) * noodle.amp * s;
+            const x = x0 + Math.cos(noodle.angle) * local - Math.sin(noodle.angle) * (wiggle + wave);
+            const y = y0 + Math.sin(noodle.angle) * local + Math.cos(noodle.angle) * (wiggle + wave * 0.22);
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+
+          ctx.strokeStyle = 'rgba(247, 204, 119, 0.88)';
+          ctx.lineWidth = Math.max(1.2, noodle.width * s * 1.15);
+          ctx.stroke();
+          ctx.strokeStyle = 'rgba(255, 237, 172, 0.34)';
+          ctx.lineWidth = Math.max(0.55, noodle.width * s * 0.38);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawTofu(cx, cy, s, t, sway) {
+        const tofu = [
+          [-0.22, -0.055, 0.09, -0.18],
+          [0.16, 0.02, 0.076, 0.12],
+          [0.31, -0.07, 0.066, -0.1],
+          [-0.02, 0.095, 0.071, 0.23]
+        ];
+
+        ctx.save();
+        for (const item of tofu) {
+          const bob = reducedMotion ? 0 : Math.sin(t * 1.2 + item[0] * 8) * s * 0.004;
+          const x = cx + item[0] * s + sway * 0.12;
+          const y = cy + item[1] * s + bob;
+          const size = item[2] * s;
+
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(item[3] + eased.x * 0.03);
+          ctx.fillStyle = '#ead8a7';
+          ctx.strokeStyle = 'rgba(91, 54, 25, 0.42)';
+          ctx.lineWidth = Math.max(1, s * 0.006);
+          ctx.beginPath();
+          ctx.roundRect(-size * 0.5, -size * 0.42, size, size * 0.84, size * 0.12);
+          ctx.fill();
+          ctx.stroke();
+
+          const blush = ctx.createLinearGradient(-size * 0.4, -size * 0.3, size * 0.45, size * 0.35);
+          blush.addColorStop(0, 'rgba(255,255,236,0.4)');
+          blush.addColorStop(1, 'rgba(207,132,65,0.18)');
+          ctx.fillStyle = blush;
+          ctx.beginPath();
+          ctx.roundRect(-size * 0.42, -size * 0.34, size * 0.84, size * 0.68, size * 0.1);
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawMushrooms(cx, cy, s, t, sway) {
+        const mushrooms = [
+          [-0.36, 0.02, 0.12, -0.12],
+          [0.07, -0.09, 0.105, 0.2],
+          [0.39, 0.045, 0.095, -0.25]
+        ];
+
+        ctx.save();
+        for (const item of mushrooms) {
+          const x = cx + item[0] * s + sway * 0.1;
+          const y = cy + item[1] * s + (reducedMotion ? 0 : Math.cos(t * 1.1 + item[0]) * s * 0.003);
+          const size = item[2] * s;
+
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(item[3] + eased.x * 0.025);
+          const cap = ctx.createRadialGradient(-size * 0.18, -size * 0.18, size * 0.08, 0, 0, size * 0.75);
+          cap.addColorStop(0, '#b87d50');
+          cap.addColorStop(0.58, '#6d3f2c');
+          cap.addColorStop(1, '#2b1813');
+          ctx.fillStyle = cap;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, size * 0.72, size * 0.44, 0, Math.PI, 0);
+          ctx.quadraticCurveTo(size * 0.58, size * 0.34, 0, size * 0.42);
+          ctx.quadraticCurveTo(-size * 0.58, size * 0.34, -size * 0.72, 0);
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(240, 186, 118, 0.38)';
+          ctx.lineWidth = Math.max(1, s * 0.004);
+          for (let i = -2; i <= 2; i += 1) {
+            ctx.beginPath();
+            ctx.moveTo(i * size * 0.17, size * 0.04);
+            ctx.quadraticCurveTo(i * size * 0.08, size * 0.25, 0, size * 0.39);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawGreens(cx, cy, s, t, sway) {
+        const leaves = [
+          [-0.48, -0.06, 0.18, -0.65],
+          [-0.42, 0.005, 0.16, -0.35],
+          [0.48, -0.045, 0.17, 0.56],
+          [0.43, 0.025, 0.145, 0.3]
+        ];
+
+        ctx.save();
+        for (const leaf of leaves) {
+          const flutter = reducedMotion ? 0 : Math.sin(t * 1.3 + leaf[0] * 5) * 0.035;
+          const x = cx + leaf[0] * s + sway * 0.08;
+          const y = cy + leaf[1] * s;
+          const size = leaf[2] * s;
+
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(leaf[3] + flutter + eased.x * 0.04);
+          const grad = ctx.createLinearGradient(-size * 0.25, 0, size * 0.3, size * 0.1);
+          grad.addColorStop(0, '#304e34');
+          grad.addColorStop(0.55, '#77aa62');
+          grad.addColorStop(1, '#adc67c');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(-size * 0.68, 0);
+          ctx.bezierCurveTo(-size * 0.22, -size * 0.34, size * 0.5, -size * 0.28, size * 0.68, 0);
+          ctx.bezierCurveTo(size * 0.3, size * 0.32, -size * 0.24, size * 0.28, -size * 0.68, 0);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(226, 235, 166, 0.28)';
+          ctx.lineWidth = Math.max(1, s * 0.004);
+          ctx.beginPath();
+          ctx.moveTo(-size * 0.52, 0);
+          ctx.quadraticCurveTo(0, -size * 0.02, size * 0.54, 0);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawNori(cx, cy, s, t, sway) {
+        ctx.save();
+        ctx.translate(cx + 0.32 * s + sway * 0.07, cy - 0.21 * s);
+        ctx.rotate(-0.23 + eased.x * 0.035);
+        const bw = 0.22 * s;
+        const bh = 0.33 * s;
+        const grad = ctx.createLinearGradient(-bw / 2, -bh / 2, bw / 2, bh / 2);
+        grad.addColorStop(0, '#182018');
+        grad.addColorStop(0.56, '#0f1510');
+        grad.addColorStop(1, '#040604');
+        ctx.fillStyle = grad;
+        ctx.strokeStyle = 'rgba(111, 145, 84, 0.23)';
+        ctx.lineWidth = Math.max(1, s * 0.004);
+        ctx.beginPath();
+        ctx.roundRect(-bw / 2, -bh / 2, bw, bh, s * 0.012);
+        ctx.fill();
+        ctx.stroke();
+        ctx.globalAlpha = 0.17;
+        ctx.strokeStyle = '#91a46d';
+        ctx.lineWidth = Math.max(0.6, s * 0.002);
+        for (let i = 0; i < 6; i += 1) {
+          const x = -bw * 0.44 + i * bw * 0.18;
+          ctx.beginPath();
+          ctx.moveTo(x, -bh * 0.45);
+          ctx.lineTo(x + Math.sin(t + i) * s * 0.004, bh * 0.46);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawGarnish(cx, cy, rx, ry, s, t, sway) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx * 0.9, ry * 0.68, 0, 0, Math.PI * 2);
+        ctx.clip();
+
+        for (const piece of scallions) {
+          const wiggle = reducedMotion ? 0 : Math.sin(t * 1.7 + piece.phase) * s * 0.003;
+          const x = cx + piece.x * s + sway * 0.1;
+          const y = cy + piece.y * s + wiggle;
+          const r = piece.r * s;
+
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(piece.angle + eased.x * 0.035);
+          ctx.fillStyle = piece.color;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, r * 1.35, r * 0.62, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(24, 56, 29, 0.78)';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, r * 0.58, r * 0.24, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        for (const seed of sesame) {
+          const x = cx + seed.x * s + sway * 0.08;
+          const y = cy + seed.y * s + (reducedMotion ? 0 : Math.sin(t * 1.1 + seed.phase) * s * 0.002);
+          ctx.fillStyle = `rgba(247, 222, 166, ${seed.alpha})`;
+          ellipsePath(x, y, seed.r * s * 1.4, seed.r * s * 0.72);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      function drawBowl(cx, cy, s, t) {
+        const driftX = eased.x * s * 0.035;
+        const driftY = eased.y * s * 0.018;
+        const bob = reducedMotion ? 0 : Math.sin(t * 0.8) * s * 0.006;
+        const bowlX = cx + driftX;
+        const bowlY = cy + driftY + bob;
+        const rimRx = s * 0.62;
+        const rimRy = s * 0.22;
+        const brothY = bowlY - s * 0.035;
+        const sway = eased.x * s * 0.035;
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'multiply';
+        const shadow = ctx.createRadialGradient(bowlX, bowlY + s * 0.37, s * 0.08, bowlX, bowlY + s * 0.37, s * 0.78);
+        shadow.addColorStop(0, 'rgba(0,0,0,0.8)');
+        shadow.addColorStop(0.6, 'rgba(0,0,0,0.42)');
+        shadow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = shadow;
+        ellipsePath(bowlX, bowlY + s * 0.38, s * 0.82, s * 0.24);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        const underGlow = ctx.createRadialGradient(bowlX, bowlY + s * 0.08, s * 0.04, bowlX, bowlY + s * 0.08, s * 0.72);
+        underGlow.addColorStop(0, 'rgba(255, 147, 65, 0.18)');
+        underGlow.addColorStop(0.62, 'rgba(126, 48, 24, 0.08)');
+        underGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = underGlow;
+        ellipsePath(bowlX, bowlY + s * 0.1, s * 0.82, s * 0.32);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(bowlX, bowlY);
+        ctx.rotate(eased.x * 0.018);
+
+        const body = ctx.createLinearGradient(0, -s * 0.03, 0, s * 0.45);
+        body.addColorStop(0, '#6f2418');
+        body.addColorStop(0.4, '#2f1310');
+        body.addColorStop(0.72, '#130908');
+        body.addColorStop(1, '#090504');
+
+        ctx.fillStyle = body;
+        ctx.beginPath();
+        ctx.moveTo(-rimRx * 0.96, -s * 0.02);
+        ctx.bezierCurveTo(-rimRx * 0.82, s * 0.34, -rimRx * 0.45, s * 0.53, 0, s * 0.54);
+        ctx.bezierCurveTo(rimRx * 0.45, s * 0.53, rimRx * 0.82, s * 0.34, rimRx * 0.96, -s * 0.02);
+        ctx.closePath();
+        ctx.fill();
+
+        const ceramic = ctx.createLinearGradient(-rimRx, 0, rimRx, s * 0.12);
+        ceramic.addColorStop(0, 'rgba(255, 156, 79, 0.08)');
+        ceramic.addColorStop(0.34, 'rgba(255, 221, 173, 0.14)');
+        ceramic.addColorStop(0.58, 'rgba(255, 89, 38, 0.06)');
+        ceramic.addColorStop(1, 'rgba(0, 0, 0, 0.32)');
+        ctx.fillStyle = ceramic;
+        ctx.beginPath();
+        ctx.moveTo(-rimRx * 0.9, s * 0.03);
+        ctx.bezierCurveTo(-rimRx * 0.68, s * 0.32, -rimRx * 0.33, s * 0.44, 0, s * 0.45);
+        ctx.bezierCurveTo(rimRx * 0.33, s * 0.44, rimRx * 0.68, s * 0.32, rimRx * 0.9, s * 0.03);
+        ctx.bezierCurveTo(rimRx * 0.62, s * 0.18, -rimRx * 0.62, s * 0.18, -rimRx * 0.9, s * 0.03);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 198, 139, 0.24)';
+        ctx.lineWidth = Math.max(1, s * 0.007);
+        ctx.beginPath();
+        ctx.moveTo(-rimRx * 0.65, s * 0.31);
+        ctx.quadraticCurveTo(0, s * 0.42, rimRx * 0.65, s * 0.31);
+        ctx.stroke();
+
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(bowlX, bowlY);
+        ctx.rotate(eased.x * 0.018);
+
+        const rimOuter = ctx.createLinearGradient(-rimRx, -rimRy, rimRx, rimRy);
+        rimOuter.addColorStop(0, '#3d1812');
+        rimOuter.addColorStop(0.2, '#c96b3b');
+        rimOuter.addColorStop(0.52, '#ffbd73');
+        rimOuter.addColorStop(0.78, '#6f271a');
+        rimOuter.addColorStop(1, '#1a0d0b');
+        ctx.fillStyle = rimOuter;
+        ellipsePath(0, 0, rimRx, rimRy);
+        ctx.fill();
+
+        const lip = ctx.createLinearGradient(0, -rimRy, 0, rimRy);
+        lip.addColorStop(0, '#fff0cf');
+        lip.addColorStop(0.18, '#d68348');
+        lip.addColorStop(0.42, '#36140f');
+        lip.addColorStop(1, '#170a08');
+        ctx.fillStyle = lip;
+        ellipsePath(0, 0, rimRx * 0.94, rimRy * 0.76);
+        ctx.fill();
+
+        const broth = ctx.createRadialGradient(-rimRx * 0.12 + sway * 0.18, -rimRy * 0.2, s * 0.04, 0, -s * 0.03, rimRx * 0.88);
+        broth.addColorStop(0, '#f6bc62');
+        broth.addColorStop(0.22, '#bc6a32');
+        broth.addColorStop(0.54, '#6d2f1c');
+        broth.addColorStop(1, '#24100d');
+        ctx.fillStyle = broth;
+        ellipsePath(sway * 0.05, -s * 0.03, rimRx * 0.88, rimRy * 0.61);
+        ctx.fill();
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.strokeStyle = `rgba(255, 220, 149, ${reducedMotion ? 0.16 : 0.16 + Math.sin(t * 2.2) * 0.03})`;
+        ctx.lineWidth = Math.max(1, s * 0.005);
+        for (let i = 0; i < 6; i += 1) {
+          const y = -s * 0.09 + i * s * 0.027;
+          ctx.beginPath();
+          ctx.ellipse(
+            sway * 0.08 + Math.sin(t * 1.3 + i) * s * 0.005,
+            y,
+            rimRx * (0.58 - i * 0.035),
+            rimRy * (0.21 - i * 0.01),
+            0,
+            Math.PI * 0.06,
+            Math.PI * 0.92
+          );
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        ctx.restore();
+
+        drawNori(bowlX, brothY, s, t, sway);
+        drawNoodles(bowlX, brothY, rimRx, rimRy, s, t, sway);
+        drawGreens(bowlX, brothY, s, t, sway);
+        drawMushrooms(bowlX, brothY, s, t, sway);
+        drawTofu(bowlX, brothY, s, t, sway);
+        drawGarnish(bowlX, brothY, rimRx, rimRy, s, t, sway);
+
+        ctx.save();
+        ctx.translate(bowlX, bowlY);
+        ctx.rotate(eased.x * 0.018);
+        ctx.strokeStyle = 'rgba(255, 231, 184, 0.38)';
+        ctx.lineWidth = Math.max(1, s * 0.01);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rimRx * 0.99, rimRy * 1.01, 0, Math.PI * 1.05, Math.PI * 1.94);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 118, 52, 0.32)';
+        ctx.lineWidth = Math.max(1, s * 0.006);
+        ctx.beginPath();
+        ctx.ellipse(0, s * 0.006, rimRx * 0.965, rimRy * 0.92, 0, Math.PI * 0.03, Math.PI * 0.96);
+        ctx.stroke();
+        ctx.restore();
+
+        drawSteam(bowlX, bowlY, s, t);
+      }
+
+      function draw(t) {
+        const minSide = Math.min(w, h);
+        const maxSide = Math.max(w, h);
+        const s = clamp(minSide * 0.92, 320, Math.min(maxSide * 0.72, 760));
+        const cx = w * 0.5;
+        const cy = h * (h < 560 ? 0.56 : 0.58);
+
+        background(t, s);
+        drawBowl(cx, cy, s, t);
+      }
+
+      function animate(now) {
+        const idle = now - lastMove > 1600;
+        const targetX = mouseActive && !idle ? pointer.x : 0;
+        const targetY = mouseActive && !idle ? pointer.y : 0;
+        eased.x += (targetX - eased.x) * 0.055;
+        eased.y += (targetY - eased.y) * 0.055;
+
+        draw((now - start) / 1000);
+        frameId = requestAnimationFrame(animate);
+      }
+
+      function startLoop() {
+        cancelAnimationFrame(frameId);
+        start = performance.now();
+        if (reducedMotion) {
+          eased.x = 0;
+          eased.y = 0;
+          draw(0);
+        } else {
+          frameId = requestAnimationFrame(animate);
+        }
+      }
+
+      resetParticles();
+      resize();
+      startLoop();
+
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('pointermove', event => setPointer(event.clientX, event.clientY), { passive: true });
+      window.addEventListener('pointerleave', clearPointer, { passive: true });
+      window.addEventListener('blur', clearPointer, { passive: true });
+
+      reduceMotionQuery.addEventListener('change', event => {
+        reducedMotion = event.matches;
+        startLoop();
+      });
+    })();
+  </script>
+</body>
+</html>

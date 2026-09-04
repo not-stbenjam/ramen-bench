@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111311">
+  <title>A little warmth</title>
+  <style>
+    :root { color-scheme: dark; background: #111311; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body { overflow: hidden; background: #111311; }
+    main {
+      position: relative; display: grid; place-items: center; grid-template-columns: minmax(0, 1fr);
+      width: 100%; height: 100%; min-height: 100svh; overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(ellipse at 48% 77%, #2a281e38 0%, transparent 45%),
+        radial-gradient(ellipse at 46% 40%, #31302755 0%, #171b1740 38%, #090c0b 100%);
+    }
+    main::before {
+      content: ""; position: absolute; inset: -20%; pointer-events: none;
+      background: conic-gradient(from 157deg at 32% -10%, transparent 0deg,
+        #cab38b06 8deg, #dac3940b 15deg, transparent 28deg, transparent 360deg);
+      filter: blur(35px);
+    }
+    #ambient {
+      position: absolute; inset: 0; pointer-events: none; opacity: .55;
+      background: radial-gradient(ellipse at 42% 39%, #b3864811, transparent 48%);
+      transform: translate(var(--light-x, 0px), var(--light-y, 0px));
+      transition: transform 1.6s ease-out;
+    }
+    #grain { position: absolute; width: 100%; height: 100%; opacity: .11; pointer-events: none; }
+    #scene {
+      position: relative; flex: none; width: min(1080px, 124vw, 120svh);
+      aspect-ratio: 1000 / 900; transform: translateY(-2%);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #ramen, #steam { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #ramen { overflow: visible; }
+    #steam { pointer-events: none; }
+    #bowl { transform-origin: 500px 600px; }
+    .broth-glimmer { animation: shimmer 7s ease-in-out infinite alternate; }
+    .broth-glimmer:nth-of-type(2) { animation-delay: -3s; }
+    @keyframes shimmer { from { opacity: .3; } to { opacity: .75; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main aria-label="A warm bowl of vegan ramen, with golden noodles, shiitake mushrooms, roasted tofu, and fresh greens. Delicate steam rises into a dark, quiet room.">
+    <div id="ambient" aria-hidden="true"></div>
+    <svg id="grain" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <filter id="room-grain"><feTurbulence type="fractalNoise" baseFrequency=".73" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+      <rect width="100%" height="100%" filter="url(#room-grain)" opacity=".48"/>
+    </svg>
+    <div id="scene">
+      <svg id="ramen" viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bowl-title bowl-description">
+        <title id="bowl-title">A bowl of warmth</title>
+        <desc id="bowl-description">Handmade charcoal stoneware filled with amber broth, golden ramen noodles, seared tofu, shiitake mushrooms, bok choy, sweetcorn, scallions, and sesame.</desc>
+        <defs>
+          <radialGradient id="table-glow"><stop stop-color="#b59351" stop-opacity=".13"/><stop offset="1" stop-color="#b59351" stop-opacity="0"/></radialGradient>
+          <radialGradient id="shadow"><stop stop-color="#000" stop-opacity=".9"/><stop offset=".48" stop-color="#020402" stop-opacity=".7"/><stop offset="1" stop-color="#040603" stop-opacity="0"/></radialGradient>
+          <linearGradient id="ceramic" x1="0" y1=".2" x2="1" y2=".65" gradientUnits="objectBoundingBox">
+            <stop stop-color="#8b8a76"/><stop offset=".12" stop-color="#53594c"/><stop offset=".4" stop-color="#303b32"/><stop offset=".68" stop-color="#222c25"/><stop offset=".9" stop-color="#141c18"/><stop offset="1" stop-color="#343d31"/>
+          </linearGradient>
+          <linearGradient id="bowl-shade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#10130d" stop-opacity="0"/><stop offset=".52" stop-color="#10160e" stop-opacity=".05"/><stop offset="1" stop-color="#050a07" stop-opacity=".8"/></linearGradient>
+          <linearGradient id="lip" x1="0" y1="0" x2=".6" y2="1"><stop stop-color="#b0a28a"/><stop offset=".2" stop-color="#e1ccb0"/><stop offset=".52" stop-color="#a49378"/><stop offset=".8" stop-color="#767660"/><stop offset="1" stop-color="#b0ad93"/></linearGradient>
+          <linearGradient id="inside" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3a3829"/><stop offset=".3" stop-color="#6b6245"/><stop offset=".7" stop-color="#a69a77"/><stop offset="1" stop-color="#d3c098"/></linearGradient>
+          <radialGradient id="broth" cx=".41" cy=".3" r=".7"><stop stop-color="#c68a3b"/><stop offset=".35" stop-color="#a56a27"/><stop offset=".7" stop-color="#79441b"/><stop offset="1" stop-color="#4c2c16"/></radialGradient>
+          <radialGradient id="broth-light" cx=".25" cy=".15" r=".9"><stop stop-color="#f0bb5e" stop-opacity=".3"/><stop offset=".45" stop-color="#d59934" stop-opacity=".05"/><stop offset="1" stop-color="#22130a" stop-opacity=".4"/></radialGradient>
+          <linearGradient id="noodle" x1="0" y1="0" x2=".15" y2="1"><stop stop-color="#f4d188"/><stop offset=".48" stop-color="#dca651"/><stop offset="1" stop-color="#b5772c"/></linearGradient>
+          <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#91a143"/><stop offset=".22" stop-color="#547a30"/><stop offset=".55" stop-color="#285329"/><stop offset="1" stop-color="#133c26"/></linearGradient>
+          <linearGradient id="leaf-light" x1="0" y1="0" x2="1" y2=".7"><stop stop-color="#b4ba64"/><stop offset=".3" stop-color="#779448"/><stop offset="1" stop-color="#2c572b"/></linearGradient>
+          <linearGradient id="stem" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#90a658"/><stop offset=".6" stop-color="#c0c890"/><stop offset="1" stop-color="#e7deac"/></linearGradient>
+          <linearGradient id="mushroom" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#a67b45"/><stop offset=".3" stop-color="#805331"/><stop offset=".72" stop-color="#4d2e1c"/><stop offset="1" stop-color="#2d1c11"/></linearGradient>
+          <linearGradient id="gill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d2b68a"/><stop offset=".6" stop-color="#a18359"/><stop offset="1" stop-color="#655037"/></linearGradient>
+          <linearGradient id="tofu-top" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ffe2a0"/><stop offset=".3" stop-color="#d8a35c"/><stop offset=".62" stop-color="#bb7837"/><stop offset="1" stop-color="#edbb68"/></linearGradient>
+          <linearGradient id="tofu-side" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c89149"/><stop offset=".3" stop-color="#efd18c"/><stop offset=".68" stop-color="#dcc084"/><stop offset="1" stop-color="#936435"/></linearGradient>
+          <radialGradient id="corn" cx=".3" cy=".2"><stop stop-color="#ffe798"/><stop offset=".55" stop-color="#edbf46"/><stop offset="1" stop-color="#b47c24"/></radialGradient>
+          <linearGradient id="nori" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#404f30"/><stop offset=".4" stop-color="#263b27"/><stop offset="1" stop-color="#11251d"/></linearGradient>
+          <filter id="clay-texture" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".64" numOctaves="3" seed="8" result="noise"/>
+            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 .7  0 0 0 0 .68  0 0 0 0 .6  .22 .22 .22 0 0" result="grain"/>
+            <feComposite in="grain" in2="SourceGraphic" operator="in" result="clipped"/>
+            <feBlend in="clipped" in2="SourceGraphic" mode="soft-light"/>
+          </filter>
+          <filter id="food-texture" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".35" numOctaves="3" seed="23" result="noise"/>
+            <feColorMatrix in="noise" type="matrix" values=".3 .3 .3 0 0  .3 .3 .3 0 0  .3 .3 .3 0 0  0 0 0 0 .2" result="grain"/>
+            <feComposite in="grain" in2="SourceGraphic" operator="in" result="clipped"/>
+            <feBlend in="clipped" in2="SourceGraphic" mode="soft-light"/>
+          </filter>
+          <filter id="food-shadow" x="-25%" y="-30%" width="155%" height="170%"><feDropShadow dx="2" dy="6" stdDeviation="5" flood-color="#211308" flood-opacity=".65"/></filter>
+          <filter id="soft"><feGaussianBlur stdDeviation="2"/></filter>
+          <clipPath id="soup-clip"><ellipse cx="500" cy="478" rx="306" ry="143"/></clipPath>
+          <clipPath id="body-clip"><path d="M159 478C164 627 271 770 496 774C723 778 830 631 841 478Z"/></clipPath>
+          <path id="leaf-shape" d="M0 105C-13 88-42 77-48 58C-54 49-48 42-55 33C-62 16-52 6-53-6C-51-22-34-22-25-34C-14-45-4-36 4-41C15-46 24-33 35-30C49-27 45-13 53-5C64 10 54 19 59 29C60 43 45 49 43 60C39 76 14 91 0 105Z"/>
+        </defs>
+
+        <ellipse cx="500" cy="758" rx="450" ry="139" fill="url(#table-glow)"/>
+        <ellipse id="cast-shadow" cx="521" cy="766" rx="342" ry="76" fill="url(#shadow)"/>
+        <g id="bowl">
+          <ellipse cx="504" cy="762" rx="111" ry="22" fill="#111710"/>
+          <path d="M393 747Q500 725 608 747L603 765Q497 791 400 763Z" fill="#30382a"/>
+          <path d="M159 478C164 627 271 770 496 774C723 778 830 631 841 478Z" fill="url(#ceramic)" filter="url(#clay-texture)"/>
+          <g id="pottery-lines" clip-path="url(#body-clip)" fill="none"></g>
+          <path d="M159 478C164 627 271 770 496 774C723 778 830 631 841 478Z" fill="url(#bowl-shade)"/>
+          <path d="M181 532C207 653 308 740 432 757" fill="none" stroke="#b8b298" stroke-width="1.5" opacity=".23"/>
+          <ellipse cx="500" cy="478" rx="342" ry="174" fill="#383b2e"/>
+          <ellipse cx="500" cy="475" rx="340" ry="169" fill="url(#lip)" filter="url(#clay-texture)"/>
+          <ellipse cx="500" cy="474" rx="324" ry="154" fill="url(#inside)"/>
+          <path d="M177 460C187 373 327 316 493 316C649 313 790 365 819 442" fill="none" stroke="#f0dbb9" stroke-width="2" opacity=".4"/>
+          <ellipse cx="500" cy="478" rx="307" ry="144" fill="#402711"/>
+          <g clip-path="url(#soup-clip)">
+            <ellipse cx="500" cy="478" rx="306" ry="143" fill="url(#broth)"/>
+            <g id="broth-detail"></g>
+            <g id="noodles" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+            <ellipse cx="500" cy="478" rx="306" ry="143" fill="url(#broth-light)" pointer-events="none"/>
+            <g class="broth-glimmer" fill="none" stroke="#f0c37c" stroke-linecap="round">
+              <path d="M219 506Q227 544 275 565" stroke-width="2"/>
+              <path d="M634 595Q677 590 708 572M714 568l9-5" stroke-width="1.5"/>
+              <path d="M470 607q44 6 82 0" stroke-width="1"/>
+            </g>
+            <g id="corn-kernels" filter="url(#food-shadow)"></g>
+          </g>
+          <g id="nori-sheets" filter="url(#food-shadow)">
+            <path d="M634 389L622 289L641 284L650 290L670 278L680 283L695 276L710 284L725 279L747 289L765 278L781 289L773 411L697 438Z" fill="url(#nori)" filter="url(#food-texture)"/>
+            <path d="M685 429L687 323L705 314L719 317L733 307L743 313L758 303L773 311L790 303L802 307L811 401L774 450Z" fill="url(#nori)" filter="url(#food-texture)"/>
+            <g id="nori-grain" opacity=".3"></g>
+          </g>
+          <g id="greens" filter="url(#food-shadow)"></g>
+          <g id="mushrooms" filter="url(#food-shadow)"></g>
+          <g id="tofu" filter="url(#food-shadow)"></g>
+          <g id="front-noodles" clip-path="url(#soup-clip)" fill="none" stroke-linecap="round"></g>
+          <g id="garnish"></g>
+          <path d="M199 552C252 611 370 643 500 644C644 644 762 600 808 541" fill="none" stroke="#d5c5a1" stroke-width="2.2" opacity=".38"/>
+          <path d="M307 612Q389 638 461 638" fill="none" stroke="#f3e0b9" stroke-width="2" stroke-linecap="round" opacity=".46"/>
+        </g>
+      </svg>
+      <canvas id="steam" aria-hidden="true"></canvas>
+    </div>
+  </main>
+  <script>
+    'use strict';
+    // All of the food is drawn here, from a repeatable seed. No images or dependencies.
+    const NS = 'http://www.w3.org/2000/svg';
+    let seed = 72419;
+    const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const between = (a, b) => a + random() * (b - a);
+    const pick = values => values[Math.floor(random() * values.length)];
+    const el = (tag, attrs, parent) => {
+      const node = document.createElementNS(NS, tag);
+      for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+      if (parent) parent.appendChild(node);
+      return node;
+    };
+    const byId = id => document.getElementById(id);
+    const path = (d, attrs, parent) => el('path', { d, ...attrs }, parent);
+
+    // Uneven throwing rings and tiny mineral flecks in the stoneware glaze.
+    for (let i = 0; i < 43; i++) {
+      const y = 468 + i * 6.6;
+      path(`M155 ${y}C241 ${y + 204} 746 ${y + 219} 847 ${y - 4}`, {
+        stroke: i % 3 ? '#bac0a0' : '#050c08', 'stroke-width': between(.4, 1.6), opacity: between(.025, .08)
+      }, byId('pottery-lines'));
+    }
+    for (let i = 0; i < 650; i++) {
+      el('ellipse', { cx: between(160, 840), cy: between(520, 776), rx: between(.35, 1.6), ry: between(.25, .75), fill: pick(['#d2c4a2', '#030b07', '#7b8868']), opacity: between(.1, .35) }, byId('pottery-lines'));
+    }
+
+    // An oily, translucent broth surface: many very small irregular highlights.
+    for (let i = 0; i < 380; i++) {
+      const x = between(198, 802), y = between(337, 620), radius = between(.6, 5);
+      el('ellipse', { cx: x, cy: y, rx: radius * 1.4, ry: radius * .65, fill: pick(['#e7aa40', '#d1912c', '#edbd5b', '#492613']), opacity: between(.09, .35), stroke: '#ffd982', 'stroke-width': .4, 'stroke-opacity': .28 }, byId('broth-detail'));
+    }
+
+    function noodle(d, width, parent, bright = false) {
+      path(d, { stroke: '#422810', 'stroke-width': width + 3.3, opacity: .57 }, parent);
+      path(d, { stroke: 'url(#noodle)', 'stroke-width': width }, parent);
+      path(d, { stroke: bright ? '#ffe2a3' : '#f9d48e', 'stroke-width': Math.max(.75, width * .24), opacity: .67, transform: 'translate(0 -1.2)' }, parent);
+    }
+    // Long strands lie in loose folds, with local variations in their bends.
+    for (let i = 0; i < 39; i++) {
+      const y = 373 + i * 5.7 + between(-3, 3);
+      const left = 258 + Math.sin(i * .54) * 24 + between(-15, 15);
+      const right = 713 + Math.cos(i * .32) * 34;
+      const fold = between(12, 38), bend = Math.sin(i * .65) * 20;
+      const d = `M${left + 45} ${y - 9}C${left - 49} ${y - 28} ${left - 35} ${y + 36} ${left + 30} ${y + 27}C${left + 104} ${y + 10 + bend} ${right - 181} ${y - fold} ${right - 78} ${y + 5}C${right + 53} ${y + 32} ${right + 32} ${y - 33} ${right - 35} ${y - 17}C${right - 107} ${y + 10} ${left + 149} ${y + 46 + bend} ${left + 71} ${y + 27}`;
+      noodle(d, between(4.4, 6), byId('noodles'));
+    }
+    for (let i = 0; i < 13; i++) {
+      const x = 420 + i * 8.5, bend = Math.sin(i * .7) * 15;
+      const d = `M${x - 64} 404C${x + 80 + bend} 422 ${x - 67} 466 ${x + 12} ${493 + bend}S${x + 111} 549 ${x + 38} 577`;
+      noodle(d, between(4.5, 5.6), byId('noodles'), true);
+    }
+
+    // A small cluster of sweetcorn peeking out along the back edge.
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 7 - Math.abs(row - 2); col++) {
+        const x = 503 + col * 15 + row * 5 + between(-3, 3);
+        const y = 357 + row * 12 + between(-3, 3);
+        const group = el('g', { transform: `translate(${x} ${y}) rotate(${between(-30, 30)})` }, byId('corn-kernels'));
+        path('M-7-4Q-7-9 0-8Q8-8 8-2L6 5Q0 9-6 4Z', { fill: 'url(#corn)', stroke: '#9f7028', 'stroke-width': .65 }, group);
+        path('M-4-4Q0-6 4-3', { fill: 'none', stroke: '#fff2af', 'stroke-width': 1.8, opacity: .6 }, group);
+      }
+    }
+    for (let i = 0; i < 110; i++) {
+      const x = between(638, 771), y = between(291, 414);
+      path(`M${x} ${y}l${between(-6, 6)} ${between(2, 11)}`, { stroke: pick(['#92a467', '#0a150e', '#8b9261']), 'stroke-width': between(.5, 2.5) }, byId('nori-grain'));
+    }
+
+    function bokChoy(x, y, rotation, scale, light) {
+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${rotation}) scale(${scale})` }, byId('greens'));
+      el('use', { href: '#leaf-shape', fill: light ? 'url(#leaf-light)' : 'url(#leaf)', stroke: '#2a4b25', 'stroke-width': 1, filter: 'url(#food-texture)' }, group);
+      for (let i = 0; i < 9; i++) {
+        const y0 = 6 + i * 9;
+        const reach = Math.sin((i + 1) / 11 * Math.PI) * 42;
+        path(`M0 ${y0 + 12}Q${-reach * .3} ${y0 + 2} ${-reach} ${y0 - 17}M1 ${y0 + 12}Q${reach * .4} ${y0 + 4} ${reach} ${y0 - 15}`, { fill: 'none', stroke: '#acc27a', 'stroke-width': between(.6, 1.1), opacity: .34 }, group);
+      }
+      path('M-4-25C-12 8 9 56-10 99Q-18 114-26 127C-29 137-10 141-2 132C10 115 13 98 12 83C7 48-2 16-4-25Z', { fill: 'url(#stem)' }, group);
+      path('M-5 128Q7 96 3 65', { fill: 'none', stroke: '#f4edc0', 'stroke-width': 2, opacity: .5 }, group);
+      path('M-38 4Q-47 23-32 41M26-14Q41-7 43 8', { fill: 'none', stroke: '#c3cb7a', 'stroke-width': 2, opacity: .23 }, group);
+    }
+    bokChoy(302, 395, -52, 1.02, false);
+    bokChoy(333, 370, -21, 1.11, false);
+    bokChoy(391, 365, 12, .9, true);
+    bokChoy(273, 432, -72, .81, true);
+
+    function mushroom(x, y, rotation, scale) {
+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${rotation}) scale(${scale})` }, byId('mushrooms'));
+      path('M-15 13Q-13 42-23 59Q-19 70-7 67Q11 40 15 12Z', { fill: 'url(#gill)', stroke: '#6c4b2d', 'stroke-width': 1 }, group);
+      path('M-66 4Q-69 34-29 43Q9 50 50 29Q65 21 64 5Z', { fill: 'url(#gill)' }, group);
+      for (let i = 0; i < 25; i++) {
+        const angle = Math.PI * (i / 24);
+        const endX = Math.cos(angle) * 62;
+        const endY = 7 + Math.sin(angle) * 32;
+        path(`M0 8Q${endX * .55} ${endY * .67} ${endX} ${endY}`, { fill: 'none', stroke: '#624629', 'stroke-width': 1.1, opacity: .68 }, group);
+      }
+      path('M-66 5C-65-32-40-57-5-57C31-60 61-34 66 1Q63 17 38 19Q2 28-28 20Q-55 19-66 5Z', { fill: 'url(#mushroom)', stroke: '#382214', 'stroke-width': 1, filter: 'url(#food-texture)' }, group);
+      path('M-60-4Q-53-42-17-48', { stroke: '#d1a46a', 'stroke-width': 2, opacity: .45, fill: 'none' }, group);
+      path('M-42-23Q-13-26 28 4L14 3Q-17-15-42-23Z', { fill: '#ead1a0' }, group);
+      path('M-3-43Q-9-25-22 4L-14 0Q-2-17 4-39Z', { fill: '#dfc18d' }, group);
+      path('M-40-21Q-9-22 24 4M-1-38L-17 1', { fill: 'none', stroke: '#6a4427', 'stroke-width': 1.5 }, group);
+      for (let i = 0; i < 35; i++) {
+        const angle = between(0, Math.PI * 2), r = Math.sqrt(random());
+        el('ellipse', { cx: Math.cos(angle) * 50 * r, cy: -16 + Math.sin(angle) * 30 * r, rx: between(.5, 2), ry: between(.35, 1), fill: pick(['#d9aa6c', '#301b10']), opacity: .3 }, group);
+      }
+    }
+    mushroom(654, 421, 18, 1.03);
+    mushroom(720, 466, 39, .91);
+    mushroom(628, 494, -13, .86);
+
+    function tofu(x, y, rotation, scale) {
+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${rotation}) scale(${scale})` }, byId('tofu'));
+      path('M-53-17L41-29L51 20L-42 35Z', { fill: '#6e4124', transform: 'translate(2 7)', opacity: .6 }, group);
+      path('M-54-18L-43 16L-37 39L-47 11Z', { fill: '#b88a4e' }, group);
+      path('M-43 16L51 2L48 24Q8 35-37 39Z', { fill: 'url(#tofu-side)', stroke: '#a9783e', 'stroke-width': .6 }, group);
+      path('M-54-18L37-32Q41-32 43-27L51 2L-43 16Z', { fill: 'url(#tofu-top)', stroke: '#e3bd77', 'stroke-width': 1.1, filter: 'url(#food-texture)' }, group);
+      for (let i = 0; i < 64; i++) {
+        const tx = between(-39, 37), ty = between(-19, 3) - tx * .14;
+        el('ellipse', { cx: tx, cy: ty, rx: between(.6, 3.8), ry: between(.3, 1.9), fill: pick(['#773e1a', '#8f4c21', '#ffe8a4', '#ca8c3f']), opacity: between(.3, .8) }, group);
+      }
+      for (let i = 0; i < 4; i++) {
+        const tx = -30 + i * 19;
+        path(`M${tx} ${-17 - tx * .15}l8 21`, { fill: 'none', stroke: '#68351c', 'stroke-width': between(2.5, 4.5), opacity: .57, 'stroke-linecap': 'round' }, group);
+        path(`M${tx + 3} ${-17 - tx * .15}l8 21`, { fill: 'none', stroke: '#f0ba62', 'stroke-width': 1.1, opacity: .65 }, group);
+      }
+      for (let i = 0; i < 28; i++) {
+        const tx = between(-34, 44);
+        el('ellipse', { cx: tx, cy: between(18, 28) - tx * .15, rx: between(.6, 1.4), ry: between(.4, 1.1), fill: '#9d733d', opacity: .4 }, group);
+      }
+      path('M-43 16L49 2', { stroke: '#ffe4a1', 'stroke-width': 1.3, opacity: .7 }, group);
+    }
+    tofu(334, 498, -22, .95);
+    tofu(288, 539, 10, .92);
+    tofu(389, 540, -8, 1.04);
+
+    // A few noodles drape over one another at the front of the soup.
+    for (let i = 0; i < 10; i++) {
+      const x = 440 + i * 9, bend = Math.sin(i * .58) * 18;
+      noodle(`M${x} ${473 + bend}C${x - 40 + bend} 502 ${x + 44} ${519 + bend} ${x + 31} 546S${x - 22} ${571 - bend} ${x + 17} 594`, between(4.4, 5.5), byId('front-noodles'), true);
+    }
+
+    const garnish = byId('garnish');
+    // Scallions are cut rings, with shaded inner walls and pale cut edges.
+    for (let i = 0; i < 47; i++) {
+      const angle = between(0, Math.PI * 2), radius = Math.sqrt(random());
+      const x = 505 + Math.cos(angle) * 94 * radius;
+      const y = 441 + Math.sin(angle) * 51 * radius;
+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${between(-70, 70)})` }, garnish);
+      const rx = between(5, 9), ry = between(3, 5);
+      el('ellipse', { cx: 1, cy: 3, rx, ry, fill: '#2b3013', opacity: .6 }, group);
+      el('ellipse', { cx: 0, cy: 0, rx, ry, fill: 'none', stroke: '#3d6c32', 'stroke-width': 3.8 }, group);
+      el('ellipse', { cx: 0, cy: -1.4, rx, ry, fill: 'none', stroke: pick(['#b1c773', '#9fb769', '#d0d58e', '#79a24f']), 'stroke-width': 2.5 }, group);
+      path(`M${-rx + 1} -2Q0 ${-ry - 2} ${rx - 2} -2`, { fill: 'none', stroke: '#dbe6ab', 'stroke-width': .7, opacity: .7 }, group);
+    }
+    // Thin chili threads and sesame give the surface a little irregularity.
+    for (let i = 0; i < 9; i++) {
+      const x = between(463, 538), y = between(419, 452);
+      path(`M${x - 22} ${y + 19}Q${x + 38} ${y - 47} ${x + 44} ${y + 2}T${x + 65} ${y + 9}`, { fill: 'none', stroke: i % 2 ? '#a63a21' : '#c34f29', 'stroke-width': between(.8, 1.4), 'stroke-linecap': 'round' }, garnish);
+    }
+    for (let i = 0; i < 105; i++) {
+      const angle = between(0, Math.PI * 2), r = Math.sqrt(random());
+      const x = 498 + Math.cos(angle) * 250 * r, y = 476 + Math.sin(angle) * 113 * r;
+      el('ellipse', { cx: x, cy: y, rx: between(1.4, 2.7), ry: between(.65, 1.2), fill: pick(['#e9d6a4', '#e5cc90', '#24291a', '#c5af76']), transform: `rotate(${between(0, 180)} ${x} ${y})`, opacity: between(.55, .9) }, garnish);
+    }
+
+function createSteam(canvas, scene, motionQuery) {
+  const context = canvas.getContext('2d');
+  if (!context) {
+    return { setPointer() {}, setActive() {}, destroy() {} };
+  }
+
+  const preference = motionQuery || window.matchMedia('(prefers-reduced-motion: reduce)');
+  const originalFilter = canvas.style.filter;
+  const ink = document.createElement('canvas');
+  const brush = ink.getContext('2d');
+  const pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
+  const plumes = [
+    { x: 375, y: 493, height: 322, width: 15, phase: 0.4, lean: -19 },
+    { x: 455, y: 485, height: 403, width: 19, phase: 2.1, lean: 19 },
+    { x: 539, y: 490, height: 361, width: 16, phase: 4.4, lean: -16 },
+    { x: 617, y: 508, height: 308, width: 12, phase: 5.7, lean: 13 }
+  ];
+  let frame = 0;
+  let time = 13;
+  let lastTime = 0;
+  let lastPaint = 0;
+  let active = true;
+  let destroyed = false;
+  let paintScale = 1;
+  let reduced = preference.matches;
+
+  const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
+
+  function ribbon(points, widthScale) {
+    brush.beginPath();
+    for (let side = 1; side >= -1; side -= 2) {
+      for (let j = 0; j < points.length; j++) {
+        const i = side === 1 ? j : points.length - 1 - j;
+        const point = points[i];
+        const before = points[Math.max(0, i - 1)];
+        const after = points[Math.min(points.length - 1, i + 1)];
+        const dx = after.x - before.x;
+        const dy = after.y - before.y;
+        const length = Math.hypot(dx, dy) || 1;
+        const x = point.x - dy / length * point.width * side * widthScale;
+        const y = point.y + dx / length * point.width * side * widthScale;
+        if (side === 1 && j === 0) brush.moveTo(x, y);
+        else brush.lineTo(x, y);
+      }
+    }
+    brush.closePath();
+    brush.fill();
+  }
+
+  function paint() {
+    if (!canvas.width || !canvas.height) return;
+    brush.setTransform(1, 0, 0, 1, 0, 0);
+    brush.clearRect(0, 0, ink.width, ink.height);
+    brush.setTransform(paintScale, 0, 0, paintScale, 0, 0);
+    brush.globalCompositeOperation = 'source-over';
+
+    for (let p = 0; p < plumes.length; p++) {
+      const plume = plumes[p];
+      const phase = plume.phase;
+      const breath = 0.83 + 0.17 * Math.sin(time * 0.37 + phase);
+      const gradient = brush.createLinearGradient(0, plume.y, 0, plume.y - plume.height);
+      gradient.addColorStop(0, 'rgba(237,219,189,0)');
+      gradient.addColorStop(0.10, 'rgba(237,225,205,0.32)');
+      gradient.addColorStop(0.30, 'rgba(243,232,213,0.65)');
+      gradient.addColorStop(0.55, 'rgba(237,227,210,0.47)');
+      gradient.addColorStop(0.80, 'rgba(229,222,211,0.15)');
+      gradient.addColorStop(1, 'rgba(229,222,211,0)');
+      brush.fillStyle = gradient;
+
+      // Neighboring translucent ribbons share a flow, then slowly unwind.
+      // Their soft edges accumulate into vapor without particle silhouettes.
+      for (let strand = 0; strand < 2; strand++) {
+        const points = [];
+        for (let i = 0; i <= 64; i++) {
+          const u = i / 64;
+          const envelope = Math.sin(Math.PI * u);
+          const flow = u * 8.2 - time * 0.63 + phase;
+          const curl = Math.sin(flow) * (7 + 23 * u)
+            + Math.sin(u * 16.1 - time * 0.81 + phase * 1.7) * 8 * u;
+          const split = (strand - 0.5) * (5 + u * 26)
+            + Math.sin(u * 10.3 - time * 0.47 + phase + strand * 2) * 8 * u;
+          points.push({
+            x: plume.x + plume.lean * u + curl * Math.min(1, u * 6)
+              + split + pointer.x * 53 * u * u,
+            y: plume.y - plume.height * u
+              + Math.sin(flow * 0.73) * 6 * envelope + pointer.y * 9 * u,
+            width: (3 + plume.width * Math.pow(envelope, 0.8))
+              * (0.75 + 0.25 * Math.sin(flow + strand * 0.8))
+              * (strand === 0 ? 1 : 0.62)
+          });
+        }
+
+        // Nested faint ribbons approximate a soft density falloff. One CSS
+        // blur composites the whole overlay; per-path canvas filters are costly.
+        const layers = [
+          [2.1, 0.009], [1.7, 0.018], [1.3, 0.025],
+          [0.95, 0.033], [0.65, 0.045], [0.4, 0.052]
+        ];
+        for (const [width, opacity] of layers) {
+          brush.globalAlpha = opacity * 1.35 * breath * (strand === 0 ? 1 : 0.76);
+          ribbon(points, width);
+        }
+      }
+    }
+
+    brush.globalAlpha = 1;
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(ink, 0, 0, canvas.width, canvas.height);
+  }
+
+  function animate(now) {
+    frame = 0;
+    if (destroyed || reduced || !active || document.hidden) return;
+    // Vapor moves slowly, so 30 fps keeps the overlay inexpensive on mobile.
+    if (!lastPaint || now - lastPaint >= 1000 / 30) {
+      const elapsed = lastTime ? Math.min((now - lastTime) / 1000, 0.1) : 0;
+      lastTime = now;
+      lastPaint = now;
+      time += elapsed;
+      const ease = 1 - Math.exp(-elapsed * 2.1);
+      pointer.x += (pointer.targetX - pointer.x) * ease;
+      pointer.y += (pointer.targetY - pointer.y) * ease;
+      paint();
+    }
+    frame = requestAnimationFrame(animate);
+  }
+
+  function synchronize() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    lastTime = 0;
+    lastPaint = 0;
+    if (destroyed) return;
+    if (reduced) {
+      pointer.x = pointer.y = 0;
+      paint();
+    } else if (active && !document.hidden) {
+      frame = requestAnimationFrame(animate);
+    }
+  }
+
+  function resize() {
+    const bounds = scene.getBoundingClientRect();
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.round(bounds.width * ratio));
+    canvas.height = Math.max(1, Math.round(bounds.height * ratio));
+    canvas.style.filter = `blur(${(bounds.width * 5.3 / 1000).toFixed(2)}px)`;
+    // Soft vapor needs less resolution than the bowl beneath it.
+    paintScale = Math.min(0.9, Math.max(0.3, canvas.width / 1000));
+    ink.width = Math.ceil(1000 * paintScale);
+    ink.height = Math.ceil(900 * paintScale);
+    paint();
+  }
+
+  function onPreferenceChange() {
+    reduced = preference.matches;
+    synchronize();
+  }
+
+  const observer = new ResizeObserver(resize);
+  observer.observe(scene);
+  preference.addEventListener('change', onPreferenceChange);
+  document.addEventListener('visibilitychange', synchronize);
+  resize();
+  synchronize();
+
+  return {
+    setPointer(x, y) {
+      pointer.targetX = clamp(Number.isFinite(x) ? x : 0, -1, 1);
+      pointer.targetY = clamp(Number.isFinite(y) ? y : 0, -1, 1);
+    },
+    setActive(value) {
+      if (active === Boolean(value)) return;
+      active = Boolean(value);
+      synchronize();
+    },
+    destroy() {
+      destroyed = true;
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      canvas.style.filter = originalFilter;
+      preference.removeEventListener('change', onPreferenceChange);
+      document.removeEventListener('visibilitychange', synchronize);
+    }
+  };
+}
+
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const scene = byId('scene');
+    const bowl = byId('bowl');
+    const ambient = byId('ambient');
+    const steam = createSteam(byId('steam'), scene, motionQuery);
+    const current = { x: 0, y: 0 }, target = { x: 0, y: 0 };
+    let pointerFrame = 0, previousTime = 0;
+
+    function easeBowl(now) {
+      pointerFrame = 0;
+      if (motionQuery.matches || document.hidden) return;
+      const delta = previousTime ? Math.min((now - previousTime) / 1000, .05) : 1 / 60;
+      previousTime = now;
+      const ease = 1 - Math.exp(-delta * 4);
+      current.x += (target.x - current.x) * ease;
+      current.y += (target.y - current.y) * ease;
+      bowl.setAttribute('transform', `translate(${current.x * 5} ${current.y * 2.5}) rotate(${current.x * .65} 500 600)`);
+      if (Math.abs(current.x - target.x) + Math.abs(current.y - target.y) > .001) pointerFrame = requestAnimationFrame(easeBowl);
+      else previousTime = 0;
+    }
+    function point(x, y) {
+      if (motionQuery.matches) return;
+      target.x = x; target.y = y;
+      steam.setPointer(x, y);
+      ambient.style.setProperty('--light-x', `${x * 28}px`);
+      ambient.style.setProperty('--light-y', `${y * 18}px`);
+      if (!pointerFrame && !document.hidden) pointerFrame = requestAnimationFrame(easeBowl);
+    }
+    window.addEventListener('pointermove', event => {
+      if (event.pointerType === 'touch') return;
+      point(Math.max(-1, Math.min(1, event.clientX / innerWidth * 2 - 1)), Math.max(-1, Math.min(1, event.clientY / innerHeight * 2 - 1)));
+    }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => point(0, 0));
+    window.addEventListener('blur', () => point(0, 0));
+    motionQuery.addEventListener('change', () => {
+      cancelAnimationFrame(pointerFrame); pointerFrame = 0; previousTime = 0;
+      current.x = current.y = target.x = target.y = 0;
+      bowl.removeAttribute('transform');
+      ambient.style.removeProperty('--light-x'); ambient.style.removeProperty('--light-y');
+      steam.setPointer(0, 0);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { cancelAnimationFrame(pointerFrame); pointerFrame = 0; previousTime = 0; }
+      else if (!motionQuery.matches) point(0, 0);
+    });
+  </script>
+</body>
+</html>

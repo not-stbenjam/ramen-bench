@@ -1,0 +1,69 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "openai/gpt-5.5/medium",
+  "vendor": {
+    "slug": "openai",
+    "displayName": "OpenAI"
+  },
+  "model": {
+    "slug": "gpt-5.5",
+    "displayName": "GPT-5.5",
+    "providerModelId": "gpt-5.5"
+  },
+  "variation": {
+    "slug": "medium",
+    "displayName": "Medium",
+    "reasoningEffort": "medium",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Codex CLI",
+    "version": "0.153.2",
+    "runtime": "OpenAI Codex",
+    "invocation": "CODEX_HOME=~/.codex-personal codex exec --model gpt-5.5 --config model_reasoning_effort=medium PROMPT.md"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-04T22:39:46Z",
+    "completedAt": "2026-09-04T22:39:46Z",
+    "wallDurationMs": 0,
+    "apiDurationMs": 0
+  },
+  "usage": {
+    "tokens": {
+      "input": 0,
+      "cachedInput": 0,
+      "cacheCreationInput": 0,
+      "reasoning": 0,
+      "output": 0,
+      "total": 0
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0,
+      "cachedInput": 0,
+      "cacheCreationInput": 0,
+      "output": 0,
+      "other": 0,
+      "total": 0,
+      "estimated": true
+    },
+    "requests": 0,
+    "turns": 0,
+    "toolCalls": 0,
+    "providerReported": false
+  },
+  "resultStats": {
+    "bytes": 18926,
+    "lines": 598
+  },
+  "provenance": {
+    "generatedAt": "2026-09-04T22:39:46Z",
+    "sourceCommit": "ba9e47b"
+  },
+  "notes": "Usage and timing were not captured by the artifact export; token and cost fields are zero estimates."
+}

@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <title>Vegan Ramen</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      background: #080909;
+      overscroll-behavior: none;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene" role="img" aria-label="A steaming bowl of vegan ramen in a dark, warm atmosphere"></canvas>
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('scene');
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+      const TAU = Math.PI * 2;
+
+      let w = 0, h = 0, dpr = 1, raf = 0, last = 0;
+      let pointer = { x: .5, y: .45, tx: .5, ty: .45, active: false };
+      let ripples = [];
+
+      const steam = Array.from({ length: 8 }, (_, i) => ({
+        x: -.34 + i * .098 + Math.sin(i * 2.7) * .025,
+        phase: i * 1.47,
+        speed: .55 + (i % 3) * .09,
+        height: .3 + (i % 4) * .045,
+        width: .018 + (i % 3) * .006
+      }));
+
+      function roundedRect(x, y, width, height, radius) {
+        const r = Math.min(radius, width / 2, height / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + width, y, x + width, y + height, r);
+        ctx.arcTo(x + width, y + height, x, y + height, r);
+        ctx.arcTo(x, y + height, x, y, r);
+        ctx.arcTo(x, y, x + width, y, r);
+        ctx.closePath();
+      }
+
+      function ellipsePath(cx, cy, rx, ry) {
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, TAU);
+      }
+
+      function line(points, stroke, width, alpha = 1) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = width;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function resize() {
+        w = innerWidth;
+        h = innerHeight;
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        render(performance.now() * .001, true);
+      }
+
+      function bowlMetrics() {
+        const compact = h < 560;
+        const bw = Math.min(w * .9, h * (compact ? 1.02 : .82), 760);
+        return {
+          cx: w * .5 + (pointer.x - .5) * Math.min(22, bw * .035),
+          cy: h * (compact ? .61 : .595) + (pointer.y - .5) * 8,
+          bw,
+          bh: bw * .49
+        };
+      }
+
+      function drawAtmosphere(t, m) {
+        const { cx, cy, bw } = m;
+        ctx.fillStyle = '#080a09';
+        ctx.fillRect(0, 0, w, h);
+
+        let g = ctx.createRadialGradient(
+          cx + (pointer.x - .5) * bw * .12, cy - bw * .25,
+          bw * .02, cx, cy - bw * .12, Math.max(w, h) * .7
+        );
+        g.addColorStop(0, pointer.active ? '#3a2818' : '#302217');
+        g.addColorStop(.18, '#201a13');
+        g.addColorStop(.5, '#111311');
+        g.addColorStop(1, '#050606');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        const horizon = cy + bw * .19;
+        g = ctx.createLinearGradient(0, horizon - 20, 0, h);
+        g.addColorStop(0, 'rgba(33,28,22,.05)');
+        g.addColorStop(.2, 'rgba(24,22,18,.7)');
+        g.addColorStop(1, '#090a09');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, horizon - 20, w, h - horizon + 20);
+
+        // A nearly invisible pool of amber light anchors the dish.
+        g = ctx.createRadialGradient(cx, cy + bw * .28, 0, cx, cy + bw * .28, bw * .72);
+        g.addColorStop(0, 'rgba(181,91,29,.12)');
+        g.addColorStop(.45, 'rgba(91,48,22,.05)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - bw, cy - bw * .2, bw * 2, bw);
+
+        // Fine procedural grain keeps the darkness organic.
+        ctx.save();
+        ctx.globalAlpha = .022;
+        ctx.fillStyle = '#fff3d3';
+        const seed = Math.floor(t * (reduceMotion.matches ? 0 : 3));
+        for (let i = 0; i < Math.min(170, Math.floor(w * h / 7000)); i++) {
+          const px = (Math.sin(i * 91.73 + seed * 19.1) * 43758.54 % 1 + 1) % 1 * w;
+          const py = (Math.sin(i * 47.11 + seed * 7.7) * 23421.13 % 1 + 1) % 1 * h;
+          ctx.fillRect(px, py, 1, 1);
+        }
+        ctx.restore();
+      }
+
+      function drawShadow(m) {
+        const { cx, cy, bw, bh } = m;
+        ctx.save();
+        ctx.filter = `blur(${Math.max(14, bw * .045)}px)`;
+        let g = ctx.createRadialGradient(cx, cy + bh * .72, bw * .04, cx, cy + bh * .72, bw * .57);
+        g.addColorStop(0, 'rgba(0,0,0,.82)');
+        g.addColorStop(.55, 'rgba(0,0,0,.56)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ellipsePath(cx, cy + bh * .69, bw * .58, bh * .26);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawSteam(t, m) {
+        const { cx, cy, bw } = m;
+        const breeze = (pointer.x - .5) * bw * .035;
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        for (let i = 0; i < steam.length; i++) {
+          const s = steam[i];
+          const life = (t * s.speed + s.phase) % 1;
+          const baseX = cx + s.x * bw;
+          const baseY = cy - bw * .13;
+          const rise = bw * s.height;
+          const sway = Math.sin(t * 1.15 + s.phase) * bw * s.width;
+          const fade = Math.sin(life * Math.PI) * (.11 + (i % 3) * .024);
+          const x0 = baseX + Math.sin(t * .8 + i) * bw * .008;
+          const y0 = baseY - life * bw * .055;
+          const grad = ctx.createLinearGradient(x0, y0, x0 + breeze, y0 - rise);
+          grad.addColorStop(0, 'rgba(245,221,184,0)');
+          grad.addColorStop(.2, `rgba(245,225,196,${fade})`);
+          grad.addColorStop(.7, `rgba(217,224,211,${fade * .75})`);
+          grad.addColorStop(1, 'rgba(210,221,214,0)');
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = Math.max(1.2, bw * .0055 * (1 - life * .25));
+          ctx.lineCap = 'round';
+          ctx.filter = `blur(${Math.max(2, bw * .004)}px)`;
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          ctx.bezierCurveTo(
+            x0 - sway, y0 - rise * .28,
+            x0 + sway * 1.8 + breeze * .55, y0 - rise * .48,
+            x0 + sway * .25 + breeze, y0 - rise
+          );
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawBowlBody(m) {
+        const { cx, cy, bw, bh } = m;
+        const top = cy;
+        const rx = bw * .5, ry = bh * .235;
+
+        ctx.save();
+        const body = new Path2D();
+        body.moveTo(cx - rx, top);
+        body.bezierCurveTo(cx - rx * .94, top + bh * .42, cx - rx * .62, top + bh * .87, cx, top + bh);
+        body.bezierCurveTo(cx + rx * .62, top + bh * .87, cx + rx * .94, top + bh * .42, cx + rx, top);
+        body.quadraticCurveTo(cx, top + ry * 1.65, cx - rx, top);
+        body.closePath();
+
+        let g = ctx.createLinearGradient(cx - rx, top, cx + rx, top + bh);
+        g.addColorStop(0, '#171a18');
+        g.addColorStop(.12, '#30322e');
+        g.addColorStop(.35, '#181b19');
+        g.addColorStop(.67, '#101311');
+        g.addColorStop(.9, '#272722');
+        g.addColorStop(1, '#0c0e0d');
+        ctx.fillStyle = g;
+        ctx.fill(body);
+
+        ctx.save();
+        ctx.clip(body);
+        g = ctx.createRadialGradient(cx - rx * .45, top + bh * .25, 0, cx - rx * .25, top + bh * .35, bw * .48);
+        g.addColorStop(0, 'rgba(255,220,161,.2)');
+        g.addColorStop(.28, 'rgba(158,121,74,.08)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - rx, top, bw, bh);
+
+        g = ctx.createLinearGradient(0, top + bh * .35, 0, top + bh);
+        g.addColorStop(0, 'rgba(0,0,0,0)');
+        g.addColorStop(1, 'rgba(0,0,0,.5)');
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - rx, top, bw, bh);
+        ctx.restore();
+
+        ctx.strokeStyle = 'rgba(224,196,151,.14)';
+        ctx.lineWidth = Math.max(1, bw * .002);
+        ctx.stroke(body);
+
+        // Foot ring.
+        g = ctx.createLinearGradient(cx, top + bh * .86, cx, top + bh * 1.05);
+        g.addColorStop(0, '#080a09');
+        g.addColorStop(1, '#1d1e1a');
+        ctx.fillStyle = g;
+        ellipsePath(cx, top + bh * .94, bw * .19, bh * .075);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawNori(m) {
+        const { cx, cy, bw, bh } = m;
+        ctx.save();
+        ctx.translate(cx + bw * .25, cy - bh * .05);
+        ctx.rotate(.1);
+        const nw = bw * .14, nh = bw * .225;
+        let g = ctx.createLinearGradient(-nw / 2, 0, nw / 2, 0);
+        g.addColorStop(0, '#07100c');
+        g.addColorStop(.5, '#183126');
+        g.addColorStop(1, '#06100b');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(-nw / 2, 0);
+        ctx.lineTo(-nw * .42, -nh);
+        ctx.quadraticCurveTo(0, -nh * 1.05, nw / 2, -nh * .94);
+        ctx.lineTo(nw / 2, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(102,142,104,.16)';
+        ctx.lineWidth = 1;
+        for (let i = 1; i < 5; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-nw / 2 + i * nw / 5, -nh * .98);
+          ctx.lineTo(-nw / 2 + i * nw / 5, 0);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawBroth(t, m) {
+        const { cx, cy, bw, bh } = m;
+        const rx = bw * .475, ry = bh * .205;
+
+        ctx.save();
+        ellipsePath(cx, cy, bw * .505, bh * .245);
+        let rim = ctx.createLinearGradient(cx - bw * .5, cy - bh * .2, cx + bw * .5, cy + bh * .18);
+        rim.addColorStop(0, '#77705e');
+        rim.addColorStop(.17, '#242823');
+        rim.addColorStop(.52, '#101310');
+        rim.addColorStop(.82, '#514b3f');
+        rim.addColorStop(1, '#161916');
+        ctx.fillStyle = rim;
+        ctx.fill();
+
+        let g = ctx.createRadialGradient(cx - rx * .25, cy - ry * .1, rx * .03, cx, cy, rx);
+        g.addColorStop(0, '#7e411c');
+        g.addColorStop(.28, '#572b13');
+        g.addColorStop(.7, '#351a0d');
+        g.addColorStop(1, '#160d08');
+        ctx.fillStyle = g;
+        ellipsePath(cx, cy, rx, ry);
+        ctx.fill();
+
+        ctx.save();
+        ellipsePath(cx, cy, rx, ry);
+        ctx.clip();
+
+        // Gloss across the broth responds to the pointer like moving candlelight.
+        g = ctx.createLinearGradient(cx - rx, cy - ry, cx + rx, cy + ry);
+        g.addColorStop(0, 'rgba(255,185,86,.18)');
+        g.addColorStop(.35, 'rgba(255,121,28,.03)');
+        g.addColorStop(.7, 'rgba(0,0,0,.13)');
+        g.addColorStop(1, 'rgba(230,116,35,.08)');
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - rx, cy - ry, rx * 2, ry * 2);
+
+        // Chili oil beads.
+        for (let i = 0; i < 34; i++) {
+          const a = i * 2.399 + .8;
+          const rr = (.18 + ((i * 37) % 67) / 100) * rx;
+          const x = cx + Math.cos(a) * rr;
+          const y = cy + Math.sin(a) * rr * (ry / rx);
+          const r = bw * (.0022 + (i % 4) * .0009);
+          ctx.fillStyle = i % 3 ? 'rgba(205,69,16,.72)' : 'rgba(247,126,37,.68)';
+          ellipsePath(x, y, r * 1.6, r);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(255,204,113,.25)';
+          ellipsePath(x - r * .3, y - r * .22, r * .43, r * .25);
+          ctx.fill();
+        }
+
+        // Slowly breathing broth highlights.
+        ctx.strokeStyle = 'rgba(255,188,100,.13)';
+        ctx.lineWidth = Math.max(1, bw * .0018);
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          const yy = cy + (i - 1) * ry * .42;
+          ctx.ellipse(cx - rx * .15 + Math.sin(t + i) * 3, yy, rx * (.26 + i * .08), ry * .09, 0, .1, Math.PI * .92);
+          ctx.stroke();
+        }
+
+        drawToppings(t, m, rx, ry);
+        drawRipples(t, m, rx, ry);
+        ctx.restore();
+
+        // Inner lip and a small warm catchlight.
+        ctx.strokeStyle = 'rgba(220,203,163,.27)';
+        ctx.lineWidth = Math.max(1.2, bw * .004);
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, bw * .492, bh * .224, 0, Math.PI * .08, Math.PI * .91);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,211,148,.42)';
+        ctx.lineWidth = Math.max(1, bw * .0022);
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, bw * .492, bh * .224, 0, Math.PI * 1.08, Math.PI * 1.52);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawToppings(t, m, rx, ry) {
+        const { cx, cy, bw } = m;
+
+        // Noodles: imperfect parallel curves, warm and slightly glossy.
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineWidth = Math.max(2.5, bw * .008);
+        for (let i = 0; i < 13; i++) {
+          const y = cy - ry * .34 + i * ry * .054;
+          const offset = Math.sin(i * 1.8) * bw * .012;
+          ctx.strokeStyle = i % 3 === 0 ? '#e9bd68' : '#d7a953';
+          ctx.beginPath();
+          ctx.moveTo(cx - rx * .55, y + offset * .15);
+          ctx.bezierCurveTo(cx - rx * .3, y - ry * .34, cx + rx * .03, y + ry * .2, cx + rx * .42, y - ry * .05);
+          ctx.stroke();
+          ctx.strokeStyle = 'rgba(255,231,153,.33)';
+          ctx.lineWidth = Math.max(.6, bw * .0015);
+          ctx.stroke();
+          ctx.lineWidth = Math.max(2.5, bw * .008);
+        }
+        ctx.restore();
+
+        // Bok choy leaves and crisp stems.
+        drawLeaf(cx - rx * .42, cy - ry * .03, bw * .18, bw * .105, -.22, '#255c2d', '#63a14c', bw);
+        drawLeaf(cx - rx * .29, cy + ry * .26, bw * .15, bw * .085, .15, '#173e25', '#5b913e', bw);
+
+        // Seared tofu cubes.
+        drawTofu(cx + rx * .05, cy - ry * .32, bw * .095, -.08, bw);
+        drawTofu(cx + rx * .25, cy + ry * .23, bw * .083, .12, bw);
+        drawTofu(cx - rx * .05, cy + ry * .39, bw * .072, -.03, bw);
+
+        // Shiitake mushrooms.
+        drawMushroom(cx + rx * .48, cy - ry * .18, bw * .12, -.06, bw);
+        drawMushroom(cx + rx * .39, cy + ry * .39, bw * .105, .12, bw);
+        drawMushroom(cx - rx * .58, cy - ry * .34, bw * .1, .05, bw);
+
+        // Scallion rings scattered as a fresh final layer.
+        const rings = [
+          [-.12,-.42,.015], [.12,.1,.013], [.28,-.35,.012], [-.23,.18,.011],
+          [.04,-.02,.011], [.37,.1,.01], [-.39,-.05,.012], [.18,.42,.009],
+          [-.06,.43,.01], [.48,.34,.008], [-.5,.24,.009], [.03,-.5,.008]
+        ];
+        rings.forEach((p, i) => {
+          const x = cx + rx * p[0];
+          const y = cy + ry * p[1] + Math.sin(t * 1.1 + i) * (reduceMotion.matches ? 0 : .5);
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(i * .61);
+          ctx.scale(1, .55);
+          ctx.strokeStyle = i % 2 ? '#90bd5b' : '#c3d883';
+          ctx.lineWidth = Math.max(1.2, bw * .0045);
+          ellipsePath(0, 0, bw * p[2], bw * p[2]);
+          ctx.stroke();
+          ctx.restore();
+        });
+
+        // Chili threads give the center a delicate vertical accent.
+        ctx.strokeStyle = '#bc351b';
+        ctx.lineWidth = Math.max(1, bw * .0022);
+        ctx.lineCap = 'round';
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.moveTo(cx - bw * .025 + i * bw * .012, cy - ry * .5);
+          ctx.quadraticCurveTo(cx + bw * (.02 - i * .008), cy - ry * .12, cx + bw * (.085 - i * .014), cy + ry * .2);
+          ctx.stroke();
+        }
+      }
+
+      function drawLeaf(x, y, width, height, rotation, dark, light, bw) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        let g = ctx.createLinearGradient(-width / 2, 0, width / 2, 0);
+        g.addColorStop(0, dark);
+        g.addColorStop(.55, light);
+        g.addColorStop(1, '#17341f');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(-width * .46, 0);
+        ctx.bezierCurveTo(-width * .35, -height * .65, width * .28, -height * .7, width * .5, 0);
+        ctx.bezierCurveTo(width * .2, height * .65, -width * .32, height * .6, -width * .46, 0);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(201,226,134,.45)';
+        ctx.lineWidth = Math.max(1, bw * .002);
+        ctx.beginPath();
+        ctx.moveTo(-width * .38, 0);
+        ctx.quadraticCurveTo(0, height * .06, width * .4, 0);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawTofu(x, y, size, rotation, bw) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.transform(1, 0, -.22, .62, 0, 0);
+        roundedRect(-size / 2, -size / 2, size, size, size * .1);
+        let g = ctx.createLinearGradient(-size / 2, -size / 2, size / 2, size / 2);
+        g.addColorStop(0, '#ffe1a0');
+        g.addColorStop(.5, '#d69b50');
+        g.addColorStop(1, '#9e592a');
+        ctx.fillStyle = g;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(100,49,19,.55)';
+        ctx.lineWidth = Math.max(1, bw * .002);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(99,48,18,.7)';
+        [[-.22,-.18],[.17,-.25],[.28,.12],[-.12,.24]].forEach(p => {
+          ellipsePath(p[0] * size, p[1] * size, size * .025, size * .025);
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      function drawMushroom(x, y, size, rotation, bw) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.scale(1, .52);
+        let g = ctx.createRadialGradient(-size * .18, -size * .2, 0, 0, 0, size * .6);
+        g.addColorStop(0, '#b47a47');
+        g.addColorStop(.45, '#754527');
+        g.addColorStop(1, '#29170f');
+        ctx.fillStyle = g;
+        ellipsePath(0, 0, size * .5, size * .5);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(225,169,104,.25)';
+        ctx.lineWidth = Math.max(1, bw * .002);
+        ctx.beginPath();
+        ctx.moveTo(-size * .35, -size * .23);
+        ctx.quadraticCurveTo(0, 0, size * .36, size * .22);
+        ctx.moveTo(-size * .17, -size * .43);
+        ctx.quadraticCurveTo(0, 0, size * .17, size * .42);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawRipples(t, m, rx, ry) {
+        const { cx, cy, bw } = m;
+        ctx.save();
+        ctx.lineWidth = Math.max(1, bw * .002);
+        ripples = ripples.filter(r => t - r.born < 1.6);
+        for (const r of ripples) {
+          const age = (t - r.born) / 1.6;
+          const radius = bw * (.012 + age * .09);
+          ctx.strokeStyle = `rgba(255,205,132,${(1 - age) * .28})`;
+          ctx.beginPath();
+          ctx.ellipse(cx + r.x * rx, cy + r.y * ry, radius, radius * .25, 0, 0, TAU);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function render(t, force = false) {
+        if (!w || !h) return;
+        if (!reduceMotion.matches) {
+          pointer.x += (pointer.tx - pointer.x) * .055;
+          pointer.y += (pointer.ty - pointer.y) * .055;
+        } else {
+          pointer.x = pointer.tx;
+          pointer.y = pointer.ty;
+        }
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        const m = bowlMetrics();
+        drawAtmosphere(t, m);
+        drawShadow(m);
+        drawSteam(t, m);
+        drawBowlBody(m);
+        drawNori(m);
+        drawBroth(t, m);
+
+        if (!reduceMotion.matches && !force) raf = requestAnimationFrame(loop);
+      }
+
+      function loop(now) {
+        const t = now * .001;
+        last = t;
+        render(t);
+      }
+
+      function restart() {
+        cancelAnimationFrame(raf);
+        if (reduceMotion.matches) render(last || performance.now() * .001, true);
+        else raf = requestAnimationFrame(loop);
+      }
+
+      function setPointer(e) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.tx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        pointer.ty = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        pointer.active = true;
+
+        const m = bowlMetrics();
+        const nx = (e.clientX - m.cx) / (m.bw * .475);
+        const ny = (e.clientY - m.cy) / (m.bh * .205);
+        if (nx * nx + ny * ny < 1 && (!ripples.length || performance.now() * .001 - ripples[ripples.length - 1].born > .16)) {
+          ripples.push({ x: nx, y: ny, born: performance.now() * .001 });
+        }
+        if (reduceMotion.matches) render(performance.now() * .001, true);
+      }
+
+      canvas.addEventListener('pointermove', setPointer, { passive: true });
+      canvas.addEventListener('pointerdown', setPointer, { passive: true });
+      canvas.addEventListener('pointerleave', () => {
+        pointer.tx = .5;
+        pointer.ty = .45;
+        pointer.active = false;
+        if (reduceMotion.matches) render(performance.now() * .001, true);
+      });
+      addEventListener('resize', resize, { passive: true });
+      reduceMotion.addEventListener?.('change', restart);
+
+      resize();
+      restart();
+    })();
+  </script>
+</body>
+</html>

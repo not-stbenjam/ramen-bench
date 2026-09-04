@@ -1,0 +1,69 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "anthropic/opus-5/xhigh",
+  "vendor": {
+    "slug": "anthropic",
+    "displayName": "Anthropic"
+  },
+  "model": {
+    "slug": "opus-5",
+    "displayName": "Opus 5",
+    "providerModelId": "anthropic/opus-5"
+  },
+  "variation": {
+    "slug": "xhigh",
+    "displayName": "XHigh",
+    "reasoningEffort": "xhigh",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Ramen Bench",
+    "version": "1",
+    "runtime": "Static artifact",
+    "invocation": "Existing benchmark artifact registration"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-04T22:39:46Z",
+    "completedAt": "2026-09-04T22:39:46Z",
+    "wallDurationMs": 0,
+    "apiDurationMs": 0
+  },
+  "usage": {
+    "tokens": {
+      "input": 0,
+      "cachedInput": 0,
+      "cacheCreationInput": 0,
+      "reasoning": 0,
+      "output": 0,
+      "total": 0
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0,
+      "cachedInput": 0,
+      "cacheCreationInput": 0,
+      "output": 0,
+      "other": 0,
+      "total": 0,
+      "estimated": true
+    },
+    "requests": 0,
+    "turns": 0,
+    "toolCalls": 0,
+    "providerReported": false
+  },
+  "resultStats": {
+    "bytes": 50268,
+    "lines": 1563
+  },
+  "provenance": {
+    "generatedAt": "2026-09-04T22:39:46Z",
+    "sourceCommit": "ba9e47b"
+  },
+  "notes": "Usage and timing were not captured by the artifact export; token and cost fields are zero estimates."
+}

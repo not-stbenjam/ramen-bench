@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #080b0d; }
+    body { cursor: default; }
+    canvas { display: block; width: 100%; height: 100%; }
+    @media (prefers-reduced-motion: reduce) { canvas { animation: none; } }
+  </style>
+</head>
+<body>
+<canvas id="scene" aria-label="A steaming bowl of vegan ramen in a dark, warm atmosphere"></canvas>
+<script>
+(() => {
+  'use strict';
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, dpr = 1, time = 0;
+  const pointer = { x: .5, y: .48, tx: .5, ty: .48 };
+  const TAU = Math.PI * 2;
+
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  addEventListener('resize', resize, { passive: true });
+  addEventListener('pointermove', e => { pointer.tx = e.clientX / W; pointer.ty = e.clientY / H; }, { passive: true });
+  addEventListener('pointerleave', () => { pointer.tx = .5; pointer.ty = .48; }, { passive: true });
+  resize();
+
+  const motes = Array.from({ length: 72 }, (_, i) => ({
+    x: Math.random(), y: Math.random(), r: .4 + Math.random() * 1.8,
+    a: .05 + Math.random() * .22, drift: Math.random() * TAU, speed: .15 + Math.random() * .45,
+    warm: Math.random() > .35
+  }));
+  const steam = Array.from({ length: 7 }, (_, i) => ({
+    x: -.44 + i * .15 + (Math.random() - .5) * .06,
+    phase: Math.random() * TAU, height: .45 + Math.random() * .3,
+    width: .025 + Math.random() * .035, alpha: .12 + Math.random() * .12
+  }));
+
+  function ellipse(x, y, rx, ry, fill, stroke, sw = 1) {
+    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, TAU);
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = sw; ctx.stroke(); }
+  }
+  function rounded(x, y, w, h, r, fill) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); }
+
+  function drawBackdrop(t) {
+    const g = ctx.createRadialGradient(W * .5, H * .48, 0, W * .5, H * .48, Math.max(W, H) * .72);
+    g.addColorStop(0, '#25201b'); g.addColorStop(.28, '#171719'); g.addColorStop(.68, '#0b0e11'); g.addColorStop(1, '#050709');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W * (.5 + (pointer.x - .5) * .08), H * .55, 0, W * .5, H * .55, Math.min(W, H) * .62);
+    glow.addColorStop(0, 'rgba(166,86,38,.14)'); glow.addColorStop(.45, 'rgba(89,55,30,.055)'); glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    for (const p of motes) {
+      const x = p.x * W + Math.sin(t * p.speed + p.drift) * W * .009;
+      const y = ((p.y + t * p.speed * .007) % 1) * H;
+      ctx.globalAlpha = p.a * (.55 + .45 * Math.sin(t * .4 + p.drift));
+      ctx.fillStyle = p.warm ? '#d39a62' : '#aebfc0'; ellipse(x, y, p.r, p.r, ctx.fillStyle);
+    }
+    ctx.restore();
+  }
+
+  function drawSteam(t, cx, cy, scale) {
+    ctx.save(); ctx.lineCap = 'round'; ctx.globalCompositeOperation = 'screen';
+    for (const s of steam) {
+      const x = cx + s.x * scale;
+      const lift = s.height * scale;
+      const sway = (reduceMotion ? 0 : Math.sin(t * .8 + s.phase) * scale * .035);
+      const grd = ctx.createLinearGradient(x, cy, x + sway, cy - lift);
+      grd.addColorStop(0, `rgba(246,215,174,${s.alpha * 1.35})`); grd.addColorStop(.42, `rgba(215,221,210,${s.alpha})`); grd.addColorStop(1, 'rgba(180,195,187,0)');
+      ctx.strokeStyle = grd; ctx.lineWidth = s.width * scale;
+      ctx.beginPath(); ctx.moveTo(x, cy);
+      ctx.bezierCurveTo(x - scale * .08 + sway, cy - lift * .25, x + scale * .1 - sway, cy - lift * .48, x + sway, cy - lift * .7);
+      ctx.bezierCurveTo(x + scale * .05 + sway, cy - lift * .82, x - scale * .06, cy - lift * .91, x + sway * .4, cy - lift);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function noodle(cx, cy, s, angle, len, color, width) {
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(angle); ctx.lineCap = 'round';
+    ctx.strokeStyle = color; ctx.lineWidth = width * s; ctx.beginPath();
+    ctx.moveTo(-len * s, 0); ctx.bezierCurveTo(-len * .4 * s, -width * 2 * s, len * .25 * s, width * 2 * s, len * s, 0); ctx.stroke(); ctx.restore();
+  }
+
+  function drawRamen(t) {
+    const s = Math.min(W, H) / 520;
+    const cx = W * (.5 + (pointer.x - .5) * .035), cy = H * .59 + (pointer.y - .48) * H * .025;
+    const bw = Math.min(W * .72, 370 * s * 1.0), bh = bw * .62;
+    ctx.save();
+    // quiet tabletop shadow and warm reflection
+    ctx.globalAlpha = .65; ctx.filter = `blur(${18 * s}px)`; ellipse(cx, cy + bh * .45, bw * .57, bh * .13, 'rgba(0,0,0,.9)');
+    ctx.filter = `blur(${34 * s}px)`; ellipse(cx, cy + bh * .24, bw * .38, bh * .15, 'rgba(172,77,26,.2)'); ctx.filter = 'none';
+    // bowl body
+    const bowl = ctx.createLinearGradient(cx, cy - bh * .05, cx, cy + bh * .55);
+    bowl.addColorStop(0, '#d07b42'); bowl.addColorStop(.16, '#b1522f'); bowl.addColorStop(.55, '#6d2923'); bowl.addColorStop(1, '#2c1318');
+    ctx.beginPath(); ctx.moveTo(cx - bw * .48, cy); ctx.bezierCurveTo(cx - bw * .43, cy + bh * .54, cx - bw * .25, cy + bh * .66, cx, cy + bh * .68); ctx.bezierCurveTo(cx + bw * .25, cy + bh * .66, cx + bw * .43, cy + bh * .54, cx + bw * .48, cy); ctx.closePath(); ctx.fillStyle = bowl; ctx.fill();
+    // ceramic shine
+    ctx.globalAlpha = .2; ctx.beginPath(); ctx.ellipse(cx - bw * .18, cy + bh * .28, bw * .12, bh * .25, -.25, 0, TAU); ctx.fillStyle = '#ffb16a'; ctx.fill(); ctx.globalAlpha = 1;
+    // rim
+    ellipse(cx, cy, bw * .51, bh * .2, '#26161a', '#e08a4b', 2 * s);
+    ellipse(cx, cy + bh * .015, bw * .455, bh * .16, '#a94422', '#5f2a22', 2 * s);
+    // broth
+    const soup = ctx.createRadialGradient(cx - bw * .15, cy - bh * .08, 0, cx, cy, bw * .48);
+    soup.addColorStop(0, '#de7133'); soup.addColorStop(.55, '#a93e1e'); soup.addColorStop(1, '#57201a');
+    ellipse(cx, cy, bw * .44, bh * .145, soup);
+    // oil pools
+    ctx.globalAlpha = .5;
+    ellipse(cx - bw * .22, cy - bh * .03, bw * .06, bh * .022, '#f5a33f'); ellipse(cx + bw * .27, cy + bh * .04, bw * .055, bh * .019, '#f6a13b'); ellipse(cx + bw * .03, cy + bh * .1, bw * .07, bh * .018, '#ef8f31'); ctx.globalAlpha = 1;
+    // noodles, softly undulating with the soup
+    const noodles = [[-.22,-.05,-.18],[.02,-.01,.2],[.2,-.04,-.1],[-.06,.07,-.22],[.27,.08,.15],[-.33,.04,.1],[.08,-.09,.04]];
+    noodles.forEach((n, i) => noodle(cx + n[0] * bw, cy + n[1] * bh + (reduceMotion ? 0 : Math.sin(t * 1.2 + i) * 1.2 * s), s, n[2], bw * (.16 + (i % 2) * .035), i % 2 ? '#efc477' : '#ffd88b', 5));
+    // bok choy leaves
+    ctx.save(); ctx.translate(cx - bw * .26, cy - bh * .035); ctx.rotate(-.18);
+    rounded(-bw*.1, -bh*.075, bw*.2, bh*.15, bw*.07, '#4f8c55'); rounded(-bw*.045, -bh*.11, bw*.09, bh*.19, bw*.04, '#87b66e'); ctx.restore();
+    ctx.save(); ctx.translate(cx + bw * .3, cy - bh * .015); ctx.rotate(.26);
+    rounded(-bw*.1, -bh*.08, bw*.2, bh*.15, bw*.07, '#477d4f'); rounded(-bw*.04, -bh*.12, bw*.08, bh*.2, bw*.03, '#96bf72'); ctx.restore();
+    // tofu cubes
+    ctx.save(); ctx.translate(cx - bw * .03, cy - bh * .07); ctx.rotate(-.08); rounded(-bw*.07, -bh*.045, bw*.13, bh*.09, 3*s, '#e9ba68'); rounded(-bw*.055, -bh*.035, bw*.07, bh*.018, 2*s, 'rgba(255,226,144,.45)'); ctx.restore();
+    // mushrooms
+    ctx.fillStyle = '#d6a56b'; ctx.beginPath(); ctx.arc(cx + bw*.08, cy + bh*.025, bw*.075, Math.PI, TAU); ctx.fill(); rounded(cx + bw*.005, cy + bh*.025, bw*.15, bh*.055, 5*s, '#b97d50');
+    // chili, sesame, scallions
+    ctx.strokeStyle = '#d95a2e'; ctx.lineWidth = 3*s; ctx.beginPath(); ctx.arc(cx + bw*.15, cy - bh*.07, bw*.07, .3, 2.6); ctx.stroke();
+    for (let i = 0; i < 15; i++) { const a = i * 2.4, rr = bw * (.1 + (i % 5) * .065); ellipse(cx + Math.cos(a)*rr, cy + Math.sin(a)*rr*.32, 2*s, 1*s, i%3===0?'#e5d19b':'#9dc079'); }
+    ctx.restore();
+    drawSteam(t, cx, cy - bh * .02, bw * 1.1);
+  }
+
+  function frame(ms) {
+    time = reduceMotion ? 0 : ms / 1000;
+    pointer.x += (pointer.tx - pointer.x) * .045; pointer.y += (pointer.ty - pointer.y) * .045;
+    drawBackdrop(time); drawRamen(time);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

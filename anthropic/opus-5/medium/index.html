@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bowl</title>
+<style>
+  :root{
+    --ink:#07060a;
+    --warm:#ff9a48;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--ink)}
+  body{
+    background:
+      radial-gradient(120% 90% at 50% 62%, #1a1114 0%, #0d0a0e 45%, #060508 100%);
+    color:#fff;
+    touch-action:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .stage{
+    position:fixed; inset:0;
+    perspective:1400px;
+    perspective-origin:50% 55%;
+  }
+  .tilt{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
+    will-change:transform;
+    transition:transform .9s cubic-bezier(.16,.7,.2,1);
+  }
+  svg.bowl{
+    width:100%; height:100%;
+    display:block;
+    overflow:visible;
+    transform:scale(var(--zoom,1));
+    transform-origin:50% 54%;
+  }
+  canvas#fx{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    pointer-events:none;
+  }
+  /* grain / vignette over everything */
+  .vignette{
+    position:fixed; inset:-10%;
+    pointer-events:none;
+    background:radial-gradient(65% 55% at 50% 55%, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 78%, rgba(0,0,0,.9) 100%);
+  }
+
+  /* --- gentle life --- */
+  .float{
+    transform-box:fill-box;
+    transform-origin:50% 50%;
+    animation:bob var(--dur,6s) ease-in-out var(--delay,0s) infinite alternate;
+    will-change:transform;
+  }
+  @keyframes bob{
+    from{transform:translate(-1.1px,-1.4px) rotate(-.35deg)}
+    to  {transform:translate(1.2px,1.6px) rotate(.4deg)}
+  }
+  .shimmer{animation:shimmer 9s ease-in-out infinite alternate}
+  @keyframes shimmer{from{opacity:.28}to{opacity:.62}}
+  .shimmer2{animation:shimmer2 13s ease-in-out infinite alternate}
+  @keyframes shimmer2{from{opacity:.5;transform:translateX(-6px)}to{opacity:.16;transform:translateX(8px)}}
+  .emberglow{animation:ember 7.5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 50%}
+  @keyframes ember{from{opacity:.55;transform:scale(.985)}to{opacity:.85;transform:scale(1.03)}}
+  .ripple{animation:ripple 2.2s cubic-bezier(.2,.6,.3,1) forwards}
+  @keyframes ripple{
+    0%{opacity:.5;transform:scale(.05)}
+    100%{opacity:0;transform:scale(1)}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    .tilt{transform:none !important}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="tilt" id="tilt">
+    <svg class="bowl" viewBox="0 -30 1000 850" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <radialGradient id="airGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ff9c4a" stop-opacity=".30"/>
+          <stop offset="45%" stop-color="#c9541f" stop-opacity=".13"/>
+          <stop offset="100%" stop-color="#3a0d06" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="tableGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ff8a3c" stop-opacity=".22"/>
+          <stop offset="100%" stop-color="#ff6a1e" stop-opacity="0"/>
+        </radialGradient>
+
+        <linearGradient id="ceramic" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#3a2c2e"/>
+          <stop offset="26%" stop-color="#241a1e"/>
+          <stop offset="70%" stop-color="#120d11"/>
+          <stop offset="100%" stop-color="#080609"/>
+        </linearGradient>
+        <linearGradient id="ceramicSide" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#5b4038" stop-opacity=".55"/>
+          <stop offset="18%"  stop-color="#000000" stop-opacity="0"/>
+          <stop offset="76%"  stop-color="#000000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#8a4f2c" stop-opacity=".5"/>
+        </linearGradient>
+        <linearGradient id="rimLight" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#ffb877" stop-opacity="0"/>
+          <stop offset="22%"  stop-color="#ffcf9c" stop-opacity=".55"/>
+          <stop offset="50%"  stop-color="#fff0d8" stop-opacity=".8"/>
+          <stop offset="78%"  stop-color="#ffc287" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#ff9c52" stop-opacity="0"/>
+        </linearGradient>
+
+        <radialGradient id="broth" cx="46%" cy="38%" r="72%">
+          <stop offset="0%"   stop-color="#b8682a"/>
+          <stop offset="34%"  stop-color="#8a4418"/>
+          <stop offset="68%"  stop-color="#4d2210"/>
+          <stop offset="100%" stop-color="#24100a"/>
+        </radialGradient>
+        <radialGradient id="brothHot" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffb066" stop-opacity=".55"/>
+          <stop offset="60%" stop-color="#e0761f" stop-opacity=".16"/>
+          <stop offset="100%" stop-color="#8a3a10" stop-opacity="0"/>
+        </radialGradient>
+
+        <linearGradient id="noodle" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f6dfa6"/>
+          <stop offset="100%" stop-color="#c99f52"/>
+        </linearGradient>
+        <linearGradient id="tofuTop" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#fbf0d8"/>
+          <stop offset="100%" stop-color="#e6cfa4"/>
+        </linearGradient>
+        <linearGradient id="tofuL" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d8bd8d"/>
+          <stop offset="100%" stop-color="#9e7c4c"/>
+        </linearGradient>
+        <linearGradient id="tofuR" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#b99a66"/>
+          <stop offset="100%" stop-color="#7d5c34"/>
+        </linearGradient>
+        <radialGradient id="shroom" cx="38%" cy="30%" r="75%">
+          <stop offset="0%" stop-color="#b07c47"/>
+          <stop offset="60%" stop-color="#7a4a26"/>
+          <stop offset="100%" stop-color="#43220f"/>
+        </radialGradient>
+        <linearGradient id="nori" x1="0" y1="0" x2="0.4" y2="1">
+          <stop offset="0%" stop-color="#20342e"/>
+          <stop offset="45%" stop-color="#101d1b"/>
+          <stop offset="100%" stop-color="#060c0c"/>
+        </linearGradient>
+        <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7fae52"/>
+          <stop offset="55%" stop-color="#4a7c33"/>
+          <stop offset="100%" stop-color="#2b4c20"/>
+        </linearGradient>
+        <linearGradient id="stem" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#eef3d8"/>
+          <stop offset="100%" stop-color="#b9c791"/>
+        </linearGradient>
+
+        <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="26"/>
+        </filter>
+        <filter id="softer" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="48"/>
+        </filter>
+        <filter id="tiny" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2.2"/>
+        </filter>
+        <filter id="innerShade" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="14"/>
+        </filter>
+
+        <clipPath id="brothClip">
+          <ellipse cx="500" cy="398" rx="268" ry="72"/>
+        </clipPath>
+      </defs>
+
+      <!-- ambient warmth behind the bowl -->
+      <g id="light">
+        <ellipse cx="500" cy="380" rx="430" ry="330" fill="url(#airGlow)" filter="url(#softer)"/>
+        <ellipse cx="500" cy="655" rx="330" ry="70" fill="url(#tableGlow)" filter="url(#soft)" class="emberglow"/>
+      </g>
+
+      <!-- shadow pooled under the bowl -->
+      <ellipse cx="500" cy="662" rx="300" ry="48" fill="#000" opacity=".65" filter="url(#soft)"/>
+
+      <!-- bowl body -->
+      <g id="vessel">
+        <path d="M210,398 A290,84 0 0 1 790,398 C787,548 688,650 500,650 C312,650 213,548 210,398 Z" fill="url(#ceramic)"/>
+        <path d="M210,398 A290,84 0 0 1 790,398 C787,548 688,650 500,650 C312,650 213,548 210,398 Z" fill="url(#ceramicSide)"/>
+        <!-- subtle glaze band -->
+        <path d="M238,470 C300,530 400,566 500,566 C600,566 700,530 762,470"
+              fill="none" stroke="#ffb478" stroke-opacity=".07" stroke-width="16" filter="url(#tiny)"/>
+        <!-- rim -->
+        <ellipse cx="500" cy="398" rx="290" ry="84" fill="none" stroke="#0b0709" stroke-width="16"/>
+        <ellipse cx="500" cy="396" rx="290" ry="84" fill="none" stroke="url(#rimLight)" stroke-width="4.5"/>
+      </g>
+
+      <!-- broth -->
+      <g id="surface">
+        <ellipse cx="500" cy="398" rx="272" ry="74" fill="#150a07"/>
+        <ellipse cx="500" cy="398" rx="268" ry="72" fill="url(#broth)"/>
+        <g clip-path="url(#brothClip)">
+          <ellipse cx="470" cy="386" rx="200" ry="58" fill="url(#brothHot)" class="shimmer"/>
+          <!-- inner wall shade -->
+          <ellipse cx="500" cy="398" rx="268" ry="72" fill="none" stroke="#1a0a05" stroke-width="34" opacity=".85" filter="url(#innerShade)"/>
+          <!-- broth sheen -->
+          <path d="M300,372 C360,352 460,348 540,362" fill="none" stroke="#ffd9a6" stroke-opacity=".22" stroke-width="5" filter="url(#tiny)" class="shimmer2"/>
+          <path d="M560,424 C620,418 665,408 700,394" fill="none" stroke="#ffc98d" stroke-opacity=".14" stroke-width="4" filter="url(#tiny)" class="shimmer"/>
+          <g id="ripples"></g>
+          <g id="oil"></g>
+        </g>
+      </g>
+
+      <!-- toppings -->
+      <g id="food" clip-path="none">
+
+        <!-- noodle nest -->
+        <g class="float" style="--dur:7.5s;--delay:-1s">
+          <g fill="none" stroke="#3a2410" stroke-opacity=".55" stroke-width="11" stroke-linecap="round">
+            <path d="M336,398 C392,362 470,356 526,390"/>
+            <path d="M356,420 C412,384 500,378 566,410"/>
+            <path d="M346,376 C404,344 486,340 548,370"/>
+            <path d="M374,436 C432,410 522,404 588,428"/>
+          </g>
+          <g fill="none" stroke="url(#noodle)" stroke-width="8.5" stroke-linecap="round">
+            <path d="M334,394 C390,358 468,352 524,386"/>
+            <path d="M354,416 C410,380 498,374 564,406"/>
+            <path d="M344,372 C402,340 484,336 546,366"/>
+            <path d="M372,432 C430,406 520,400 586,424"/>
+            <path d="M318,410 C352,396 392,390 424,398"/>
+            <path d="M400,352 C450,332 512,332 556,350"/>
+          </g>
+          <g fill="none" stroke="#fff2cf" stroke-opacity=".45" stroke-width="2" stroke-linecap="round">
+            <path d="M348,388 C396,358 462,352 512,378"/>
+            <path d="M362,410 C412,380 492,374 552,400"/>
+          </g>
+        </g>
+
+        <!-- nori sheet, leaning -->
+        <g transform="translate(322,332) rotate(-13)">
+          <g class="float" style="--dur:8.5s;--delay:-3s">
+            <path d="M0,0 L92,-14 C98,20 100,58 96,92 L4,106 C-2,72 -2,34 0,0 Z" fill="url(#nori)"/>
+            <path d="M0,0 L92,-14 C98,20 100,58 96,92" fill="none" stroke="#4c7a63" stroke-opacity=".35" stroke-width="2"/>
+            <path d="M14,10 C40,44 46,66 42,96" fill="none" stroke="#6f9c85" stroke-opacity=".16" stroke-width="6"/>
+          </g>
+        </g>
+
+        <!-- shiitake slices -->
+        <g transform="translate(352,414)">
+          <g class="float" style="--dur:6.4s;--delay:-2.2s">
+            <ellipse cx="0" cy="4" rx="46" ry="20" fill="#2a1409" opacity=".7"/>
+            <ellipse cx="0" cy="0" rx="46" ry="20" fill="url(#shroom)"/>
+            <ellipse cx="-6" cy="-4" rx="34" ry="12" fill="#a3703e" opacity=".85"/>
+            <path d="M-44,-2 A46,20 0 0 1 30,-15" fill="none" stroke="#ffc98d" stroke-opacity=".35" stroke-width="2.5"/>
+            <path d="M-22,-8 L18,8 M14,-12 L-18,10" stroke="#f2dcbb" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+          </g>
+        </g>
+        <g transform="translate(678,406)">
+          <g class="float" style="--dur:7.1s;--delay:-4.5s">
+            <ellipse cx="0" cy="4" rx="40" ry="17" fill="#2a1409" opacity=".7"/>
+            <ellipse cx="0" cy="0" rx="40" ry="17" fill="url(#shroom)"/>
+            <ellipse cx="-4" cy="-3" rx="29" ry="10" fill="#96663a" opacity=".85"/>
+            <path d="M-38,-2 A40,17 0 0 1 26,-13" fill="none" stroke="#ffc98d" stroke-opacity=".32" stroke-width="2.2"/>
+            <path d="M-18,-6 L16,6 M12,-10 L-15,8" stroke="#f2dcbb" stroke-opacity=".45" stroke-width="2.6" stroke-linecap="round"/>
+          </g>
+        </g>
+
+        <!-- tofu cubes -->
+        <g transform="translate(556,340)">
+          <g class="float" style="--dur:6.8s;--delay:-0.6s">
+            <ellipse cx="34" cy="42" rx="42" ry="14" fill="#1c0c06" opacity=".6"/>
+            <path d="M0,0 L34,-15 L68,0 L34,15 Z" fill="url(#tofuTop)"/>
+            <path d="M0,0 L0,24 L34,39 L34,15 Z" fill="url(#tofuL)"/>
+            <path d="M68,0 L68,24 L34,39 L34,15 Z" fill="url(#tofuR)"/>
+            <path d="M0,0 L34,-15 L68,0" fill="none" stroke="#fff8e6" stroke-opacity=".6" stroke-width="1.6"/>
+            <path d="M2,20 L32,34" stroke="#c79a56" stroke-opacity=".5" stroke-width="2"/>
+          </g>
+        </g>
+        <g transform="translate(408,336)">
+          <g class="float" style="--dur:7.9s;--delay:-3.8s">
+            <ellipse cx="26" cy="34" rx="34" ry="12" fill="#1c0c06" opacity=".55"/>
+            <path d="M0,0 L26,-11 L52,0 L26,11 Z" fill="url(#tofuTop)"/>
+            <path d="M0,0 L0,19 L26,30 L26,11 Z" fill="url(#tofuL)"/>
+            <path d="M52,0 L52,19 L26,30 L26,11 Z" fill="url(#tofuR)"/>
+            <path d="M0,0 L26,-11 L52,0" fill="none" stroke="#fff8e6" stroke-opacity=".5" stroke-width="1.4"/>
+          </g>
+        </g>
+
+        <!-- bok choy -->
+        <g transform="translate(474,432)">
+          <g class="float" style="--dur:6.1s;--delay:-1.8s">
+            <ellipse cx="0" cy="10" rx="52" ry="16" fill="#12180a" opacity=".55"/>
+            <path d="M-54,8 C-48,-18 -22,-36 4,-34 C-2,-20 -4,-6 -6,8 Z" fill="url(#leaf)"/>
+            <path d="M-6,8 C-8,-14 6,-34 30,-32 C52,-30 60,-10 50,6 C30,14 8,14 -6,8 Z" fill="url(#leaf)"/>
+            <path d="M-6,8 C0,-10 12,-24 30,-30" fill="none" stroke="#d6e9ab" stroke-opacity=".45" stroke-width="2.4"/>
+            <path d="M6,6 C14,-4 26,-14 40,-20 M20,8 C28,0 38,-6 48,-9" fill="none" stroke="#cfe3a6" stroke-opacity=".22" stroke-width="1.8"/>
+            <path d="M-30,4 C-28,-10 -20,-22 -8,-28" fill="none" stroke="#d6e9ab" stroke-opacity=".3" stroke-width="2"/>
+            <path d="M-56,8 C-40,14 -12,18 14,16 C0,22 -34,22 -56,8 Z" fill="url(#stem)"/>
+          </g>
+        </g>
+
+        <!-- corn -->
+        <g id="corn"></g>
+        <!-- scallions + sesame + chili flakes -->
+        <g id="garnish"></g>
+
+        <!-- rising heat highlight on the food -->
+        <ellipse cx="500" cy="392" rx="230" ry="60" fill="url(#brothHot)" opacity=".18" style="mix-blend-mode:screen"/>
+      </g>
+
+      <!-- front rim over the food for depth -->
+      <path d="M212,404 C232,462 350,486 500,486 C650,486 768,462 788,404
+               C788,470 660,506 500,506 C340,506 212,470 212,404 Z"
+            fill="#0c0709" opacity=".0"/>
+      <path d="M210,398 A290,84 0 0 0 790,398" fill="none" stroke="#0d090b" stroke-width="15"/>
+      <path d="M214,404 A286,80 0 0 0 786,404" fill="none" stroke="#ffbe86" stroke-opacity=".28" stroke-width="3"/>
+
+      <!-- steam origin marker (invisible) -->
+      <ellipse id="anchor" cx="500" cy="390" rx="240" ry="56" fill="none"/>
+    </svg>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+<div class="vignette"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var reduce = reduceQuery.matches;
+
+  /* ---------- deterministic-ish random ---------- */
+  var seed = 20260904;
+  function rnd(){ seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+  function rr(a,b){ return a + (b-a)*rnd(); }
+
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs){
+    var n = document.createElementNS(SVGNS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  /* ---------- scatter garnish across the broth ellipse ---------- */
+  var CX = 500, CY = 398, RX = 250, RY = 62;
+  function scatter(count, minR, maxR, fn){
+    var made = 0, guard = 0;
+    while (made < count && guard++ < count * 40){
+      var a = rr(0, Math.PI*2), r = Math.sqrt(rr(minR*minR, maxR*maxR));
+      var x = CX + Math.cos(a) * RX * r;
+      var y = CY + Math.sin(a) * RY * r;
+      if (fn(x, y, r)) made++;
+    }
+  }
+
+  var cornAt = [];
+  var cornG = document.getElementById('corn');
+  scatter(15, .2, .95, function(x,y){
+    if (x > 316 && x < 600 && y > 336 && y < 448) return false; // keep the nest readable
+    for (var q=0;q<cornAt.length;q++){                          // no clumping
+      if (Math.abs(cornAt[q][0]-x) < 34 && Math.abs(cornAt[q][1]-y) < 18) return false;
+    }
+    cornAt.push([x,y]);
+    var g = el('g', {transform:'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') rotate(' + rr(-25,25).toFixed(1) + ')'});
+    var inner = el('g', {'class':'float'});
+    inner.style.setProperty('--dur', rr(4.5, 8.5).toFixed(2) + 's');
+    inner.style.setProperty('--delay', (-rr(0,7)).toFixed(2) + 's');
+    var s = rr(.85, 1.25);
+    inner.appendChild(el('ellipse', {cx:0, cy:3*s, rx:9*s, ry:5*s, fill:'#2a1607', opacity:.55}));
+    inner.appendChild(el('ellipse', {cx:0, cy:0, rx:9*s, ry:6.4*s, fill:'#f0b93c'}));
+    inner.appendChild(el('ellipse', {cx:-2*s, cy:-2*s, rx:4.6*s, ry:2.9*s, fill:'#ffe28a', opacity:.85}));
+    g.appendChild(inner); cornG.appendChild(g);
+    return true;
+  });
+
+  var garnish = document.getElementById('garnish');
+  // scallion rings
+  scatter(28, .15, 1.0, function(x,y){
+    var g = el('g', {transform:'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') rotate(' + rr(-30,30).toFixed(1) + ')'});
+    var inner = el('g', {'class':'float'});
+    inner.style.setProperty('--dur', rr(4, 9).toFixed(2) + 's');
+    inner.style.setProperty('--delay', (-rr(0,8)).toFixed(2) + 's');
+    var s = rr(.7, 1.35);
+    inner.appendChild(el('ellipse', {cx:0, cy:2.5*s, rx:8*s, ry:4.6*s, fill:'#16240c', opacity:.5}));
+    inner.appendChild(el('ellipse', {cx:0, cy:0, rx:8*s, ry:5*s, fill:'#8dc158'}));
+    inner.appendChild(el('ellipse', {cx:0, cy:0, rx:3.6*s, ry:2.1*s, fill:'#e9f6cd'}));
+    inner.appendChild(el('ellipse', {cx:-1.6*s, cy:-1.6*s, rx:3*s, ry:1.5*s, fill:'#c9e79a', opacity:.6}));
+    g.appendChild(inner); garnish.appendChild(g);
+    return true;
+  });
+  // sesame seeds
+  scatter(30, .1, 1.0, function(x,y){
+    var s = rr(.7,1.1);
+    garnish.appendChild(el('ellipse', {
+      cx:x.toFixed(1), cy:y.toFixed(1), rx:(3.4*s).toFixed(2), ry:(2.1*s).toFixed(2),
+      transform:'rotate(' + rr(-40,40).toFixed(1) + ' ' + x.toFixed(1) + ' ' + y.toFixed(1) + ')',
+      fill: rnd() > .45 ? '#f3e7cb' : '#3c3226', opacity:.9
+    }));
+    return true;
+  });
+  // chili flakes
+  scatter(22, .2, 1.0, function(x,y){
+    var s = rr(.6,1.2);
+    garnish.appendChild(el('rect', {
+      x:(x-2.6*s).toFixed(1), y:(y-1.6*s).toFixed(1), width:(5.2*s).toFixed(1), height:(3.2*s).toFixed(1), rx:1.2,
+      transform:'rotate(' + rr(0,180).toFixed(1) + ' ' + x.toFixed(1) + ' ' + y.toFixed(1) + ')',
+      fill: rnd() > .5 ? '#c2360f' : '#e0561a', opacity:.92
+    }));
+    return true;
+  });
+
+  // chili-oil pools floating on the broth
+  var oil = document.getElementById('oil');
+  scatter(16, .1, 1.0, function(x,y){
+    var s = rr(6, 26);
+    var g = el('g', {'class':'float'});
+    g.style.setProperty('--dur', rr(6,12).toFixed(2) + 's');
+    g.style.setProperty('--delay', (-rr(0,9)).toFixed(2) + 's');
+    g.appendChild(el('ellipse', {cx:x.toFixed(1), cy:y.toFixed(1), rx:s.toFixed(1), ry:(s*.42).toFixed(1),
+      fill:'#ff7a20', opacity:(rr(.10,.26)).toFixed(2)}));
+    g.appendChild(el('ellipse', {cx:(x-s*.2).toFixed(1), cy:(y-s*.12).toFixed(1), rx:(s*.55).toFixed(1), ry:(s*.2).toFixed(1),
+      fill:'#ffcf8a', opacity:(rr(.08,.2)).toFixed(2)}));
+    oil.appendChild(g);
+    return true;
+  });
+
+  /* ---------- pointer state ---------- */
+  var pointer = { x:0.5, y:0.5, px:0.5, py:0.5, vx:0, vy:0, active:false };
+  var tilt = document.getElementById('tilt');
+  var lightG = document.getElementById('light');
+
+  function onMove(cx, cy){
+    pointer.x = cx / window.innerWidth;
+    pointer.y = cy / window.innerHeight;
+    pointer.active = true;
+  }
+  if (!reduce){
+    window.addEventListener('pointermove', function(e){ onMove(e.clientX, e.clientY); }, {passive:true});
+    window.addEventListener('pointerdown', function(e){ onMove(e.clientX, e.clientY); splash(e.clientX, e.clientY); }, {passive:true});
+    window.addEventListener('pointerleave', function(){ pointer.active = false; }, {passive:true});
+  }
+
+  /* ---------- ripple on the broth when you touch it ---------- */
+  var ripples = document.getElementById('ripples');
+  var svg = document.querySelector('svg.bowl');
+  function splash(cx, cy){
+    var r = svg.getBoundingClientRect();
+    if (!r.width) return;
+    // map screen -> viewBox (preserveAspectRatio meet)
+    var s = Math.min(r.width/1000, r.height/850);
+    var ox = r.left + (r.width - 1000*s)/2, oy = r.top + (r.height - 850*s)/2;
+    var vx = (cx - ox)/s, vy = (cy - oy)/s - 30;
+    var dx = (vx - CX)/272, dy = (vy - CY)/74;
+    if (dx*dx + dy*dy > 1.05) return; // only inside the bowl
+
+    var g = el('g', {transform:'translate(' + vx.toFixed(1) + ',' + vy.toFixed(1) + ')'});
+    var ring = el('ellipse', {cx:0, cy:0, rx:170, ry:46, fill:'none', stroke:'#ffcf95', 'stroke-width':10, opacity:0});
+    ring.setAttribute('class', 'ripple');
+    ring.style.transformOrigin = 'center';
+    var ring2 = el('ellipse', {cx:0, cy:0, rx:110, ry:30, fill:'none', stroke:'#ffb268', 'stroke-width':6, opacity:0});
+    ring2.setAttribute('class', 'ripple');
+    ring2.style.transformOrigin = 'center';
+    ring2.style.animationDelay = '.18s';
+    g.appendChild(ring); g.appendChild(ring2);
+    ripples.appendChild(g);
+    setTimeout(function(){ if (g.parentNode) g.parentNode.removeChild(g); }, 2700);
+    // a puff of steam where it was disturbed
+    burst(cx, cy);
+  }
+
+  /* ---------- steam ---------- */
+  var canvas = document.getElementById('fx');
+  var ctx = canvas.getContext('2d');
+  var W = 0, H = 0, DPR = 1;
+
+  // soft round sprite
+  var sprite = document.createElement('canvas');
+  sprite.width = sprite.height = 128;
+  (function(){
+    var c = sprite.getContext('2d');
+    var g = c.createRadialGradient(64,64,0,64,64,64);
+    g.addColorStop(0,   'rgba(255,236,214,1)');
+    g.addColorStop(0.35,'rgba(255,222,190,0.42)');
+    g.addColorStop(0.7, 'rgba(240,200,170,0.10)');
+    g.addColorStop(1,   'rgba(220,180,150,0)');
+    c.fillStyle = g; c.fillRect(0,0,128,128);
+  })();
+
+  var anchor = document.getElementById('anchor');
+  var box = {x:0, y:0, w:0, h:0, scale:1};
+  function measure(){
+    var r = anchor.getBoundingClientRect();
+    if (r.width > 0){
+      box.x = r.left + r.width/2;
+      box.y = r.top + r.height/2;
+      box.w = r.width; box.h = r.height;
+      box.scale = r.width / 480;
+    }
+  }
+
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    // keep the bowl a comfortable size on every aspect ratio, never clipped
+    var fit = Math.min(W/1000, H/850);
+    var want = Math.min(W*0.92, H*0.80);
+    var zoom = Math.min(2.2, want / (580 * fit));
+    // scaling happens about (50%, 54%) of the viewport; solve for the largest
+    // zoom that still keeps the bowl (x 186..814, y 300..712) comfortably framed
+    var cy0 = 0.54*H, cx0 = 0.5*W;
+    var offY = (H - 850*fit)/2, offX = (W - 1000*fit)/2;
+    function vy(v){ return (v + 30)*fit + offY; }
+    function vx(v){ return v*fit + offX; }
+    function cap(pos, center, limit){
+      var d = pos - center;
+      return Math.abs(d) < 0.5 ? Infinity : (limit - center) / d;
+    }
+    zoom = Math.min(zoom,
+      cap(vy(712), cy0, H*0.97),   // bowl foot stays off the bottom edge
+      cap(vy(300), cy0, H*0.30),   // headroom above the rim for the steam
+      cap(vx(814), cx0, W*0.97),
+      cap(vx(186), cx0, W*0.03));
+    zoom = Math.max(0.7, zoom);
+    document.documentElement.style.setProperty('--zoom', zoom.toFixed(3));
+    canvas.width = Math.floor(W*DPR); canvas.height = Math.floor(H*DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    measure();
+    if (reduce) drawStatic();
+  }
+
+  var parts = [];
+  var motes = [];
+
+  function spawn(x, y, power){
+    var s = box.scale || 1;
+    parts.push({
+      x: x, y: y,
+      vx: rr(-5,5) * s,
+      vy: (-rr(30,62) - (power||0)*34) * s,
+      life: 0,
+      max: rr(2.8, 5.4),
+      r0: rr(7,15) * s,
+      r1: rr(48,104) * s,
+      ph: rr(0, Math.PI*2),
+      fr: rr(.3, .9),
+      sw: rr(9, 28) * s,
+      a: rr(.07, .13),
+      rot: rr(0, Math.PI*2)
+    });
+  }
+
+  function seedSteam(){
+    if (!box.w) return;
+    var n = 1;
+    for (var i=0;i<n;i++){
+      var t = rr(-1,1);
+      var x = box.x + t * box.w * 0.26;
+      var y = box.y - Math.abs(t) * box.h * 0.12 + rr(-6, 10);
+      spawn(x, y, 0);
+    }
+  }
+
+  function burst(cx, cy){
+    for (var i=0;i<14;i++){
+      spawn(cx + rr(-30,30), cy + rr(-14,14), rr(.3,1));
+    }
+  }
+
+  function seedMotes(){
+    motes.length = 0;
+    var n = Math.round(Math.min(70, (W*H)/26000));
+    for (var i=0;i<n;i++){
+      motes.push({
+        x: rr(0,W), y: rr(0,H),
+        r: rr(.6, 2.1),
+        a: rr(.04,.16),
+        vx: rr(-6,6), vy: rr(-12,-2),
+        ph: rr(0,Math.PI*2), fr: rr(.15,.5)
+      });
+    }
+  }
+
+  var lastT = 0, frame = 0;
+  var mx = W*0.5, my = H*0.5, pmx = mx, pmy = my, speed = 0;
+  var tiltX = 0, tiltY = 0, tTiltX = 0, tTiltY = 0;
+
+  function step(t){
+    var dt = Math.min(0.05, (t - lastT)/1000 || 0.016);
+    lastT = t;
+    frame++;
+    if (frame % 20 === 0) measure();
+
+    // smoothed pointer in px
+    var targetX = pointer.active ? pointer.x*W : W*0.5;
+    var targetY = pointer.active ? pointer.y*H : H*0.42;
+    pmx = mx; pmy = my;
+    mx += (targetX - mx) * Math.min(1, dt*6);
+    my += (targetY - my) * Math.min(1, dt*6);
+    var dvx = (mx - pmx)/Math.max(dt,.001), dvy = (my - pmy)/Math.max(dt,.001);
+    speed += (Math.min(1, Math.hypot(dvx,dvy)/1400) - speed) * Math.min(1, dt*3);
+
+    // scene parallax
+    tTiltY = (mx/W - .5) * 5.5;
+    tTiltX = -(my/H - .5) * 3.5;
+    tiltX += (tTiltX - tiltX) * Math.min(1, dt*2.2);
+    tiltY += (tTiltY - tiltY) * Math.min(1, dt*2.2);
+    tilt.style.transition = 'none';
+    tilt.style.transform = 'rotateX(' + tiltX.toFixed(3) + 'deg) rotateY(' + tiltY.toFixed(3) + 'deg) translate3d(' +
+      (-(mx/W-.5)*16).toFixed(2) + 'px,' + (-(my/H-.5)*10).toFixed(2) + 'px,0)';
+    lightG.setAttribute('transform', 'translate(' + ((mx/W-.5)*90).toFixed(1) + ',' + ((my/H-.5)*46).toFixed(1) + ')');
+
+    // spawn
+    var want = 1 + (speed > .25 ? 1 : 0);
+    for (var i=0;i<want;i++) seedSteam();
+
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'lighter';
+
+    // dust motes drifting in the warm air
+    for (var m=0;m<motes.length;m++){
+      var d = motes[m];
+      d.x += (d.vx + Math.sin(t/1000*d.fr + d.ph)*6) * dt;
+      d.y += d.vy * dt;
+      if (d.y < -10){ d.y = H + 10; d.x = rr(0,W); }
+      if (d.x < -10) d.x = W+10; else if (d.x > W+10) d.x = -10;
+      var tw = 0.6 + 0.4*Math.sin(t/700*d.fr + d.ph);
+      ctx.globalAlpha = d.a * tw;
+      var rr2 = d.r*6;
+      ctx.drawImage(sprite, d.x-rr2, d.y-rr2, rr2*2, rr2*2);
+    }
+
+    // steam
+    updateAndDraw(dt, t/1000, true);
+
+    requestAnimationFrame(step);
+  }
+
+  function updateAndDraw(dt, time, draw){
+    for (var i = parts.length - 1; i >= 0; i--){
+      var p = parts[i];
+      p.life += dt;
+      var k = p.life / p.max;
+      if (k >= 1){ parts.splice(i,1); continue; }
+
+      // curl: horizontal sway that widens as it rises
+      var sway = Math.sin(time*p.fr*2.2 + p.ph + p.y*0.006) * p.sw;
+      var rise = 1 - k*0.35;
+
+      // pointer breeze: push steam aside, stronger when the pointer moves
+      if (draw){
+        var dx = p.x - mx, dy = p.y - my;
+        var d2 = dx*dx + dy*dy;
+        var sig = 190 * (box.scale || 1);
+        var f = Math.exp(-d2 / (2*sig*sig));
+        var push = f * (260 + speed*900) * (box.scale || 1);
+        var dist = Math.sqrt(d2) || 1;
+        p.vx += (dx/dist) * push * dt;
+        p.vy += (dy/dist) * push * 0.35 * dt;
+      }
+
+      p.vx += (sway - p.vx) * Math.min(1, dt*1.4);
+      p.vy += -8 * dt * (box.scale||1);       // buoyancy
+      p.vx *= (1 - dt*0.6);
+      p.vy *= (1 - dt*0.25);
+
+      p.x += p.vx * dt;
+      p.y += p.vy * dt * rise;
+
+      if (!draw) continue;
+
+      var r = p.r0 + (p.r1 - p.r0) * Math.pow(k, 0.65);
+      var fade = Math.sin(Math.min(1,k*1.02) * Math.PI);
+      var alpha = p.a * fade * (1 - k*0.25);
+      if (alpha <= 0.001) continue;
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(sprite, p.x - r, p.y - r, r*2, r*2);
+    }
+  }
+
+  function drawStatic(){
+    // one calm, still plume for reduced-motion viewers
+    parts.length = 0; motes.length = 0;
+    seed = 7717;
+    measure();
+    mx = box.x; my = box.y - box.h*4;
+    for (var i=0;i<260;i++){
+      seedSteam();
+      updateAndDraw(0.05, i*0.05, false);
+    }
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'lighter';
+    for (var j=0;j<parts.length;j++){
+      var p = parts[j];
+      var k = p.life/p.max;
+      var r = p.r0 + (p.r1 - p.r0)*Math.pow(k,0.65);
+      ctx.globalAlpha = p.a * Math.sin(Math.min(1,k*1.02)*Math.PI) * 0.9;
+      ctx.drawImage(sprite, p.x-r, p.y-r, r*2, r*2);
+    }
+  }
+
+  window.addEventListener('resize', resize, {passive:true});
+  window.addEventListener('orientationchange', function(){ setTimeout(resize, 250); }, {passive:true});
+  if (reduceQuery.addEventListener){
+    reduceQuery.addEventListener('change', function(e){ reduce = e.matches; location.reload(); });
+  }
+
+  resize();
+  if (!reduce){
+    seedMotes();
+    window.addEventListener('resize', function(){ seedMotes(); }, {passive:true});
+    // pre-fill the plume so it does not start empty
+    measure();
+    mx = pmx = W*0.5; my = pmy = H*0.42;
+    for (var i=0;i<300;i++){ seedSteam(); updateAndDraw(0.05, i*0.05, false); }
+    requestAnimationFrame(function(t){ lastT = t; requestAnimationFrame(step); });
+  }
+})();
+</script>
+</body>
+</html>

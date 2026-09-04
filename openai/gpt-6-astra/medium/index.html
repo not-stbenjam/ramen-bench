@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111411">
+<title>A bowl of warmth</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:#101310}main{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;min-height:100%;height:100svh;overflow:hidden;background:radial-gradient(ellipse at 51% 50%,#3a35251f 0%,#171c1690 35%,#0c100e 85%)}
+main::before{content:"";position:absolute;inset:-20%;pointer-events:none;background:radial-gradient(ellipse at 49% 37%,#b7894430,transparent 42%);filter:blur(55px)}
+main::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.11;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' opacity='.5' d='M0 0h180v180H0z'/%3E%3C/svg%3E");mix-blend-mode:soft-light}
+.scene{position:relative;width:min(100vw,1050px,119svh);aspect-ratio:1000/850;transform:translate3d(var(--x,0px),var(--y,0px),0) rotate(var(--r,0deg));will-change:transform}
+svg{display:block;width:100%;height:100%;overflow:visible}canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.static-steam{opacity:0}.glimmer{animation:glimmer 7s ease-in-out infinite alternate;transform-origin:500px 435px}@keyframes glimmer{to{opacity:.35;transform:scale(.985,1.008)}}
+@media(max-aspect-ratio:3/4){.scene{width:132vw;max-width:none;flex-shrink:0}main::before{background:radial-gradient(ellipse at 50% 44%,#b7894427,transparent 47%)}}
+@media(prefers-reduced-motion:reduce){.scene{transform:none!important;will-change:auto}.glimmer{animation:none}canvas{display:none}.static-steam{opacity:.23}}
+</style>
+</head>
+<body>
+<main aria-label="A warm bowl of vegan ramen, with noodles, mushrooms, tofu and fresh greens in a softly lit, dark room.">
+<div class="scene">
+<svg viewBox="0 0 1000 850" role="img" aria-labelledby="dish-title">
+<title id="dish-title">Steaming vegan ramen in a handmade ceramic bowl</title>
+<defs>
+<radialGradient id="table"><stop stop-color="#86724b" stop-opacity=".16"/><stop offset="1" stop-color="#86724b" stop-opacity="0"/></radialGradient>
+<linearGradient id="ceramic" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#e2d9bc"/><stop offset=".25" stop-color="#c5c3ac"/><stop offset=".6" stop-color="#8d998a"/><stop offset=".88" stop-color="#556457"/><stop offset="1" stop-color="#303e33"/></linearGradient>
+<linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b0ad91"/><stop offset=".45" stop-color="#eeead4"/><stop offset="1" stop-color="#c8cdb6"/></linearGradient>
+<radialGradient id="soup" cx=".43" cy=".38" r=".7"><stop stop-color="#b7792e"/><stop offset=".55" stop-color="#95521c"/><stop offset=".86" stop-color="#633818"/><stop offset="1" stop-color="#322719"/></radialGradient>
+<linearGradient id="inside" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#49503b"/><stop offset="1" stop-color="#b4ab7b"/></linearGradient>
+<linearGradient id="tofu" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#f7d996"/><stop offset=".5" stop-color="#eac17b"/><stop offset="1" stop-color="#c08438"/></linearGradient>
+<linearGradient id="cap" x1="0" y1="0" x2=".6" y2="1"><stop stop-color="#c39862"/><stop offset=".35" stop-color="#94613a"/><stop offset="1" stop-color="#453322"/></linearGradient>
+<linearGradient id="green" x1="0" y1="0" x2="1" y2=".6"><stop stop-color="#172e19"/><stop offset=".45" stop-color="#467538"/><stop offset=".65" stop-color="#648443"/><stop offset="1" stop-color="#223d21"/></linearGradient>
+<linearGradient id="stem"><stop stop-color="#7b9b53"/><stop offset=".5" stop-color="#d1d799"/><stop offset="1" stop-color="#eeead0"/></linearGradient>
+<radialGradient id="radish"><stop stop-color="#eee1c0"/><stop offset=".82" stop-color="#f3d9b9"/><stop offset=".91" stop-color="#d87570"/><stop offset="1" stop-color="#a73844"/></radialGradient>
+<filter id="shadow" x="-40%" y="-50%" width="180%" height="200%"><feGaussianBlur stdDeviation="17"/></filter>
+<filter id="foodShadow" x="-30%" y="-40%" width="160%" height="190%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#28180b" flood-opacity=".6"/></filter>
+<filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+<filter id="steamBlur"><feGaussianBlur stdDeviation="7"/></filter>
+<clipPath id="brothClip"><ellipse cx="500" cy="439" rx="290" ry="156"/></clipPath>
+<clipPath id="bowlClip"><path d="M181 434C187 572 270 686 418 714Q500 735 583 714C728 681 814 570 819 434Q500 590 181 434Z"/></clipPath>
+<g id="leaf"><path d="M0 80C-21 63-58 43-61 9C-67-10-49-27-35-24C-26-48-1-47 10-32C27-43 46-24 39-9C68 8 47 45 24 59Z" fill="url(#green)"/><path d="M0 76Q-5 21-18-25M-5 41Q-27 18-44 7M-8 24Q15 8 28-11M-1 55Q25 37 38 20" fill="none" stroke="#88a057" stroke-width="2" opacity=".42"/><path d="M-6 55Q4 74 5 103L23 109Q10 76 6 51Z" fill="url(#stem)"/></g>
+<g id="mushroom"><path d="M-13 3L-18 48Q-4 59 12 47L13 1" fill="#d9c39a"/><path d="M-8 14L-9 45M4 12L3 47" stroke="#a28c60" stroke-width="2"/><path d="M-62 9C-63-24-34-49-4-49C31-50 62-26 64 6Q3 40-62 9Z" fill="url(#cap)"/><path d="M-59 9Q-2 20 61 6Q22 40-19 30Z" fill="#5b3d27"/><path d="M-52 12L-15 25M-36 15L-8 28M-19 17L0 28M3 17L8 29M24 14L15 27M43 10L21 25" stroke="#bb9661" stroke-width="2" opacity=".75"/><path d="M-30-25Q-12-17 27-15M-4-38Q-12-17-17-4" fill="none" stroke="#dfc299" stroke-width="7" stroke-linecap="round"/><path d="M-47-9Q-39-26-29-30" fill="none" stroke="#e3c493" stroke-width="2" opacity=".55"/></g>
+<g id="tofuPiece"><path d="M-42-26L32-33L48 20L-27 30Z" fill="url(#tofu)"/><path d="M-27 30L48 20L47 34L-26 44Z" fill="#956027"/><path d="M-42-26L-27 30L-26 44L-43-9Z" fill="#ba8747"/><path d="M-34-20L27-26" stroke="#ffe2a0" stroke-width="2"/><g fill="#9d5b25" opacity=".65"><ellipse cx="-18" cy="-10" rx="6" ry="3"/><ellipse cx="17" cy="8" rx="10" ry="5"/><ellipse cx="0" cy="-17" rx="4" ry="2"/><ellipse cx="-15" cy="18" rx="5" ry="3"/><circle cx="28" cy="-10" r="3"/><circle cx="-3" cy="4" r="2"/></g></g>
+</defs>
+<!-- A pool of light and the soft contact shadow keep the bowl grounded. -->
+<ellipse cx="510" cy="706" rx="415" ry="133" fill="url(#table)"/>
+<ellipse cx="505" cy="718" rx="234" ry="40" fill="#020604" opacity=".85" filter="url(#shadow)"/>
+<ellipse cx="501" cy="709" rx="96" ry="22" fill="#354337"/>
+<path d="M181 434C187 572 270 686 418 714Q500 735 583 714C728 681 814 570 819 434Q500 590 181 434Z" fill="url(#ceramic)"/>
+<g clip-path="url(#bowlClip)" fill="none" stroke="#e9e2c0" opacity=".075"><path d="M183 488Q500 755 816 482M183 503Q500 765 816 497M183 518Q500 774 816 512M183 534Q500 784 816 528M183 550Q500 794 816 544M183 566Q500 804 816 560" stroke-width="2"/></g>
+<path d="M220 532C256 618 328 675 406 694" fill="none" stroke="#ece6ce" stroke-width="3" opacity=".19"/>
+<ellipse cx="500" cy="430" rx="320" ry="184" fill="url(#rim)"/>
+<ellipse cx="500" cy="428" rx="306" ry="170" fill="url(#inside)"/>
+<ellipse cx="500" cy="439" rx="290" ry="156" fill="url(#soup)"/>
+<g clip-path="url(#brothClip)">
+<g id="oil"></g>
+<g id="noodles" fill="none" stroke-linecap="round"></g>
+<g opacity=".4" class="glimmer" fill="none" stroke="#f2bd69"><path d="M235 465Q240 507 287 530M631 552Q704 536 743 494" stroke-width="2"/><path d="M295 350Q326 330 367 326M711 374Q745 393 757 417" stroke-width="3"/></g>
+<!-- Bok choy, shiitake, seared tofu, radish, and scallions. -->
+<g filter="url(#foodShadow)">
+<use href="#leaf" transform="translate(644 349) rotate(48) scale(1.05 1.18)"/>
+<use href="#leaf" transform="translate(704 383) rotate(72) scale(.92 1.03)"/>
+<use href="#leaf" transform="translate(590 323) rotate(14) scale(.82 1.05)"/>
+<path d="M591 410Q635 390 652 350Q650 390 614 434Z" fill="url(#stem)"/>
+<path d="M609 435Q665 432 700 398Q681 445 627 450Z" fill="url(#stem)"/>
+<use href="#mushroom" transform="translate(379 344) rotate(-21) scale(.94 .85)"/>
+<use href="#mushroom" transform="translate(309 394) rotate(-36) scale(.91 .84)"/>
+<use href="#mushroom" transform="translate(410 395) rotate(12) scale(.76 .72)"/>
+<use href="#tofuPiece" transform="translate(649 465) rotate(-19) scale(.9)"/>
+<use href="#tofuPiece" transform="translate(714 458) rotate(16) scale(.8)"/>
+<use href="#tofuPiece" transform="translate(686 504) rotate(-6) scale(.87)"/>
+<g transform="translate(356 517) rotate(25)"><ellipse rx="44" ry="30" fill="url(#radish)"/><path d="M-33 0H33M0-22V22M-24-15L24 15M-24 15L24-15" stroke="#fff1d3" stroke-width="1" opacity=".48"/></g>
+<g transform="translate(322 487) rotate(18)"><ellipse rx="40" ry="28" fill="url(#radish)"/><path d="M-31 0H31M0-20V20M-22-14L22 14M-22 14L22-14" stroke="#fff1d3" stroke-width="1" opacity=".48"/></g>
+</g>
+<g id="garnish"></g>
+<g fill="#c74c2c" stroke="#f88b50" stroke-width="1.3" filter="url(#foodShadow)"><ellipse cx="541" cy="449" rx="13" ry="7" transform="rotate(-30 541 449)"/><ellipse cx="508" cy="477" rx="11" ry="6" transform="rotate(22 508 477)"/><ellipse cx="571" cy="493" rx="10" ry="6" transform="rotate(-22 571 493)"/></g>
+<g fill="#67361b"><ellipse cx="541" cy="449" rx="8" ry="3.4" transform="rotate(-30 541 449)"/><ellipse cx="508" cy="477" rx="6.5" ry="2.7" transform="rotate(22 508 477)"/><ellipse cx="571" cy="493" rx="6" ry="2.5" transform="rotate(-22 571 493)"/></g>
+<g id="sesame"></g>
+</g>
+<path d="M189 455C213 558 398 613 542 608C665 604 781 553 806 481" fill="none" stroke="#f3ecd2" stroke-width="3" opacity=".5"/>
+<g id="ceramicSpecks" clip-path="url(#bowlClip)"></g>
+<g class="static-steam" fill="none" stroke="#dcd8be" stroke-width="14" filter="url(#steamBlur)"><path d="M420 345C356 262 471 243 417 145"/><path d="M531 322C588 246 471 212 526 110"/><path d="M607 360C675 273 574 272 610 192"/></g>
+</svg>
+<canvas aria-hidden="true"></canvas>
+</div>
+</main>
+<script>
+(() => {
+'use strict';
+const ns='http://www.w3.org/2000/svg';
+let seed=71;
+const random=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646};
+function add(id,tag,attrs){const el=document.createElementNS(ns,tag);for(const [k,v]of Object.entries(attrs))el.setAttribute(k,v);document.getElementById(id).appendChild(el);return el}
+for(let i=0;i<100;i++){
+ const x=220+random()*560,y=290+random()*295,r=1+random()*8;
+ add('oil','ellipse',{cx:x,cy:y,rx:r,ry:r*.55,fill:i%3?'#e6a442':'#f5ce81',opacity:.08+random()*.19,stroke:'#e4ad58','stroke-width':.65});
+}
+// Each noodle has its own meandering contour, shadow, and warm highlight.
+for(let i=0;i<44;i++){
+ const y=351+i*4.3+random()*19,x=352+random()*65,end=551+random()*77;
+ const d=`M ${x} ${y} C ${x-74} ${y-35},${end+72} ${y-45},${end} ${y+9} S ${x-62} ${y+33},${x+5} ${y+44} S ${end+71} ${y+21},${end+19} ${y+51}`;
+ add('noodles','path',{d,stroke:'#694019','stroke-width':7.3,opacity:.7,transform:'translate(0 2)'});
+ add('noodles','path',{d,stroke:['#d5ab5e','#e7bd70','#c99b4f','#eed091'][i%4],'stroke-width':4.6});
+ add('noodles','path',{d,stroke:'#ffe0a0','stroke-width':1,opacity:.45,transform:'translate(0 -1)'});
+}
+for(let i=0;i<31;i++){
+ const x=424+random()*171,y=384+random()*136,angle=random()*180;
+ add('garnish','ellipse',{cx:x,cy:y,rx:5+random()*5,ry:3+random()*2,fill:'#263f21',stroke:['#8fa956','#628d3e','#afbd6e'][i%3],'stroke-width':3,transform:`rotate(${angle} ${x} ${y})`});
+}
+for(let i=0;i<85;i++){
+ const x=285+random()*440,y=335+random()*211;
+ add('sesame','ellipse',{cx:x,cy:y,rx:1.1+random()*.7,ry:2.2,fill:i%4?'#e7d29a':'#332b1b',opacity:.8,transform:`rotate(${random()*180} ${x} ${y})`});
+}
+for(let i=0;i<900;i++) add('ceramicSpecks','circle',{cx:180+random()*640,cy:455+random()*275,r:.25+random()*.8,fill:i%3?'#344534':'#e5dabe',opacity:.08+random()*.2});
+const scene=document.querySelector('.scene'),canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d');
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+let targetX=0,targetY=0,px=0,py=0,last=0,raf=0,w=1000,h=850;
+const wisps=Array.from({length:23},(_,i)=>({age:i/23,life:5+random()*4,x:380+random()*245,phase:random()*Math.PI*2,width:9+random()*17}));
+function resize(){const bounds=scene.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);w=bounds.width;h=bounds.height;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(canvas.width/1000,0,0,canvas.height/850,0,0)}
+new ResizeObserver(resize).observe(scene);
+window.addEventListener('pointermove',e=>{targetX=(e.clientX/innerWidth-.5)*2;targetY=(e.clientY/innerHeight-.5)*2},{passive:true});
+document.documentElement.addEventListener('pointerleave',()=>{targetX=targetY=0});
+window.addEventListener('blur',()=>{targetX=targetY=0});
+function frame(now){
+ const dt=Math.min((now-last)/1000,.05)||0;last=now;
+ px+=(targetX-px)*Math.min(dt*2,1);py+=(targetY-py)*Math.min(dt*2,1);
+ scene.style.setProperty('--x',`${px*6}px`);scene.style.setProperty('--y',`${py*3}px`);scene.style.setProperty('--r',`${px*.35}deg`);
+ ctx.clearRect(0,0,1000,850);
+ for(const p of wisps){
+  p.age+=dt/p.life;if(p.age>1)p.age-=1;
+  const a=p.age,baseY=390-a*247,drift=Math.sin(a*5+p.phase)*25+px*a*48;
+  const opacity=Math.sin(Math.PI*a)*.115;
+  const grad=ctx.createLinearGradient(0,baseY-80,0,baseY+45);grad.addColorStop(0,'rgba(229,224,201,0)');grad.addColorStop(.5,`rgba(229,224,201,${opacity})`);grad.addColorStop(1,'rgba(229,224,201,0)');
+  ctx.beginPath();ctx.moveTo(p.x+drift,baseY+45);ctx.bezierCurveTo(p.x+drift-38,baseY,p.x+drift+35,baseY-35,p.x+drift+Math.sin(p.phase+a*7)*35,baseY-95);
+  ctx.strokeStyle=grad;ctx.lineWidth=p.width+a*19;ctx.lineCap='round';ctx.filter='blur(9px)';ctx.stroke();
+ }
+ ctx.filter='none';raf=requestAnimationFrame(frame);
+}
+function sync(){cancelAnimationFrame(raf);last=0;if(!reduced.matches&&!document.hidden)raf=requestAnimationFrame(frame);else{ctx.clearRect(0,0,1000,850);scene.style.setProperty('--x','0px');scene.style.setProperty('--y','0px');scene.style.setProperty('--r','0deg')}}
+reduced.addEventListener('change',sync);document.addEventListener('visibilitychange',sync);resize();sync();
+})();
+</script>
+</body>
+</html>

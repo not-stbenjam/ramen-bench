@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vegan Ramen</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #080b0b; }
+    canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+  </style>
+</head>
+<body>
+  <canvas id="scene" aria-label="A steaming bowl of vegan ramen"></canvas>
+  <script>
+  (() => {
+    const canvas = document.getElementById('scene');
+    const ctx = canvas.getContext('2d');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let width, height, dpr, unit, mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const steam = Array.from({ length: 18 }, (_, i) => ({
+      x: rand(-.78, .78), y: rand(.08, .88), size: rand(.025, .06),
+      speed: rand(.16, .33), drift: rand(.5, 1.4), phase: rand(0, Math.PI * 2), life: rand(.55, 1)
+    }));
+    const sparks = Array.from({ length: 54 }, () => ({ x: rand(-1, 1), y: rand(-.8, .7), r: rand(.35, 1.45), a: rand(.08, .45), p: rand(0, 8) }));
+
+    function resize() {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      width = innerWidth; height = innerHeight;
+      canvas.width = width * dpr; canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      unit = Math.min(width, height) / 700;
+    }
+    addEventListener('resize', resize, { passive: true }); resize();
+    addEventListener('pointermove', e => {
+      if (!reduced) { mouse.tx = (e.clientX / width - .5) * 2; mouse.ty = (e.clientY / height - .5) * 2; }
+    }, { passive: true });
+    addEventListener('pointerleave', () => { mouse.tx = mouse.ty = 0; });
+
+    function ellipse(x, y, rx, ry, fill, blur = 0) {
+      ctx.save(); if (blur) ctx.filter = `blur(${blur * unit}px)`;
+      ctx.fillStyle = fill; ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    function path(points, style, width = 1, fill = false) {
+      ctx.beginPath(); points.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+      if (fill) { ctx.fillStyle = style; ctx.fill(); } else { ctx.strokeStyle = style; ctx.lineWidth = width; ctx.stroke(); }
+    }
+    function ovalPath(x, y, rx, ry) { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); }
+    function blob(x, y, r, color) {
+      ctx.save(); ctx.translate(x,y); ctx.fillStyle = color; ctx.beginPath();
+      for (let i=0; i<10; i++) { const a=i*Math.PI/5, q=r*(.77+Math.sin(i*17.2)*.12); i ? ctx.lineTo(Math.cos(a)*q,Math.sin(a)*q) : ctx.moveTo(Math.cos(a)*q,Math.sin(a)*q); } ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+
+    function draw(t) {
+      const motion = reduced ? 0 : t;
+      mouse.x += (mouse.tx - mouse.x) * .035; mouse.y += (mouse.ty - mouse.y) * .035;
+      const cx = width / 2 + mouse.x * 9 * unit;
+      const cy = height * .54 + mouse.y * 5 * unit;
+      const s = Math.min(width / 700, height / 700) * 1.13;
+      ctx.clearRect(0, 0, width, height);
+      // Deep, softly uneven kitchen darkness.
+      let g = ctx.createRadialGradient(cx, cy - 120*s, 12, cx, cy - 60*s, Math.max(width,height)*.75);
+      g.addColorStop(0, '#263125'); g.addColorStop(.27, '#141b18'); g.addColorStop(.64, '#0b100f'); g.addColorStop(1, '#050707');
+      ctx.fillStyle=g; ctx.fillRect(0,0,width,height);
+      const vignette = ctx.createRadialGradient(cx,cy,Math.min(width,height)*.18,cx,cy,Math.max(width,height)*.67);
+      vignette.addColorStop(.55,'rgba(0,0,0,0)'); vignette.addColorStop(1,'rgba(0,0,0,.74)'); ctx.fillStyle=vignette;ctx.fillRect(0,0,width,height);
+      // Flecks suspended in the warmth.
+      sparks.forEach(p => {
+        const xx = cx + p.x * width*.44 + mouse.x * p.p;
+        const yy = cy + p.y * height*.38;
+        ellipse(xx, yy, p.r*unit, p.r*unit, `rgba(232,178,100,${p.a})`, .6);
+      });
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(s,s);
+      // Table halo and grounded shadow.
+      ellipse(0, 145, 334, 57, 'rgba(0,0,0,.64)', 18);
+      ellipse(0, 129, 255, 35, 'rgba(229,110,23,.16)', 25);
+      ellipse(0, 137, 210, 20, 'rgba(0,0,0,.48)', 8);
+      // Bowl exterior, a warm hand-thrown ceramic.
+      const bowl = ctx.createLinearGradient(0,-2,0,170); bowl.addColorStop(0,'#c54b27'); bowl.addColorStop(.18,'#b83d20'); bowl.addColorStop(.68,'#7e241b'); bowl.addColorStop(1,'#421619');
+      ctx.beginPath(); ctx.moveTo(-235, 0); ctx.bezierCurveTo(-226, 79,-190,152,-111,171); ctx.bezierCurveTo(-49,189,49,189,111,171); ctx.bezierCurveTo(190,152,226,79,235,0); ctx.closePath();ctx.fillStyle=bowl;ctx.fill();
+      const glaze=ctx.createLinearGradient(-180,20,140,130);glaze.addColorStop(0,'rgba(255,151,83,.36)');glaze.addColorStop(.28,'rgba(255,107,50,.06)');glaze.addColorStop(.78,'rgba(47,4,9,.22)');glaze.addColorStop(1,'rgba(0,0,0,.36)');ctx.fillStyle=glaze;ctx.fill();
+      ctx.save(); ctx.globalAlpha=.27; ctx.strokeStyle='#f58c59';ctx.lineWidth=2;for(let i=0;i<12;i++){const x=Math.sin(i*9.71)*120,y=92+Math.cos(i*6.23)*61,rx=18+(i%4)*11;ctx.beginPath();ctx.ellipse(x,y,rx,1+(i%3),Math.sin(i)*.4,0,Math.PI*2);ctx.stroke();}ctx.restore();
+      // Bowl lip and broth.
+      ellipse(0, 0, 240, 73, '#55251a');
+      ellipse(0, -3, 226, 63, '#f0a33b');
+      const broth=ctx.createRadialGradient(-70,-25,5,0,0,215);broth.addColorStop(0,'#ffd06c');broth.addColorStop(.4,'#d77a24');broth.addColorStop(.78,'#9b401a');broth.addColorStop(1,'#5f2419');ellipse(0,-4,218,56,broth);
+      // Floating broth sheen.
+      for (let i=0;i<22;i++) { const x=Math.sin(i*17.13)*184, y=Math.cos(i*8.37)*37; ellipse(x,y,4+(i%5)*2.5,1+(i%3)*.7,`rgba(255,214,105,${.08+(i%5)*.035})`,1); }
+      // Nori sheet at rear.
+      ctx.save();ctx.translate(87,-47);ctx.rotate(.13);ctx.fillStyle='#192d23';ctx.fillRect(-45,-35,91,63);ctx.strokeStyle='rgba(130,173,97,.35)';ctx.lineWidth=1;for(let i=-35;i<45;i+=10){ctx.beginPath();ctx.moveTo(i,-34);ctx.lineTo(i+5,27);ctx.stroke();}ctx.restore();
+      // Noodles, layered waves.
+      ctx.save(); ovalPath(0, -3, 215, 55); ctx.clip();
+      ctx.lineCap='round';
+      for(let j=0;j<27;j++) { const yy=-35+j*3.15; ctx.beginPath(); for(let x=-180;x<=180;x+=8){let y=yy+Math.sin(x*.06+j*.82)*7+Math.sin(x*.15+j)*2; x===-180?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.strokeStyle=j%3===0?'#e9b24c':'#f4c85f';ctx.lineWidth=4.5;ctx.stroke(); }
+      ctx.restore();
+      // Greens and toppings.
+      [[-118,-22,18,'#4d7e38'],[-93,9,16,'#5c9140'],[-60,-34,18,'#3d7238'],[134,-11,18,'#5e8436'],[161,-27,14,'#4d7932'],[111,20,13,'#477b36']].forEach(v=>{blob(v[0],v[1],v[2],v[3]);ellipse(v[0]-4,v[1]-5,v[2]*.45,v[2]*.21,'rgba(171,220,87,.28)',1)});
+      // Mushrooms.
+      [[-148,20],[-129,29],[53,29]].forEach(([x,y])=>{ellipse(x,y,18,8,'#ebd1a1');ellipse(x,y-2,17,6,'#9c6038');ctx.strokeStyle='#f4deb2';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-11,y-1);ctx.lineTo(x+10,y+2);ctx.stroke();});
+      // Tofu slices.
+      [[-10,-32,-.25],[36,-23,.32],[73,3,-.18]].forEach(([x,y,r])=>{ctx.save();ctx.translate(x,y);ctx.rotate(r);ctx.fillStyle='#f5d891';ctx.fillRect(-17,-10,34,20);ctx.strokeStyle='#c99548';ctx.lineWidth=1.5;ctx.strokeRect(-17,-10,34,20);ctx.restore();});
+      // Chili oil droplets.
+      [[-40,24,6],[5,20,4],[35,13,5],[95,-23,4],[-75,20,3],[-18,0,3]].forEach(v=>ellipse(v[0],v[1],v[2],v[2]*.55,'#a92513',1));
+      // Scallions.
+      [[-80,-35,.8],[17,-12,-.45],[-22,17,.2],[126,9,-.6],[148,18,.35]].forEach(([x,y,r])=>{ctx.save();ctx.translate(x,y);ctx.rotate(r);ctx.fillStyle='#86be45';ctx.fillRect(-17,-3,34,6);ctx.fillStyle='#cee77c';ctx.fillRect(-12,-2,23,2);ctx.restore();});
+      // Rim highlight foreground.
+      ctx.beginPath();ctx.ellipse(0,-2,227,64,0,0,Math.PI);ctx.strokeStyle='rgba(255,184,99,.55)';ctx.lineWidth=5;ctx.stroke();
+      // Steam comes last, curls upward from the bowl.
+      ctx.globalCompositeOperation='screen';
+      steam.forEach((p,i)=>{
+        const rise = ((motion * p.speed + p.y) % 1.15), alpha = Math.sin(Math.min(1,rise/.18)*Math.PI*.5) * Math.pow(1-rise/1.15,1.8) * p.life;
+        const baseX=p.x*165, yy=-38-rise*290, wave=Math.sin(motion*1.4*p.drift+p.phase+rise*7)*22*(.25+rise);
+        ctx.beginPath();ctx.moveTo(baseX,-31);ctx.bezierCurveTo(baseX+wave,yy+95,baseX-wave*1.6,yy+42,baseX+wave*.5,yy);
+        ctx.strokeStyle=`rgba(255,235,196,${alpha*.20})`;ctx.lineWidth=(p.size*700)*(1-rise*.5);ctx.filter='blur(5px)';ctx.stroke();
+        ctx.strokeStyle=`rgba(255,246,221,${alpha*.24})`;ctx.lineWidth=Math.max(1,p.size*180);ctx.filter='blur(1px)';ctx.stroke();ctx.filter='none';
+      }); ctx.restore();
+      if (!reduced) requestAnimationFrame(draw);
+    }
+    draw(0);
+  })();
+  </script>
+</body>
+</html>
