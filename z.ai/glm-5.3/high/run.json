@@ -1,0 +1,94 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "z.ai/glm-5.3/high",
+  "vendor": {
+    "slug": "z.ai",
+    "displayName": "Z.ai"
+  },
+  "model": {
+    "slug": "glm-5.3",
+    "displayName": "GLM-5.3",
+    "providerModelId": "glm-5.3"
+  },
+  "variation": {
+    "slug": "high",
+    "displayName": "High",
+    "reasoningEffort": "high",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Claude Code",
+    "version": "2.1.261",
+    "runtime": "Claude Code CLI with Z.ai provider",
+    "invocation": "Claude Code session using glm-5.3; effort high"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-05T02:16:47.595Z",
+    "completedAt": "2026-09-05T02:35:18.557Z",
+    "wallDurationMs": 1110962,
+    "apiDurationMs": 1076889
+  },
+  "usage": {
+    "tokens": {
+      "input": 90913,
+      "cachedInput": 2635136,
+      "cacheCreationInput": 0,
+      "reasoning": 0,
+      "output": 67815,
+      "total": 2793864
+    },
+    "cost": {
+      "currency": "USD",
+      "total": 3.467508,
+      "estimated": false
+    },
+    "requests": 30,
+    "turns": 1,
+    "toolCalls": 41,
+    "providerReported": true,
+    "raw": {
+      "source": "Claude Code final cost-state",
+      "requestCountBasis": "unique recorded assistant message ids",
+      "costState": {
+        "totalCostUSD": 3.467508,
+        "totalAPIDurationMs": 1076889,
+        "totalDurationMs": 1137537,
+        "startTimeEpochMs": 1788574599456,
+        "hasUnknownModelCost": true,
+        "modelUsage": {
+          "glm-5.3-flash": {
+            "inputTokens": 816,
+            "outputTokens": 148,
+            "thinkingTokens": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 0.0077800000000000005
+          },
+          "glm-5.3": {
+            "inputTokens": 90097,
+            "outputTokens": 67667,
+            "thinkingTokens": 0,
+            "cacheReadInputTokens": 2635136,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 3.4597279999999997
+          }
+        }
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 35247,
+    "lines": 861
+  },
+  "provenance": {
+    "pricingSource": "Claude Code 2.1.261 final cost-state"
+  },
+  "notes": "Token and cost totals are the exact final Claude Code cost-state totals. The public transcript omits hidden thinking, private agent-mail activity, credentials, and private local path prefixes. The result matches its recorded Write/Edit replay (15 operations)."
+}

@@ -48,6 +48,12 @@ DISPLAY_NAMES = {
     "gpt-5.5": "GPT 5.5",
     "fable-5.1": "Fable 5.1",
     "opus-5": "Opus 5",
+    "glm-5.3": "GLM-5.3",
+}
+VENDOR_DISPLAY_NAMES = {
+    "anthropic": "Anthropic",
+    "openai": "OpenAI",
+    "z.ai": "Z.ai",
 }
 EFFORT_NAMES = {
     "low": "Low",
@@ -68,6 +74,22 @@ CLAUDE_SOURCES = {
     "anthropic/opus-5/high": "4920bb88-dd70-4834-9840-7ddcd388c369.jsonl",
     "anthropic/opus-5/xhigh": "f7517ad6-13ef-4b03-aa98-afd1229c781d.jsonl",
     "anthropic/opus-5/max": "0cef914e-533c-4793-972f-95e098e24cd9.jsonl",
+    "z.ai/glm-5.3/max": "85757c43-1df7-4d13-978a-6d135545dc86.jsonl",
+    "z.ai/glm-5.3/high": "5817ebce-617e-481b-93b1-383fb4000df2.jsonl",
+    # The supplied Low-directory session records claude-opus-5, so it cannot
+    # truthfully serve as a GLM-5.3 source mapping.
+}
+CLAUDE_SOURCE_ROOTS = {
+    "z.ai/glm-5.3/max": ".claude",
+    "z.ai/glm-5.3/high": ".claude",
+}
+CLAUDE_REPLAY_VERIFICATION = {
+    "z.ai/glm-5.3/max",
+    "z.ai/glm-5.3/high",
+}
+CLAUDE_EXPECTED_PROVIDER_MODELS = {
+    "z.ai/glm-5.3/max": "glm-5.3",
+    "z.ai/glm-5.3/high": "glm-5.3",
 }
 
 CODEX_SESSION_SOURCES = {
@@ -331,7 +353,7 @@ def run_base(
         "id": run_id,
         "vendor": {
             "slug": vendor,
-            "displayName": "Anthropic" if vendor == "anthropic" else "OpenAI",
+            "displayName": VENDOR_DISPLAY_NAMES[vendor],
         },
         "model": {
             "slug": model_slug,
@@ -396,11 +418,82 @@ def latest_claude_messages(rows: list[dict[str, Any]]) -> dict[str, dict[str, An
     return latest
 
 
+def claude_tool_call_count(rows: list[dict[str, Any]]) -> int:
+    """Count unique recorded tool calls across streamed message fragments."""
+    call_ids: set[str] = set()
+    for row in rows:
+        if row.get("type") != "assistant":
+            continue
+        message = row.get("message", {})
+        message_id = str(message.get("id", ""))
+        blocks = message.get("content", [])
+        for index, block in enumerate(blocks if isinstance(blocks, list) else []):
+            if isinstance(block, dict) and block.get("type") == "tool_use":
+                call_ids.add(str(block.get("id") or f"{message_id}:{index}"))
+    return len(call_ids)
+
+
+def benchmark_claude_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Discard setup records before the benchmark prompt enters the session."""
+    for index, row in enumerate(rows):
+        if row.get("type") != "user":
+            continue
+        content = row.get("message", {}).get("content", "")
+        if any(PROMPT in value for value in iter_strings(content)):
+            return rows[index:]
+    raise ValueError("Claude Code session does not contain the benchmark prompt")
+
+
+def verify_claude_result(rows: list[dict[str, Any]], run_id: str) -> str:
+    """Replay recorded Write/Edit operations and require the final artifact to match."""
+    content: str | None = None
+    operation_count = 0
+    for row in rows:
+        if row.get("type") != "assistant":
+            continue
+        blocks = row.get("message", {}).get("content", [])
+        for block in blocks if isinstance(blocks, list) else []:
+            if not isinstance(block, dict) or block.get("type") != "tool_use":
+                continue
+            tool = block.get("name")
+            tool_input = block.get("input", {})
+            if not isinstance(tool_input, dict):
+                continue
+            file_path = str(tool_input.get("file_path", ""))
+            if Path(file_path).name != "index.html":
+                continue
+            if tool == "Write":
+                recorded = tool_input.get("content")
+                if not isinstance(recorded, str):
+                    raise ValueError(f"{run_id}: recorded Write has no text content")
+                content = recorded
+                operation_count += 1
+            elif tool == "Edit" and content is not None:
+                old = tool_input.get("old_string")
+                new = tool_input.get("new_string")
+                if not isinstance(old, str) or not isinstance(new, str):
+                    raise ValueError(f"{run_id}: recorded Edit is incomplete")
+                occurrences = content.count(old)
+                replace_all = bool(tool_input.get("replace_all"))
+                if occurrences == 0 or (not replace_all and occurrences != 1):
+                    raise ValueError(
+                        f"{run_id}: cannot replay recorded Edit with "
+                        f"{occurrences} matching regions"
+                    )
+                content = content.replace(old, new, -1 if replace_all else 1)
+                operation_count += 1
+    if content is None:
+        raise ValueError(f"{run_id}: no recorded index.html Write found")
+    artifact = (ROOT / run_id / "index.html").read_text()
+    if content != artifact:
+        raise ValueError(f"{run_id}: index.html differs from the final recorded write")
+    return f"recorded Write/Edit replay ({operation_count} operations)"
+
+
 def normalize_claude_events(
     rows: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], int]:
-    latest = latest_claude_messages(rows)
-    emitted_messages: set[str] = set()
+    emitted_blocks: set[tuple[str, str, str]] = set()
     published_calls: set[str] = set()
     omitted_calls: set[str] = set()
     events: list[dict[str, Any]] = []
@@ -410,15 +503,18 @@ def normalize_claude_events(
         timestamp = row.get("timestamp")
         if row.get("type") == "assistant":
             message = row.get("message", {})
-            message_id = message.get("id")
-            if not message_id or latest.get(message_id) is not row or message_id in emitted_messages:
+            message_id = str(message.get("id", ""))
+            if not message_id:
                 continue
-            emitted_messages.add(message_id)
             for block in message.get("content", []):
                 if not isinstance(block, dict):
                     continue
                 block_type = block.get("type")
                 if block_type == "text" and block.get("text"):
+                    signature = (message_id, "text", str(block["text"]))
+                    if signature in emitted_blocks:
+                        continue
+                    emitted_blocks.add(signature)
                     event = {
                         "type": "message",
                         "role": "assistant",
@@ -429,6 +525,10 @@ def normalize_claude_events(
                     events.append(event)
                 elif block_type == "tool_use":
                     call_id = str(block.get("id", message_id))
+                    signature = (message_id, "tool_use", call_id)
+                    if signature in emitted_blocks:
+                        continue
+                    emitted_blocks.add(signature)
                     tool = str(block.get("name", "tool"))
                     raw_input = block.get("input", {})
                     if PRIVATE_TOOL_RE.search(tool) or PRIVATE_TOOL_RE.search(
@@ -525,12 +625,7 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
             },
             "requests": len(latest_messages),
             "turns": 1,
-            "toolCalls": sum(
-                1
-                for row in latest_messages
-                for block in row.get("message", {}).get("content", [])
-                if isinstance(block, dict) and block.get("type") == "tool_use"
-            ),
+            "toolCalls": claude_tool_call_count(rows),
             "providerReported": True,
             "raw": {
                 "source": "Claude Code final cost-state",
@@ -540,6 +635,7 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
                     "totalAPIDurationMs": state.get("totalAPIDuration"),
                     "totalDurationMs": state.get("totalDuration"),
                     "startTimeEpochMs": state.get("startTime"),
+                    "hasUnknownModelCost": state.get("hasUnknownModelCost"),
                     "modelUsage": model_usage,
                 },
             },
@@ -582,12 +678,7 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
         "cost": cost,
         "requests": len(latest_messages),
         "turns": 1,
-        "toolCalls": sum(
-            1
-            for row in latest_messages
-            for block in row.get("message", {}).get("content", [])
-            if isinstance(block, dict) and block.get("type") == "tool_use"
-        ),
+        "toolCalls": claude_tool_call_count(rows),
         "providerReported": True,
         "raw": {
             "source": "sum of final snapshots for unique Claude message ids",
@@ -601,11 +692,19 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
 def build_claude(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
     filename = CLAUDE_SOURCES[run_id]
     project_directory = str(ROOT / run_id).replace(os.sep, "-").replace(".", "-")
-    source = HOME / ".claude-personal/projects" / project_directory / filename
+    source_root = CLAUDE_SOURCE_ROOTS.get(run_id, ".claude-personal")
+    source = HOME / source_root / "projects" / project_directory / filename
     rows = read_jsonl(source)
-    events, omitted_calls = normalize_claude_events(rows)
+    public_rows = benchmark_claude_rows(rows)
+    events, omitted_calls = normalize_claude_events(public_rows)
     usage, provider_model_id, cost_kind = claude_usage(rows)
-    started_at, completed_at = timestamp_bounds(rows)
+    expected_provider_model = CLAUDE_EXPECTED_PROVIDER_MODELS.get(run_id)
+    if expected_provider_model and provider_model_id != expected_provider_model:
+        raise ValueError(
+            f"{run_id}: expected provider model {expected_provider_model}, "
+            f"recorded {provider_model_id}"
+        )
+    started_at, completed_at = timestamp_bounds(public_rows)
     timing: dict[str, Any] = {
         "startedAt": started_at,
         "completedAt": completed_at,
@@ -621,7 +720,11 @@ def build_claude(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
     harness = {
         "name": "Claude Code",
         "version": cli_version,
-        "runtime": "Anthropic Claude Code CLI",
+        "runtime": (
+            "Claude Code CLI with Z.ai provider"
+            if run_id.startswith("z.ai/")
+            else "Anthropic Claude Code CLI"
+        ),
         "invocation": f"Claude Code session using {provider_model_id}; effort {run_id.rsplit('/', 1)[1]}",
     }
     if cost_kind == "provider":
@@ -641,6 +744,9 @@ def build_claude(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
             "thinking, private agent-mail activity, credentials, and private local path "
             "prefixes."
         )
+    if run_id in CLAUDE_REPLAY_VERIFICATION:
+        verification = verify_claude_result(public_rows, run_id)
+        notes += f" The result matches its {verification}."
     run = run_base(
         run_id,
         provider_model_id,
@@ -1090,7 +1196,13 @@ def build_codex_log(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
 
 def tracked_run_ids() -> list[str]:
     output = subprocess.check_output(
-        ["git", "ls-files", "anthropic/**/run.json", "openai/**/run.json"],
+        [
+            "git",
+            "ls-files",
+            "anthropic/**/run.json",
+            "openai/**/run.json",
+            "z.ai/**/run.json",
+        ],
         cwd=ROOT,
         text=True,
     )
@@ -1140,6 +1252,12 @@ def main(argv: list[str] | None = None) -> None:
         default="all",
         help="limit regeneration to one harness",
     )
+    parser.add_argument(
+        "--run",
+        action="append",
+        dest="run_ids",
+        help="regenerate one mapped run id (repeatable; permits onboarding an untracked run)",
+    )
     args = parser.parse_args(argv)
 
     installed_version = package_version("litellm")
@@ -1148,27 +1266,30 @@ def main(argv: list[str] | None = None) -> None:
             f"expected LiteLLM {EXPECTED_LITELLM_VERSION}, found {installed_version}"
         )
 
-    all_run_ids = tracked_run_ids()
     expected = set(CLAUDE_SOURCES) | set(CODEX_SESSION_SOURCES) | set(LOG_STARTS) | {
         TERRA_LOW_ID
     }
-    if set(all_run_ids) != expected:
+    all_run_ids = tracked_run_ids()
+    if not args.run_ids and set(all_run_ids) != expected:
         missing_sources = sorted(set(all_run_ids) - expected)
         missing_runs = sorted(expected - set(all_run_ids))
         raise ValueError(
             f"source map mismatch; missing sources={missing_sources}, missing runs={missing_runs}"
         )
-    run_ids = [
-        run_id
-        for run_id in all_run_ids
-        if args.harness == "all"
-        or (args.harness == "claude-code" and run_id.startswith("anthropic/"))
-        or (args.harness == "codex" and run_id.startswith("openai/"))
-    ]
+    requested = list(dict.fromkeys(args.run_ids or all_run_ids))
+    unknown = sorted(set(requested) - expected)
+    if unknown:
+        raise ValueError(f"no source mapping for requested runs: {unknown}")
+    run_ids = []
+    for run_id in requested:
+        run_harness = "claude-code" if run_id in CLAUDE_SOURCES else "codex"
+        if args.harness != "all" and args.harness != run_harness:
+            raise ValueError(f"{run_id} is not a {args.harness} run")
+        run_ids.append(run_id)
 
     coverage = {
-        "anthropicProviderCost": 0,
-        "anthropicLiteLLMCost": 0,
+        "claudeProviderCost": 0,
+        "claudeLiteLLMCost": 0,
         "openaiLiteLLMCost": 0,
         "openaiCostUnavailable": 0,
         "events": 0,
@@ -1180,9 +1301,9 @@ def main(argv: list[str] | None = None) -> None:
         if run_id in CLAUDE_SOURCES:
             run, transcript, cost_kind = build_claude(run_id)
             coverage[
-                "anthropicProviderCost"
+                "claudeProviderCost"
                 if cost_kind == "provider"
-                else "anthropicLiteLLMCost"
+                else "claudeLiteLLMCost"
             ] += 1
         elif run_id in CODEX_SESSION_SOURCES:
             run, transcript, _ = build_codex_session(run_id)
@@ -1206,8 +1327,8 @@ def main(argv: list[str] | None = None) -> None:
     print(f"{action} {len(run_ids)} runs and {len(changed_paths)} metadata files.")
     print(
         "Coverage: "
-        f"Anthropic provider cost={coverage['anthropicProviderCost']}, "
-        f"Anthropic LiteLLM cost={coverage['anthropicLiteLLMCost']}, "
+        f"Claude Code provider cost={coverage['claudeProviderCost']}, "
+        f"Claude Code LiteLLM cost={coverage['claudeLiteLLMCost']}, "
         f"OpenAI LiteLLM cost={coverage['openaiLiteLLMCost']}, "
         f"OpenAI cost unavailable (total tokens only)={coverage['openaiCostUnavailable']}."
     )

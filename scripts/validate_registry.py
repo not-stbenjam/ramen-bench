@@ -84,7 +84,12 @@ def main() -> int:
         run_count += 1
         event_count += len(transcript["events"])
 
-    if audit_censoring([str(ROOT / name) for name in ("anthropic", "openai", "google", "meta")]):
+    if audit_censoring(
+        [
+            str(ROOT / name)
+            for name in ("anthropic", "openai", "google", "meta", "z.ai")
+        ]
+    ):
         raise ValueError("one or more public JSON files need censoring")
     print(f"Validated {run_count} registered runs and {event_count} public transcript events.")
     return 0

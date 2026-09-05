@@ -194,15 +194,21 @@ def censor_text(
     roots: dict[str, str] = {
         f"{home_text}/.codex-personal": "<CODEX_HOME>",
         f"{home_text}/.claude-personal": "<CLAUDE_HOME>",
+        f"{home_text}/.claude": "<CLAUDE_HOME>",
     }
     for path, placeholder in (session_roots or {}).items():
         roots[str(Path(path).resolve())] = placeholder
     for private_path, placeholder in sorted(
         roots.items(), key=lambda item: len(item[0]), reverse=True
     ):
-        value = _replace_literal(
-            value, private_path, placeholder, stats, "private_paths"
-        )
+        for variant in (
+            private_path,
+            quote(private_path, safe=""),
+            private_path.replace("/", "-"),
+        ):
+            value = _replace_literal(
+                value, variant, placeholder, stats, "private_paths"
+            )
 
     value = _replace_literal(
         value, workspace_text, "<WORKSPACE>", stats, "private_paths"
@@ -220,8 +226,10 @@ def censor_text(
     for private_path, placeholder in (
         ("<HOME>/.codex-personal", "<CODEX_HOME>"),
         ("<HOME>/.claude-personal", "<CLAUDE_HOME>"),
+        ("<HOME>/.claude", "<CLAUDE_HOME>"),
         ("~/.codex-personal", "<CODEX_HOME>"),
         ("~/.claude-personal", "<CLAUDE_HOME>"),
+        ("~/.claude", "<CLAUDE_HOME>"),
         ("${HOME}", "<HOME>"),
         ("$HOME", "<HOME>"),
         ("${TMPDIR}", "<TMP>"),
@@ -358,7 +366,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     paths = args.paths or [
-        REPO_ROOT / name for name in ("anthropic", "openai", "google", "meta")
+        REPO_ROOT / name
+        for name in ("anthropic", "openai", "google", "meta", "z.ai")
     ]
     paths = [path if path.is_absolute() else REPO_ROOT / path for path in paths]
 
