@@ -41,6 +41,7 @@
     "google/gemini-3.8-flash/high/run.json",
     "google/gemini-3.8-flash/medium/run.json",
     "google/gemini-3.8-flash/low/run.json",
+    "google/gemini-3.7-flash/high/run.json",
     "google/gemini-3.7-flash/medium/run.json",
     "google/gemini-3.7-flash/low/run.json",
     "meta/muse-spark-1.3/xhigh/run.json",

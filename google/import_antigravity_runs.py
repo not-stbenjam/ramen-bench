@@ -42,6 +42,12 @@ RUNS = (
     {
         "model": "gemini-3.7-flash",
         "model_name": "Gemini 3.7 Flash",
+        "variation": "high",
+        "variation_name": "High",
+    },
+    {
+        "model": "gemini-3.7-flash",
+        "model_name": "Gemini 3.7 Flash",
         "variation": "low",
         "variation_name": "Low",
         "source_workspace": "google/gemini-3.7-flash",
@@ -633,11 +639,18 @@ def main() -> None:
         action="store_true",
         help="verify and decode sources without writing run files",
     )
+    parser.add_argument(
+        "--run",
+        choices=[f"google/{run['model']}/{run['variation']}" for run in RUNS],
+        help="process only the selected run",
+    )
     arguments = parser.parse_args()
 
     outputs: list[Path] = []
     for config in RUNS:
         run_id = f"google/{config['model']}/{config['variation']}"
+        if arguments.run and run_id != arguments.run:
+            continue
         if arguments.check_sources:
             session_id, database, _transcript, log = discover_sources(config, run_id)
             read_cli_version(

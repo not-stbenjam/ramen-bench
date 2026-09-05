@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Artisanal Vegan Ramen</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #060403;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    body:active {
+      cursor: grabbing;
+    }
+    #ramen-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="ramen-canvas"></canvas>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // Respect prefers-reduced-motion
+    let prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+      prefersReducedMotion = e.matches;
+    });
+
+    const canvas = document.getElementById('ramen-canvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    // Fast 2D Simplex Noise for procedural organic textures and fluid steam
+    class SimplexNoise {
+      constructor(seed = 1984) {
+        this.p = new Uint8Array(256);
+        for (let i = 0; i < 256; i++) this.p[i] = i;
+        let s = seed;
+        for (let i = 255; i > 0; i--) {
+          s = (s * 16807) % 2147483647;
+          const j = s % (i + 1);
+          const temp = this.p[i];
+          this.p[i] = this.p[j];
+          this.p[j] = temp;
+        }
+        this.perm = new Uint8Array(512);
+        this.permMod12 = new Uint8Array(512);
+        for (let i = 0; i < 512; i++) {
+          this.perm[i] = this.p[i & 255];
+          this.permMod12[i] = (this.perm[i] % 12);
+        }
+      }
+      noise2D(xin, yin) {
+        const F2 = 0.5 * (Math.sqrt(3.0) - 1.0);
+        const G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
+        const grad3 = [
+          [1,1],[-1,1],[1,-1],[-1,-1],
+          [1,0],[-1,0],[1,0],[-1,0],
+          [0,1],[0,-1],[0,1],[0,-1]
+        ];
+        let n0 = 0, n1 = 0, n2 = 0;
+        const s = (xin + yin) * F2;
+        const i = Math.floor(xin + s);
+        const j = Math.floor(yin + s);
+        const t = (i + j) * G2;
+        const X0 = i - t;
+        const Y0 = j - t;
+        const x0 = xin - X0;
+        const y0 = yin - Y0;
+
+        let i1, j1;
+        if (x0 > y0) { i1 = 1; j1 = 0; }
+        else { i1 = 0; j1 = 1; }
+
+        const x1 = x0 - i1 + G2;
+        const y1 = y0 - j1 + G2;
+        const x2 = x0 - 1.0 + 2.0 * G2;
+        const y2 = y0 - 1.0 + 2.0 * G2;
+
+        const ii = i & 255;
+        const jj = j & 255;
+        const gi0 = this.permMod12[ii + this.perm[jj]];
+        const gi1 = this.permMod12[ii + i1 + this.perm[jj + j1]];
+        const gi2 = this.permMod12[ii + 1 + this.perm[jj + 1]];
+
+        let t0 = 0.5 - x0 * x0 - y0 * y0;
+        if (t0 >= 0) {
+          t0 *= t0;
+          n0 = t0 * t0 * (grad3[gi0][0] * x0 + grad3[gi0][1] * y0);
+        }
+        let t1 = 0.5 - x1 * x1 - y1 * y1;
+        if (t1 >= 0) {
+          t1 *= t1;
+          n1 = t1 * t1 * (grad3[gi1][0] * x1 + grad3[gi1][1] * y1);
+        }
+        let t2 = 0.5 - x2 * x2 - y2 * y2;
+        if (t2 >= 0) {
+          t2 *= t2;
+          n2 = t2 * t2 * (grad3[gi2][0] * x2 + grad3[gi2][1] * y2);
+        }
+        return 70.0 * (n0 + n1 + n2);
+      }
+    }
+
+    const noise = new SimplexNoise(2025);
+    const noiseB = new SimplexNoise(54321);
+
+    // Viewport & Scaling Management
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Mouse & Touch Tracking State
+    const mouse = {
+      x: width * 0.5,
+      y: height * 0.5,
+      targetX: width * 0.5,
+      targetY: height * 0.5,
+      vx: 0,
+      vy: 0,
+      isDown: false,
+      speed: 0
+    };
+
+    function updateMouse(clientX, clientY) {
+      mouse.targetX = clientX;
+      mouse.targetY = clientY;
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      updateMouse(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mousedown', (e) => {
+      mouse.isDown = true;
+      triggerBrothInteraction(e.clientX, e.clientY, 1.0);
+    });
+
+    window.addEventListener('mouseup', () => {
+      mouse.isDown = false;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+        triggerBrothInteraction(e.touches[0].clientX, e.touches[0].clientY, 0.9);
+      }
+    }, { passive: true });
+
+    // Gyroscope tilt on mobile
+    let tiltX = 0, tiltY = 0;
+    window.addEventListener('deviceorientation', (e) => {
+      if (e.gamma !== null && e.beta !== null) {
+        tiltX = Math.max(-30, Math.min(30, e.gamma)) / 30;
+        tiltY = Math.max(-30, Math.min(30, e.beta - 40)) / 30;
+      }
+    });
+
+    // ----------------------------------------------------
+    // HIGH-FIDELITY PROCEDURAL ASSETS (Cached Offscreen)
+    // ----------------------------------------------------
+    const offscreenCache = {};
+
+    function createOffscreen(w, h, renderFn) {
+      const c = document.createElement('canvas');
+      c.width = Math.ceil(w);
+      c.height = Math.ceil(h);
+      const cCtx = c.getContext('2d');
+      renderFn(cCtx, w, h);
+      return c;
+    }
+
+    // 1. Dark Izakaya Rustic Wood Slab
+    function initWoodTable() {
+      offscreenCache.wood = createOffscreen(1000, 1000, (c, w, h) => {
+        const bgGrad = c.createLinearGradient(0, 0, w, h);
+        bgGrad.addColorStop(0, '#1a130f');
+        bgGrad.addColorStop(0.5, '#110c09');
+        bgGrad.addColorStop(1, '#080504');
+        c.fillStyle = bgGrad;
+        c.fillRect(0, 0, w, h);
+
+        c.lineWidth = 1.2;
+        for (let y = 0; y < h; y += 2.5) {
+          const n = noise.noise2D(0.007 * y, 0.3) * 22 + noiseB.noise2D(0.04 * y, 1.1) * 6;
+          const alpha = 0.04 + 0.03 * Math.sin(y * 0.08 + n * 0.5);
+          c.strokeStyle = `rgba(195, 135, 90, ${alpha})`;
+          c.beginPath();
+          c.moveTo(0, y + n);
+          c.lineTo(w, y + n);
+          c.stroke();
+        }
+
+        const imgData = c.getImageData(0, 0, w, h);
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const grain = (Math.random() - 0.5) * 12;
+          d[i] = Math.min(255, Math.max(0, d[i] + grain));
+          d[i+1] = Math.min(255, Math.max(0, d[i+1] + grain * 0.7));
+          d[i+2] = Math.min(255, Math.max(0, d[i+2] + grain * 0.5));
+        }
+        c.putImageData(imgData, 0, 0);
+      });
+    }
+
+    const BOWL_RADIUS_X = 350;
+    const BOWL_RADIUS_Y = 270;
+    const BROTH_RADIUS_X = 318;
+    const BROTH_RADIUS_Y = 240;
+
+    // 2. Handcrafted Stoneware Donburi (Ceramic Bowl)
+    function initBowlTexture() {
+      offscreenCache.bowl = createOffscreen(900, 800, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = 390;
+
+        c.save();
+
+        // Deep Drop Shadow beneath bowl
+        c.shadowColor = 'rgba(0, 0, 0, 0.95)';
+        c.shadowBlur = 45;
+        c.shadowOffsetY = 28;
+
+        c.beginPath();
+        c.ellipse(cx, cy, BOWL_RADIUS_X + 22, BOWL_RADIUS_Y + 20, 0, 0, Math.PI * 2);
+        c.fillStyle = '#0f0c0a';
+        c.fill();
+        c.shadowBlur = 0;
+        c.shadowOffsetY = 0;
+
+        // Stoneware Body Shading (Matte Charcoal with Earthy Undertones)
+        const bodyGrad = c.createRadialGradient(cx - 80, cy - 60, 40, cx, cy + 30, BOWL_RADIUS_X + 30);
+        bodyGrad.addColorStop(0, '#362d28');
+        bodyGrad.addColorStop(0.35, '#221b17');
+        bodyGrad.addColorStop(0.75, '#130e0c');
+        bodyGrad.addColorStop(1, '#060403');
+
+        c.beginPath();
+        c.ellipse(cx, cy, BOWL_RADIUS_X + 18, BOWL_RADIUS_Y + 16, 0, 0, Math.PI * 2);
+        c.fillStyle = bodyGrad;
+        c.fill();
+
+        // Grog Speckles / Mineral Clay Texture
+        for (let i = 0; i < 5000; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const r = Math.sqrt(Math.random()) * (BOWL_RADIUS_X + 16);
+          const px = cx + Math.cos(angle) * r;
+          const py = cy + Math.sin(angle) * (r * (BOWL_RADIUS_Y / BOWL_RADIUS_X));
+          const op = Math.random() * 0.18;
+          c.fillStyle = Math.random() > 0.35 ? `rgba(225, 195, 165, ${op})` : `rgba(15, 10, 8, ${op * 2.5})`;
+          c.fillRect(px, py, 1.5, 1.5);
+        }
+
+        // Glazed Ceramic Rim Ring
+        c.lineWidth = 16;
+        const rimGrad = c.createLinearGradient(cx - BOWL_RADIUS_X, cy - BOWL_RADIUS_Y, cx + BOWL_RADIUS_X, cy + BOWL_RADIUS_Y);
+        rimGrad.addColorStop(0, '#453831');
+        rimGrad.addColorStop(0.2, '#7e6a60');
+        rimGrad.addColorStop(0.45, '#2c231f');
+        rimGrad.addColorStop(0.7, '#504037');
+        rimGrad.addColorStop(1, '#1e1613');
+
+        c.beginPath();
+        c.ellipse(cx, cy, BOWL_RADIUS_X + 4, BOWL_RADIUS_Y + 3, 0, 0, Math.PI * 2);
+        c.strokeStyle = rimGrad;
+        c.stroke();
+
+        // Hand-painted Iron-Red Accent Stripe
+        c.lineWidth = 3.5;
+        c.strokeStyle = 'rgba(185, 95, 35, 0.65)';
+        c.beginPath();
+        c.ellipse(cx, cy, BOWL_RADIUS_X - 4, BOWL_RADIUS_Y - 4, 0, 0, Math.PI * 2);
+        c.stroke();
+
+        // Sloping Inner Ceramic Wall Shadow
+        const innerWallGrad = c.createRadialGradient(cx, cy, BROTH_RADIUS_Y * 0.6, cx, cy, BOWL_RADIUS_X);
+        innerWallGrad.addColorStop(0, 'rgba(15, 10, 8, 0)');
+        innerWallGrad.addColorStop(0.7, 'rgba(25, 17, 13, 0.4)');
+        innerWallGrad.addColorStop(0.9, 'rgba(10, 7, 5, 0.88)');
+        innerWallGrad.addColorStop(1, '#070503');
+
+        c.beginPath();
+        c.ellipse(cx, cy, BOWL_RADIUS_X - 6, BOWL_RADIUS_Y - 6, 0, 0, Math.PI * 2);
+        c.fillStyle = innerWallGrad;
+        c.fill();
+
+        c.restore();
+      });
+    }
+
+    // 3. Glazed Braised King Oyster Mushroom "Chashu" Medallion
+    function createMushroomChashu() {
+      return createOffscreen(280, 280, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+        const r = 105;
+
+        c.save();
+        c.beginPath();
+        for (let a = 0; a <= Math.PI * 2; a += 0.08) {
+          const varR = r + Math.sin(a * 6) * 3.5 + Math.cos(a * 4) * 2.5;
+          const x = cx + Math.cos(a) * varR;
+          const y = cy + Math.sin(a) * (varR * 0.9);
+          if (a === 0) c.moveTo(x, y);
+          else c.lineTo(x, y);
+        }
+        c.closePath();
+
+        const chashuGrad = c.createRadialGradient(cx - 25, cy - 20, 10, cx, cy, r);
+        chashuGrad.addColorStop(0, '#fff6eb');
+        chashuGrad.addColorStop(0.3, '#fae0be');
+        chashuGrad.addColorStop(0.65, '#d4964e');
+        chashuGrad.addColorStop(0.88, '#914d1b');
+        chashuGrad.addColorStop(1, '#3b1b06');
+        c.fillStyle = chashuGrad;
+        c.fill();
+        c.clip();
+
+        // Mushroom fiber striations
+        c.strokeStyle = 'rgba(165, 105, 50, 0.22)';
+        c.lineWidth = 1.2;
+        for (let i = -r; i < r; i += 3.5) {
+          c.beginPath();
+          c.moveTo(cx + i, cy - r);
+          c.bezierCurveTo(cx + i + 6, cy, cx + i - 4, cy + r * 0.5, cx + i, cy + r);
+          c.stroke();
+        }
+
+        // Torched Grill Diamond Scoring with Burnt Caramel Glow
+        const gridStep = 24;
+        for (let pass = 0; pass < 2; pass++) {
+          if (pass === 0) {
+            c.lineWidth = 7;
+            c.strokeStyle = 'rgba(180, 65, 15, 0.45)';
+          } else {
+            c.lineWidth = 3.2;
+            c.strokeStyle = 'rgba(32, 10, 3, 0.95)';
+          }
+
+          for (let i = -r * 1.3; i <= r * 1.3; i += gridStep) {
+            c.beginPath();
+            c.moveTo(cx + i - 60, cy - r);
+            c.lineTo(cx + i + 60, cy + r);
+            c.stroke();
+
+            c.beginPath();
+            c.moveTo(cx + i + 60, cy - r);
+            c.lineTo(cx + i - 60, cy + r);
+            c.stroke();
+          }
+        }
+
+        // Sweet Teriyaki Soy Glaze Pooling
+        const glazeGrad = c.createRadialGradient(cx + 15, cy + 15, 25, cx, cy, r);
+        glazeGrad.addColorStop(0, 'rgba(195, 85, 15, 0.25)');
+        glazeGrad.addColorStop(0.65, 'rgba(115, 40, 8, 0.52)');
+        glazeGrad.addColorStop(0.95, 'rgba(45, 12, 3, 0.82)');
+        c.fillStyle = glazeGrad;
+        c.fill();
+
+        // Glossy Specular Highlights
+        c.fillStyle = 'rgba(255, 250, 235, 0.75)';
+        for (let i = 0; i < 20; i++) {
+          const gx = cx + (Math.random() - 0.5) * r * 1.3;
+          const gy = cy + (Math.random() - 0.5) * r * 1.1;
+          const gw = 3 + Math.random() * 6;
+          c.beginPath();
+          c.ellipse(gx, gy, gw, gw * 0.45, Math.PI * 0.25, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        // Toasted white & black sesame seeds
+        for (let i = 0; i < 24; i++) {
+          const sx = cx + (Math.random() - 0.5) * r * 1.4;
+          const sy = cy + (Math.random() - 0.5) * r * 1.2;
+          const sa = Math.random() * Math.PI;
+          c.save();
+          c.translate(sx, sy);
+          c.rotate(sa);
+          if (i % 5 === 0) {
+            c.fillStyle = '#1c1410';
+          } else {
+            c.fillStyle = '#fff4de';
+          }
+          c.beginPath();
+          c.ellipse(0, 0, 4.5, 2.5, 0, 0, Math.PI * 2);
+          c.fill();
+          c.restore();
+        }
+
+        c.restore();
+      });
+    }
+
+    // 4. Braised Shiitake Mushroom (Hana-Shiitake)
+    function createShiitake() {
+      return createOffscreen(240, 240, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+        const r = 85;
+
+        c.save();
+        c.beginPath();
+        for (let a = 0; a <= Math.PI * 2; a += 0.08) {
+          const varR = r + Math.sin(a * 4) * 2.5;
+          const x = cx + Math.cos(a) * varR;
+          const y = cy + Math.sin(a) * (varR * 0.88);
+          if (a === 0) c.moveTo(x, y);
+          else c.lineTo(x, y);
+        }
+        c.closePath();
+
+        const capGrad = c.createRadialGradient(cx - 25, cy - 20, 10, cx, cy, r);
+        capGrad.addColorStop(0, '#5f2f18');
+        capGrad.addColorStop(0.45, '#3e1b0c');
+        capGrad.addColorStop(0.85, '#200c05');
+        capGrad.addColorStop(1, '#0e0401');
+        c.fillStyle = capGrad;
+        c.fill();
+
+        // Velvety radial cap creases
+        c.strokeStyle = 'rgba(15, 6, 2, 0.45)';
+        c.lineWidth = 1.8;
+        for (let a = 0; a < Math.PI * 2; a += Math.PI / 18) {
+          c.beginPath();
+          c.moveTo(cx + Math.cos(a) * 28, cy + Math.sin(a) * 24);
+          c.lineTo(cx + Math.cos(a) * (r - 2), cy + Math.sin(a) * (r * 0.86));
+          c.stroke();
+        }
+
+        // 4-Point Star Carving
+        c.save();
+        c.fillStyle = '#fbf0de';
+        c.shadowColor = 'rgba(15, 5, 1, 0.8)';
+        c.shadowBlur = 3;
+        c.beginPath();
+        const cuts = 4;
+        for (let i = 0; i < cuts; i++) {
+          const angle = (i * Math.PI / 2) + Math.PI / 4;
+          const len = 42;
+          const halfW = 8;
+          const tipX = cx + Math.cos(angle) * len;
+          const tipY = cy + Math.sin(angle) * (len * 0.88);
+          const leftX = cx + Math.cos(angle - Math.PI / 2) * halfW;
+          const leftY = cy + Math.sin(angle - Math.PI / 2) * halfW;
+          const rightX = cx + Math.cos(angle + Math.PI / 2) * halfW;
+          const rightY = cy + Math.sin(angle + Math.PI / 2) * halfW;
+
+          c.moveTo(cx, cy);
+          c.lineTo(leftX, leftY);
+          c.lineTo(tipX, tipY);
+          c.lineTo(rightX, rightY);
+          c.closePath();
+        }
+        c.fill();
+
+        c.fillStyle = 'rgba(190, 150, 115, 0.5)';
+        c.beginPath();
+        c.arc(cx, cy, 7, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+
+        // Glistening broth coat
+        c.fillStyle = 'rgba(255, 240, 220, 0.42)';
+        c.beginPath();
+        c.ellipse(cx - 32, cy - 28, 18, 8, -Math.PI / 6, 0, Math.PI * 2);
+        c.fill();
+
+        c.restore();
+      });
+    }
+
+    // 5. Authentic Halved Baby Bok Choy (Pak Choi)
+    function createBokChoy() {
+      return createOffscreen(380, 280, (c, w, h) => {
+        c.save();
+        c.translate(50, 140);
+        c.rotate(-Math.PI * 0.08);
+
+        // Multiple natural leaf fronds fanning out
+        const leafGrad = c.createLinearGradient(130, -50, 310, 40);
+        leafGrad.addColorStop(0, '#2b6e22');
+        leafGrad.addColorStop(0.45, '#174712');
+        leafGrad.addColorStop(0.85, '#0b2b09');
+        leafGrad.addColorStop(1, '#051704');
+
+        c.fillStyle = leafGrad;
+        c.beginPath();
+        c.moveTo(140, -25);
+        c.bezierCurveTo(170, -75, 230, -85, 275, -55);
+        c.bezierCurveTo(310, -65, 335, -30, 325, 5);
+        c.bezierCurveTo(345, 35, 315, 75, 265, 65);
+        c.bezierCurveTo(225, 58, 180, 35, 140, 10);
+        c.closePath();
+        c.fill();
+
+        // Pale Jade Ribbed Stalk Cluster
+        const stalkGrad = c.createLinearGradient(0, -35, 180, 25);
+        stalkGrad.addColorStop(0, '#f9fdf7');
+        stalkGrad.addColorStop(0.35, '#dbeed3');
+        stalkGrad.addColorStop(0.75, '#99c98b');
+        stalkGrad.addColorStop(1, '#4e8d3f');
+
+        c.fillStyle = stalkGrad;
+        c.beginPath();
+        c.moveTo(0, -5);
+        c.bezierCurveTo(45, -45, 110, -40, 175, -20);
+        c.bezierCurveTo(185, 5, 180, 25, 160, 32);
+        c.bezierCurveTo(110, 42, 45, 35, 0, 15);
+        c.closePath();
+        c.fill();
+
+        // Juicy inner heart stalk
+        const heartGrad = c.createLinearGradient(15, -20, 150, 10);
+        heartGrad.addColorStop(0, '#ffffff');
+        heartGrad.addColorStop(0.5, '#e4f5dc');
+        heartGrad.addColorStop(1, '#a6d996');
+
+        c.fillStyle = heartGrad;
+        c.beginPath();
+        c.moveTo(10, -2);
+        c.bezierCurveTo(45, -25, 95, -22, 145, -8);
+        c.bezierCurveTo(135, 12, 85, 20, 10, 8);
+        c.closePath();
+        c.fill();
+
+        // Stalk fibrous ribs
+        c.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+        c.lineWidth = 1.8;
+        for (let y = -18; y <= 16; y += 7) {
+          c.beginPath();
+          c.moveTo(15, y * 0.5);
+          c.bezierCurveTo(65, y - 6, 120, y - 4, 165, y * 0.4);
+          c.stroke();
+        }
+
+        // Branching Leaf Veins
+        c.strokeStyle = 'rgba(180, 235, 160, 0.45)';
+        c.lineWidth = 2.0;
+        c.beginPath();
+        c.moveTo(160, -10);
+        c.bezierCurveTo(210, -15, 265, -8, 305, -18);
+        c.stroke();
+
+        c.lineWidth = 1.3;
+        c.beginPath();
+        c.moveTo(205, -12);
+        c.bezierCurveTo(225, -45, 255, -55, 275, -50);
+        c.moveTo(235, -7);
+        c.bezierCurveTo(255, 25, 280, 38, 300, 30);
+        c.stroke();
+
+        // Wok Char along leaf edges
+        c.lineWidth = 8;
+        c.lineCap = 'round';
+        c.strokeStyle = 'rgba(18, 14, 10, 0.85)';
+        c.beginPath();
+        c.moveTo(260, -60);
+        c.bezierCurveTo(295, -58, 325, -25, 320, 5);
+        c.bezierCurveTo(330, 32, 305, 60, 260, 55);
+        c.stroke();
+
+        // Glistening broth/oil sheen on leaves
+        c.fillStyle = 'rgba(255, 255, 255, 0.38)';
+        c.beginPath();
+        c.ellipse(95, -5, 45, 8, -Math.PI * 0.04, 0, Math.PI * 2);
+        c.fill();
+
+        c.restore();
+      });
+    }
+
+    // 6. Braised Lotus Root Slices (Renkon)
+    function createLotusRoot() {
+      return createOffscreen(200, 200, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+        const r = 70;
+
+        c.save();
+        c.beginPath();
+        c.arc(cx, cy, r, 0, Math.PI * 2);
+
+        const renGrad = c.createRadialGradient(cx - 15, cy - 15, 10, cx, cy, r);
+        renGrad.addColorStop(0, '#faebd7');
+        renGrad.addColorStop(0.5, '#e5be85');
+        renGrad.addColorStop(0.85, '#b07a3b');
+        renGrad.addColorStop(1, '#5e3811');
+        c.fillStyle = renGrad;
+        c.fill();
+
+        c.globalCompositeOperation = 'destination-out';
+        c.beginPath();
+        c.arc(cx, cy, 10, 0, Math.PI * 2);
+        c.fill();
+
+        const holeCount = 8;
+        for (let i = 0; i < holeCount; i++) {
+          const a = (i * Math.PI * 2) / holeCount;
+          const hx = cx + Math.cos(a) * (r * 0.55);
+          const hy = cy + Math.sin(a) * (r * 0.55);
+          c.beginPath();
+          c.ellipse(hx, hy, 12, 8, a, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        c.globalCompositeOperation = 'source-over';
+        c.strokeStyle = 'rgba(95, 55, 18, 0.6)';
+        c.lineWidth = 2;
+        c.stroke();
+
+        c.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        c.beginPath();
+        c.ellipse(cx - 20, cy - 25, 20, 6, -0.3, 0, Math.PI * 2);
+        c.fill();
+
+        c.restore();
+      });
+    }
+
+    // 7. Plump Sweet Corn Mound
+    function createCornCluster() {
+      return createOffscreen(220, 190, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+
+        const kernels = [];
+        for (let row = 0; row < 6; row++) {
+          const count = 7 - Math.abs(row - 2.5);
+          for (let col = 0; col < count; col++) {
+            const kx = cx + (col - count / 2 + 0.5) * 19 + (Math.random() - 0.5) * 3;
+            const ky = cy + (row - 2.5) * 17 + (Math.random() - 0.5) * 3;
+            kernels.push({ x: kx, y: ky, r: 8.5 + Math.random() * 2 });
+          }
+        }
+
+        c.fillStyle = '#613c06';
+        for (const k of kernels) {
+          c.beginPath();
+          c.arc(k.x, k.y + 2.5, k.r + 1.5, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        for (const k of kernels) {
+          const kGrad = c.createRadialGradient(k.x - 3, k.y - 3, 1, k.x, k.y, k.r);
+          kGrad.addColorStop(0, '#fff6b0');
+          kGrad.addColorStop(0.35, '#ffd22e');
+          kGrad.addColorStop(0.8, '#e59c09');
+          kGrad.addColorStop(1, '#945502');
+
+          c.fillStyle = kGrad;
+          c.beginPath();
+          c.ellipse(k.x, k.y, k.r, k.r * 0.88, Math.random() * 0.4, 0, Math.PI * 2);
+          c.fill();
+
+          c.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          c.beginPath();
+          c.arc(k.x - 2.5, k.y - 2.5, 2.5, 0, Math.PI * 2);
+          c.fill();
+        }
+      });
+    }
+
+    // 8. Menma (Seasoned Braised Bamboo Shoots)
+    function createMenma() {
+      return createOffscreen(200, 150, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+
+        for (let i = 0; i < 4; i++) {
+          c.save();
+          c.translate(cx - 40 + i * 26, cy - 10 + i * 9);
+          c.rotate(0.28 - i * 0.14);
+
+          const mGrad = c.createLinearGradient(-16, -48, 16, 48);
+          mGrad.addColorStop(0, '#ebd09e');
+          mGrad.addColorStop(0.5, '#c49358');
+          mGrad.addColorStop(1, '#825326');
+
+          c.fillStyle = mGrad;
+          c.beginPath();
+          c.roundRect(-15, -48, 30, 96, 6);
+          c.fill();
+
+          c.strokeStyle = 'rgba(95, 55, 20, 0.38)';
+          c.lineWidth = 1.2;
+          for (let gx = -11; gx <= 11; gx += 4.5) {
+            c.beginPath();
+            c.moveTo(gx, -45);
+            c.lineTo(gx, 45);
+            c.stroke();
+          }
+
+          c.strokeStyle = 'rgba(65, 32, 10, 0.55)';
+          c.lineWidth = 2;
+          c.beginPath();
+          c.roundRect(-15, -48, 30, 96, 6);
+          c.stroke();
+
+          c.restore();
+        }
+      });
+    }
+
+    // 9. Roasted Nori Seaweed Sheets
+    function createNoriSheets() {
+      return createOffscreen(280, 320, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+
+        for (let sheet = 0; sheet < 2; sheet++) {
+          c.save();
+          const angle = sheet === 0 ? -0.2 : 0.1;
+          c.translate(cx + (sheet - 0.5) * 50, cy + 25);
+          c.rotate(angle);
+
+          c.fillStyle = '#0c140f';
+          c.beginPath();
+          c.moveTo(-48, -120);
+          c.lineTo(48, -118);
+          c.lineTo(52, 120);
+          c.lineTo(-52, 120);
+          c.closePath();
+          c.fill();
+
+          for (let i = 0; i < 1800; i++) {
+            const px = -48 + Math.random() * 96;
+            const py = -118 + Math.random() * 236;
+            const green = 20 + Math.random() * 38;
+            c.fillStyle = `rgba(12, ${green}, 18, 0.38)`;
+            c.fillRect(px, py, 2, 2);
+          }
+
+          c.fillStyle = '#1c291e';
+          for (let x = -48; x < 48; x += 3) {
+            const deckle = Math.random() * 4.5;
+            c.fillRect(x, -120 + deckle, 3, 3.5);
+          }
+
+          c.fillStyle = 'rgba(255, 255, 255, 0.06)';
+          c.beginPath();
+          c.ellipse(0, -35, 38, 75, 0.1, 0, Math.PI * 2);
+          c.fill();
+
+          c.restore();
+        }
+      });
+    }
+
+    // 10. Negi (Scallions / Spring Onions) & Shiraga Negi & Ito Togarashi
+    function createNegiGarnish() {
+      return createOffscreen(260, 260, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+
+        for (let i = 0; i < 35; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const r = Math.random() * 85;
+          const sx = cx + Math.cos(angle) * r;
+          const sy = cy + Math.sin(angle) * (r * 0.85);
+          const rad = 5 + Math.random() * 4.5;
+
+          c.save();
+          c.translate(sx, sy);
+          c.rotate(Math.random() * Math.PI);
+          c.scale(1, 0.6 + Math.random() * 0.4);
+
+          c.fillStyle = '#26731a';
+          c.beginPath();
+          c.arc(0, 0, rad, 0, Math.PI * 2);
+          c.fill();
+
+          c.fillStyle = '#5ee032';
+          c.beginPath();
+          c.arc(0, 0, rad - 1.2, 0, Math.PI * 2);
+          c.fill();
+
+          c.fillStyle = '#ebfae3';
+          c.beginPath();
+          c.arc(0, 0, rad - 2.6, 0, Math.PI * 2);
+          c.fill();
+
+          c.fillStyle = 'rgba(25, 65, 18, 0.7)';
+          c.beginPath();
+          c.arc(0, 0, rad - 3.9, 0, Math.PI * 2);
+          c.fill();
+
+          c.restore();
+        }
+
+        // Shiraga Negi
+        c.strokeStyle = '#f4fcf0';
+        c.lineWidth = 1.2;
+        c.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        c.shadowBlur = 2;
+        for (let i = 0; i < 16; i++) {
+          const sx = cx - 30 + Math.random() * 60;
+          const sy = cy - 25 + Math.random() * 50;
+          c.beginPath();
+          c.moveTo(sx, sy);
+          c.bezierCurveTo(
+            sx + (Math.random() - 0.5) * 35, sy - 15 - Math.random() * 20,
+            sx + (Math.random() - 0.5) * 45, sy + (Math.random() - 0.5) * 25,
+            sx + (Math.random() - 0.5) * 55, sy + 15 + Math.random() * 20
+          );
+          c.stroke();
+        }
+
+        // Ito Togarashi
+        c.strokeStyle = '#eb2610';
+        c.lineWidth = 1.6;
+        c.shadowColor = 'rgba(255, 50, 15, 0.6)';
+        c.shadowBlur = 4;
+
+        for (let i = 0; i < 16; i++) {
+          c.beginPath();
+          const startX = cx - 40 + Math.random() * 80;
+          const startY = cy - 30 + Math.random() * 60;
+          c.moveTo(startX, startY);
+          c.bezierCurveTo(
+            startX + (Math.random() - 0.5) * 45, startY - 25 - Math.random() * 25,
+            startX + (Math.random() - 0.5) * 55, startY + (Math.random() - 0.5) * 35,
+            startX + (Math.random() - 0.5) * 65, startY + 20 + Math.random() * 30
+          );
+          c.stroke();
+        }
+        c.shadowBlur = 0;
+      });
+    }
+
+    // 11. Wooden Chopsticks & Ceramic Hashioki
+    function createChopsticks() {
+      return createOffscreen(200, 540, (c, w, h) => {
+        const cx = 100;
+
+        const restGrad = c.createLinearGradient(40, 275, 160, 315);
+        restGrad.addColorStop(0, '#1c2830');
+        restGrad.addColorStop(0.5, '#3b5568');
+        restGrad.addColorStop(1, '#151e24');
+
+        c.fillStyle = restGrad;
+        c.beginPath();
+        c.roundRect(50, 280, 100, 26, 9);
+        c.fill();
+
+        c.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        c.beginPath();
+        c.ellipse(100, 287, 36, 4.5, 0, 0, Math.PI * 2);
+        c.fill();
+
+        for (let idx = 0; idx < 2; idx++) {
+          const xOff = (idx - 0.5) * 18;
+          c.save();
+          c.translate(cx + xOff, 250);
+          c.rotate(-0.03 + idx * 0.07);
+
+          const stickGrad = c.createLinearGradient(-6, -230, 6, 230);
+          stickGrad.addColorStop(0, '#2e231c');
+          stickGrad.addColorStop(0.5, '#1b1411');
+          stickGrad.addColorStop(1, '#0c0907');
+
+          c.fillStyle = stickGrad;
+          c.beginPath();
+          c.moveTo(-6, -220);
+          c.lineTo(6, -220);
+          c.lineTo(2.4, 230);
+          c.lineTo(-2.4, 230);
+          c.closePath();
+          c.fill();
+
+          const brassGrad = c.createLinearGradient(-6, -220, 6, -195);
+          brassGrad.addColorStop(0, '#dbaa4c');
+          brassGrad.addColorStop(0.5, '#fff4b8');
+          brassGrad.addColorStop(1, '#946a1e');
+          c.fillStyle = brassGrad;
+          c.fillRect(-6, -220, 12, 26);
+
+          c.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+          c.lineWidth = 1;
+          c.beginPath();
+          c.moveTo(-2, -190);
+          c.lineTo(-0.5, 210);
+          c.stroke();
+
+          c.restore();
+        }
+      });
+    }
+
+    // 12. Golden Ramen Noodle Nest (Luscious woven waves with broth perimeter)
+    function createNoodleNest() {
+      return createOffscreen(700, 540, (c, w, h) => {
+        const cx = w * 0.5;
+        const cy = h * 0.5;
+        const rx = BROTH_RADIUS_X - 16;
+        const ry = BROTH_RADIUS_Y - 14;
+
+        c.save();
+        c.beginPath();
+        c.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        c.clip();
+
+        // Warm tonkotsu-miso base glow
+        const underGrad = c.createRadialGradient(cx, cy, 30, cx, cy, rx);
+        underGrad.addColorStop(0, '#e5932a');
+        underGrad.addColorStop(0.65, '#aa580e');
+        underGrad.addColorStop(1, '#522103');
+        c.fillStyle = underGrad;
+        c.fill();
+
+        // Continuous Wavy Bundles
+        for (let b = 0; b < 14; b++) {
+          const bundleY = -ry + (b + 0.8) * (ry * 2 / 15);
+          const bundleCount = 13;
+          for (let i = 0; i < bundleCount; i++) {
+            const yOffset = (i - bundleCount / 2) * 5.2;
+            const curY = cy + bundleY + yOffset;
+            const phase = (b * 1.5 + i * 0.4);
+
+            c.beginPath();
+            let started = false;
+            for (let x = -rx; x <= rx; x += 12) {
+              const curX = cx + x;
+              const distNorm = (x * x) / (rx * rx) + ((curY - cy) * (curY - cy)) / (ry * ry);
+              if (distNorm <= 0.95) {
+                const waveY = curY + Math.sin(x * 0.06 + phase) * 7.5 + Math.cos(x * 0.03 + b) * 4;
+                if (!started) {
+                  c.moveTo(curX, waveY);
+                  started = true;
+                } else {
+                  c.lineTo(curX, waveY);
+                }
+              }
+            }
+
+            if (started) {
+              c.strokeStyle = '#753b0a';
+              c.lineWidth = 5.8;
+              c.stroke();
+
+              c.strokeStyle = '#fcdb7d';
+              c.lineWidth = 4.2;
+              c.stroke();
+
+              c.strokeStyle = 'rgba(255, 253, 240, 0.75)';
+              c.lineWidth = 1.5;
+              c.stroke();
+            }
+          }
+        }
+
+        // Additional organic looping strands on top
+        for (let s = 0; s < 45; s++) {
+          const sa = Math.random() * Math.PI * 2;
+          const sr = Math.random() * (rx * 0.8);
+          let px = cx + Math.cos(sa) * sr;
+          let py = cy + Math.sin(sa) * (sr * 0.75);
+
+          c.beginPath();
+          c.moveTo(px, py);
+          const segs = 3 + Math.floor(Math.random() * 3);
+          for (let seg = 0; seg < segs; seg++) {
+            const cp1x = px + (Math.random() - 0.5) * 50;
+            const cp1y = py + (Math.random() - 0.5) * 35;
+            px += (Math.random() - 0.5) * 60;
+            py += (Math.random() - 0.5) * 45;
+            c.quadraticCurveTo(cp1x, cp1y, px, py);
+          }
+
+          c.strokeStyle = '#753b0a';
+          c.lineWidth = 5.5;
+          c.stroke();
+
+          c.strokeStyle = '#fcdb7d';
+          c.lineWidth = 4.0;
+          c.stroke();
+
+          c.strokeStyle = 'rgba(255, 253, 240, 0.8)';
+          c.lineWidth = 1.4;
+          c.stroke();
+        }
+
+        c.restore();
+      });
+    }
+
+    // Initialize all procedural assets
+    initWoodTable();
+    initBowlTexture();
+    offscreenCache.chashu = createMushroomChashu();
+    offscreenCache.shiitake = createShiitake();
+    offscreenCache.bokchoy = createBokChoy();
+    offscreenCache.lotus = createLotusRoot();
+    offscreenCache.corn = createCornCluster();
+    offscreenCache.menma = createMenma();
+    offscreenCache.nori = createNoriSheets();
+    offscreenCache.negi = createNegiGarnish();
+    offscreenCache.chopsticks = createChopsticks();
+    offscreenCache.noodles = createNoodleNest();
+
+    // ----------------------------------------------------
+    // DYNAMIC CHILI OIL (RAYU) & BROTH RIPPLE PHYSICS
+    // ----------------------------------------------------
+    const RAYU_COUNT = 36;
+    const rayuDroplets = [];
+
+    for (let i = 0; i < RAYU_COUNT; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 50 + Math.random() * 200;
+      rayuDroplets.push({
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * (dist * 0.75),
+        vx: 0,
+        vy: 0,
+        baseR: 3.5 + Math.random() * 12,
+        pulseSpeed: 0.6 + Math.random() * 1.4,
+        phase: Math.random() * Math.PI * 2,
+        isChili: Math.random() > 0.3
+      });
+    }
+
+    const ripples = [];
+    function triggerBrothInteraction(clientX, clientY, intensity = 1.0) {
+      const centerX = width * 0.5;
+      const centerY = height * 0.52;
+      const scale = Math.min(width / 1080, height / 920) * 0.92;
+
+      const relX = (clientX - centerX) / scale;
+      const relY = (clientY - centerY) / scale;
+
+      const inBroth = (relX * relX) / (BROTH_RADIUS_X * BROTH_RADIUS_X) +
+                      (relY * relY) / (BROTH_RADIUS_Y * BROTH_RADIUS_Y);
+
+      if (inBroth <= 1.1) {
+        ripples.push({
+          x: relX,
+          y: relY,
+          radius: 6,
+          maxRadius: 200 * intensity,
+          opacity: 0.95 * intensity,
+          speed: 3.2
+        });
+
+        for (const drop of rayuDroplets) {
+          const dx = drop.x - relX;
+          const dy = drop.y - relY;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          if (d < 140) {
+            const force = (140 - d) / 140 * 7 * intensity;
+            drop.vx += (dx / d) * force;
+            drop.vy += (dy / d) * force;
+          }
+        }
+
+        spawnSteamBurst(relX, relY, 14);
+      }
+    }
+
+    // ----------------------------------------------------
+    // REALISTIC DELICATE VOLUMETRIC STEAM SYSTEM
+    // ----------------------------------------------------
+    const MAX_STEAM_PARTICLES = 160;
+    const steamParticles = [];
+
+    const steamEmitters = [
+      { x: -70, y: -40, w: 90 },
+      { x: 50, y: -70, w: 80 },
+      { x: 0, y: 30, w: 100 },
+      { x: -120, y: 20, w: 60 },
+      { x: 100, y: 10, w: 70 },
+      { x: -30, y: -90, w: 80 }
+    ];
+
+    class SteamParticle {
+      constructor() {
+        this.reset();
+        this.life = Math.floor(Math.random() * this.maxLife);
+      }
+      reset(customX, customY, burst = false) {
+        if (customX !== undefined) {
+          this.x = customX + (Math.random() - 0.5) * 25;
+          this.y = customY + (Math.random() - 0.5) * 15;
+        } else {
+          const em = steamEmitters[Math.floor(Math.random() * steamEmitters.length)];
+          const ea = Math.random() * Math.PI * 2;
+          const er = Math.random() * em.w;
+          this.x = em.x + Math.cos(ea) * er;
+          this.y = em.y + Math.sin(ea) * (er * 0.65);
+        }
+        this.z = Math.random() * 0.8 + 0.2;
+
+        this.vx = (Math.random() - 0.5) * 0.25;
+        this.vy = burst ? -(1.6 + Math.random() * 1.8) : -(0.6 + Math.random() * 0.9);
+        this.size = burst ? 12 + Math.random() * 16 : 10 + Math.random() * 18;
+        this.maxSize = this.size * (4.2 + Math.random() * 2.8);
+
+        this.life = 0;
+        this.maxLife = burst ? 110 + Math.random() * 70 : 180 + Math.random() * 140;
+        this.opacity = 0;
+        this.maxOpacity = burst ? 0.18 + Math.random() * 0.1 : 0.08 + Math.random() * 0.08;
+        this.seed = Math.random() * 1000;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.vRot = (Math.random() - 0.5) * 0.012;
+      }
+      update(time, cursorWakeX, cursorWakeY, cursorSpeed) {
+        if (prefersReducedMotion) {
+          this.vy = -0.35;
+          this.vx = 0;
+        }
+
+        this.life++;
+        if (this.life >= this.maxLife) {
+          this.reset();
+          return;
+        }
+
+        const nFactor = 0.0035;
+        const swirl = noise.noise2D(this.x * nFactor, (this.y + time * 35) * nFactor);
+
+        if (!prefersReducedMotion) {
+          this.vx += swirl * 0.06 + (Math.sin(time * 1.1 + this.seed) * 0.025);
+          this.vy -= 0.004;
+        }
+
+        this.vx *= 0.97;
+        this.vy *= 0.99;
+
+        const cdx = this.x - cursorWakeX;
+        const cdy = this.y - cursorWakeY;
+        const cDist = Math.sqrt(cdx * cdx + cdy * cdy);
+        if (cDist < 150 && cursorSpeed > 0.4) {
+          const push = ((150 - cDist) / 150) * Math.min(cursorSpeed * 0.07, 2.2);
+          this.vx += (cdx / (cDist || 1)) * push + mouse.vx * 0.035;
+          this.vy += (cdy / (cDist || 1)) * push + mouse.vy * 0.035;
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+        this.rotation += this.vRot;
+
+        const progress = this.life / this.maxLife;
+        if (progress < 0.25) {
+          this.opacity = (progress / 0.25) * this.maxOpacity;
+        } else {
+          this.opacity = (1 - (progress - 0.25) / 0.75) * this.maxOpacity;
+        }
+
+        this.currentSize = this.size + (this.maxSize - this.size) * Math.pow(progress, 0.85);
+      }
+    }
+
+    for (let i = 0; i < MAX_STEAM_PARTICLES; i++) {
+      steamParticles.push(new SteamParticle());
+    }
+
+    function spawnSteamBurst(x, y, count = 12) {
+      for (let i = 0; i < count; i++) {
+        const deadParticle = steamParticles.find(p => p.life >= p.maxLife) || steamParticles[Math.floor(Math.random() * steamParticles.length)];
+        deadParticle.reset(x, y, true);
+      }
+    }
+
+    // Atmospheric Floating Golden Dust Motes
+    const DUST_COUNT = 36;
+    const dustMotes = [];
+    for (let i = 0; i < DUST_COUNT; i++) {
+      dustMotes.push({
+        x: (Math.random() - 0.5) * 850,
+        y: -420 + Math.random() * 850,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: -0.12 - Math.random() * 0.3,
+        size: 0.7 + Math.random() * 2.0,
+        opacity: 0.15 + Math.random() * 0.45,
+        seed: Math.random() * 100
+      });
+    }
+
+    // ----------------------------------------------------
+    // MAIN RENDER LOOP & REAL-TIME 3D LIGHTING
+    // ----------------------------------------------------
+    let lastTime = performance.now();
+    let animTime = 0;
+
+    function render(now) {
+      requestAnimationFrame(render);
+
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+      if (!prefersReducedMotion) {
+        animTime += dt;
+      } else {
+        animTime += dt * 0.25;
+      }
+
+      // Smooth Spring Inertia
+      const mouseLerp = prefersReducedMotion ? 0.03 : 0.075;
+      mouse.vx = (mouse.targetX - mouse.x);
+      mouse.vy = (mouse.targetY - mouse.y);
+      mouse.speed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
+      mouse.x += mouse.vx * mouseLerp;
+      mouse.y += mouse.vy * mouseLerp;
+
+      // 3D Parallax Tilt Angles (-1 to 1)
+      const normMouseX = ((mouse.x / width) - 0.5) * 2 + tiltX * 0.6;
+      const normMouseY = ((mouse.y / height) - 0.5) * 2 + tiltY * 0.6;
+      const tiltAngleX = prefersReducedMotion ? 0 : normMouseX * 0.07;
+      const tiltAngleY = prefersReducedMotion ? 0 : normMouseY * 0.05;
+
+      const centerX = width * 0.5;
+      const centerY = height * 0.52;
+      const baseScale = Math.min(width / 1080, height / 920) * 0.92;
+
+      ctx.fillStyle = '#060403';
+      ctx.fillRect(0, 0, width, height);
+
+      // 1. ATMOSPHERIC COUNTERTOP & VOLUMETRIC WARM LIGHT
+      ctx.save();
+      const breathe = prefersReducedMotion ? 0 : Math.sin(animTime * 0.75) * 0.04;
+      const lightPulse = 0.96 + breathe;
+
+      const tableShiftX = -normMouseX * 10;
+      const tableShiftY = -normMouseY * 7;
+      const woodPattern = ctx.createPattern(offscreenCache.wood, 'repeat');
+      ctx.save();
+      ctx.translate(tableShiftX, tableShiftY);
+      ctx.fillStyle = woodPattern;
+      ctx.fillRect(-50, -50, width + 100, height + 100);
+      ctx.restore();
+
+      // Volumetric Overhead Warm Key Light
+      const spotGrad = ctx.createRadialGradient(
+        centerX + normMouseX * 35, centerY - 140 + normMouseY * 25, 50,
+        centerX, centerY, Math.max(width, height) * 0.8
+      );
+      spotGrad.addColorStop(0, `rgba(255, 185, 90, ${0.26 * lightPulse})`);
+      spotGrad.addColorStop(0.35, `rgba(195, 110, 40, ${0.13 * lightPulse})`);
+      spotGrad.addColorStop(0.7, 'rgba(40, 18, 10, 0.08)');
+      spotGrad.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
+      ctx.fillStyle = spotGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Vignette
+      const vigGrad = ctx.createRadialGradient(
+        centerX, centerY, Math.min(width, height) * 0.35,
+        centerX, centerY, Math.max(width, height) * 0.88
+      );
+      vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      vigGrad.addColorStop(1, 'rgba(0,0,0,0.88)');
+      ctx.fillStyle = vigGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. THE HERO RAMEN DISH COMPOSITING
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.scale(baseScale, baseScale);
+
+      // 2.5D Tilt
+      ctx.transform(
+        1, tiltAngleY * 0.3,
+        tiltAngleX * 0.3, 1,
+        normMouseX * 16, normMouseY * 11
+      );
+
+      // A. Deep Soft Drop Shadow under Bowl
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(0, 75, BOWL_RADIUS_X + 50, BOWL_RADIUS_Y + 20, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+      ctx.shadowBlur = 50;
+      ctx.fill();
+      ctx.restore();
+
+      // B. Wooden Chopsticks & Hashioki (Resting cleanly on the table to the right)
+      ctx.save();
+      ctx.translate(BOWL_RADIUS_X + 115, 0);
+      ctx.rotate(0.04 + normMouseX * 0.02);
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetX = 12;
+      ctx.shadowOffsetY = 16;
+      ctx.drawImage(offscreenCache.chopsticks, -100, -270);
+      ctx.restore();
+
+      // C. Stoneware Donburi (Ceramic Bowl)
+      ctx.save();
+      ctx.drawImage(offscreenCache.bowl, -450, -390);
+
+      // Dynamic Glazed Ceramic Rim Specular Highlight
+      const rimHighlightX = -normMouseX * 65;
+      const rimHighlightY = -BOWL_RADIUS_Y + 5 - normMouseY * 22;
+      const rimSpecGrad = ctx.createRadialGradient(rimHighlightX, rimHighlightY, 8, rimHighlightX, rimHighlightY, 160);
+      rimSpecGrad.addColorStop(0, 'rgba(255, 240, 210, 0.65)');
+      rimSpecGrad.addColorStop(0.3, 'rgba(255, 185, 110, 0.25)');
+      rimSpecGrad.addColorStop(1, 'rgba(255, 185, 110, 0)');
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, BOWL_RADIUS_X + 2, BOWL_RADIUS_Y + 2, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = rimSpecGrad;
+      ctx.lineWidth = 6;
+      ctx.stroke();
+      ctx.restore();
+
+      // D. THE BROTH & INGREDIENT SANCTUARY (Clipped precisely inside bowl rim)
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(0, 0, BROTH_RADIUS_X, BROTH_RADIUS_Y, 0, 0, Math.PI * 2);
+      ctx.clip();
+
+      // Creamy Rich Vegan Tonkotsu / Sesame Miso Broth
+      const brothGrad = ctx.createRadialGradient(
+        normMouseX * 35, -20 + normMouseY * 20, 25,
+        0, 0, BROTH_RADIUS_X
+      );
+      brothGrad.addColorStop(0, '#e8a142');
+      brothGrad.addColorStop(0.35, '#c06b18');
+      brothGrad.addColorStop(0.7, '#823808');
+      brothGrad.addColorStop(0.95, '#401903');
+      brothGrad.addColorStop(1, '#1e0a02');
+      ctx.fillStyle = brothGrad;
+      ctx.fill();
+
+      // Convective Broth Heat Swirls
+      const brothTime = animTime * 0.65;
+      ctx.fillStyle = 'rgba(240, 155, 55, 0.14)';
+      for (let cr = 0; cr < 3; cr++) {
+        ctx.beginPath();
+        const swirlAngle = brothTime + cr * 2.1;
+        const swX = Math.cos(swirlAngle) * (45 + cr * 35);
+        const swY = Math.sin(swirlAngle) * (35 + cr * 25);
+        ctx.ellipse(swX, swY, 115 - cr * 20, 75 - cr * 15, swirlAngle * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // E. Golden Ramen Noodle Nest (Underneath Toppings)
+      ctx.save();
+      ctx.drawImage(offscreenCache.noodles, -350, -270);
+      ctx.restore();
+
+      // F. Roasted Nori Seaweed (Standing against the back rim)
+      ctx.save();
+      ctx.translate(65, -BROTH_RADIUS_Y + 45);
+      ctx.drawImage(offscreenCache.nori, -140, -160);
+      ctx.restore();
+
+      // G. Dynamic Floating Chili Oil (Rayu) in the Broth Depth
+      for (let i = 0; i < rayuDroplets.length; i++) {
+        const d = rayuDroplets[i];
+
+        if (!prefersReducedMotion) {
+          const dropNoise = noise.noise2D((d.x + i * 50) * 0.005, (d.y + animTime * 15) * 0.005);
+          d.vx += Math.cos(d.phase + animTime * d.pulseSpeed) * 0.04 + dropNoise * 0.06;
+          d.vy += Math.sin(d.phase + animTime * d.pulseSpeed) * 0.03;
+        }
+        d.vx *= 0.94;
+        d.vy *= 0.94;
+        d.x += d.vx;
+        d.y += d.vy;
+
+        const ellDist = (d.x * d.x) / ((BROTH_RADIUS_X - 35) ** 2) + (d.y * d.y) / ((BROTH_RADIUS_Y - 35) ** 2);
+        if (ellDist > 1.0) {
+          d.vx -= (d.x / BROTH_RADIUS_X) * 0.22;
+          d.vy -= (d.y / BROTH_RADIUS_Y) * 0.22;
+        }
+
+        const curR = d.baseR + Math.sin(animTime * 2 + d.phase) * 0.5;
+
+        ctx.save();
+        ctx.translate(d.x, d.y);
+
+        ctx.fillStyle = d.isChili ? 'rgba(110, 15, 5, 0.65)' : 'rgba(140, 85, 15, 0.55)';
+        ctx.beginPath();
+        ctx.arc(0, 0, curR + 1.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        const oilGrad = ctx.createRadialGradient(-curR * 0.3, -curR * 0.3, curR * 0.1, 0, 0, curR);
+        if (d.isChili) {
+          oilGrad.addColorStop(0, 'rgba(255, 125, 45, 0.95)');
+          oilGrad.addColorStop(0.5, 'rgba(225, 45, 15, 0.88)');
+          oilGrad.addColorStop(1, 'rgba(145, 15, 5, 0.75)');
+        } else {
+          oilGrad.addColorStop(0, 'rgba(255, 238, 145, 0.95)');
+          oilGrad.addColorStop(0.5, 'rgba(242, 180, 45, 0.88)');
+          oilGrad.addColorStop(1, 'rgba(175, 105, 15, 0.75)');
+        }
+        ctx.fillStyle = oilGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, curR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.beginPath();
+        ctx.arc(-curR * 0.35, -curR * 0.35, Math.max(1, curR * 0.25), 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // H. Seasoned Menma (Bamboo Shoots - Bottom Center)
+      ctx.save();
+      ctx.translate(15, BROTH_RADIUS_Y * 0.45);
+      ctx.rotate(-0.1);
+      ctx.drawImage(offscreenCache.menma, -100, -75);
+      ctx.restore();
+
+      // I. Braised Lotus Root Slices (Renkon - Lower Left)
+      ctx.save();
+      ctx.translate(-145, 95);
+      ctx.rotate(-0.3);
+      ctx.drawImage(offscreenCache.lotus, -100, -100);
+
+      ctx.translate(75, 20);
+      ctx.rotate(0.5);
+      ctx.scale(0.85, 0.85);
+      ctx.drawImage(offscreenCache.lotus, -100, -100);
+      ctx.restore();
+
+      // J. Charred Baby Bok Choy (Upper-Right Arc)
+      ctx.save();
+      ctx.translate(95, -60);
+      ctx.rotate(0.38);
+      ctx.drawImage(offscreenCache.bokchoy, -190, -140);
+      ctx.restore();
+
+      // K. Glazed King Oyster Mushroom "Chashu" Medallions (Left Side)
+      ctx.save();
+      ctx.save();
+      ctx.translate(-125, 20);
+      ctx.rotate(-0.25);
+      ctx.drawImage(offscreenCache.chashu, -140, -140);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(-155, -55);
+      ctx.rotate(0.15);
+      ctx.drawImage(offscreenCache.chashu, -140, -140);
+      ctx.restore();
+      ctx.restore();
+
+      // L. Plump Braised Shiitake Mushrooms (Upper Left)
+      ctx.save();
+      ctx.translate(-55, -110);
+      ctx.rotate(-0.1);
+      ctx.drawImage(offscreenCache.shiitake, -120, -120);
+
+      ctx.translate(75, -25);
+      ctx.rotate(0.42);
+      ctx.scale(0.88, 0.88);
+      ctx.drawImage(offscreenCache.shiitake, -120, -120);
+      ctx.restore();
+
+      // M. Sweet Corn Mound (Right Side)
+      ctx.save();
+      ctx.translate(125, 55);
+      ctx.drawImage(offscreenCache.corn, -110, -95);
+      ctx.restore();
+
+      // N. Vivid Negi (Scallions) & Ito Togarashi (Center Mound)
+      ctx.save();
+      ctx.translate(-5, 0);
+      ctx.drawImage(offscreenCache.negi, -130, -130);
+      ctx.restore();
+
+      // O. Interactive Surface Waves / Ripples
+      for (let rIdx = ripples.length - 1; rIdx >= 0; rIdx--) {
+        const rp = ripples[rIdx];
+        rp.radius += rp.speed;
+        rp.opacity -= 0.013;
+
+        if (rp.opacity <= 0 || rp.radius >= rp.maxRadius) {
+          ripples.splice(rIdx, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(rp.x, rp.y, rp.radius, rp.radius * 0.75, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(255, 242, 205, ${rp.opacity * 0.5})`;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.ellipse(rp.x, rp.y, Math.max(1, rp.radius - 8), Math.max(1, (rp.radius - 8) * 0.75), 0, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(80, 30, 5, ${rp.opacity * 0.38})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // P. Dynamic Broth Surface Specular Caustic Glint (Follows Light/Mouse)
+      const specX = normMouseX * 75;
+      const specY = -45 + normMouseY * 45;
+      const brothSpecGrad = ctx.createRadialGradient(specX, specY, 10, specX, specY, 190);
+      brothSpecGrad.addColorStop(0, 'rgba(255, 245, 215, 0.38)');
+      brothSpecGrad.addColorStop(0.3, 'rgba(255, 195, 115, 0.16)');
+      brothSpecGrad.addColorStop(1, 'rgba(255, 185, 85, 0)');
+      ctx.fillStyle = brothSpecGrad;
+      ctx.fill();
+
+      ctx.restore(); // end broth clipping
+
+      ctx.restore(); // end hero dish 3D transform
+
+      // 3. MULTI-LAYER VOLUMETRIC STEAM SIMULATION (Renders in World Space above the bowl)
+      ctx.save();
+      const cursorRelX = (mouse.x - centerX) / baseScale;
+      const cursorRelY = (mouse.y - centerY) / baseScale;
+
+      ctx.translate(centerX, centerY);
+      ctx.scale(baseScale, baseScale);
+
+      for (let i = 0; i < steamParticles.length; i++) {
+        const p = steamParticles[i];
+        p.update(animTime, cursorRelX, cursorRelY, mouse.speed);
+
+        if (p.opacity <= 0.004) continue;
+
+        ctx.save();
+        const steamParallaxX = normMouseX * 24 * p.z;
+        const steamParallaxY = normMouseY * 18 * p.z;
+        ctx.translate(p.x + steamParallaxX, p.y + steamParallaxY);
+        ctx.rotate(p.rotation);
+
+        const sGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.currentSize);
+        const heightFactor = Math.max(0, Math.min(1, (p.y + 220) / 320));
+        const rVal = Math.floor(250 + 5 * heightFactor);
+        const gVal = Math.floor(225 + 20 * heightFactor);
+        const bVal = Math.floor(195 + 50 * heightFactor);
+
+        sGrad.addColorStop(0, `rgba(${rVal}, ${gVal}, ${bVal}, ${p.opacity})`);
+        sGrad.addColorStop(0.4, `rgba(${rVal}, ${gVal}, ${bVal}, ${p.opacity * 0.65})`);
+        sGrad.addColorStop(0.75, `rgba(${rVal}, ${gVal}, ${bVal}, ${p.opacity * 0.2})`);
+        sGrad.addColorStop(1, `rgba(${rVal}, ${gVal}, ${bVal}, 0)`);
+
+        ctx.fillStyle = sGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, p.currentSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // 4. FLOATING DUST MOTES IN WARM LIGHT CONE
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.scale(baseScale, baseScale);
+
+      for (const d of dustMotes) {
+        if (!prefersReducedMotion) {
+          d.x += d.vx + Math.sin(animTime + d.seed) * 0.15;
+          d.y += d.vy;
+          if (d.y < -380) d.y = 280;
+          if (d.x < -400) d.x = 400;
+          if (d.x > 400) d.x = -400;
+        }
+
+        const distFromCenter = Math.sqrt(d.x * d.x + (d.y + 90) * (d.y + 90));
+        const coneAlpha = Math.max(0, 1 - distFromCenter / 380) * d.opacity * lightPulse;
+
+        if (coneAlpha > 0.02) {
+          ctx.fillStyle = `rgba(255, 218, 145, ${coneAlpha})`;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    // Start Animation Loop
+    requestAnimationFrame(render);
+
+  })();
+  </script>
+</body>
+</html>
