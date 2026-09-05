@@ -8,7 +8,7 @@
   },
   "model": {
     "slug": "gpt-6-astra",
-    "displayName": "GPT-6-Astra",
+    "displayName": "GPT 6 Astra",
     "providerModelId": "gpt-6-astra"
   },
   "variation": {
@@ -20,50 +20,73 @@
   "harness": {
     "name": "Codex CLI",
     "version": "0.153.2",
-    "runtime": "OpenAI Codex",
-    "invocation": "CODEX_HOME=~/.codex-personal codex exec --model gpt-6-astra --config model_reasoning_effort=max PROMPT.md"
+    "runtime": "OpenAI Codex CLI",
+    "invocation": "Codex CLI session using gpt-6-astra; reasoning effort max"
   },
   "artifacts": {
     "result": "index.html",
     "transcript": "transcript.json"
   },
   "timing": {
-    "startedAt": "2026-09-04T22:39:46Z",
-    "completedAt": "2026-09-04T22:39:46Z",
-    "wallDurationMs": 0,
-    "apiDurationMs": 0
+    "startedAt": "2026-09-04T21:47:30.836Z",
+    "completedAt": "2026-09-04T22:43:37.397Z",
+    "wallDurationMs": 3366561
   },
   "usage": {
     "tokens": {
-      "input": 0,
-      "cachedInput": 0,
+      "input": 796481,
+      "cachedInput": 724096,
       "cacheCreationInput": 0,
-      "reasoning": 0,
-      "output": 0,
-      "total": 0
+      "reasoning": 8235,
+      "output": 29503,
+      "total": 825984
     },
     "cost": {
       "currency": "USD",
-      "input": 0,
-      "cachedInput": 0,
-      "cacheCreationInput": 0,
-      "output": 0,
-      "other": 0,
-      "total": 0,
+      "input": 0.72385,
+      "cachedInput": 0.724096,
+      "cacheCreationInput": 0.0,
+      "output": 1.47515,
+      "total": 2.923096,
       "estimated": true
     },
-    "requests": 0,
-    "turns": 0,
-    "toolCalls": 0,
-    "providerReported": false
+    "requests": 20,
+    "turns": 1,
+    "toolCalls": 19,
+    "providerReported": true,
+    "raw": {
+      "source": "Codex final cumulative thread_token_usage",
+      "codexThreadTokenUsage": {
+        "input_tokens": 796481,
+        "cached_input_tokens": 724096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 29503,
+        "reasoning_output_tokens": 8235,
+        "total_tokens": 825984
+      },
+      "pricing": {
+        "library": "litellm",
+        "version": "1.83.7",
+        "modelKey": "gpt-6-astra",
+        "ratesUsdPerToken": {
+          "input": 1e-05,
+          "cachedInput": 1e-06,
+          "cacheCreationInput": 1.25e-05,
+          "output": 5e-05
+        }
+      },
+      "costCalculation": {
+        "uncachedInputTokens": 72385,
+        "cachedInputIsSubsetOfInput": true
+      }
+    }
   },
   "resultStats": {
-    "bytes": 318191,
-    "lines": 1788
+    "bytes": 318367,
+    "lines": 1794
   },
   "provenance": {
-    "generatedAt": "2026-09-04T22:39:46Z",
-    "sourceCommit": "ba9e47b"
+    "pricingSource": "LiteLLM 1.83.7 model_cost[gpt-6-astra]"
   },
-  "notes": "Usage and timing were not captured by the artifact export; token and cost fields are zero estimates."
+  "notes": "Codex recorded exact cumulative token categories. Cost was calculated from LiteLLM rates; cached input is a subset of Codex's input total. The public transcript omits hidden reasoning, private agent-mail activity, credentials, and private local path prefixes."
 }

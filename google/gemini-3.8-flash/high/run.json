@@ -1,0 +1,91 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "google/gemini-3.8-flash/high",
+  "vendor": {
+    "slug": "google",
+    "displayName": "Google"
+  },
+  "model": {
+    "slug": "gemini-3.8-flash",
+    "displayName": "Gemini 3.8 Flash",
+    "providerModelId": "gemini-3.8-flash"
+  },
+  "variation": {
+    "slug": "high",
+    "displayName": "High",
+    "reasoningEffort": "high",
+    "parameters": {
+      "modelSelection": "Gemini 3.8 Flash (High)"
+    }
+  },
+  "harness": {
+    "name": "Antigravity CLI",
+    "version": "1.1.26",
+    "runtime": "Google Antigravity",
+    "invocation": "agy --dangerously-skip-permissions (interactive model selection)"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-05T01:20:07.123Z",
+    "completedAt": "2026-09-05T01:42:24.421Z",
+    "wallDurationMs": 1337298,
+    "apiDurationMs": 1097226
+  },
+  "usage": {
+    "tokens": {
+      "input": 833770,
+      "cachedInput": 5927643,
+      "cacheCreationInput": 0,
+      "reasoning": 46847,
+      "output": 218709,
+      "total": 6980122
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0.6253275,
+      "cachedInput": 0.444573225,
+      "cacheCreationInput": 0,
+      "output": 0.82015875,
+      "other": 0,
+      "total": 1.890059475,
+      "estimated": true
+    },
+    "requests": 73,
+    "turns": 1,
+    "toolCalls": 68,
+    "providerReported": true,
+    "raw": {
+      "antigravityModelUsageStats": {
+        "inputTokens": 833770,
+        "outputTokens": 218709,
+        "cacheReadTokens": 5927643,
+        "thinkingOutputTokens": 46847,
+        "responseOutputTokens": 171862,
+        "toolCallOutputTokens": 0
+      },
+      "pricing": {
+        "catalog": "LiteLLM",
+        "catalogVersion": "1.83.7",
+        "modelKey": "vertex_ai/gemini-3.8-flash",
+        "inputCostPerToken": 7.5e-07,
+        "cacheReadInputCostPerToken": 7.5e-08,
+        "outputCostPerToken": 3.75e-06,
+        "source": "https://cloud.google.com/vertex-ai/generative-ai/pricing",
+        "endpointRegion": "global"
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 55498,
+    "lines": 1599
+  },
+  "provenance": {
+    "generatedAt": "2026-09-05T01:42:24.421Z",
+    "pricingSource": "LiteLLM 1.83.7 vertex_ai/gemini-3.8-flash rate catalog"
+  },
+  "notes": "Tokens are exact provider usage reconstructed from Antigravity CLI 1.1.26 assistant/checkpoint step protobuf metadata. inputTokens excludes separately reported cacheReadTokens; outputTokens includes thinkingOutputTokens and responseOutputTokens. API duration sums recorded model request intervals. USD cost is estimated from the retained LiteLLM Vertex AI global-endpoint rates; Antigravity did not record provider cost. The public transcript retains complete recorded visible messages and tool inputs/outputs, including generated source. Only hidden planner thinking and system checkpoint bodies are omitted; secret-like values, personal identifiers, and private paths are replaced with neutral placeholders."
+}

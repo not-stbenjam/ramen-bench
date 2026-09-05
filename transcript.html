@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A lazy-loaded Ramen Bench session transcript.">
+    <meta name="theme-color" content="#120e0b">
+    <title>Session transcript · Ramen Bench</title>
+    <link rel="stylesheet" href="styles.css?v=20260904-release">
+    <link rel="stylesheet" href="transcript.css?v=20260904-release">
+    <script src="transcript.js?v=20260904-release" defer></script>
+  </head>
+  <body class="transcript-page">
+    <header class="transcript-page-header">
+      <a class="transcript-back" id="back-link" href="./">← Back to Ramen Bench</a>
+      <div>
+        <span class="modal-kicker">Run record</span>
+        <h1 id="transcript-title">Session transcript</h1>
+        <p id="transcript-subtitle">Loading run metadata…</p>
+      </div>
+      <div class="transcript-links" id="artifact-links" hidden></div>
+    </header>
+
+    <main class="transcript-shell">
+      <p class="transcript-status" id="transcript-status">Loading session transcript…</p>
+      <section id="run-summary" hidden></section>
+      <section class="transcript" id="transcript-events" hidden>
+        <div class="transcript-header">
+          <h2>Session events</h2>
+          <span id="event-count"></span>
+        </div>
+        <div id="event-list"></div>
+        <button class="load-more" id="load-more" type="button" hidden>Load more events</button>
+      </section>
+    </main>
+  </body>
+</html>

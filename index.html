@@ -9,9 +9,9 @@
     >
     <meta name="theme-color" content="#120e0b">
     <title>Ramen Bench</title>
-    <link rel="stylesheet" href="styles.css?v=20260904">
-    <script src="site.config.js" defer></script>
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260904-release">
+    <script src="site.config.js?v=20260904-release" defer></script>
+    <script src="app.js?v=20260904-release" defer></script>
   </head>
   <body>
     <button class="mobile-menu" id="mobile-menu" type="button" aria-controls="sidebar" aria-expanded="false">
@@ -23,7 +23,7 @@
     <button class="sidebar-scrim" id="sidebar-scrim" type="button" tabindex="-1" aria-label="Close model menu"></button>
 
     <aside class="sidebar" id="sidebar" aria-label="Benchmark controls">
-      <a class="brand" href="#" aria-label="Ramen Bench home">
+      <a class="brand" id="brand-home" href="#" aria-label="Show the first benchmark result">
         <span class="brand-mark" aria-hidden="true">
           <span class="steam steam-one"></span>
           <span class="steam steam-two"></span>
@@ -148,17 +148,6 @@
         <button class="modal-close" type="button" aria-label="Close leaderboard">×</button>
       </div>
       <div class="modal-body leaderboard" id="leaderboard"></div>
-    </dialog>
-
-    <dialog class="modal transcript-modal" id="transcript-dialog">
-      <div class="modal-header">
-        <div>
-          <span class="modal-kicker">Run record</span>
-          <h2 id="transcript-title">Session transcript</h2>
-        </div>
-        <button class="modal-close" type="button" aria-label="Close transcript">×</button>
-      </div>
-      <div class="modal-body transcript-body" id="transcript-body"></div>
     </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

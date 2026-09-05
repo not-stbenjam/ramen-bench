@@ -39,7 +39,22 @@ Example registry item:
 "openai/gpt-5.6-sol/high/run.json"
 ```
 
-`run.json` keeps an itemized token and cost breakdown, wall/API timing, harness provenance, and artifact paths. `transcript.json` stores normalized messages and tool activity for the built-in session viewer; it must be scrubbed of secrets and must not contain hidden chain-of-thought.
+`run.json` keeps an itemized token and cost breakdown, wall/API timing, harness provenance, and artifact paths. `transcript.json` stores normalized messages and tool activity for the built-in session viewer. It preserves reasoning the model intentionally shared as an ordinary message, while excluding hidden reasoning fields, encrypted payloads, and secrets.
+
+## Import session records
+
+Install the pinned importer dependencies with `python3 -m pip install -r requirements-backfill.txt`. Each harness has its own repeatable entry point:
+
+```sh
+python3 scripts/import_claude_code.py
+python3 scripts/import_codex.py
+python3 scripts/import_antigravity.py
+python3 scripts/import_muse.py <redacted-export-directory>
+```
+
+The importers recover recorded transcripts, timing, and token usage from the corresponding local harness stores. Provider-recorded costs take precedence; otherwise the scripts use the pinned LiteLLM catalog when the recorded token categories are sufficient for a calculation.
+
+Every entry point finishes by running `scripts/censor_transcripts.py`. This shared pass redacts personal paths, usernames, email and LAN addresses, and secret-like values, and replaces encrypted strings and large embedded media/base64 payloads with factual encoding-and-size markers. It leaves ordinary recorded messages, source code, and tool activity intact. Run `python3 scripts/censor_transcripts.py` by itself for a read-only audit, or add `--write` to normalize existing transcript JSON. Run `python3 scripts/validate_registry.py` to check the complete public registry, schemas, artifact paths, transcript provenance, and censoring state.
 
 ## Shared ratings API
 

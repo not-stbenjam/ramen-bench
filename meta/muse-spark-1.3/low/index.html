@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vegan Ramen</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #070605;
+  }
+  body { position: fixed; inset: 0; }
+  canvas#scene {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100dvh;
+    display: block;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    canvas#scene { cursor: default; }
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<script>
+(function () {
+  "use strict";
+  var canvas = document.getElementById("scene");
+  var ctx = canvas.getContext("2d");
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var DPR = 1, W = 0, H = 0, CX = 0, CY = 0, S = 1;
+  var mouse = { x: 0.5, y: 0.45, tx: 0.5, ty: 0.45, vx: 0, vy: 0, px: 0.5, active: false };
+  var time = 0;
+  var glowFlicker = 0, glowTarget = 0;
+  var ripples = [];
+  var bubbles = [];
+  var motes = [];
+  var steamPuffs = [];
+  var sesame = [];
+  var oilDrops = [];
+  var seed = 7;
+  function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  function resetSeeds() {
+    seed = 1234567;
+    sesame = []; oilDrops = []; motes = []; bubbles = []; steamPuffs = [];
+    var i;
+    for (i = 0; i < 46; i++) sesame.push({ a: rnd() * Math.PI * 2, r: 0.52 + rnd() * 0.42, s: 0.5 + rnd() * 0.9, w: rnd() * Math.PI });
+    for (i = 0; i < 9; i++) oilDrops.push({ a: rnd() * Math.PI * 2, r: 0.25 + rnd() * 0.6, s: 5 + rnd() * 11 });
+    for (i = 0; i < 70; i++) motes.push({ x: rnd(), y: rnd(), r: 0.4 + rnd() * 1.6, p: rnd() * Math.PI * 2, sp: 0.2 + rnd() * 0.8 });
+    for (i = 0; i < 26; i++) bubbles.push({ a: rnd() * Math.PI * 2, r: 0.15 + rnd() * 0.8, s: 0.3 + rnd() * 1, o: rnd() * Math.PI * 2 });
+    for (i = 0; i < 34; i++) steamPuffs.push(newPuff(true));
+  }
+  function newPuff(anyY) {
+    return {
+      x: (rnd() - 0.5) * 0.5,
+      y: anyY ? rnd() : 0,
+      r: 18 + rnd() * 42,
+      life: anyY ? rnd() : 0,
+      max: 5 + rnd() * 4,
+      drift: (rnd() - 0.5) * 0.4,
+      wob: rnd() * Math.PI * 2,
+      wobSp: 0.6 + rnd() * 1.4
+    };
+  }
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(1, Math.floor(window.innerWidth * DPR));
+    H = Math.max(1, Math.floor(window.innerHeight * DPR));
+    canvas.width = W; canvas.height = H;
+    CX = W / 2; CY = H * 0.56;
+    S = Math.min(W, H) / 620;
+    if (S < 0.4) S = 0.4;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+  resetSeeds();
+
+  function onMove(cx, cy) {
+    var nx = cx / Math.max(1, window.innerWidth);
+    var ny = cy / Math.max(1, window.innerHeight);
+    nx = Math.min(1, Math.max(0, nx)); ny = Math.min(1, Math.max(0, ny));
+    mouse.vx = nx - mouse.tx; mouse.vy = ny - mouse.ty;
+    mouse.tx = nx; mouse.ty = ny; mouse.active = true;
+    glowTarget = Math.min(1, Math.abs(mouse.vx) * 30 + Math.abs(mouse.vy) * 30);
+    if (!reduceMotion && ripples.length < 6 && Math.hypot(mouse.vx, mouse.vy) > 0.004) {
+      ripples.push({ r: 10 * S, alpha: 0.35 });
+    }
+  }
+  window.addEventListener("pointermove", function (e) { onMove(e.clientX, e.clientY); }, { passive: true });
+  window.addEventListener("pointerdown", function (e) {
+    onMove(e.clientX, e.clientY);
+    if (!reduceMotion) { ripples.push({ r: 6 * S, alpha: 0.6 }); ripples.push({ r: 2 * S, alpha: 0.4 }); }
+  }, { passive: true });
+  window.addEventListener("touchmove", function (e) {
+    if (e.touches.length) onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  function bg() {
+    var g = ctx.createRadialGradient(CX, CY - 120 * S, 40 * S, CX, CY - 60 * S, Math.max(W, H) * 0.85);
+    g.addColorStop(0, "#241610");
+    g.addColorStop(0.28, "#150e0a");
+    g.addColorStop(0.6, "#0a0806");
+    g.addColorStop(1, "#040303");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    // distant warm halo behind bowl
+    var haloX = CX + (mouse.x - 0.5) * 40 * S;
+    var haloY = CY - 150 * S + (mouse.y - 0.5) * 24 * S;
+    var haloR = 300 * S * (1 + glowFlicker * 0.06);
+    var hg = ctx.createRadialGradient(haloX, haloY, 10, haloX, haloY, haloR);
+    hg.addColorStop(0, "rgba(255,138,54," + (0.20 + glowFlicker * 0.05) + ")");
+    hg.addColorStop(0.5, "rgba(150,60,20,0.08)");
+    hg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = hg;
+    ctx.fillRect(0, 0, W, H);
+    // table
+    var tg = ctx.createLinearGradient(0, CY, 0, H);
+    tg.addColorStop(0, "#100b08");
+    tg.addColorStop(0.25, "#17100b");
+    tg.addColorStop(1, "#050403");
+    ctx.fillStyle = tg;
+    ctx.fillRect(0, CY + 60 * S, W, H - CY);
+    // table sheen under bowl
+    var sh = ctx.createRadialGradient(CX, CY + 170 * S, 10, CX, CY + 170 * S, 340 * S);
+    sh.addColorStop(0, "rgba(255,150,70,0.10)");
+    sh.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = sh;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function ellipse(x, y, rx, ry, fill) {
+    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = fill; ctx.fill();
+  }
+
+  function bowl(px, py) {
+    var bx = CX + px * 26 * S, by = CY + py * 16 * S;
+    // shadow
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ellipse(bx, by + 168 * S, 218 * S, 34 * S, "#000");
+    ctx.restore();
+    ctx.save();
+    ctx.filter = "blur(" + (18 * S) + "px)";
+    ellipse(bx, by + 165 * S, 200 * S, 28 * S, "rgba(0,0,0,0.8)");
+    ctx.restore();
+    // chopsticks (behind, right side)
+    ctx.save();
+    ctx.translate(bx + 200 * S, by - 60 * S);
+    ctx.rotate(-0.5 + px * 0.03);
+    ctx.fillStyle = "#5a3a22";
+    roundRect(-160 * S, -8 * S, 340 * S, 9 * S, 4 * S); ctx.fill();
+    ctx.fillStyle = "#8a5c34";
+    roundRect(-160 * S, -8 * S, 340 * S, 3.5 * S, 3 * S); ctx.fill();
+    ctx.translate(14 * S, 16 * S); ctx.rotate(0.045);
+    ctx.fillStyle = "#4e3320";
+    roundRect(-160 * S, -8 * S, 340 * S, 9 * S, 4 * S); ctx.fill();
+    ctx.restore();
+    // bowl body
+    var bodyG = ctx.createLinearGradient(0, by - 40 * S, 0, by + 170 * S);
+    bodyG.addColorStop(0, "#2b2f36");
+    bodyG.addColorStop(0.18, "#1a1e24");
+    bodyG.addColorStop(0.75, "#0c0e12");
+    bodyG.addColorStop(1, "#050607");
+    ctx.beginPath();
+    ctx.ellipse(bx, by, 210 * S, 118 * S, 0, 0.08, Math.PI - 0.08);
+    ctx.ellipse(bx, by + 96 * S, 128 * S, 30 * S, 0, 0, Math.PI, true);
+    ctx.closePath();
+    ctx.fillStyle = bodyG; ctx.fill();
+    // rim light left (mouse-reactive)
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(bx, by, 210 * S, 118 * S, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,170,100," + (0.22 + mouse.x * 0.12) + ")";
+    ctx.lineWidth = 3 * S; ctx.stroke();
+    ctx.restore();
+    // rim highlight arc following mouse
+    ctx.save();
+    ctx.beginPath();
+    var a0 = Math.PI * 1.05 + (mouse.x - 0.5) * 0.5;
+    ctx.ellipse(bx, by, 206 * S, 114 * S, 0, a0, a0 + 1.1);
+    ctx.strokeStyle = "rgba(255,200,150,0.35)";
+    ctx.lineWidth = 2.5 * S; ctx.lineCap = "round"; ctx.stroke();
+    ctx.restore();
+    // broth
+    var brothG = ctx.createRadialGradient(bx - 40 * S, by - 18 * S, 20 * S, bx, by, 200 * S);
+    brothG.addColorStop(0, "#e8933c");
+    brothG.addColorStop(0.35, "#c96a22");
+    brothG.addColorStop(0.7, "#7c3a12");
+    brothG.addColorStop(1, "#3d1e0c");
+    ctx.beginPath(); ctx.ellipse(bx, by, 188 * S, 100 * S, 0, 0, Math.PI * 2);
+    ctx.fillStyle = brothG; ctx.fill();
+    // simmer shimmer
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(bx, by, 188 * S, 100 * S, 0, 0, Math.PI * 2); ctx.clip();
+    var shimmerX = (mouse.x - 0.5) * 120 * S;
+    var sg = ctx.createLinearGradient(bx - 190 * S + shimmerX, 0, bx + 190 * S + shimmerX, 0);
+    sg.addColorStop(0.32, "rgba(255,220,170,0)");
+    sg.addColorStop(0.5, "rgba(255,220,170," + (0.20 + glowFlicker * 0.04) + ")");
+    sg.addColorStop(0.68, "rgba(255,220,170,0)");
+    ctx.fillStyle = sg;
+    ctx.fillRect(bx - 190 * S, by - 100 * S, 380 * S, 200 * S);
+    // chili oil drops
+    var i, d, ox, oy;
+    for (i = 0; i < oilDrops.length; i++) {
+      d = oilDrops[i];
+      var wob = reduceMotion ? 0 : Math.sin(time * 0.8 + i * 2.1) * 3 * S;
+      ox = bx + Math.cos(d.a) * d.r * 165 * S + wob;
+      oy = by + Math.sin(d.a) * d.r * 86 * S;
+      var og = ctx.createRadialGradient(ox - 2 * S, oy - 2 * S, 0.5 * S, ox, oy, d.s * S);
+      og.addColorStop(0, "rgba(255,120,40,0.85)");
+      og.addColorStop(1, "rgba(140,30,5,0.55)");
+      ctx.beginPath(); ctx.arc(ox, oy, d.s * S, 0, Math.PI * 2);
+      ctx.fillStyle = og; ctx.fill();
+    }
+    // noodles: swirling strands
+    ctx.lineCap = "round";
+    for (i = 0; i < 11; i++) {
+      (function (k) {
+        var drift = reduceMotion ? 0 : Math.sin(time * 1.1 + k * 1.7) * 4 * S;
+        var lift = reduceMotion ? 0 : Math.cos(time * 0.9 + k * 2.3) * 3 * S;
+        ctx.beginPath();
+        var yBase = by - 30 * S + (k - 5) * 11 * S + lift;
+        ctx.moveTo(bx - 150 * S + (k % 3) * 12 * S, yBase);
+        ctx.bezierCurveTo(bx - 70 * S, yBase - 26 * S + drift, bx + 30 * S, yBase + 24 * S - drift, bx + 145 * S - (k % 4) * 10 * S, yBase - 6 * S);
+        ctx.strokeStyle = k % 2 ? "#f2c063" : "#e8a94b";
+        ctx.lineWidth = (5.5 - (k % 3)) * S;
+        ctx.globalAlpha = 0.9;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      })(i);
+    }
+    toppings(bx, by);
+    // bubbles
+    var b;
+    for (i = 0; i < bubbles.length; i++) {
+      b = bubbles[i];
+      var ba = b.a + (reduceMotion ? 0 : time * 0.05 * b.s);
+      var brad = 0.2 + 0.5 * (0.5 + 0.5 * Math.sin(time * b.s + b.o));
+      var bubX = bx + Math.cos(ba) * b.r * 150 * S;
+      var bubY = by + Math.sin(ba) * b.r * 78 * S;
+      ctx.beginPath(); ctx.arc(bubX, bubY, Math.max(0.6, brad * 3 * S), 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,210,150,0.35)"; ctx.fill();
+    }
+    // ripples from interaction
+    var rp;
+    for (i = ripples.length - 1; i >= 0; i--) {
+      rp = ripples[i];
+      ctx.beginPath(); ctx.ellipse(bx, by, rp.r, rp.r * 0.53, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255,230,190," + rp.alpha.toFixed(3) + ")";
+      ctx.lineWidth = 2 * S; ctx.stroke();
+    }
+    // sesame
+    for (i = 0; i < sesame.length; i++) {
+      var sm = sesame[i];
+      var sa = sm.a + (reduceMotion ? 0 : Math.sin(time * 0.5 + i) * 0.01);
+      var sx = bx + Math.cos(sa) * sm.r * 150 * S;
+      var sy = by + Math.sin(sa) * sm.r * 80 * S;
+      ctx.save(); ctx.translate(sx, sy); ctx.rotate(sm.w + sa);
+      ctx.fillStyle = "rgba(255,240,210,0.85)";
+      ctx.fillRect(-2.2 * S * sm.s, -0.9 * S * sm.s, 4.4 * S * sm.s, 1.8 * S * sm.s);
+      ctx.restore();
+    }
+    ctx.restore();
+    // inner shadow of rim over broth
+    ctx.beginPath(); ctx.ellipse(bx, by, 190 * S, 102 * S, 0, Math.PI * 1.02, Math.PI * 1.98);
+    ctx.strokeStyle = "rgba(0,0,0,0.5)"; ctx.lineWidth = 7 * S; ctx.stroke();
+  }
+
+  function leaf(x, y, len, wid, ang, c1, c2) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+    var g = ctx.createLinearGradient(0, 0, len, 0);
+    g.addColorStop(0, c1); g.addColorStop(1, c2);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(len * 0.5, -wid, len, 0);
+    ctx.quadraticCurveTo(len * 0.5, wid, 0, 0);
+    ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = "rgba(20,60,20,0.5)"; ctx.lineWidth = 1 * S;
+    ctx.beginPath(); ctx.moveTo(2 * S, 0); ctx.lineTo((len - 2 * S), 0); ctx.stroke();
+    ctx.restore();
+  }
+
+  function toppings(bx, by) {
+    var sway = reduceMotion ? 0 : Math.sin(time * 1.3) * 2 * S;
+    // nori sheet (left)
+    ctx.save();
+    ctx.translate(bx - 118 * S, by - 52 * S + sway * 0.4);
+    ctx.rotate(-0.12);
+    var ng = ctx.createLinearGradient(0, -50 * S, 0, 30 * S);
+    ng.addColorStop(0, "#12241a"); ng.addColorStop(1, "#0a1410");
+    ctx.fillStyle = ng;
+    ctx.fillRect(-34 * S, -52 * S, 68 * S, 96 * S);
+    ctx.strokeStyle = "rgba(120,200,140,0.12)"; ctx.lineWidth = 1.5 * S;
+    var k; for (k = 1; k < 5; k++) { ctx.beginPath(); ctx.moveTo(-34 * S + k * 13 * S, -52 * S); ctx.lineTo(-34 * S + k * 13 * S, 44 * S); ctx.stroke(); }
+    ctx.restore();
+    // bok choy leaves (right-center)
+    leaf(bx + 30 * S, by - 46 * S + sway, 74 * S, 17 * S, -0.28, "#3f7d2e", "#1d4a1e");
+    leaf(bx + 44 * S, by - 30 * S - sway, 66 * S, 15 * S, -0.1, "#4c8f36", "#245722");
+    leaf(bx + 18 * S, by - 28 * S - sway * 0.5, 60 * S, 14 * S, -0.5, "#57a03e", "#2a6326");
+    // mushrooms (left-center)
+    var caps = [[-52, -38, 30], [-18, -52, 26], [-78, -18, 24]];
+    for (var i = 0; i < caps.length; i++) {
+      (function (c, j) {
+        var mx = bx + c[0] * S + (reduceMotion ? 0 : Math.sin(time + j * 2) * 1.5 * S);
+        var my = by + c[1] * S;
+        var mr = c[2] * S;
+        ctx.beginPath(); ctx.ellipse(mx, my, mr, mr * 0.72, -0.2, Math.PI, 0);
+        var mg = ctx.createLinearGradient(0, my - mr, 0, my + mr * 0.5);
+        mg.addColorStop(0, "#e8d9c2"); mg.addColorStop(0.6, "#b99a76"); mg.addColorStop(1, "#6e5138");
+        ctx.fillStyle = mg; ctx.fill();
+        ctx.fillStyle = "rgba(90,60,40,0.6)";
+        ctx.fillRect(mx - 5 * S, my - 2 * S, 10 * S, 14 * S);
+      })(caps[i], i);
+    }
+    // tofu cubes
+    var tofu = [[58, 8, 0.2], [92, -12, -0.15], [30, 26, 0.35]];
+    for (var t = 0; t < tofu.length; t++) {
+      (function (q) {
+        var tx = bx + q[0] * S, ty = by + q[1] * S;
+        ctx.save(); ctx.translate(tx, ty); ctx.rotate(q[2]);
+        var tg2 = ctx.createLinearGradient(0, -14 * S, 0, 14 * S);
+        tg2.addColorStop(0, "#fff6e8"); tg2.addColorStop(1, "#d9c39a");
+        ctx.fillStyle = tg2;
+        ctx.fillRect(-15 * S, -12 * S, 30 * S, 24 * S);
+        ctx.strokeStyle = "rgba(150,110,60,0.55)"; ctx.lineWidth = 1.5 * S;
+        ctx.strokeRect(-15 * S, -12 * S, 30 * S, 24 * S);
+        ctx.restore();
+      })(tofu[t]);
+    }
+    // corn
+    var corn = [[-40, 30], [-24, 36], [-8, 30], [-32, 18], [-12, 16], [4, 22], [-48, 14]];
+    for (var c2 = 0; c2 < corn.length; c2++) {
+      var qx = bx + corn[c2][0] * S, qy = by + corn[c2][1] * S;
+      var cg = ctx.createRadialGradient(qx - 2 * S, qy - 2 * S, 1, qx, qy, 7 * S);
+      cg.addColorStop(0, "#ffe27a"); cg.addColorStop(1, "#d99a1e");
+      ctx.beginPath(); ctx.arc(qx, qy, 6 * S, 0, Math.PI * 2);
+      ctx.fillStyle = cg; ctx.fill();
+    }
+    // scallion rings
+    ctx.lineWidth = 2.6 * S;
+    var rings = [[70, 30], [86, 18], [52, -14], [-64, 32], [10, -48]];
+    for (var r = 0; r < rings.length; r++) {
+      var gx = bx + rings[r][0] * S, gy = by + rings[r][1] * S;
+      ctx.beginPath(); ctx.arc(gx, gy, 6.5 * S, 0, Math.PI * 2);
+      ctx.strokeStyle = "#7ed957"; ctx.stroke();
+      ctx.beginPath(); ctx.arc(gx, gy, 2.6 * S, 0, Math.PI * 2);
+      ctx.fillStyle = "#c9f29b"; ctx.fill();
+    }
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function steamAndMotes(px, py, dt) {
+    var bx = CX + px * 26 * S, by = CY + py * 16 * S;
+    var wind = (mouse.x - 0.5) * 160 * S + mouse.vx * 900 * S;
+    var i, p;
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (i = 0; i < steamPuffs.length; i++) {
+      p = steamPuffs[i];
+      if (!reduceMotion) {
+        p.life += dt;
+        if (p.life >= p.max) { steamPuffs[i] = newPuff(false); p = steamPuffs[i]; }
+      }
+      var t = reduceMotion ? 0.45 : (p.life / p.max);
+      var rise = t * 340 * S;
+      var swayX = Math.sin(p.wob + time * p.wobSp + p.y * 4) * (20 + t * 60) * S;
+      var sx = bx + p.x * 260 * S + swayX + wind * t * t + px * 40 * S * t;
+      var sy = by - 80 * S - rise;
+      var sr = p.r * S * (0.6 + t * 1.6);
+      var alpha = (reduceMotion ? 0.10 : 0.16 * Math.sin(Math.PI * Math.min(1, t)) + 0.02);
+      var g = ctx.createRadialGradient(sx, sy, 1, sx, sy, sr);
+      g.addColorStop(0, "rgba(255,235,215," + alpha.toFixed(3) + ")");
+      g.addColorStop(1, "rgba(255,235,215,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    // ambient dust motes in warm light
+    ctx.save();
+    for (i = 0; i < motes.length; i++) {
+      var m = motes[i];
+      var mx, my;
+      if (reduceMotion) { mx = m.x * W; my = m.y * H; }
+      else {
+        m.p += dt * m.sp * 0.4;
+        mx = (m.x + Math.sin(m.p) * 0.01 + (mouse.x - 0.5) * 0.03) * W;
+        my = ((m.y - time * 0.008 * m.sp) % 1 + 1) % 1 * H;
+      }
+      var tw = reduceMotion ? 0.5 : (0.25 + 0.35 * (0.5 + 0.5 * Math.sin(time * 2 + m.p * 5)));
+      ctx.beginPath(); ctx.arc(mx, my, m.r * DPR, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,190,130," + tw.toFixed(3) + ")";
+      ctx.fill();
+    }
+    ctx.restore();
+    // vignette
+    var v = ctx.createRadialGradient(CX, H * 0.5, Math.min(W, H) * 0.35, CX, H * 0.5, Math.max(W, H) * 0.75);
+    v.addColorStop(0, "rgba(0,0,0,0)");
+    v.addColorStop(1, "rgba(0,0,0,0.62)");
+    ctx.fillStyle = v;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  var last = 0, pxS = 0, pyS = 0;
+  function frame(ts) {
+    var dt = Math.min(0.05, (ts - last) / 1000 || 0.016);
+    last = ts;
+    if (!reduceMotion) time += dt;
+    else time = 1.2;
+    mouse.x += (mouse.tx - mouse.x) * 0.06;
+    mouse.y += (mouse.ty - mouse.y) * 0.06;
+    mouse.vx *= 0.9; mouse.vy *= 0.9;
+    glowFlicker += ((reduceMotion ? 0.3 : (0.5 + 0.5 * Math.sin(time * 7.3) * 0.5 + 0.5 * Math.sin(time * 13.7) * 0.5)) - glowFlicker) * 0.08;
+    var k;
+    for (k = ripples.length - 1; k >= 0; k--) {
+      ripples[k].r += (reduceMotion ? 0 : 90 * S * dt);
+      ripples[k].alpha -= (reduceMotion ? 1 : dt * 0.5);
+      if (ripples[k].alpha <= 0) ripples.splice(k, 1);
+    }
+    pxS += ((mouse.x - 0.5) * 2 - pxS) * 0.05;
+    pyS += ((mouse.y - 0.5) * 2 - pyS) * 0.05;
+    ctx.clearRect(0, 0, W, H);
+    bg();
+    bowl(pxS, pyS);
+    steamAndMotes(pxS, pyS, dt);
+    if (!reduceMotion) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(function (ts) {
+    last = ts;
+    if (reduceMotion) { time = 1.2; frame(ts); }
+    else frame(ts);
+  });
+})();
+</script>
+</body>
+</html>

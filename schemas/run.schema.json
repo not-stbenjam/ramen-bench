@@ -48,7 +48,7 @@
         "displayName": { "type": "string", "minLength": 1 },
         "reasoningEffort": {
           "type": "string",
-          "enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "other"]
+          "enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra", "other"]
         },
         "parameters": {
           "description": "Other model or harness settings that distinguish this run.",
@@ -101,7 +101,13 @@
       "required": ["tokens", "cost"],
       "properties": {
         "tokens": { "$ref": "#/$defs/tokens" },
-        "cost": { "$ref": "#/$defs/cost" },
+        "cost": {
+          "description": "Itemized cost, or null when the recorded token categories are insufficient to calculate it without guessing.",
+          "oneOf": [
+            { "$ref": "#/$defs/cost" },
+            { "type": "null" }
+          ]
+        },
         "requests": { "type": "integer", "minimum": 0 },
         "turns": { "type": "integer", "minimum": 0 },
         "toolCalls": { "type": "integer", "minimum": 0 },

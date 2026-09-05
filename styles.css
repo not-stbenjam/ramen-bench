@@ -341,12 +341,74 @@ select:focus-visible {
 
 .group-label {
   margin: 0;
+  padding: 0;
+}
+
+.vendor-button {
+  width: 100%;
   padding: 8px 16px 5px;
   color: #74695f;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
   font-size: 9px;
   font-weight: 750;
   letter-spacing: 0.12em;
+  text-align: left;
   text-transform: uppercase;
+}
+
+.vendor-button:hover {
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.model-family + .model-family {
+  margin-top: 5px;
+}
+
+.model-family-label {
+  margin: 0;
+  padding: 0;
+}
+
+.model-family-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px 6px 28px;
+  color: var(--text-soft);
+  background: transparent;
+  border: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.model-family-toggle:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.model-family-chevron {
+  display: inline-block;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 140ms ease;
+}
+
+.model-family-toggle[aria-expanded="true"] .model-family-chevron {
+  transform: rotate(90deg);
+}
+
+.model-family .model-button {
+  min-height: 38px;
+  padding-left: 20px;
 }
 
 .model-button {
@@ -426,18 +488,6 @@ select:focus-visible {
   letter-spacing: 0.02em;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.badge {
-  padding: 2px 5px;
-  color: #ffd6ae;
-  background: rgba(217, 112, 42, 0.13);
-  border: 1px solid rgba(232, 139, 68, 0.32);
-  border-radius: 999px;
-  font-size: 8px;
-  font-weight: 750;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 .rating-badge {
@@ -651,10 +701,15 @@ select:focus-visible {
 .frame {
   position: relative;
   height: 100%;
+  display: none;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
   background: var(--bg);
+}
+
+.frame.visible {
+  display: block;
 }
 
 .frame iframe {
@@ -749,16 +804,12 @@ select:focus-visible {
   cursor: pointer;
   font-size: 9px;
   font-weight: 650;
+  text-decoration: none;
 }
 
 .transcript-button:hover {
   color: var(--text);
   border-color: var(--accent);
-}
-
-.transcript-button:disabled {
-  cursor: default;
-  opacity: 0.35;
 }
 
 .transcript-button svg {

@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/leaktk/leaktk.git
+    # LeakTK recommends pinning the pre-commit hook by commit.
+    # v0.3.9: https://github.com/leaktk/leaktk/releases/tag/v0.3.9
+    rev: 34b41197d206e52de6527a74135203ff877a37e4
+    hooks:
+      - id: leaktk.git.pre-commit
+        # Use LeakTK's signed release binary. Building this hook's full Go
+        # module on Linux requires optional Podman/btrfs development headers.
+        language: system
+        exclude: >-
+          (?x)^(?:
+            node_modules/|
+            api/node_modules/|
+            api/\.wrangler/|
+            \.ruff_cache/|
+            \.pytest_cache/|
+            \.mypy_cache/|
+            (?:.*/)?__pycache__/|
+            .*\.py[co]$
+          )

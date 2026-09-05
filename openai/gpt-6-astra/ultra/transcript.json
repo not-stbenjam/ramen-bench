@@ -2,20 +2,639 @@
   "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
   "schemaVersion": 1,
   "runId": "openai/gpt-6-astra/ultra",
-  "sourceFormat": "codex-exec-public-summary",
+  "sessionId": "01a06e64-3cc2-7683-9899-b23ee13ada47",
+  "sourceFormat": "codex-rollout-jsonl",
   "events": [
     {
       "type": "message",
       "role": "user",
       "content": "Create a single-file HTML page (index.html) with all CSS and JavaScript inline and zero external assets. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.",
-      "timestamp": "2026-09-04T22:39:46Z"
+      "timestamp": "2026-09-04T21:47:44.149Z"
     },
     {
       "type": "message",
       "role": "assistant",
-      "content": "Created the requested single-file ramen scene in index.html.",
-      "timestamp": "2026-09-04T22:39:46Z"
+      "content": "I’ll build the scene around a richly detailed ramen bowl, with gentle steam, warm lighting, and subtle mouse response—all contained in one HTML file.",
+      "timestamp": "2026-09-04T21:47:54.171Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_v4a7paaONilTAKBt1GpTjt2n",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"for path in /AGENTS.md <HOME> <HOME>/AGENTS.md <HOME>/git/AGENTS.md <WORKSPACE>/AGENTS.md <WORKSPACE>/openai/AGENTS.md <WORKSPACE>/openai/gpt-6-astra/AGENTS.md <WORKSPACE>/openai/gpt-6-astra/ultra/AGENTS.md; do if [ -f \\\"$path\\\" ]; then printf '\\\\n%s\\\\n' \\\"$path\\\"; cat \\\"$path\\\"; fi; done\\nls -la\",\"max_output_tokens\":5000}));\n",
+      "timestamp": "2026-09-04T21:48:13.591Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_v4a7paaONilTAKBt1GpTjt2n",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"a9f7b5\",\"wall_time_seconds\":0.000004,\"exit_code\":127,\"original_token_count\":8,\"output\":\"zsh:2: command not found: ls\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T21:48:13.661Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_kkfAISfquIj55fwhl3e2yXJ2",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"for task_file in /AGENTS.md <HOME> <HOME>/AGENTS.md <HOME>/git/AGENTS.md <WORKSPACE>/AGENTS.md <WORKSPACE>/openai/AGENTS.md <WORKSPACE>/openai/gpt-6-astra/AGENTS.md <WORKSPACE>/openai/gpt-6-astra/ultra/AGENTS.md; do if [ -f \\\"$task_file\\\" ]; then printf '\\\\n%s\\\\n' \\\"$task_file\\\"; cat \\\"$task_file\\\"; fi; done\\nls -la\\ncommand -v node\\ncommand -v chromium\\ncommand -v google-chrome\",\"max_output_tokens\":4000}));\n",
+      "timestamp": "2026-09-04T21:48:24.265Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_kkfAISfquIj55fwhl3e2yXJ2",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"af7d5f\",\"wall_time_seconds\":0.000004625,\"exit_code\":1,\"original_token_count\":72,\"output\":\"total 0\\ndrwxr-xr-x. 1 <USER> <USER> 34 Sep  4 17:48 .\\ndrwxr-xr-x. 1 <USER> <USER> 52 Sep  4 17:45 ..\\ndr-xr-xr-x. 2 <USER> <USER> 40 Sep  4 17:48 .agents\\ndr-xr-xr-x. 2 <USER> <USER> 40 Sep  4 17:48 .codex\\ndr-xr-xr-x. 2 <USER> <USER> 40 Sep  4 17:48 .git\\n/usr/bin/node\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T21:48:24.420Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ePDzEPcojarENkxp4dlVCLzm",
+      "tool": "spawn_agent",
+      "input": {
+        "task_name": "steam",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"1700\">"
+      },
+      "timestamp": "2026-09-04T21:48:40.380Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ePDzEPcojarENkxp4dlVCLzm",
+      "status": "success",
+      "output": "{\"task_name\":\"/root/steam\"}",
+      "timestamp": "2026-09-04T21:48:40.442Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_4fI1z3rLb31XR19rqZb6pd7R",
+      "tool": "spawn_agent",
+      "input": {
+        "task_name": "browser_check",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"1060\">"
+      },
+      "timestamp": "2026-09-04T21:49:04.377Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_4fI1z3rLb31XR19rqZb6pd7R",
+      "status": "success",
+      "output": "{\"task_name\":\"/root/browser_check\"}",
+      "timestamp": "2026-09-04T21:49:04.464Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The scene will use handmade ceramic textures, glossy amber broth, tangled noodles, and layered vegetables. The steam is ready; I’m now shaping the bowl and food so the composition feels warm and dimensional.",
+      "timestamp": "2026-09-04T21:54:46.216Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_TlX8uMd2LoIW4YJ2N5HITCHX",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"cat <TMP>/ramen-steam.js\",\"max_output_tokens\":7000}));\n",
+      "timestamp": "2026-09-04T21:54:46.220Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_TlX8uMd2LoIW4YJ2N5HITCHX",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"8a227a\",\"wall_time_seconds\":0.000003542,\"exit_code\":0,\"original_token_count\":1658,\"output\":\"function createSteam(canvas, scene, motionQuery) {\\n  const context = canvas.getContext('2d');\\n  if (!context) {\\n    return { setPointer() {}, setActive() {}, destroy() {} };\\n  }\\n\\n  const preference = motionQuery || window.matchMedia('(prefers-reduced-motion: reduce)');\\n  const ink = document.createElement('canvas');\\n  const brush = ink.getContext('2d');\\n  const pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };\\n  const plumes = [\\n    { x: 375, y: 493, height: 322, width: 15, phase: 0.4, lean: -19 },\\n    { x: 455, y: 485, height: 403, width: 19, phase: 2.1, lean: 19 },\\n    { x: 539, y: 490, height: 361, width: 16, phase: 4.4, lean: -16 },\\n    { x: 617, y: 508, height: 308, width: 12, phase: 5.7, lean: 13 }\\n  ];\\n  let frame = 0;\\n  let time = 13;\\n  let lastTime = 0;\\n  let lastPaint = 0;\\n  let active = true;\\n  let destroyed = false;\\n  let paintScale = 1;\\n  let reduced = preference.matches;\\n\\n  const clamp = (value, low, high) => Math.max(low, Math.min(high, value));\\n\\n  function ribbon(points, widthScale) {\\n    brush.beginPath();\\n    for (let side = 1; side >= -1; side -= 2) {\\n      for (let j = 0; j < points.length; j++) {\\n        const i = side === 1 ? j : points.length - 1 - j;\\n        const point = points[i];\\n        const before = points[Math.max(0, i - 1)];\\n        const after = points[Math.min(points.length - 1, i + 1)];\\n        const dx = after.x - before.x;\\n        const dy = after.y - before.y;\\n        const length = Math.hypot(dx, dy) || 1;\\n        const x = point.x - dy / length * point.width * side * widthScale;\\n        const y = point.y + dx / length * point.width * side * widthScale;\\n        if (side === 1 && j === 0) brush.moveTo(x, y);\\n        else brush.lineTo(x, y);\\n      }\\n    }\\n    brush.closePath();\\n    brush.fill();\\n  }\\n\\n  function paint() {\\n    if (!canvas.width || !canvas.height) return;\\n    brush.setTransform(1, 0, 0, 1, 0, 0);\\n    brush.clearRect(0, 0, ink.width, ink.height);\\n    brush.setTransform(paintScale, 0, 0, paintScale, 0, 0);\\n    brush.globalCompositeOperation = 'source-over';\\n\\n    for (let p = 0; p < plumes.length; p++) {\\n      const plume = plumes[p];\\n      const phase = plume.phase;\\n      const breath = 0.83 + 0.17 * Math.sin(time * 0.37 + phase);\\n      const gradient = brush.createLinearGradient(0, plume.y, 0, plume.y - plume.height);\\n      gradient.addColorStop(0, 'rgba(237,219,189,0)');\\n      gradient.addColorStop(0.10, 'rgba(237,225,205,0.32)');\\n      gradient.addColorStop(0.30, 'rgba(243,232,213,0.65)');\\n      gradient.addColorStop(0.55, 'rgba(237,227,210,0.47)');\\n      gradient.addColorStop(0.80, 'rgba(229,222,211,0.15)');\\n      gradient.addColorStop(1, 'rgba(229,222,211,0)');\\n      brush.fillStyle = gradient;\\n\\n      // Neighboring translucent ribbons share a flow, then slowly unwind.\\n      // Their soft edges accumulate into vapor without particle silhouettes.\\n      for (let strand = 0; strand < 2; strand++) {\\n        const points = [];\\n        for (let i = 0; i <= 64; i++) {\\n          const u = i / 64;\\n          const envelope = Math.sin(Math.PI * u);\\n          const flow = u * 8.2 - time * 0.63 + phase;\\n          const curl = Math.sin(flow) * (7 + 23 * u)\\n            + Math.sin(u * 16.1 - time * 0.81 + phase * 1.7) * 8 * u;\\n          const split = (strand - 0.5) * (5 + u * 26)\\n            + Math.sin(u * 10.3 - time * 0.47 + phase + strand * 2) * 8 * u;\\n          points.push({\\n            x: plume.x + plume.lean * u + curl * Math.min(1, u * 6)\\n              + split + pointer.x * 53 * u * u,\\n            y: plume.y - plume.height * u\\n              + Math.sin(flow * 0.73) * 6 * envelope + pointer.y * 9 * u,\\n            width: (3 + plume.width * Math.pow(envelope, 0.8))\\n              * (0.75 + 0.25 * Math.sin(flow + strand * 0.8))\\n              * (strand === 0 ? 1 : 0.62)\\n          });\\n        }\\n\\n        brush.globalAlpha = 0.095 * breath;\\n        brush.filter = `blur(${11 * paintScale}px)`;\\n        ribbon(points, 1.7);\\n\\n        brush.globalAlpha = (strand === 0 ? 0.12 : 0.07) * breath;\\n        brush.filter = `blur(${4.5 * paintScale}px)`;\\n        ribbon(points, 0.55);\\n      }\\n    }\\n\\n    brush.filter = 'none';\\n    brush.globalAlpha = 1;\\n    context.setTransform(1, 0, 0, 1, 0, 0);\\n    context.clearRect(0, 0, canvas.width, canvas.height);\\n    context.drawImage(ink, 0, 0, canvas.width, canvas.height);\\n  }\\n\\n  function animate(now) {\\n    frame = 0;\\n    if (destroyed || reduced || !active || document.hidden) return;\\n    // Vapor moves slowly, so 30 fps keeps the overlay inexpensive on mobile.\\n    if (!lastPaint || now - lastPaint >= 1000 / 30) {\\n      const elapsed = lastTime ? Math.min((now - lastTime) / 1000, 0.1) : 0;\\n      lastTime = now;\\n      lastPaint = now;\\n      time += elapsed;\\n      const ease = 1 - Math.exp(-elapsed * 2.1);\\n      pointer.x += (pointer.targetX - pointer.x) * ease;\\n      pointer.y += (pointer.targetY - pointer.y) * ease;\\n      paint();\\n    }\\n    frame = requestAnimationFrame(animate);\\n  }\\n\\n  function synchronize() {\\n    cancelAnimationFrame(frame);\\n    frame = 0;\\n    lastTime = 0;\\n    lastPaint = 0;\\n    if (destroyed) return;\\n    if (reduced) {\\n      pointer.x = pointer.y = 0;\\n      paint();\\n    } else if (active && !document.hidden) {\\n      frame = requestAnimationFrame(animate);\\n    }\\n  }\\n\\n  function resize() {\\n    const bounds = scene.getBoundingClientRect();\\n    const ratio = Math.min(window.devicePixelRatio || 1, 2);\\n    canvas.width = Math.max(1, Math.round(bounds.width * ratio));\\n    canvas.height = Math.max(1, Math.round(bounds.height * ratio));\\n    // Soft vapor needs less resolution than the bowl beneath it.\\n    paintScale = Math.min(0.9, Math.max(0.3, canvas.width / 1000));\\n    ink.width = Math.ceil(1000 * paintScale);\\n    ink.height = Math.ceil(900 * paintScale);\\n    paint();\\n  }\\n\\n  function onPreferenceChange() {\\n    reduced = preference.matches;\\n    synchronize();\\n  }\\n\\n  const observer = new ResizeObserver(resize);\\n  observer.observe(scene);\\n  preference.addEventListener('change', onPreferenceChange);\\n  document.addEventListener('visibilitychange', synchronize);\\n  resize();\\n  synchronize();\\n\\n  return {\\n    setPointer(x, y) {\\n      pointer.targetX = clamp(Number.isFinite(x) ? x : 0, -1, 1);\\n      pointer.targetY = clamp(Number.isFinite(y) ? y : 0, -1, 1);\\n    },\\n    setActive(value) {\\n      if (active === Boolean(value)) return;\\n      active = Boolean(value);\\n      synchronize();\\n    },\\n    destroy() {\\n      destroyed = true;\\n      cancelAnimationFrame(frame);\\n      observer.disconnect();\\n      preference.removeEventListener('change', onPreferenceChange);\\n      document.removeEventListener('visibilitychange', synchronize);\\n    }\\n  };\\n}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T21:54:46.311Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_q0yav6j820qP0ivBhmwqYays",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: <WORKSPACE>/openai/gpt-6-astra/ultra/index.html\\n+<!doctype html>\\n+<html lang=\\\"en\\\">\\n+<head>\\n+  <meta charset=\\\"utf-8\\\">\\n+  <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\">\\n+  <meta name=\\\"theme-color\\\" content=\\\"#111311\\\">\\n+  <title>A little warmth</title>\\n+  <style>\\n+    :root { color-scheme: dark; background: #111311; }\\n+    * { box-sizing: border-box; }\\n+    html, body { width: 100%; height: 100%; margin: 0; }\\n+    body { overflow: hidden; background: #111311; }\\n+    main {\\n+      position: relative; display: grid; place-items: center;\\n+      width: 100%; height: 100%; min-height: 100svh; overflow: hidden;\\n+      isolation: isolate;\\n+      background:\\n+        radial-gradient(ellipse at 48% 77%, #2a281e38 0%, transparent 45%),\\n+        radial-gradient(ellipse at 46% 40%, #31302755 0%, #171b1740 38%, #090c0b 100%);\\n+    }\\n+    main::before {\\n+      content: \\\"\\\"; position: absolute; inset: -20%; pointer-events: none;\\n+      background: conic-gradient(from 157deg at 32% -10%, transparent 0deg,\\n+        #cab38b06 8deg, #dac3940b 15deg, transparent 28deg, transparent 360deg);\\n+      filter: blur(35px);\\n+    }\\n+    #ambient {\\n+      position: absolute; inset: 0; pointer-events: none; opacity: .55;\\n+      background: radial-gradient(ellipse at 42% 39%, #b3864811, transparent 48%);\\n+      transform: translate(var(--light-x, 0px), var(--light-y, 0px));\\n+      transition: transform 1.6s ease-out;\\n+    }\\n+    #grain { position: absolute; width: 100%; height: 100%; opacity: .11; pointer-events: none; }\\n+    #scene {\\n+      position: relative; flex: none; width: min(1080px, 124vw, 120svh);\\n+      aspect-ratio: 1000 / 900; transform: translateY(-2%);\\n+      -webkit-tap-highlight-color: transparent;\\n+    }\\n+    #ramen, #steam { position: absolute; inset: 0; width: 100%; height: 100%; }\\n+    #ramen { overflow: visible; }\\n+    #steam { pointer-events: none; }\\n+    #bowl { transform-origin: 500px 600px; }\\n+    .broth-glimmer { animation: shimmer 7s ease-in-out infinite alternate; }\\n+    .broth-glimmer:nth-of-type(2) { animation-delay: -3s; }\\n+    @keyframes shimmer { from { opacity: .3; } to { opacity: .75; } }\\n+    @media (prefers-reduced-motion: reduce) {\\n+      *, *::before, *::after { animation: none !important; transition: none !important; }\\n+    }\\n+  </style>\\n+</head>\\n+<body>\\n+  <main aria-label=\\\"A warm bowl of vegan ramen, with golden noodles, shiitake mushrooms, roasted tofu, and fresh greens. Delicate steam rises into a dark, quiet room.\\\">\\n+    <div id=\\\"ambient\\\" aria-hidden=\\\"true\\\"></div>\\n+    <svg id=\\\"grain\\\" aria-hidden=\\\"true\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\">\\n+      <filter id=\\\"room-grain\\\"><feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".73\\\" numOctaves=\\\"3\\\" stitchTiles=\\\"stitch\\\"/><feColorMatrix type=\\\"saturate\\\" values=\\\"0\\\"/></filter>\\n+      <rect width=\\\"100%\\\" height=\\\"100%\\\" filter=\\\"url(#room-grain)\\\" opacity=\\\".48\\\"/>\\n+    </svg>\\n+    <div id=\\\"scene\\\">\\n+      <svg id=\\\"ramen\\\" viewBox=\\\"0 0 1000 900\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" role=\\\"img\\\" aria-labelledby=\\\"bowl-title bowl-description\\\">\\n+        <title id=\\\"bowl-title\\\">A bowl of warmth</title>\\n+        <desc id=\\\"bowl-description\\\">Handmade charcoal stoneware filled with amber broth, golden ramen noodles, seared tofu, shiitake mushrooms, bok choy, sweetcorn, scallions, and sesame.</desc>\\n+        <defs>\\n+          <radialGradient id=\\\"table-glow\\\"><stop stop-color=\\\"#b59351\\\" stop-opacity=\\\".13\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#b59351\\\" stop-opacity=\\\"0\\\"/></radialGradient>\\n+          <radialGradient id=\\\"shadow\\\"><stop stop-color=\\\"#000\\\" stop-opacity=\\\".9\\\"/><stop offset=\\\".48\\\" stop-color=\\\"#020402\\\" stop-opacity=\\\".7\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#040603\\\" stop-opacity=\\\"0\\\"/></radialGradient>\\n+          <linearGradient id=\\\"ceramic\\\" x1=\\\"0\\\" y1=\\\".2\\\" x2=\\\"1\\\" y2=\\\".65\\\" gradientUnits=\\\"objectBoundingBox\\\">\\n+            <stop stop-color=\\\"#8b8a76\\\"/><stop offset=\\\".12\\\" stop-color=\\\"#53594c\\\"/><stop offset=\\\".4\\\" stop-color=\\\"#303b32\\\"/><stop offset=\\\".68\\\" stop-color=\\\"#222c25\\\"/><stop offset=\\\".9\\\" stop-color=\\\"#141c18\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#343d31\\\"/>\\n+          </linearGradient>\\n+          <linearGradient id=\\\"bowl-shade\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#10130d\\\" stop-opacity=\\\"0\\\"/><stop offset=\\\".52\\\" stop-color=\\\"#10160e\\\" stop-opacity=\\\".05\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#050a07\\\" stop-opacity=\\\".8\\\"/></linearGradient>\\n+          <linearGradient id=\\\"lip\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".6\\\" y2=\\\"1\\\"><stop stop-color=\\\"#b0a28a\\\"/><stop offset=\\\".2\\\" stop-color=\\\"#e1ccb0\\\"/><stop offset=\\\".52\\\" stop-color=\\\"#a49378\\\"/><stop offset=\\\".8\\\" stop-color=\\\"#767660\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#b0ad93\\\"/></linearGradient>\\n+          <linearGradient id=\\\"inside\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#3a3829\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#6b6245\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#a69a77\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#d3c098\\\"/></linearGradient>\\n+          <radialGradient id=\\\"broth\\\" cx=\\\".41\\\" cy=\\\".3\\\" r=\\\".7\\\"><stop stop-color=\\\"#c68a3b\\\"/><stop offset=\\\".35\\\" stop-color=\\\"#a56a27\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#79441b\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#4c2c16\\\"/></radialGradient>\\n+          <radialGradient id=\\\"broth-light\\\" cx=\\\".25\\\" cy=\\\".15\\\" r=\\\".9\\\"><stop stop-color=\\\"#f0bb5e\\\" stop-opacity=\\\".3\\\"/><stop offset=\\\".45\\\" stop-color=\\\"#d59934\\\" stop-opacity=\\\".05\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#22130a\\\" stop-opacity=\\\".4\\\"/></radialGradient>\\n+          <linearGradient id=\\\"noodle\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".15\\\" y2=\\\"1\\\"><stop stop-color=\\\"#f4d188\\\"/><stop offset=\\\".48\\\" stop-color=\\\"#dca651\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#b5772c\\\"/></linearGradient>\\n+          <linearGradient id=\\\"leaf\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"1\\\"><stop stop-color=\\\"#91a143\\\"/><stop offset=\\\".22\\\" stop-color=\\\"#547a30\\\"/><stop offset=\\\".55\\\" stop-color=\\\"#285329\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#133c26\\\"/></linearGradient>\\n+          <linearGradient id=\\\"leaf-light\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\".7\\\"><stop stop-color=\\\"#b4ba64\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#779448\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#2c572b\\\"/></linearGradient>\\n+          <linearGradient id=\\\"stem\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#90a658\\\"/><stop offset=\\\".6\\\" stop-color=\\\"#c0c890\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#e7deac\\\"/></linearGradient>\\n+          <linearGradient id=\\\"mushroom\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".7\\\" y2=\\\"1\\\"><stop stop-color=\\\"#a67b45\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#805331\\\"/><stop offset=\\\".72\\\" stop-color=\\\"#4d2e1c\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#2d1c11\\\"/></linearGradient>\\n+          <linearGradient id=\\\"gill\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#d2b68a\\\"/><stop offset=\\\".6\\\" stop-color=\\\"#a18359\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#655037\\\"/></linearGradient>\\n+          <linearGradient id=\\\"tofu-top\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".8\\\" y2=\\\"1\\\"><stop stop-color=\\\"#ffe2a0\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#d8a35c\\\"/><stop offset=\\\".62\\\" stop-color=\\\"#bb7837\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#edbb68\\\"/></linearGradient>\\n+          <linearGradient id=\\\"tofu-side\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#c89149\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#efd18c\\\"/><stop offset=\\\".68\\\" stop-color=\\\"#dcc084\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#936435\\\"/></linearGradient>\\n+          <radialGradient id=\\\"corn\\\" cx=\\\".3\\\" cy=\\\".2\\\"><stop stop-color=\\\"#ffe798\\\"/><stop offset=\\\".55\\\" stop-color=\\\"#edbf46\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#b47c24\\\"/></radialGradient>\\n+          <linearGradient id=\\\"nori\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"1\\\"><stop stop-color=\\\"#404f30\\\"/><stop offset=\\\".4\\\" stop-color=\\\"#263b27\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#11251d\\\"/></linearGradient>\\n+          <filter id=\\\"clay-texture\\\" x=\\\"-3%\\\" y=\\\"-3%\\\" width=\\\"106%\\\" height=\\\"106%\\\">\\n+            <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".64\\\" numOctaves=\\\"3\\\" seed=\\\"8\\\" result=\\\"noise\\\"/>\\n+            <feColorMatrix in=\\\"noise\\\" type=\\\"saturate\\\" values=\\\"0\\\"/>\\n+            <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n+            <feBlend in=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n+          </filter>\\n+          <filter id=\\\"food-texture\\\" x=\\\"-5%\\\" y=\\\"-5%\\\" width=\\\"110%\\\" height=\\\"110%\\\">\\n+            <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".35\\\" numOctaves=\\\"3\\\" seed=\\\"23\\\" result=\\\"noise\\\"/>\\n+            <feColorMatrix in=\\\"noise\\\" type=\\\"saturate\\\" values=\\\".2\\\"/>\\n+            <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n+            <feBlend in=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n+          </filter>\\n+          <filter id=\\\"food-shadow\\\" x=\\\"-25%\\\" y=\\\"-30%\\\" width=\\\"155%\\\" height=\\\"170%\\\"><feDropShadow dx=\\\"2\\\" dy=\\\"6\\\" stdDeviation=\\\"5\\\" flood-color=\\\"#211308\\\" flood-opacity=\\\".65\\\"/></filter>\\n+          <filter id=\\\"soft\\\"><feGaussianBlur stdDeviation=\\\"2\\\"/></filter>\\n+          <clipPath id=\\\"soup-clip\\\"><ellipse cx=\\\"500\\\" cy=\\\"478\\\" rx=\\\"306\\\" ry=\\\"143\\\"/></clipPath>\\n+          <clipPath id=\\\"body-clip\\\"><path d=\\\"M159 478C164 627 271 770 496 774C723 778 830 631 841 478Z\\\"/></clipPath>\\n+          <path id=\\\"leaf-shape\\\" d=\\\"M0 105C-13 88-42 77-48 58C-54 49-48 42-55 33C-62 16-52 6-53-6C-51-22-34-22-25-34C-14-45-4-36 4-41C15-46 24-33 35-30C49-27 45-13 53-5C64 10 54 19 59 29C60 43 45 49 43 60C39 76 14 91 0 105Z\\\"/>\\n+        </defs>\\n+\\n+        <ellipse cx=\\\"500\\\" cy=\\\"758\\\" rx=\\\"450\\\" ry=\\\"139\\\" fill=\\\"url(#table-glow)\\\"/>\\n+        <ellipse id=\\\"cast-shadow\\\" cx=\\\"521\\\" cy=\\\"766\\\" rx=\\\"342\\\" ry=\\\"76\\\" fill=\\\"url(#shadow)\\\"/>\\n+        <g id=\\\"bowl\\\">\\n+          <ellipse cx=\\\"504\\\" cy=\\\"762\\\" rx=\\\"111\\\" ry=\\\"22\\\" fill=\\\"#111710\\\"/>\\n+          <path d=\\\"M393 747Q500 725 608 747L603 765Q497 791 400 763Z\\\" fill=\\\"#30382a\\\"/>\\n+          <path d=\\\"M159 478C164 627 271 770 496 774C723 778 830 631 841 478Z\\\" fill=\\\"url(#ceramic)\\\" filter=\\\"url(#clay-texture)\\\"/>\\n+          <g id=\\\"pottery-lines\\\" clip-path=\\\"url(#body-clip)\\\" fill=\\\"none\\\"></g>\\n+          <path d=\\\"M159 478C164 627 271 770 496 774C723 778 830 631 841 478Z\\\" fill=\\\"url(#bowl-shade)\\\"/>\\n+          <path d=\\\"M181 532C207 653 308 740 432 757\\\" fill=\\\"none\\\" stroke=\\\"#b8b298\\\" stroke-width=\\\"1.5\\\" opacity=\\\".23\\\"/>\\n+          <ellipse cx=\\\"500\\\" cy=\\\"478\\\" rx=\\\"342\\\" ry=\\\"174\\\" fill=\\\"#383b2e\\\"/>\\n+          <ellipse cx=\\\"500\\\" cy=\\\"475\\\" rx=\\\"340\\\" ry=\\\"169\\\" fill=\\\"url(#lip)\\\" filter=\\\"url(#clay-texture)\\\"/>\\n+          <ellipse cx=\\\"500\\\" cy=\\\"474\\\" rx=\\\"324\\\" ry=\\\"154\\\" fill=\\\"url(#inside)\\\"/>\\n+          <path d=\\\"M177 460C187 373 327 316 493 316C649 313 790 365 819 442\\\" fill=\\\"none\\\" stroke=\\\"#f0dbb9\\\" stroke-width=\\\"2\\\" opacity=\\\".4\\\"/>\\n+          <ellipse cx=\\\"500\\\" cy=\\\"478\\\" rx=\\\"307\\\" ry=\\\"144\\\" fill=\\\"#402711\\\"/>\\n+          <g clip-path=\\\"url(#soup-clip)\\\">\\n+            <ellipse cx=\\\"500\\\" cy=\\\"478\\\" rx=\\\"306\\\" ry=\\\"143\\\" fill=\\\"url(#broth)\\\"/>\\n+            <g id=\\\"broth-detail\\\"></g>\\n+            <g id=\\\"noodles\\\" fill=\\\"none\\\" stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\"></g>\\n+            <ellipse cx=\\\"500\\\" cy=\\\"478\\\" rx=\\\"306\\\" ry=\\\"143\\\" fill=\\\"url(#broth-light)\\\" pointer-events=\\\"none\\\"/>\\n+            <g class=\\\"broth-glimmer\\\" fill=\\\"none\\\" stroke=\\\"#f0c37c\\\" stroke-linecap=\\\"round\\\">\\n+              <path d=\\\"M219 506Q227 544 275 565\\\" stroke-width=\\\"2\\\"/>\\n+              <path d=\\\"M634 595Q677 590 708 572M714 568l9-5\\\" stroke-width=\\\"1.5\\\"/>\\n+              <path d=\\\"M470 607q44 6 82 0\\\" stroke-width=\\\"1\\\"/>\\n+            </g>\\n+            <g id=\\\"corn-kernels\\\" filter=\\\"url(#food-shadow)\\\"></g>\\n+          </g>\\n+          <g id=\\\"nori-sheets\\\" filter=\\\"url(#food-shadow)\\\">\\n+            <path d=\\\"M634 389L622 289L641 284L650 290L670 278L680 283L695 276L710 284L725 279L747 289L765 278L781 289L773 411L697 438Z\\\" fill=\\\"url(#nori)\\\" filter=\\\"url(#food-texture)\\\"/>\\n+            <path d=\\\"M685 429L687 323L705 314L719 317L733 307L743 313L758 303L773 311L790 303L802 307L811 401L774 450Z\\\" fill=\\\"url(#nori)\\\" filter=\\\"url(#food-texture)\\\"/>\\n+            <g id=\\\"nori-grain\\\" opacity=\\\".3\\\"></g>\\n+          </g>\\n+          <g id=\\\"greens\\\" filter=\\\"url(#food-shadow)\\\"></g>\\n+          <g id=\\\"mushrooms\\\" filter=\\\"url(#food-shadow)\\\"></g>\\n+          <g id=\\\"tofu\\\" filter=\\\"url(#food-shadow)\\\"></g>\\n+          <g id=\\\"front-noodles\\\" clip-path=\\\"url(#soup-clip)\\\" fill=\\\"none\\\" stroke-linecap=\\\"round\\\"></g>\\n+          <g id=\\\"garnish\\\"></g>\\n+          <path d=\\\"M199 552C252 611 370 643 500 644C644 644 762 600 808 541\\\" fill=\\\"none\\\" stroke=\\\"#d5c5a1\\\" stroke-width=\\\"2.2\\\" opacity=\\\".38\\\"/>\\n+          <path d=\\\"M307 612Q389 638 461 638\\\" fill=\\\"none\\\" stroke=\\\"#f3e0b9\\\" stroke-width=\\\"2\\\" stroke-linecap=\\\"round\\\" opacity=\\\".46\\\"/>\\n+        </g>\\n+      </svg>\\n+      <canvas id=\\\"steam\\\" aria-hidden=\\\"true\\\"></canvas>\\n+    </div>\\n+  </main>\\n+  <script>\\n+    'use strict';\\n+    // All of the food is drawn here, from a repeatable seed. No images or dependencies.\\n+    const NS = 'http://www.w3.org/2000/svg';\\n+    let seed = 72419;\\n+    const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };\\n+    const between = (a, b) => a + random() * (b - a);\\n+    const pick = values => values[Math.floor(random() * values.length)];\\n+    const el = (tag, attrs, parent) => {\\n+      const node = document.createElementNS(NS, tag);\\n+      for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);\\n+      if (parent) parent.appendChild(node);\\n+      return node;\\n+    };\\n+    const byId = id => document.getElementById(id);\\n+    const path = (d, attrs, parent) => el('path', { d, ...attrs }, parent);\\n+\\n+    // Uneven throwing rings and tiny mineral flecks in the stoneware glaze.\\n+    for (let i = 0; i < 43; i++) {\\n+      const y = 468 + i * 6.6;\\n+      path(`M155 ${y}C241 ${y + 204} 746 ${y + 219} 847 ${y - 4}`, {\\n+        stroke: i % 3 ? '#bac0a0' : '#050c08', 'stroke-width': between(.4, 1.6), opacity: between(.025, .08)\\n+      }, byId('pottery-lines'));\\n+    }\\n+    for (let i = 0; i < 650; i++) {\\n+      el('ellipse', { cx: between(160, 840), cy: between(520, 776), rx: between(.35, 1.6), ry: between(.25, .75), fill: pick(['#d2c4a2', '#030b07', '#7b8868']), opacity: between(.1, .35) }, byId('pottery-lines'));\\n+    }\\n+\\n+    // An oily, translucent broth surface: many very small irregular highlights.\\n+    for (let i = 0; i < 380; i++) {\\n+      const x = between(198, 802), y = between(337, 620), radius = between(.6, 5);\\n+      el('ellipse', { cx: x, cy: y, rx: radius * 1.4, ry: radius * .65, fill: pick(['#e7aa40', '#d1912c', '#edbd5b', '#492613']), opacity: between(.09, .35), stroke: '#ffd982', 'stroke-width': .4, 'stroke-opacity': .28 }, byId('broth-detail'));\\n+    }\\n+\\n+    function noodle(d, width, parent, bright = false) {\\n+      path(d, { stroke: '#422810', 'stroke-width': width + 3.3, opacity: .57 }, parent);\\n+      path(d, { stroke: 'url(#noodle)', 'stroke-width': width }, parent);\\n+      path(d, { stroke: bright ? '#ffe2a3' : '#f9d48e', 'stroke-width': Math.max(.75, width * .24), opacity: .67, transform: 'translate(0 -1.2)' }, parent);\\n+    }\\n+    // Long strands lie in loose folds, with local variations in their bends.\\n+    for (let i = 0; i < 53; i++) {\\n+      const y = 373 + i * 4.2;\\n+      const left = 258 + Math.sin(i * .54) * 24 + between(-15, 15);\\n+      const right = 713 + Math.cos(i * .32) * 34;\\n+      const fold = between(12, 30);\\n+      const d = `M${left + 45} ${y - 9}C${left - 49} ${y - 28} ${left - 35} ${y + 36} ${left + 30} ${y + 27}C${left + 104} ${y + 10} ${right - 181} ${y - fold} ${right - 78} ${y + 5}C${right + 53} ${y + 32} ${right + 32} ${y - 33} ${right - 35} ${y - 17}C${right - 107} ${y + 10} ${left + 149} ${y + 46} ${left + 71} ${y + 27}`;\\n+      noodle(d, between(4.4, 6), byId('noodles'));\\n+    }\\n+    for (let i = 0; i < 13; i++) {\\n+      const x = 420 + i * 8.5;\\n+      const d = `M${x - 64} 404C${x + 80} 422 ${x - 67} 466 ${x + 12} 493S${x + 111} 549 ${x + 38} 577`;\\n+      noodle(d, between(4.5, 5.6), byId('noodles'), true);\\n+    }\\n+\\n+    // A small cluster of sweetcorn peeking out along the back edge.\\n+    for (let row = 0; row < 5; row++) {\\n+      for (let col = 0; col < 7 - Math.abs(row - 2); col++) {\\n+        const x = 503 + col * 15 + row * 5 + between(-3, 3);\\n+        const y = 357 + row * 12 + between(-3, 3);\\n+        const group = el('g', { transform: `translate(${x} ${y}) rotate(${between(-30, 30)})` }, byId('corn-kernels'));\\n+        path('M-7-4Q-7-9 0-8Q8-8 8-2L6 5Q0 9-6 4Z', { fill: 'url(#corn)', stroke: '#9f7028', 'stroke-width': .65 }, group);\\n+        path('M-4-4Q0-6 4-3', { fill: 'none', stroke: '#fff2af', 'stroke-width': 1.8, opacity: .6 }, group);\\n+      }\\n+    }\\n+    for (let i = 0; i < 110; i++) {\\n+      const x = between(638, 771), y = between(291, 414);\\n+      path(`M${x} ${y}l${between(-6, 6)} ${between(2, 11)}`, { stroke: pick(['#92a467', '#0a150e', '#8b9261']), 'stroke-width': between(.5, 2.5) }, byId('nori-grain'));\\n+    }\\n+\\n+    function bokChoy(x, y, rotation, scale, light) {\\n+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${rotation}) scale(${scale})` }, byId('greens'));\\n+      el('use', { href: '#leaf-shape', fill: light ? 'url(#leaf-light)' : 'url(#leaf)', stroke: '#2a4b25', 'stroke-width': 1, filter: 'url(#food-texture)' }, group);\\n+      for (let i = 0; i < 9; i++) {\\n+        const y0 = 6 + i * 9;\\n+        const reach = Math.sin((i + 1) / 11 * Math.PI) * 42;\\n+        path(`M0 ${y0 + 12}Q${-reach * .3} ${y0 + 2} ${-reach} ${y0 - 17}M1 ${y0 + 12}Q${reach * .4} ${y0 + 4} ${reach} ${y0 - 15}`, { fill: 'none', stroke: '#acc27a', 'stroke-width': between(.6, 1.1), opacity: .34 }, group);\\n+      }\\n+      path('M-4-25C-12 8 9 56-10 99Q-18 114-26 127C-29 137-10 141-2 132C10 115 13 98 12 83C7 48-2 16-4-25Z', { fill: 'url(#stem)' }, group);\\n+      path('M-5 128Q7 96 3 65', { fill: 'none', stroke: '#f4edc0', 'stroke-width': 2, opacity: .5 }, group);\\n+      path('M-38 4Q-47 23-32 41M26-14Q41-7 43 8', { fill: 'none', stroke: '#c3cb7a', 'stroke-width': 2, opacity: .23 }, group);\\n+    }\\n+    bokChoy(302, 395, -52, 1.02, false);\\n+    bokChoy(333, 370, -21, 1.11, false);\\n+    bokChoy(391, 365, 12, .9, true);\\n+    bokChoy(273, 432, -72, .81, true);\\n+\\n+    function mushroom(x, y, rotation, scale) {\\n+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${rotation}) scale(${scale})` }, byId('mushrooms'));\\n+      path('M-15 13Q-13 42-23 59Q-19 70-7 67Q11 40 15 12Z', { fill: 'url(#gill)', stroke: '#6c4b2d', 'stroke-width': 1 }, group);\\n+      path('M-66 4Q-69 34-29 43Q9 50 50 29Q65 21 64 5Z', { fill: 'url(#gill)' }, group);\\n+      for (let i = 0; i < 25; i++) {\\n+        const angle = Math.PI * (i / 24);\\n+        const endX = Math.cos(angle) * 62;\\n+        const endY = 7 + Math.sin(angle) * 32;\\n+        path(`M0 8Q${endX * .55} ${endY * .67} ${endX} ${endY}`, { fill: 'none', stroke: '#624629', 'stroke-width': 1.1, opacity: .68 }, group);\\n+      }\\n+      path('M-66 5C-65-32-40-57-5-57C31-60 61-34 66 1Q63 17 38 19Q2 28-28 20Q-55 19-66 5Z', { fill: 'url(#mushroom)', stroke: '#382214', 'stroke-width': 1, filter: 'url(#food-texture)' }, group);\\n+      path('M-60-4Q-53-42-17-48', { stroke: '#d1a46a', 'stroke-width': 2, opacity: .45, fill: 'none' }, group);\\n+      path('M-42-23Q-13-26 28 4L14 3Q-17-15-42-23Z', { fill: '#ead1a0' }, group);\\n+      path('M-3-43Q-9-25-22 4L-14 0Q-2-17 4-39Z', { fill: '#dfc18d' }, group);\\n+      path('M-40-21Q-9-22 24 4M-1-38L-17 1', { fill: 'none', stroke: '#6a4427', 'stroke-width': 1.5 }, group);\\n+      for (let i = 0; i < 35; i++) {\\n+        const angle = between(0, Math.PI * 2), r = Math.sqrt(random());\\n+        el('ellipse', { cx: Math.cos(angle) * 50 * r, cy: -16 + Math.sin(angle) * 30 * r, rx: between(.5, 2), ry: between(.35, 1), fill: pick(['#d9aa6c', '#301b10']), opacity: .3 }, group);\\n+      }\\n+    }\\n+    mushroom(654, 421, 18, 1.03);\\n+    mushroom(720, 466, 39, .91);\\n+    mushroom(628, 494, -13, .86);\\n+\\n+    function tofu(x, y, rotation, scale) {\\n+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${rotation}) scale(${scale})` }, byId('tofu'));\\n+      path('M-53-17L41-29L51 20L-42 35Z', { fill: '#6e4124', transform: 'translate(2 7)', opacity: .6 }, group);\\n+      path('M-54-18L-43 16L-37 39L-47 11Z', { fill: '#b88a4e' }, group);\\n+      path('M-43 16L51 2L48 24Q8 35-37 39Z', { fill: 'url(#tofu-side)', stroke: '#a9783e', 'stroke-width': .6 }, group);\\n+      path('M-54-18L37-32Q41-32 43-27L51 2L-43 16Z', { fill: 'url(#tofu-top)', stroke: '#e3bd77', 'stroke-width': 1.1, filter: 'url(#food-texture)' }, group);\\n+      for (let i = 0; i < 64; i++) {\\n+        const tx = between(-39, 37), ty = between(-19, 3) - tx * .14;\\n+        el('ellipse', { cx: tx, cy: ty, rx: between(.6, 3.8), ry: between(.3, 1.9), fill: pick(['#773e1a', '#8f4c21', '#ffe8a4', '#ca8c3f']), opacity: between(.3, .8) }, group);\\n+      }\\n+      for (let i = 0; i < 4; i++) {\\n+        const tx = -30 + i * 19;\\n+        path(`M${tx} ${-17 - tx * .15}l8 21`, { fill: 'none', stroke: '#68351c', 'stroke-width': between(2.5, 4.5), opacity: .57, 'stroke-linecap': 'round' }, group);\\n+        path(`M${tx + 3} ${-17 - tx * .15}l8 21`, { fill: 'none', stroke: '#f0ba62', 'stroke-width': 1.1, opacity: .65 }, group);\\n+      }\\n+      for (let i = 0; i < 28; i++) {\\n+        const tx = between(-34, 44);\\n+        el('ellipse', { cx: tx, cy: between(18, 28) - tx * .15, rx: between(.6, 1.4), ry: between(.4, 1.1), fill: '#9d733d', opacity: .4 }, group);\\n+      }\\n+      path('M-43 16L49 2', { stroke: '#ffe4a1', 'stroke-width': 1.3, opacity: .7 }, group);\\n+    }\\n+    tofu(334, 498, -22, .95);\\n+    tofu(288, 539, 10, .92);\\n+    tofu(389, 540, -8, 1.04);\\n+\\n+    // A few noodles drape over one another at the front of the soup.\\n+    for (let i = 0; i < 12; i++) {\\n+      const x = 440 + i * 8;\\n+      noodle(`M${x} 473C${x - 40} 502 ${x + 44} 519 ${x + 31} 546S${x - 22} 571 ${x + 17} 594`, 4.7, byId('front-noodles'), true);\\n+    }\\n+\\n+    const garnish = byId('garnish');\\n+    // Scallions are cut rings, with shaded inner walls and pale cut edges.\\n+    for (let i = 0; i < 47; i++) {\\n+      const angle = between(0, Math.PI * 2), radius = Math.sqrt(random());\\n+      const x = 505 + Math.cos(angle) * 94 * radius;\\n+      const y = 441 + Math.sin(angle) * 51 * radius;\\n+      const group = el('g', { transform: `translate(${x} ${y}) rotate(${between(-70, 70)})` }, garnish);\\n+      const rx = between(5, 9), ry = between(3, 5);\\n+      el('ellipse', { cx: 1, cy: 3, rx, ry, fill: '#2b3013', opacity: .6 }, group);\\n+      el('ellipse', { cx: 0, cy: 0, rx, ry, fill: 'none', stroke: '#3d6c32', 'stroke-width': 3.8 }, group);\\n+      el('ellipse', { cx: 0, cy: -1.4, rx, ry, fill: 'none', stroke: pick(['#b1c773', '#9fb769', '#d0d58e', '#79a24f']), 'stroke-width': 2.5 }, group);\\n+      path(`M${-rx + 1} -2Q0 ${-ry - 2} ${rx - 2} -2`, { fill: 'none', stroke: '#dbe6ab', 'stroke-width': .7, opacity: .7 }, group);\\n+    }\\n+    // Thin chili threads and sesame give the surface a little irregularity.\\n+    for (let i = 0; i < 9; i++) {\\n+      const x = between(463, 538), y = between(419, 452);\\n+      path(`M${x - 22} ${y + 19}Q${x + 38} ${y - 47} ${x + 44} ${y + 2}T${x + 65} ${y + 9}`, { fill: 'none', stroke: i % 2 ? '#a63a21' : '#c34f29', 'stroke-width': between(.8, 1.4), 'stroke-linecap': 'round' }, garnish);\\n+    }\\n+    for (let i = 0; i < 105; i++) {\\n+      const angle = between(0, Math.PI * 2), r = Math.sqrt(random());\\n+      const x = 498 + Math.cos(angle) * 250 * r, y = 476 + Math.sin(angle) * 113 * r;\\n+      el('ellipse', { cx: x, cy: y, rx: between(1.4, 2.7), ry: between(.65, 1.2), fill: pick(['#e9d6a4', '#e5cc90', '#24291a', '#c5af76']), transform: `rotate(${between(0, 180)} ${x} ${y})`, opacity: between(.55, .9) }, garnish);\\n+    }\\n+\\n+    /* STEAM_IMPLEMENTATION */\\n+\\n+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');\\n+    const scene = byId('scene');\\n+    const bowl = byId('bowl');\\n+    const ambient = byId('ambient');\\n+    const steam = createSteam(byId('steam'), scene, motionQuery);\\n+    const current = { x: 0, y: 0 }, target = { x: 0, y: 0 };\\n+    let pointerFrame = 0, previousTime = 0;\\n+\\n+    function easeBowl(now) {\\n+      pointerFrame = 0;\\n+      if (motionQuery.matches || document.hidden) return;\\n+      const delta = previousTime ? Math.min((now - previousTime) / 1000, .05) : 1 / 60;\\n+      previousTime = now;\\n+      const ease = 1 - Math.exp(-delta * 4);\\n+      current.x += (target.x - current.x) * ease;\\n+      current.y += (target.y - current.y) * ease;\\n+      bowl.setAttribute('transform', `translate(${current.x * 5} ${current.y * 2.5}) rotate(${current.x * .65} 500 600)`);\\n+      if (Math.abs(current.x - target.x) + Math.abs(current.y - target.y) > .001) pointerFrame = requestAnimationFrame(easeBowl);\\n+      else previousTime = 0;\\n+    }\\n+    function point(x, y) {\\n+      if (motionQuery.matches) return;\\n+      target.x = x; target.y = y;\\n+      steam.setPointer(x, y);\\n+      ambient.style.setProperty('--light-x', `${x * 28}px`);\\n+      ambient.style.setProperty('--light-y', `${y * 18}px`);\\n+      if (!pointerFrame && !document.hidden) pointerFrame = requestAnimationFrame(easeBowl);\\n+    }\\n+    window.addEventListener('pointermove', event => {\\n+      if (event.pointerType === 'touch') return;\\n+      point(Math.max(-1, Math.min(1, event.clientX / innerWidth * 2 - 1)), Math.max(-1, Math.min(1, event.clientY / innerHeight * 2 - 1)));\\n+    }, { passive: true });\\n+    document.documentElement.addEventListener('pointerleave', () => point(0, 0));\\n+    window.addEventListener('blur', () => point(0, 0));\\n+    motionQuery.addEventListener('change', () => {\\n+      cancelAnimationFrame(pointerFrame); pointerFrame = 0; previousTime = 0;\\n+      current.x = current.y = target.x = target.y = 0;\\n+      bowl.removeAttribute('transform');\\n+      ambient.style.removeProperty('--light-x'); ambient.style.removeProperty('--light-y');\\n+      steam.setPointer(0, 0);\\n+    });\\n+    document.addEventListener('visibilitychange', () => {\\n+      if (document.hidden) { cancelAnimationFrame(pointerFrame); pointerFrame = 0; previousTime = 0; }\\n+      else if (!motionQuery.matches) point(0, 0);\\n+    });\\n+  </script>\\n+</body>\\n+</html>\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\npage = Path('index.html')\\npage.write_text(page.read_text().replace('    /* STEAM_IMPLEMENTATION */', Path('<TMP>/ramen-steam.js').read_text()))\\nPY\",\"max_output_tokens\":1000}));\n",
+      "timestamp": "2026-09-04T22:05:35.108Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_q0yav6j820qP0ivBhmwqYays",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"4cefb8\",\"wall_time_seconds\":0.000007833,\"exit_code\":0,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:05:35.272Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_PP1YMob9bRQEY3Nzx0iWJadO",
+      "tool": "send_message",
+      "input": {
+        "target": "browser_check",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"292\">"
+      },
+      "timestamp": "2026-09-04T22:05:39.371Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_PP1YMob9bRQEY3Nzx0iWJadO",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-09-04T22:05:39.472Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_SugeP9jTU27oOgJYmEjDfnQo",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"node --check <TMP>/ramen-steam.js\\nwc -c index.html\",\"max_output_tokens\":1000}));\n",
+      "timestamp": "2026-09-04T22:05:51.185Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_SugeP9jTU27oOgJYmEjDfnQo",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"af84f4\",\"wall_time_seconds\":0.00000425,\"exit_code\":0,\"original_token_count\":5,\"output\":\"31705 index.html\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:05:51.313Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_8si7upnJlOVHGun6epDzppfx",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"ls -l <TMP>/ramen-desktop.png <TMP>/ramen-mobile.png 2>/dev/null\",\"max_output_tokens\":1000}));\n",
+      "timestamp": "2026-09-04T22:05:55.212Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_8si7upnJlOVHGun6epDzppfx",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"96ca1d\",\"wall_time_seconds\":0.000004042,\"exit_code\":0,\"original_token_count\":38,\"output\":\"-rw-r--r--. 1 <USER> <USER> 1899221 Sep  4 18:05 <TMP>/ramen-desktop.png\\n-rw-r--r--. 1 <USER> <USER>  435009 Sep  4 18:05 <TMP>/ramen-mobile.png\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:05:55.297Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_K4srLmZTbQfYYFt2qUUuHNSH",
+      "tool": "exec",
+      "input": "const r = await tools.view_image({path:\"<TMP>/ramen-desktop.png\"}); image(r.image_url);\n",
+      "timestamp": "2026-09-04T22:05:59.603Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_K4srLmZTbQfYYFt2qUUuHNSH",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"2532296\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-09-04T22:05:59.734Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The first browser render is complete. I found two things to refine: the ceramic texture is too strong, and the steam blur is slowing animation. I’m softening the materials, speeding up the vapor, and correcting the bowl’s centering on narrow screens.",
+      "timestamp": "2026-09-04T22:07:23.674Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_0nmdYYJ3TaFvZYeGajbtiLxM",
+      "tool": "followup_task",
+      "input": {
+        "target": "steam",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"1100\">"
+      },
+      "timestamp": "2026-09-04T22:07:23.674Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_0nmdYYJ3TaFvZYeGajbtiLxM",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-09-04T22:07:23.839Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ASqWqJ2WWvEayEXummXGLvCu",
+      "tool": "send_message",
+      "input": {
+        "target": "browser_check",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"356\">"
+      },
+      "timestamp": "2026-09-04T22:07:27.524Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ASqWqJ2WWvEayEXummXGLvCu",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-09-04T22:07:27.591Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_dOrSKLqkxQGEVP5GwgzXF8uM",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"cat <HOME>/.agents/skills/test-failures/SKILL.md\",\"max_output_tokens\":5000}));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: <WORKSPACE>/openai/gpt-6-astra/ultra/index.html\\n@@\\n-      position: relative; display: grid; place-items: center;\\n+      position: relative; display: grid; place-items: center; grid-template-columns: minmax(0, 1fr);\\n@@\\n-          <filter id=\\\"clay-texture\\\" x=\\\"-3%\\\" y=\\\"-3%\\\" width=\\\"106%\\\" height=\\\"106%\\\">\\n+          <filter id=\\\"clay-texture\\\" x=\\\"-3%\\\" y=\\\"-3%\\\" width=\\\"106%\\\" height=\\\"106%\\\" color-interpolation-filters=\\\"sRGB\\\">\\n             <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".64\\\" numOctaves=\\\"3\\\" seed=\\\"8\\\" result=\\\"noise\\\"/>\\n-            <feColorMatrix in=\\\"noise\\\" type=\\\"saturate\\\" values=\\\"0\\\"/>\\n-            <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n-            <feBlend in=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n+            <feColorMatrix in=\\\"noise\\\" type=\\\"matrix\\\" values=\\\"0 0 0 0 .7  0 0 0 0 .68  0 0 0 0 .6  .22 .22 .22 0 0\\\" result=\\\"grain\\\"/>\\n+            <feComposite in=\\\"grain\\\" in2=\\\"SourceGraphic\\\" operator=\\\"in\\\" result=\\\"clipped\\\"/>\\n+            <feBlend in=\\\"clipped\\\" in2=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n           </filter>\\n-          <filter id=\\\"food-texture\\\" x=\\\"-5%\\\" y=\\\"-5%\\\" width=\\\"110%\\\" height=\\\"110%\\\">\\n+          <filter id=\\\"food-texture\\\" x=\\\"-5%\\\" y=\\\"-5%\\\" width=\\\"110%\\\" height=\\\"110%\\\" color-interpolation-filters=\\\"sRGB\\\">\\n             <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".35\\\" numOctaves=\\\"3\\\" seed=\\\"23\\\" result=\\\"noise\\\"/>\\n-            <feColorMatrix in=\\\"noise\\\" type=\\\"saturate\\\" values=\\\".2\\\"/>\\n-            <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n-            <feBlend in=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n+            <feColorMatrix in=\\\"noise\\\" type=\\\"matrix\\\" values=\\\".3 .3 .3 0 0  .3 .3 .3 0 0  .3 .3 .3 0 0  0 0 0 0 .2\\\" result=\\\"grain\\\"/>\\n+            <feComposite in=\\\"grain\\\" in2=\\\"SourceGraphic\\\" operator=\\\"in\\\" result=\\\"clipped\\\"/>\\n+            <feBlend in=\\\"clipped\\\" in2=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n*** End Patch\"));\n",
+      "timestamp": "2026-09-04T22:08:16.483Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_dOrSKLqkxQGEVP5GwgzXF8uM",
+      "status": "error",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"460477\",\"wall_time_seconds\":0.000004209,\"exit_code\":0,\"original_token_count\":477,\"output\":\"---\\nname: test-failures\\ndescription: Use this skill whenever any test fails. Follow the required investigation process before deciding whether a failure is pre-existing or what to fix.\\nlicense: MIT\\nmetadata:\\n  author: <USER>\\n  version: \\\"0.1.0\\\"\\n---\\n\\nWhen any test fails, you MUST follow this process:\\n\\n## Never Assume Pre-existing Failures\\n\\n- NEVER dismiss a test failure as \\\"pre-existing\\\" or \\\"unrelated\\\" without thorough investigation.\\n- Always consider whether your changes caused or contributed to the failure, even if the connection is not immediately obvious.\\n- Correlation matters: if a test fails after your change, the default assumption is that your change broke it until proven otherwise.\\n\\n## Required Investigation Steps\\n\\n1. **Read the full error output** — understand exactly what failed and why.\\n2. **Trace the failure to root cause** — identify the specific assertion, error, or panic that triggered the failure.\\n3. **Check if your changes touch the failing execution path** — follow imports, shared state, interfaces, and transitive dependencies. Subtle interactions count.\\n4. **Run the test on the base branch** — if you need to prove the failure is pre-existing, actually verify it fails without your changes too. Do not guess.\\n5. **Provide a concrete explanation** — state why the test failed. \\\"It was already broken\\\" is not sufficient without evidence.\\n\\n## If the Failure Is Genuinely Pre-existing\\n\\n- You must still explain the root cause of the failure.\\n- Offer to fix it (Boy Scout Rule: leave the repository better than you found it).\\n- If the fix is out of scope, flag it clearly and suggest a follow-up.\\n\\n## If the Failure Is Caused by Your Changes\\n\\n- Fix it before moving on. Do not leave broken tests behind.\\n- If the test expectation is wrong (e.g., testing old behavior you intentionally changed), update the test and explain why the old expectation no longer applies.\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:08:16.640Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ho2L11zu9rodIY6OXy6TYaXa",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\npage = Path('index.html')\\nhtml = page.read_text()\\nstart = html.index('function createSteam(')\\nend = html.index(\\\"    const motionQuery = window.matchMedia\\\", start)\\npage.write_text(html[:start] + Path('<TMP>/ramen-steam.js').read_text() + '\\\\n\\\\n' + html[end:])\\nPY\\nnode <TMP>/ramen-browser-check.cjs\",\"yield_time_ms\":1000,\"max_output_tokens\":2000}));\n",
+      "timestamp": "2026-09-04T22:08:35.321Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ho2L11zu9rodIY6OXy6TYaXa",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"8be0e1\",\"wall_time_seconds\":1.001279403,\"session_id\":12392,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:08:36.488Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ZR24uHzrvzzJYBVPnPZngncR",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:12392,chars:\"\",\"yield_time_ms\":1000,\"max_output_tokens\":4000}));\n",
+      "timestamp": "2026-09-04T22:08:39.868Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ZR24uHzrvzzJYBVPnPZngncR",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 5.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"5a0edc\",\"wall_time_seconds\":5.001746096,\"session_id\":12392,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:08:44.878Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_TcxAncgdE9o8eqXC1CR5E4SX",
+      "tool": "exec",
+      "input": "const r = await tools.view_image({path:\"<TMP>/ramen-desktop.png\"}); image(r.image_url);\n",
+      "timestamp": "2026-09-04T22:08:50.003Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_TcxAncgdE9o8eqXC1CR5E4SX",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"2277880\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-09-04T22:08:50.152Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ZIsl3rzhfCbccps3PXXIIhS7",
+      "tool": "exec",
+      "input": "const r = await tools.view_image({path:\"<TMP>/ramen-mobile.png\"}); image(r.image_url);\ntext(await tools.write_stdin({session_id:12392,chars:\"\",\"yield_time_ms\":1000,\"max_output_tokens\":5000}));\n",
+      "timestamp": "2026-09-04T22:09:00.987Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ZIsl3rzhfCbccps3PXXIIhS7",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"537284\">",
+          "detail": "high"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"fd7d3f\",\"wall_time_seconds\":0.000002375,\"exit_code\":0,\"original_token_count\":1101,\"output\":\"[\\n  {\\n    \\\"label\\\": \\\"desktop\\\",\\n    \\\"errors\\\": [],\\n    \\\"externalRequests\\\": [],\\n    \\\"viewport\\\": {\\n      \\\"width\\\": 1440,\\n      \\\"height\\\": 1000\\n    },\\n    \\\"document\\\": {\\n      \\\"width\\\": 1440,\\n      \\\"height\\\": 1000\\n    },\\n    \\\"body\\\": {\\n      \\\"width\\\": 1440,\\n      \\\"height\\\": 1000\\n    },\\n    \\\"visibleText\\\": \\\"\\\",\\n    \\\"svgCount\\\": 2,\\n    \\\"canvases\\\": [\\n      {\\n        \\\"width\\\": 1080,\\n        \\\"height\\\": 972,\\n        \\\"rect\\\": {\\n          \\\"x\\\": 180,\\n          \\\"y\\\": -5.440000534057617,\\n          \\\"width\\\": 1080,\\n          \\\"height\\\": 972,\\n          \\\"top\\\": -5.440000534057617,\\n          \\\"right\\\": 1260,\\n          \\\"bottom\\\": 966.5599994659424,\\n          \\\"left\\\": 180\\n        },\\n        \\\"pngLength\\\": 245838\\n      }\\n    ],\\n    \\\"reduced\\\": false,\\n    \\\"rafCallbacksIn450ms\\\": 15,\\n    \\\"canvasChanges\\\": [\\n      true\\n    ],\\n    \\\"animationCount\\\": 1,\\n    \\\"pointerTransformsChanged\\\": true,\\n    \\\"dynamicReduced\\\": {\\n      \\\"rafCallbacks\\\": 0,\\n      \\\"canvasChanged\\\": false,\\n      \\\"resumedCallbacks\\\": 14\\n    }\\n  },\\n  {\\n    \\\"label\\\": \\\"mobile\\\",\\n    \\\"errors\\\": [],\\n    \\\"externalRequests\\\": [],\\n    \\\"viewport\\\": {\\n      \\\"width\\\": 390,\\n      \\\"height\\\": 844\\n    },\\n    \\\"document\\\": {\\n      \\\"width\\\": 390,\\n      \\\"height\\\": 844\\n    },\\n    \\\"body\\\": {\\n      \\\"width\\\": 390,\\n      \\\"height\\\": 844\\n    },\\n    \\\"visibleText\\\": \\\"\\\",\\n    \\\"svgCount\\\": 2,\\n    \\\"canvases\\\": [\\n      {\\n        \\\"width\\\": 484,\\n        \\\"height\\\": 435,\\n        \\\"rect\\\": {\\n          \\\"x\\\": -46.796875,\\n          \\\"y\\\": 195.67031860351562,\\n          \\\"width\\\": 483.59375,\\n          \\\"height\\\": 435.2343444824219,\\n          \\\"top\\\": 195.67031860351562,\\n          \\\"right\\\": 436.796875,\\n          \\\"bottom\\\": 630.9046630859375,\\n          \\\"left\\\": -46.796875\\n        },\\n        \\\"pngLength\\\": 61846\\n      }\\n    ],\\n    \\\"reduced\\\": false,\\n    \\\"rafCallbacksIn450ms\\\": 28,\\n    \\\"canvasChanges\\\": [\\n      true\\n    ],\\n    \\\"animationCount\\\": 1,\\n    \\\"pointerTransformsChanged\\\": true\\n  },\\n  {\\n    \\\"label\\\": \\\"small-mobile\\\",\\n    \\\"errors\\\": [],\\n    \\\"externalRequests\\\": [],\\n    \\\"viewport\\\": {\\n      \\\"width\\\": 320,\\n      \\\"height\\\": 568\\n    },\\n    \\\"document\\\": {\\n      \\\"width\\\": 320,\\n      \\\"height\\\": 568\\n    },\\n    \\\"body\\\": {\\n      \\\"width\\\": 320,\\n      \\\"height\\\": 568\\n    },\\n    \\\"visibleText\\\": \\\"\\\",\\n    \\\"svgCount\\\": 2,\\n    \\\"canvases\\\": [\\n      {\\n        \\\"width\\\": 397,\\n        \\\"height\\\": 357,\\n        \\\"rect\\\": {\\n          \\\"x\\\": -38.390625,\\n          \\\"y\\\": 98.2953109741211,\\n          \\\"width\\\": 396.796875,\\n          \\\"height\\\": 357.109375,\\n          \\\"top\\\": 98.2953109741211,\\n          \\\"right\\\": 358.40625,\\n          \\\"bottom\\\": 455.4046859741211,\\n          \\\"left\\\": -38.390625\\n        },\\n        \\\"pngLength\\\": 43350\\n      }\\n    ],\\n    \\\"reduced\\\": false,\\n    \\\"rafCallbacksIn450ms\\\": 28,\\n    \\\"canvasChanges\\\": [\\n      true\\n    ],\\n    \\\"animationCount\\\": 1,\\n    \\\"pointerTransformsChanged\\\": true\\n  },\\n  {\\n    \\\"label\\\": \\\"landscape\\\",\\n    \\\"errors\\\": [],\\n    \\\"externalRequests\\\": [],\\n    \\\"viewport\\\": {\\n      \\\"width\\\": 844,\\n      \\\"height\\\": 390\\n    },\\n    \\\"document\\\": {\\n      \\\"width\\\": 844,\\n      \\\"height\\\": 390\\n    },\\n    \\\"body\\\": {\\n      \\\"width\\\": 844,\\n      \\\"height\\\": 390\\n    },\\n    \\\"visibleText\\\": \\\"\\\",\\n    \\\"svgCount\\\": 2,\\n    \\\"canvases\\\": [\\n      {\\n        \\\"width\\\": 468,\\n        \\\"height\\\": 421,\\n        \\\"rect\\\": {\\n          \\\"x\\\": 188,\\n          \\\"y\\\": -8.423749923706055,\\n          \\\"width\\\": 468,\\n          \\\"height\\\": 421.1875,\\n          \\\"top\\\": -8.423749923706055,\\n          \\\"right\\\": 656,\\n          \\\"bottom\\\": 412.76375007629395,\\n          \\\"left\\\": 188\\n        },\\n        \\\"pngLength\\\": 58266\\n      }\\n    ],\\n    \\\"reduced\\\": false,\\n    \\\"rafCallbacksIn450ms\\\": 28,\\n    \\\"canvasChanges\\\": [\\n      true\\n    ],\\n    \\\"animationCount\\\": 1,\\n    \\\"pointerTransformsChanged\\\": true\\n  },\\n  {\\n    \\\"label\\\": \\\"reduced\\\",\\n    \\\"errors\\\": [],\\n    \\\"externalRequests\\\": [],\\n    \\\"viewport\\\": {\\n      \\\"width\\\": 1440,\\n      \\\"height\\\": 1000\\n    },\\n    \\\"document\\\": {\\n      \\\"width\\\": 1440,\\n      \\\"height\\\": 1000\\n    },\\n    \\\"body\\\": {\\n      \\\"width\\\": 1440,\\n      \\\"height\\\": 1000\\n    },\\n    \\\"visibleText\\\": \\\"\\\",\\n    \\\"svgCount\\\": 2,\\n    \\\"canvases\\\": [\\n      {\\n        \\\"width\\\": 1080,\\n        \\\"height\\\": 972,\\n        \\\"rect\\\": {\\n          \\\"x\\\": 180,\\n          \\\"y\\\": -5.440000534057617,\\n          \\\"width\\\": 1080,\\n          \\\"height\\\": 972,\\n          \\\"top\\\": -5.440000534057617,\\n          \\\"right\\\": 1260,\\n          \\\"bottom\\\": 966.5599994659424,\\n          \\\"left\\\": 180\\n        },\\n        \\\"pngLength\\\": 246806\\n      }\\n    ],\\n    \\\"reduced\\\": true,\\n    \\\"rafCallbacksIn450ms\\\": 0,\\n    \\\"canvasChanges\\\": [\\n      false\\n    ],\\n    \\\"animationCount\\\": 0,\\n    \\\"pointerTransformsChanged\\\": false\\n  }\\n]\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:09:01.077Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_URdMSZrUDSP46YP2N09qt714",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"sed -n '65,160p' <TMP>/ramen-steam.js\\nsed -n '1,100p' <TMP>/ramen-browser-check.cjs\",\"max_output_tokens\":5000}));\n",
+      "timestamp": "2026-09-04T22:09:16.201Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_URdMSZrUDSP46YP2N09qt714",
+      "status": "error",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"ccca4e\",\"wall_time_seconds\":0.000004,\"exit_code\":0,\"original_token_count\":2169,\"output\":\"      gradient.addColorStop(0.55, 'rgba(237,227,210,0.47)');\\n      gradient.addColorStop(0.80, 'rgba(229,222,211,0.15)');\\n      gradient.addColorStop(1, 'rgba(229,222,211,0)');\\n      brush.fillStyle = gradient;\\n\\n      // Neighboring translucent ribbons share a flow, then slowly unwind.\\n      // Their soft edges accumulate into vapor without particle silhouettes.\\n      for (let strand = 0; strand < 2; strand++) {\\n        const points = [];\\n        for (let i = 0; i <= 64; i++) {\\n          const u = i / 64;\\n          const envelope = Math.sin(Math.PI * u);\\n          const flow = u * 8.2 - time * 0.63 + phase;\\n          const curl = Math.sin(flow) * (7 + 23 * u)\\n            + Math.sin(u * 16.1 - time * 0.81 + phase * 1.7) * 8 * u;\\n          const split = (strand - 0.5) * (5 + u * 26)\\n            + Math.sin(u * 10.3 - time * 0.47 + phase + strand * 2) * 8 * u;\\n          points.push({\\n            x: plume.x + plume.lean * u + curl * Math.min(1, u * 6)\\n              + split + pointer.x * 53 * u * u,\\n            y: plume.y - plume.height * u\\n              + Math.sin(flow * 0.73) * 6 * envelope + pointer.y * 9 * u,\\n            width: (3 + plume.width * Math.pow(envelope, 0.8))\\n              * (0.75 + 0.25 * Math.sin(flow + strand * 0.8))\\n              * (strand === 0 ? 1 : 0.62)\\n          });\\n        }\\n\\n        // Nested faint ribbons approximate a soft density falloff. One CSS\\n        // blur composites the whole overlay; per-path canvas filters are costly.\\n        const layers = [\\n          [2.1, 0.009], [1.7, 0.018], [1.3, 0.025],\\n          [0.95, 0.033], [0.65, 0.045], [0.4, 0.052]\\n        ];\\n        for (const [width, opacity] of layers) {\\n          brush.globalAlpha = opacity * breath * (strand === 0 ? 1 : 0.76);\\n          ribbon(points, width);\\n        }\\n      }\\n    }\\n\\n    brush.globalAlpha = 1;\\n    context.setTransform(1, 0, 0, 1, 0, 0);\\n    context.clearRect(0, 0, canvas.width, canvas.height);\\n    context.drawImage(ink, 0, 0, canvas.width, canvas.height);\\n  }\\n\\n  function animate(now) {\\n    frame = 0;\\n    if (destroyed || reduced || !active || document.hidden) return;\\n    // Vapor moves slowly, so 30 fps keeps the overlay inexpensive on mobile.\\n    if (!lastPaint || now - lastPaint >= 1000 / 30) {\\n      const elapsed = lastTime ? Math.min((now - lastTime) / 1000, 0.1) : 0;\\n      lastTime = now;\\n      lastPaint = now;\\n      time += elapsed;\\n      const ease = 1 - Math.exp(-elapsed * 2.1);\\n      pointer.x += (pointer.targetX - pointer.x) * ease;\\n      pointer.y += (pointer.targetY - pointer.y) * ease;\\n      paint();\\n    }\\n    frame = requestAnimationFrame(animate);\\n  }\\n\\n  function synchronize() {\\n    cancelAnimationFrame(frame);\\n    frame = 0;\\n    lastTime = 0;\\n    lastPaint = 0;\\n    if (destroyed) return;\\n    if (reduced) {\\n      pointer.x = pointer.y = 0;\\n      paint();\\n    } else if (active && !document.hidden) {\\n      frame = requestAnimationFrame(animate);\\n    }\\n  }\\n\\n  function resize() {\\n    const bounds = scene.getBoundingClientRect();\\n    const ratio = Math.min(window.devicePixelRatio || 1, 2);\\n    canvas.width = Math.max(1, Math.round(bounds.width * ratio));\\n    canvas.height = Math.max(1, Math.round(bounds.height * ratio));\\n    canvas.style.filter = `blur(${(bounds.width * 5.3 / 1000).toFixed(2)}px)`;\\n    // Soft vapor needs less resolution than the bowl beneath it.\\n    paintScale = Math.min(0.9, Math.max(0.3, canvas.width / 1000));\\n    ink.width = Math.ceil(1000 * paintScale);\\n    ink.height = Math.ceil(900 * paintScale);\\n    paint();\\n  }\\n\\n  function onPreferenceChange() {\\n    reduced = preference.matches;\\n    synchronize();\\n  }\\n\\nconst {chromium} = require('/usr/local/lib/node_modules/promptfoo/node_modules/playwright');\\nconst fs = require('node:fs');\\nconst target='file://<WORKSPACE>/openai/gpt-6-astra/ultra/index.html';\\n(async()=>{\\n  const browser = await chromium.launch({executablePath:'/usr/bin/chromium-browser',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});\\n  const report=[];\\n  try {\\n    for(const [label,width,height,reduced] of [\\n      ['desktop',1440,1000,false],['mobile',390,844,false],['small-mobile',320,568,false],['landscape',844,390,false],['reduced',1440,1000,true]\\n    ]) {\\n      const context = await browser.newContext({viewport:{width,height},deviceScaleFactor:1,reducedMotion:reduced?'reduce':'no-preference'});\\n      const page=await context.newPage();\\n      const errors=[],externalRequests=[];\\n      page.on('pageerror', e=>errors.push(String(e)));\\n      page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});\\n      page.on('request',r=>{if(/^https?:/.test(r.url()))externalRequests.push(r.url())});\\n      await page.addInitScript(()=>{\\n        window.__rafCount=0;\\n        const native=window.requestAnimationFrame.bind(window);\\n        window.requestAnimationFrame=function(callback){return native(time=>{window.__rafCount++;callback(time)})};\\n      });\\n      await page.goto(target,{waitUntil:'load'});\\n      await page.waitForTimeout(1300);\\n      const initial = await page.evaluate(()=>({\\n        title:document.title,\\n        viewport:{width:innerWidth,height:innerHeight},\\n        document:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight},\\n        body:{width:document.body.scrollWidth,height:document.body.scrollHeight},\\n        visibleText:document.body.innerText.trim(),\\n        svgs:[...document.querySelectorAll('svg')].map(el=>({viewBox:el.getAttribute('viewBox'),rect:el.getBoundingClientRect().toJSON(),visibility:getComputedStyle(el).visibility})),\\n        canvases:[...document.querySelectorAll('canvas')].map(el=>({width:el.width,height:el.height,rect:el.getBoundingClientRect().toJSON(),sample:el.toDataURL()})),\\n        animations:document.getAnimations().map(a=>({state:a.playState,rate:a.playbackRate,remaining:a.effect.getComputedTiming().endTime})),\\n        transformTargets:[...document.querySelectorAll('body *')].filter(el=>getComputedStyle(el).transform!=='none').map(el=>({id:el.id,tag:el.tagName,transform:getComputedStyle(el).transform})),\\n        reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,\\n        raf:window.__rafCount\\n      }));\\n      await page.waitForTimeout(450);\\n      const after=await page.evaluate(()=>({raf:window.__rafCount,canvases:[...document.querySelectorAll('canvas')].map(el=>el.toDataURL())}));\\n      initial.rafCallbacksIn450ms=after.raf-initial.raf;\\n      initial.canvasChanges=initial.canvases.map((v,i)=>v.sample!==after.canvases[i]);\\n      initial.canvases.forEach(v=>{v.pngLength=v.sample.length;delete v.sample;});\\n      if(label==='desktop'||label==='mobile'||label==='reduced')await page.screenshot({path:`<TMP>/ramen-${label}.png`});\\n      await page.mouse.move(width*.84,height*.34);\\n      await page.waitForTimeout(400);\\n      initial.pointerTransforms=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>getComputedStyle(el).transform!=='none').map(el=>({id:el.id,tag:el.tagName,transform:getComputedStyle(el).transform})));\\n      if(label==='desktop') {\\n        await page.emulateMedia({reducedMotion:'reduce'});\\n        await page.waitForTimeout(300);\\n        const from=await page.evaluate(()=>window.__rafCount);\\n        const canvasFrom=await page.evaluate(()=>[...document.querySelectorAll('canvas')].map(el=>el.toDataURL()));\\n        await page.waitForTimeout(450);\\n        initial.dynamicReduced={rafCallbacks:await page.evaluate(()=>window.__rafCount)-from,canvasChanged:await page.evaluate(samples=>[...document.querySelectorAll('canvas')].some((el,i)=>el.toDataURL()!==samples[i]),canvasFrom)};\\n        await page.emulateMedia({reducedMotion:'no-preference'});\\n        const resumedFrom=await page.evaluate(()=>window.__rafCount);\\n        await page.waitForTimeout(450);\\n        initial.dynamicReduced.resumedCallbacks=await page.evaluate(()=>window.__rafCount)-resumedFrom;\\n      }\\n      report.push({label,errors,externalRequests,...initial});\\n      await context.close();\\n    }\\n  } finally {await browser.close();}\\n  fs.writeFileSync('<TMP>/ramen-browser-report.json',JSON.stringify(report,null,2));\\n  console.log(JSON.stringify(report.map(r=>({label:r.label,errors:r.errors,externalRequests:r.externalRequests,viewport:r.viewport,document:r.document,body:r.body,visibleText:r.visibleText,svgCount:r.svgs.length,canvases:r.canvases,reduced:r.reduced,rafCallbacksIn450ms:r.rafCallbacksIn450ms,canvasChanges:r.canvasChanges,animationCount:r.animations.length,pointerTransformsChanged:JSON.stringify(r.transformTargets)!==JSON.stringify(r.pointerTransforms),dynamicReduced:r.dynamicReduced})),null,2));\\n})().catch(error=>{console.error(error);process.exit(1)});\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:09:16.287Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The bowl now stays centered on mobile, and the steam runs smoothly after removing the expensive blur operations. I used the test-failures skill to trace both issues. I’m finishing the visual polish and checking the session inbox with the Agent Mail skill.",
+      "timestamp": "2026-09-04T22:09:25.981Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_sBnm46pLJau27p5kx8RfrbRq",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: <WORKSPACE>/openai/gpt-6-astra/ultra/index.html\\n@@\\n-    for (let i = 0; i < 53; i++) {\\n-      const y = 373 + i * 4.2;\\n+    for (let i = 0; i < 39; i++) {\\n+      const y = 373 + i * 5.7 + between(-3, 3);\\n@@\\n-      const fold = between(12, 30);\\n-      const d = `M${left + 45} ${y - 9}C${left - 49} ${y - 28} ${left - 35} ${y + 36} ${left + 30} ${y + 27}C${left + 104} ${y + 10} ${right - 181} ${y - fold} ${right - 78} ${y + 5}C${right + 53} ${y + 32} ${right + 32} ${y - 33} ${right - 35} ${y - 17}C${right - 107} ${y + 10} ${left + 149} ${y + 46} ${left + 71} ${y + 27}`;\\n+      const fold = between(12, 38), bend = Math.sin(i * .65) * 20;\\n+      const d = `M${left + 45} ${y - 9}C${left - 49} ${y - 28} ${left - 35} ${y + 36} ${left + 30} ${y + 27}C${left + 104} ${y + 10 + bend} ${right - 181} ${y - fold} ${right - 78} ${y + 5}C${right + 53} ${y + 32} ${right + 32} ${y - 33} ${right - 35} ${y - 17}C${right - 107} ${y + 10} ${left + 149} ${y + 46 + bend} ${left + 71} ${y + 27}`;\\n@@\\n-      const x = 420 + i * 8.5;\\n-      const d = `M${x - 64} 404C${x + 80} 422 ${x - 67} 466 ${x + 12} 493S${x + 111} 549 ${x + 38} 577`;\\n+      const x = 420 + i * 8.5, bend = Math.sin(i * .7) * 15;\\n+      const d = `M${x - 64} 404C${x + 80 + bend} 422 ${x - 67} 466 ${x + 12} ${493 + bend}S${x + 111} 549 ${x + 38} 577`;\\n@@\\n-    for (let i = 0; i < 12; i++) {\\n-      const x = 440 + i * 8;\\n-      noodle(`M${x} 473C${x - 40} 502 ${x + 44} 519 ${x + 31} 546S${x - 22} 571 ${x + 17} 594`, 4.7, byId('front-noodles'), true);\\n+    for (let i = 0; i < 10; i++) {\\n+      const x = 440 + i * 9, bend = Math.sin(i * .58) * 18;\\n+      noodle(`M${x} ${473 + bend}C${x - 40 + bend} 502 ${x + 44} ${519 + bend} ${x + 31} 546S${x - 22} ${571 - bend} ${x + 17} 594`, between(4.4, 5.5), byId('front-noodles'), true);\\n@@\\n-          brush.globalAlpha = opacity * breath * (strand === 0 ? 1 : 0.76);\\n+          brush.globalAlpha = opacity * 1.35 * breath * (strand === 0 ? 1 : 0.76);\\n*** End Patch\"));\n",
+      "timestamp": "2026-09-04T22:10:12.013Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_sBnm46pLJau27p5kx8RfrbRq",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:10:12.109Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_WzecTXDZzINKIbxwNAX4OcVi",
+      "tool": "send_message",
+      "input": {
+        "target": "browser_check",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"780\">"
+      },
+      "timestamp": "2026-09-04T22:10:18.955Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_WzecTXDZzINKIbxwNAX4OcVi",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-09-04T22:10:19.055Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_rLKvSLvb6Wbgn6v2mbh7t7YP",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"ls -la\\nwc -l -c index.html\",\"max_output_tokens\":1000}));\n",
+      "timestamp": "2026-09-04T22:10:41.265Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_rLKvSLvb6Wbgn6v2mbh7t7YP",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"834242\",\"wall_time_seconds\":0.000003291,\"exit_code\":0,\"original_token_count\":94,\"output\":\"total 32\\ndrwxr-xr-x. 1 <USER> <USER>    54 Sep  4 18:10 .\\ndrwxr-xr-x. 1 <USER> <USER>    52 Sep  4 17:45 ..\\ndr-xr-xr-x. 2 <USER> <USER>    40 Sep  4 18:10 .agents\\ndr-xr-xr-x. 2 <USER> <USER>    40 Sep  4 18:10 .codex\\ndr-xr-xr-x. 2 <USER> <USER>    40 Sep  4 18:10 .git\\n-rw-r--r--. 1 <USER> <USER> 32554 Sep  4 18:10 index.html\\n  546 32554 index.html\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:10:41.348Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_sGq3JuIUDhS6MfgUBeteAsjP",
+      "tool": "exec",
+      "input": "const r=await tools.view_image({path:\"<TMP>/ramen-desktop.png\"});image(r.image_url);\n",
+      "timestamp": "2026-09-04T22:10:48.348Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_sGq3JuIUDhS6MfgUBeteAsjP",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"2270548\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-09-04T22:10:48.469Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_LoMswDRxjcrmmoyrTll1QIae",
+      "tool": "list_agents",
+      "input": {},
+      "timestamp": "2026-09-04T22:10:54.053Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_LoMswDRxjcrmmoyrTll1QIae",
+      "status": "success",
+      "output": "{\"agents\":[{\"agent_name\":\"/root\",\"agent_status\":\"running\"},{\"agent_name\":\"/root/browser_check\",\"agent_status\":\"running\"},{\"agent_name\":\"/root/steam\",\"agent_status\":{\"completed\":\"Optimized [ramen-steam.js](<TMP>/ramen-steam.js) is ready.\\n\\nReplaced expensive per-path canvas filters with layered translucent ribbons and one CSS blur. Chromium’s full-scene benchmark improved from **15.0 fps to 60.5 fps** at 1440 × 1000. Soft wisps remain visually intact. `index.html` was untouched.\"}}]}",
+      "timestamp": "2026-09-04T22:10:54.063Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ckPc1N35LUAIlRCY8QZOc78A",
+      "tool": "wait_agent",
+      "input": {
+        "timeout_ms": 10000
+      },
+      "timestamp": "2026-09-04T22:10:59.987Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ckPc1N35LUAIlRCY8QZOc78A",
+      "status": "success",
+      "output": "{\"message\":\"Wait timed out.\",\"timed_out\":true}",
+      "timestamp": "2026-09-04T22:11:10.005Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_lvSln33wEW0F7Vj5kDdn9nmQ",
+      "tool": "send_message",
+      "input": {
+        "target": "browser_check",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"376\">"
+      },
+      "timestamp": "2026-09-04T22:11:17.306Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_lvSln33wEW0F7Vj5kDdn9nmQ",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-09-04T22:11:17.356Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_WF5AKmM5qW3h0VR6zC1WD4sX",
+      "tool": "wait_agent",
+      "input": {
+        "timeout_ms": 10000
+      },
+      "timestamp": "2026-09-04T22:11:26.980Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_WF5AKmM5qW3h0VR6zC1WD4sX",
+      "status": "success",
+      "output": "{\"message\":\"Wait timed out.\",\"timed_out\":true}",
+      "timestamp": "2026-09-04T22:11:36.999Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The visual polish is finished. Browser checks show no external requests, visible text, or controls, and reduced motion stops the animation. The final pass is confirming the bowl fits across desktop, portrait, and landscape layouts.",
+      "timestamp": "2026-09-04T22:11:47.003Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_46XIMsE55NMEvy7a6O6XkFE7",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"ls -l <TMP>/ramen-browser-report.json <TMP>/ramen-desktop.png <TMP>/ramen-mobile.png\",\"max_output_tokens\":1000}));\n",
+      "timestamp": "2026-09-04T22:11:47.010Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_46XIMsE55NMEvy7a6O6XkFE7",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"743f8f\",\"wall_time_seconds\":0.00000375,\"exit_code\":0,\"original_token_count\":59,\"output\":\"-rw-r--r--. 1 <USER> <USER>  363261 Sep  4 18:10 <TMP>/ramen-browser-report.json\\n-rw-r--r--. 1 <USER> <USER> 1702911 Sep  4 18:10 <TMP>/ramen-desktop.png\\n-rw-r--r--. 1 <USER> <USER>  402369 Sep  4 18:10 <TMP>/ramen-mobile.png\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:11:47.092Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Created [index.html](<WORKSPACE>/openai/gpt-6-astra/ultra/index.html) with detailed vegan ramen, drifting steam, warm lighting, and subtle mouse response.\n\nEverything is inline, with zero external assets or visible UI. Verified desktop, mobile, landscape, and reduced-motion behavior.",
+      "timestamp": "2026-09-04T22:12:10.603Z"
     }
   ],
-  "metadata": {}
+  "metadata": {
+    "sourceRecord": "rollout-2026-09-04T17-47-38-01a06e64-3cc2-7683-9899-b23ee13ada47.jsonl",
+    "normalization": {
+      "excluded": [
+        "system and developer prompts",
+        "hidden thinking and reasoning",
+        "credentials and private agent-mail calls",
+        "large base64 and embedded image data (event retained with size marker)"
+      ],
+      "omittedPrivateToolCalls": 4
+    },
+    "eventCounts": {
+      "message": 7,
+      "tool_call": 27,
+      "tool_result": 27
+    }
+  }
 }

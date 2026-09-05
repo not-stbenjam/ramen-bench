@@ -1,0 +1,94 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "meta/muse-spark-1.3/low",
+  "vendor": {
+    "slug": "meta",
+    "displayName": "Meta"
+  },
+  "model": {
+    "slug": "muse-spark-1.3",
+    "displayName": "Muse Spark 1.3",
+    "providerModelId": "muse-spark-1.3-contributor"
+  },
+  "variation": {
+    "slug": "low",
+    "displayName": "Low",
+    "reasoningEffort": "low"
+  },
+  "harness": {
+    "name": "Muse Code",
+    "version": "1.0.3 (238bb03ff3)"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-05T01:21:20.671582Z",
+    "completedAt": "2026-09-05T01:22:52.270582Z",
+    "wallDurationMs": 91599,
+    "apiDurationMs": 72482
+  },
+  "usage": {
+    "tokens": {
+      "input": 52639,
+      "cachedInput": 492492,
+      "cacheCreationInput": 0,
+      "reasoning": 1013,
+      "output": 10525,
+      "total": 556669
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0.0052639,
+      "cachedInput": 0.000984984,
+      "cacheCreationInput": 0,
+      "output": 0.0023076,
+      "other": 0,
+      "total": 0.008556484,
+      "estimated": true
+    },
+    "requests": 13,
+    "turns": 1,
+    "toolCalls": 12,
+    "providerReported": true,
+    "raw": {
+      "modelCompletedTotals": {
+        "input_tokens": 545131,
+        "cached_tokens": 492492,
+        "cache_read_tokens": 492492,
+        "cache_write_tokens": 0,
+        "output_tokens": 10525,
+        "reasoning_tokens": 1013
+      },
+      "terminal": {
+        "eot_gate_ms": 16686,
+        "kind": "terminal",
+        "reason": null,
+        "terminal": "completed",
+        "time_to_first_token_ms": 4069,
+        "turn_duration_ms": 91599
+      },
+      "pricing": {
+        "library": "LiteLLM",
+        "version": "1.83.7",
+        "modelKey": "meta/muse-spark-1.3-contributor",
+        "inputCostPerToken": 1e-07,
+        "cachedInputCostPerToken": 2e-09,
+        "outputCostPerToken": 2e-07,
+        "reasoningCostPerToken": 2e-07
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 18328,
+    "lines": 450
+  },
+  "provenance": {
+    "generatedAt": "2026-09-05T02:07:46.665950Z",
+    "sourceCommit": "5292b3628a7d42cf2729731510ccca8a3fe90d79",
+    "pricingSource": "LiteLLM 1.83.7 model_cost['meta/muse-spark-1.3-contributor']"
+  },
+  "notes": "Token counts and durations are exact sums of Muse Code model_completed events and the completed terminal event. Provider input includes cache hits; usage.tokens.input is the uncached remainder. Estimated cost uses LiteLLM's recorded contributor rates, with reasoning tokens charged at the output rate."
+}

@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Artisanal Vegan Ramen</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #030202;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      cursor: default;
+    }
+    #ramen-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="ramen-canvas"></canvas>
+
+  <script>
+  (function() {
+    'use strict';
+
+    const canvas = document.getElementById('ramen-canvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    // Accessibility: prefers-reduced-motion
+    let prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => {
+      prefersReducedMotion = e.matches;
+    });
+
+    // Screen dimensions & DPI
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let bowlCenterX = 0;
+    let bowlCenterY = 0;
+    let baseScale = 1;
+
+    // Mouse & Pointer State
+    const mouse = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      targetX: window.innerWidth / 2,
+      targetY: window.innerHeight / 2,
+      vx: 0,
+      vy: 0,
+      isDown: false,
+      isHoveringBowl: false
+    };
+
+    // Parallax Tilt State
+    const tilt = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0
+    };
+
+    // Dynamic Lighting
+    const light = {
+      x: 0.15,
+      y: -0.65,
+      targetX: 0.15,
+      targetY: -0.65,
+      intensity: 1.0,
+      warmthPulse: 0
+    };
+
+    // Interactive Ripples on broth
+    const ripples = [];
+
+    function addRipple(x, y, maxR = 90, strength = 1.0) {
+      if (prefersReducedMotion) return;
+      ripples.push({
+        x: x,
+        y: y,
+        r: 3,
+        maxR: maxR,
+        alpha: 0.65 * strength,
+        speed: 1.3 + Math.random() * 0.4
+      });
+      if (ripples.length > 10) ripples.shift();
+    }
+
+    // Floating Oil Droplets (Rayu chili oil, aromatic scallion oil, sesame rings)
+    const oilDroplets = [];
+    const NUM_DROPLETS = 80;
+
+    function initOilDroplets() {
+      oilDroplets.length = 0;
+      for (let i = 0; i < NUM_DROPLETS; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const distRatio = 0.35 + 0.62 * Math.sqrt(Math.random());
+        const baseR = distRatio * 185;
+        
+        const rand = Math.random();
+        const type = rand < 0.52 ? 'chili' : (rand < 0.78 ? 'scallion' : 'sesame');
+        const radius = type === 'chili' 
+          ? (2.2 + Math.random() * 5.2) 
+          : (type === 'scallion' ? (2.6 + Math.random() * 4.8) : (3.2 + Math.random() * 5.8));
+
+        oilDroplets.push({
+          angle: angle,
+          dist: baseR,
+          baseDist: baseR,
+          angularSpeed: (0.0006 + Math.random() * 0.0014) * (Math.random() < 0.5 ? 1 : -1),
+          radialOffset: 0,
+          radialPhase: Math.random() * Math.PI * 2,
+          radius: radius,
+          type: type,
+          x: 0,
+          y: 0,
+          vx: 0,
+          vy: 0
+        });
+      }
+    }
+
+    // Volumetric Steam Simulation
+    const steamParticles = [];
+    const MAX_STEAM = 190;
+
+    function createSteamParticle(initY = null, initialProgress = 0) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = (0.15 + Math.random() * 0.75) * 175;
+      const x = Math.cos(angle) * r * 1.05;
+      const spawnY = 4 + Math.sin(angle) * r * 0.78;
+      const y = initY !== null ? initY : spawnY;
+
+      const maxLife = prefersReducedMotion ? (260 + Math.random() * 100) : (160 + Math.random() * 110);
+      const life = initialProgress > 0 ? maxLife * initialProgress : 0;
+
+      return {
+        x: x,
+        y: y,
+        spawnX: x,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: prefersReducedMotion ? -(0.35 + Math.random() * 0.35) : -(1.05 + Math.random() * 1.35),
+        size: 16 + Math.random() * 14,
+        maxSize: 72 + Math.random() * 55,
+        alpha: 0,
+        maxAlpha: 0.065 + Math.random() * 0.075,
+        life: life,
+        maxLife: maxLife,
+        curlSeed: Math.random() * 100,
+        curlFreq: 0.02 + Math.random() * 0.016,
+        curlAmp: prefersReducedMotion ? 0.12 : (0.65 + Math.random() * 0.85)
+      };
+    }
+
+    function initSteam() {
+      steamParticles.length = 0;
+      for (let i = 0; i < MAX_STEAM; i++) {
+        const prog = Math.random();
+        const p = createSteamParticle(null, prog);
+        p.y -= prog * 310;
+        steamParticles.push(p);
+      }
+    }
+
+    // Ambient floating dust motes
+    const motes = [];
+    for (let i = 0; i < 40; i++) {
+      motes.push({
+        x: Math.random(),
+        y: Math.random(),
+        vx: (Math.random() - 0.5) * 0.00035,
+        vy: -0.00025 - Math.random() * 0.0005,
+        size: 0.8 + Math.random() * 1.8,
+        alpha: 0.1 + Math.random() * 0.4,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    // Responsive Canvas Resize
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      bowlCenterX = width / 2;
+      bowlCenterY = height * 0.52;
+
+      const minDim = Math.min(width, height);
+      baseScale = Math.max(0.48, Math.min(1.22, minDim / 680));
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    initOilDroplets();
+    initSteam();
+
+    // Smooth Mouse / Pointer Tracking
+    function updatePointer(clientX, clientY) {
+      mouse.targetX = clientX;
+      mouse.targetY = clientY;
+    }
+
+    window.addEventListener('pointermove', e => {
+      updatePointer(e.clientX, e.clientY);
+    }, { passive: true });
+
+    window.addEventListener('pointerdown', e => {
+      mouse.isDown = true;
+      updatePointer(e.clientX, e.clientY);
+
+      const dx = (e.clientX - bowlCenterX) / baseScale;
+      const dy = (e.clientY - (bowlCenterY + 4 * baseScale)) / baseScale;
+      if (dx * dx + (dy / 0.78) * (dy / 0.78) < 215 * 215) {
+        addRipple(dx, dy, 130, 1.4);
+        light.warmthPulse = 0.28;
+
+        for (let i = 0; i < 10; i++) {
+          if (steamParticles.length < MAX_STEAM + 30) {
+            const p = createSteamParticle(dy);
+            p.x = dx + (Math.random() - 0.5) * 40;
+            p.vy *= 1.4;
+            p.maxAlpha *= 1.3;
+            steamParticles.push(p);
+          }
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('pointerup', () => { mouse.isDown = false; });
+    window.addEventListener('pointercancel', () => { mouse.isDown = false; });
+
+    // Procedural Table & Counter Texture
+    function drawDarkTable(time) {
+      const bgGrad = ctx.createRadialGradient(
+        bowlCenterX + light.x * 60, bowlCenterY - 180 * baseScale + light.y * 40, 40 * baseScale,
+        bowlCenterX, bowlCenterY, Math.max(width, height) * 0.9
+      );
+      
+      const pulse = Math.sin(time * 0.85) * 0.018;
+      bgGrad.addColorStop(0, `rgba(48, 25, 12, ${0.52 + pulse})`);
+      bgGrad.addColorStop(0.28, `rgba(22, 13, 7, ${0.82 + pulse})`);
+      bgGrad.addColorStop(0.65, '#0a0806');
+      bgGrad.addColorStop(1, '#030202');
+
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Fine charred cypress wood grain
+      ctx.save();
+      ctx.globalAlpha = 0.04;
+      ctx.strokeStyle = '#e0be92';
+      const grainStep = 8 * baseScale;
+      const startY = Math.floor((bowlCenterY - 320 * baseScale) / grainStep) * grainStep;
+      for (let y = startY; y < height; y += grainStep) {
+        ctx.beginPath();
+        ctx.lineWidth = 1 + (Math.sin(y * 0.06) + 1) * 0.7;
+        ctx.moveTo(0, y + Math.sin(y * 0.025) * 4);
+        ctx.bezierCurveTo(
+          width * 0.33, y + Math.cos(y * 0.035) * 5,
+          width * 0.66, y - Math.sin(y * 0.045) * 4,
+          width, y + Math.cos(y * 0.025) * 3
+        );
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Atmospheric floating warm dust motes
+      ctx.save();
+      for (let i = 0; i < motes.length; i++) {
+        const m = motes[i];
+        m.y += m.vy;
+        m.x += m.vx + Math.sin(time * 0.5 + m.phase) * 0.00025;
+        if (m.y < 0) m.y = 1;
+        if (m.x < 0) m.x = 1;
+        if (m.x > 1) m.x = 0;
+
+        const px = m.x * width;
+        const py = m.y * height;
+        const distFromCenter = Math.hypot(px - bowlCenterX, py - (bowlCenterY - 120));
+        const beamIntensity = Math.max(0, 1 - distFromCenter / (440 * baseScale));
+
+        if (beamIntensity > 0.04) {
+          ctx.beginPath();
+          ctx.arc(px, py, m.size * baseScale, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 215, 155, ${m.alpha * beamIntensity * 0.85})`;
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    // Heavy Stoneware Bowl Shadow on Counter
+    function drawBowlShadow(scale, tX, tY) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * -10, bowlCenterY + 48 * scale + tY * -6);
+
+      const contactGrad = ctx.createRadialGradient(0, 48 * scale, 35 * scale, 0, 48 * scale, 275 * scale);
+      contactGrad.addColorStop(0, 'rgba(0, 0, 0, 0.96)');
+      contactGrad.addColorStop(0.35, 'rgba(2, 2, 1, 0.78)');
+      contactGrad.addColorStop(0.72, 'rgba(8, 5, 3, 0.32)');
+      contactGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.beginPath();
+      ctx.ellipse(0, 48 * scale, 268 * scale, 130 * scale, 0, 0, Math.PI * 2);
+      ctx.fillStyle = contactGrad;
+      ctx.fill();
+
+      const bounceGrad = ctx.createRadialGradient(0, 56 * scale, 90 * scale, 0, 65 * scale, 290 * scale);
+      bounceGrad.addColorStop(0, 'rgba(225, 115, 25, 0.09)');
+      bounceGrad.addColorStop(0.5, 'rgba(170, 70, 10, 0.03)');
+      bounceGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.beginPath();
+      ctx.ellipse(0, 65 * scale, 295 * scale, 115 * scale, 0, 0, Math.PI * 2);
+      ctx.fillStyle = bounceGrad;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Stoneware Donburi Outer Ceramic Vessel & Glaze
+    function drawBowlBody(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 6, bowlCenterY + tY * 4);
+
+      const R_OUTER_X = 265 * scale;
+      const R_OUTER_Y = 222 * scale;
+      const FOOT_R_X = 120 * scale;
+      const FOOT_R_Y = 58 * scale;
+      const BOWL_DEPTH = 142 * scale;
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, R_OUTER_X, R_OUTER_Y, 0, 0, Math.PI);
+      ctx.bezierCurveTo(
+        R_OUTER_X * 0.95, BOWL_DEPTH * 0.58,
+        FOOT_R_X * 1.35, BOWL_DEPTH * 0.95,
+        FOOT_R_X, BOWL_DEPTH
+      );
+      ctx.ellipse(0, BOWL_DEPTH, FOOT_R_X, FOOT_R_Y * 0.45, 0, 0, Math.PI, false);
+      ctx.bezierCurveTo(
+        -FOOT_R_X * 1.35, BOWL_DEPTH * 0.95,
+        -R_OUTER_X * 0.95, BOWL_DEPTH * 0.58,
+        -R_OUTER_X, 0
+      );
+      ctx.closePath();
+
+      const bodyGrad = ctx.createLinearGradient(-R_OUTER_X, -40 * scale, R_OUTER_X, BOWL_DEPTH);
+      bodyGrad.addColorStop(0, '#222126');
+      bodyGrad.addColorStop(0.22, '#141416');
+      bodyGrad.addColorStop(0.68, '#0d0d0f');
+      bodyGrad.addColorStop(0.92, '#1c1611');
+      bodyGrad.addColorStop(1, '#110c08');
+
+      ctx.fillStyle = bodyGrad;
+      ctx.fill();
+
+      // Concentric hand-thrown wheel ridges
+      ctx.save();
+      ctx.clip();
+      ctx.strokeStyle = 'rgba(255, 235, 210, 0.038)';
+      ctx.lineWidth = 2 * scale;
+      for (let r = 0.18; r < 0.95; r += 0.15) {
+        ctx.beginPath();
+        ctx.ellipse(0, BOWL_DEPTH * r, (R_OUTER_X * (1 - r * 0.45)), (R_OUTER_Y * 0.45 * (1 - r * 0.3)), 0, 0, Math.PI);
+        ctx.stroke();
+      }
+
+      // Specular highlight on curved ceramic body
+      const bodyHighlight = ctx.createRadialGradient(
+        lightVec.x * 125 * scale, 42 * scale + lightVec.y * 30 * scale, 10 * scale,
+        lightVec.x * 125 * scale, 52 * scale + lightVec.y * 30 * scale, 190 * scale
+      );
+      bodyHighlight.addColorStop(0, 'rgba(255, 240, 215, 0.13)');
+      bodyHighlight.addColorStop(0.5, 'rgba(220, 180, 140, 0.04)');
+      bodyHighlight.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = bodyHighlight;
+      ctx.fill();
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    // Inner Ceramic Wall (sloping down from the rim to the broth level)
+    function drawInnerBowlWall(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 12, bowlCenterY + tY * 8);
+
+      const R_RIM_X = 246 * scale;
+      const R_RIM_Y = 203 * scale;
+      const R_BROTH_X = 240 * scale;
+      const R_BROTH_Y = 194 * scale;
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, R_RIM_X, R_RIM_Y, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 4 * scale, R_BROTH_X, R_BROTH_Y, 0, 0, Math.PI * 2, true);
+
+      const innerWallGrad = ctx.createLinearGradient(0, -R_RIM_Y, 0, R_RIM_Y);
+      innerWallGrad.addColorStop(0, '#1c1613');
+      innerWallGrad.addColorStop(0.35, '#2e2018');
+      innerWallGrad.addColorStop(0.72, '#482d1c');
+      innerWallGrad.addColorStop(1, '#5a361e');
+
+      ctx.fillStyle = innerWallGrad;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Rich Broth Surface, Golden Sheen & Convective Convection
+    function drawBrothSurface(scale, tX, tY, time, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 16, bowlCenterY + 4 * scale + tY * 11);
+
+      const R_BROTH_X = 240 * scale;
+      const R_BROTH_Y = 194 * scale;
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, R_BROTH_X, R_BROTH_Y, 0, 0, Math.PI * 2);
+
+      const simmer = Math.sin(time * 1.5) * 0.02;
+      const brothGrad = ctx.createRadialGradient(
+        lightVec.x * 50 * scale, -25 * scale + lightVec.y * 35 * scale, 20 * scale,
+        0, 0, R_BROTH_X
+      );
+
+      brothGrad.addColorStop(0, `rgba(218, 138, 48, ${0.98 + simmer})`);
+      brothGrad.addColorStop(0.38, 'rgba(158, 78, 18, 0.99)');
+      brothGrad.addColorStop(0.72, '#5e2708');
+      brothGrad.addColorStop(0.93, '#2a0e02');
+      brothGrad.addColorStop(1, '#130601');
+
+      ctx.fillStyle = brothGrad;
+      ctx.fill();
+
+      // Liquid Surface Sheen
+      ctx.save();
+      ctx.clip();
+
+      const sheenGrad = ctx.createRadialGradient(
+        lightVec.x * 70 * scale, -38 * scale + lightVec.y * 42 * scale, 12 * scale,
+        lightVec.x * 65 * scale, -28 * scale + lightVec.y * 42 * scale, 165 * scale
+      );
+      sheenGrad.addColorStop(0, `rgba(255, 238, 200, ${0.24 + simmer * 1.5 + light.warmthPulse})`);
+      sheenGrad.addColorStop(0.38, 'rgba(235, 168, 85, 0.10)');
+      sheenGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = sheenGrad;
+      ctx.beginPath();
+      ctx.ellipse(lightVec.x * 60 * scale, -32 * scale + lightVec.y * 38 * scale, R_BROTH_X * 0.72, R_BROTH_Y * 0.58, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Interactive liquid ripples
+      if (ripples.length > 0) {
+        ctx.lineWidth = 2 * scale;
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const rip = ripples[i];
+          rip.r += rip.speed;
+          rip.alpha *= 0.965;
+
+          if (rip.alpha < 0.015 || rip.r > rip.maxR) {
+            ripples.splice(i, 1);
+            continue;
+          }
+
+          ctx.beginPath();
+          ctx.ellipse(rip.x * scale, rip.y * scale * 0.78, rip.r * scale, rip.r * 0.78 * scale, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 235, 190, ${rip.alpha * 0.55})`;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.ellipse(rip.x * scale, (rip.y + 1.5) * scale * 0.78, (rip.r - 2) * scale, (rip.r - 2) * 0.78 * scale, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(35, 12, 3, ${rip.alpha * 0.38})`;
+          ctx.stroke();
+        }
+      }
+
+      ctx.restore();
+      ctx.restore();
+    }
+
+    // TOPPING: Roasted Nori Sheets (Tucked neatly against rear inner rim wall)
+    function drawNoriSheets(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 24, bowlCenterY + 4 * scale + tY * 16);
+
+      // Sheet 1 (Right back)
+      ctx.save();
+      ctx.translate(22 * scale, -100 * scale);
+      ctx.rotate(0.12);
+
+      const noriGrad1 = ctx.createLinearGradient(-30 * scale, -45 * scale, 30 * scale, 35 * scale);
+      noriGrad1.addColorStop(0, '#101712');
+      noriGrad1.addColorStop(0.5, '#17221a');
+      noriGrad1.addColorStop(1, '#0b100d');
+
+      ctx.fillStyle = noriGrad1;
+      ctx.fillRect(-30 * scale, -45 * scale, 60 * scale, 75 * scale);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+      for (let i = -24; i < 24; i += 6) {
+        for (let j = -38; j < 25; j += 7) {
+          ctx.fillRect((i + Math.sin(j) * 2) * scale, j * scale, 2.5 * scale, 2 * scale);
+        }
+      }
+
+      ctx.strokeStyle = 'rgba(225, 245, 215, 0.22)';
+      ctx.lineWidth = 1.4 * scale;
+      ctx.beginPath();
+      ctx.moveTo(-30 * scale, -45 * scale);
+      ctx.lineTo(30 * scale, -45 * scale);
+      ctx.stroke();
+      ctx.restore();
+
+      // Sheet 2 (Left back)
+      ctx.save();
+      ctx.translate(-24 * scale, -106 * scale);
+      ctx.rotate(-0.06);
+
+      const noriGrad2 = ctx.createLinearGradient(-32 * scale, -48 * scale, 32 * scale, 38 * scale);
+      noriGrad2.addColorStop(0, '#0d130f');
+      noriGrad2.addColorStop(0.5, '#151e17');
+      noriGrad2.addColorStop(1, '#080d0a');
+
+      ctx.fillStyle = noriGrad2;
+      ctx.fillRect(-32 * scale, -48 * scale, 64 * scale, 80 * scale);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+      for (let i = -26; i < 26; i += 6) {
+        for (let j = -42; j < 28; j += 7) {
+          ctx.fillRect((i + Math.sin(j * 1.5) * 2) * scale, j * scale, 2.5 * scale, 2 * scale);
+        }
+      }
+
+      ctx.strokeStyle = 'rgba(225, 245, 215, 0.25)';
+      ctx.lineWidth = 1.4 * scale;
+      ctx.beginPath();
+      ctx.moveTo(-32 * scale, -48 * scale);
+      ctx.lineTo(32 * scale, -48 * scale);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    // Abundant, Intertwined, Springy Wavy Ramen Noodles (Continuous curving loops)
+    function drawNoodles(scale, tX, tY, time) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 22, bowlCenterY + 4 * scale + tY * 15);
+
+      const R_BROTH_X = 240 * scale;
+      const R_BROTH_Y = 194 * scale;
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, R_BROTH_X, R_BROTH_Y, 0, 0, Math.PI * 2);
+      ctx.clip();
+
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Sweeping curving paths that loop naturally and tuck under toppings
+      const noodlePaths = [
+        // Deep looping under-nest
+        [[-135, 20], [-80, 75], [-10, 68], [50, 42], [95, 20], [135, -5]],
+        [[-125, 40], [-65, 95], [10, 90], [70, 60], [115, 35], [140, 10]],
+        [[-115, 60], [-50, 115], [25, 110], [80, 80], [125, 50], [130, 25]],
+        [[-100, 80], [-35, 132], [40, 128], [95, 95], [120, 65], [105, 45]],
+        [[-85, 100], [-20, 145], [55, 138], [105, 108], [110, 80], [75, 75]],
+        [[-145, 5], [-85, 45], [-20, 40], [45, 22], [90, 5], [125, -20]],
+        [[-130, -15], [-70, 25], [-5, 18], [60, -2], [100, -18], [130, -38]],
+
+        // Mid-depth looping bundles
+        [[-120, 32], [-70, 72], [-5, 62], [55, 48], [105, 25], [120, -2]],
+        [[-110, 52], [-55, 92], [15, 82], [75, 58], [115, 30], [125, 8]],
+        [[-95, 72], [-38, 112], [32, 102], [88, 72], [118, 48], [100, 32]],
+        [[-80, 92], [-18, 128], [48, 118], [98, 88], [110, 62], [85, 50]],
+        [[-65, 110], [2, 140], [62, 128], [102, 98], [88, 78], [60, 70]],
+        [[-135, 15], [-75, 55], [-12, 48], [48, 32], [95, 12], [115, -10]],
+        [[-105, 18], [-48, 42], [12, 35], [68, 15], [108, -5], [118, -25]],
+
+        // Surface-breaking luscious wavy strands
+        [[-115, 28], [-68, 68], [-2, 58], [58, 42], [102, 18], [118, -8]],
+        [[-102, 46], [-50, 85], [18, 75], [72, 50], [112, 22], [122, -2]],
+        [[-90, 65], [-32, 105], [35, 95], [85, 65], [115, 38], [98, 20]],
+        [[-75, 85], [-12, 120], [52, 110], [95, 80], [105, 55], [80, 42]],
+        [[-60, 102], [8, 132], [65, 120], [98, 90], [82, 70], [52, 62]],
+        [[-125, 8], [-65, 48], [-8, 38], [52, 22], [98, 2], [112, -18]],
+        [[-96, 12], [-42, 35], [18, 28], [72, 8], [105, -12], [115, -30]],
+        [[-82, 38], [-28, 62], [28, 52], [78, 30], [108, 8], [112, -12]],
+        [[-70, 58], [-15, 82], [42, 70], [88, 45], [112, 18], [95, 5]],
+        [[-52, 78], [5, 102], [58, 88], [95, 60], [102, 38], [78, 28]],
+        [[-36, 95], [22, 118], [72, 105], [98, 75], [85, 55], [62, 48]]
+      ];
+
+      // Draw helper function
+      function drawStrandCurve(pts, offsetY = 0) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0] * scale, (pts[0][1] + offsetY) * scale);
+        for (let i = 1; i < pts.length - 2; i++) {
+          const xc = (pts[i][0] + pts[i + 1][0]) * 0.5 * scale;
+          const yc = (pts[i][1] + pts[i + 1][1] + offsetY * 2) * 0.5 * scale;
+          ctx.quadraticCurveTo(pts[i][0] * scale, (pts[i][1] + offsetY) * scale, xc, yc);
+        }
+        ctx.quadraticCurveTo(
+          pts[pts.length - 2][0] * scale, (pts[pts.length - 2][1] + offsetY) * scale,
+          pts[pts.length - 1][0] * scale, (pts[pts.length - 1][1] + offsetY) * scale
+        );
+        ctx.stroke();
+      }
+
+      // 1. Deep strands
+      ctx.lineWidth = 5.4 * scale;
+      ctx.strokeStyle = 'rgba(180, 108, 32, 0.45)';
+      for (let i = 0; i < 7; i++) {
+        drawStrandCurve(noodlePaths[i]);
+      }
+
+      // 2. Mid strands
+      ctx.lineWidth = 4.8 * scale;
+      ctx.strokeStyle = '#c68426';
+      for (let i = 7; i < 14; i++) {
+        drawStrandCurve(noodlePaths[i]);
+      }
+
+      // 3. Surface strands (with shadow, body, and wet specular hairline)
+      for (let i = 14; i < noodlePaths.length; i++) {
+        const pts = noodlePaths[i];
+
+        // Soft noodle shadow
+        ctx.lineWidth = 4.8 * scale;
+        ctx.strokeStyle = '#a4681a';
+        drawStrandCurve(pts, 1.2);
+
+        // Springy golden body
+        ctx.lineWidth = 3.6 * scale;
+        ctx.strokeStyle = '#f8d06b';
+        drawStrandCurve(pts, 0);
+
+        // Glistening wet highlight along ridge
+        ctx.lineWidth = 1.3 * scale;
+        ctx.strokeStyle = 'rgba(255, 252, 230, 0.88)';
+        drawStrandCurve(pts, -0.6);
+      }
+
+      ctx.restore();
+      ctx.restore();
+    }
+
+    // TOPPING: Crisp Baby Bok Choy (Pak Choi - organically nestled along left inner flank)
+    function drawBokChoy(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 28, bowlCenterY + 4 * scale + tY * 18);
+
+      ctx.save();
+      ctx.translate(-118 * scale, -25 * scale);
+      ctx.rotate(-0.25);
+
+      // Contact shadow beneath bok choy
+      ctx.beginPath();
+      ctx.ellipse(0, 10 * scale, 22 * scale, 58 * scale, 0.1, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(12, 5, 2, 0.55)';
+      ctx.fill();
+
+      // 1. Succulent Pale Jade Stalk
+      ctx.beginPath();
+      ctx.moveTo(-16 * scale, 45 * scale);
+      ctx.bezierCurveTo(-30 * scale, 15 * scale, -26 * scale, -18 * scale, -10 * scale, -48 * scale);
+      ctx.bezierCurveTo(2 * scale, -54 * scale, 16 * scale, -48 * scale, 18 * scale, -32 * scale);
+      ctx.bezierCurveTo(22 * scale, -8 * scale, 18 * scale, 18 * scale, 10 * scale, 48 * scale);
+      ctx.closePath();
+
+      const stalkGrad = ctx.createLinearGradient(-18 * scale, 34 * scale, 14 * scale, -45 * scale);
+      stalkGrad.addColorStop(0, '#e4f5e2');
+      stalkGrad.addColorStop(0.38, '#bfe3ba');
+      stalkGrad.addColorStop(0.78, '#82be7b');
+      stalkGrad.addColorStop(1, '#3b7c35');
+
+      ctx.fillStyle = stalkGrad;
+      ctx.fill();
+
+      // Striations on stalk
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1.1 * scale;
+      for (let offset of [-10, -3, 3, 9]) {
+        ctx.beginPath();
+        ctx.moveTo(offset * scale * 0.9, 40 * scale);
+        ctx.bezierCurveTo(
+          (offset - 4) * scale, 8 * scale,
+          (offset - 2) * scale, -16 * scale,
+          offset * scale * 0.7, -42 * scale
+        );
+        ctx.stroke();
+      }
+
+      // Juicy specular glisten
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.72)';
+      ctx.lineWidth = 2.2 * scale;
+      ctx.beginPath();
+      ctx.moveTo(-8 * scale, 28 * scale);
+      ctx.bezierCurveTo(-13 * scale, 8 * scale, -10 * scale, -14 * scale, -3 * scale, -35 * scale);
+      ctx.stroke();
+
+      // 2. Lush Crinkled Dark Emerald Leaves (Layered organic leaves)
+      // Leaf 1: Back ruffle
+      ctx.beginPath();
+      ctx.moveTo(-12 * scale, -42 * scale);
+      ctx.bezierCurveTo(-34 * scale, -58 * scale, -38 * scale, -82 * scale, -24 * scale, -102 * scale);
+      ctx.bezierCurveTo(-8 * scale, -112 * scale, 8 * scale, -108 * scale, 18 * scale, -92 * scale);
+      ctx.bezierCurveTo(32 * scale, -78 * scale, 28 * scale, -55 * scale, 14 * scale, -42 * scale);
+      ctx.closePath();
+
+      const leafGrad1 = ctx.createRadialGradient(
+        0, -72 * scale, 12 * scale,
+        0, -78 * scale, 52 * scale
+      );
+      leafGrad1.addColorStop(0, '#2e6f36');
+      leafGrad1.addColorStop(0.5, '#1d4e25');
+      leafGrad1.addColorStop(0.85, '#123517');
+      leafGrad1.addColorStop(1, '#0a210e');
+
+      ctx.fillStyle = leafGrad1;
+      ctx.fill();
+
+      // Leaf 2: Front ruffled leaf with scalloped edge
+      ctx.beginPath();
+      ctx.moveTo(-8 * scale, -44 * scale);
+      ctx.bezierCurveTo(-26 * scale, -60 * scale, -28 * scale, -78 * scale, -15 * scale, -94 * scale);
+      ctx.bezierCurveTo(-2 * scale, -100 * scale, 10 * scale, -96 * scale, 15 * scale, -82 * scale);
+      ctx.bezierCurveTo(24 * scale, -70 * scale, 20 * scale, -52 * scale, 10 * scale, -42 * scale);
+      ctx.closePath();
+
+      const leafGrad2 = ctx.createRadialGradient(
+        -2 * scale, -68 * scale, 8 * scale,
+        -2 * scale, -72 * scale, 42 * scale
+      );
+      leafGrad2.addColorStop(0, '#388442');
+      leafGrad2.addColorStop(0.55, '#23612d');
+      leafGrad2.addColorStop(1, '#133e1a');
+
+      ctx.fillStyle = leafGrad2;
+      ctx.fill();
+
+      // Wet leaf folds & specular ridges
+      ctx.strokeStyle = 'rgba(175, 245, 165, 0.45)';
+      ctx.lineWidth = 1.4 * scale;
+      const leafVeins = [
+        [-4, -46, -10, -66, -14, -86],
+        [3, -44, 8, -62, 12, -78],
+        [-1, -46, -1, -70, -2, -92]
+      ];
+      for (let v of leafVeins) {
+        ctx.beginPath();
+        ctx.moveTo(v[0] * scale, v[1] * scale);
+        ctx.bezierCurveTo(v[2] * scale, (v[1] + v[3]) * 0.5 * scale, v[2] * scale, (v[3] + v[5]) * 0.5 * scale, v[4] * scale, v[5] * scale);
+        ctx.stroke();
+      }
+
+      // Broth droplet on leaf
+      ctx.beginPath();
+      ctx.arc(5 * scale, -72 * scale, 2.2 * scale, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 220, 125, 0.92)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(4.2 * scale, -72.8 * scale, 0.7 * scale, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+
+      ctx.restore();
+      ctx.restore();
+    }
+
+    // TOPPING: Braised & Seared King Oyster Mushroom Chashu (2 Thick Medallions with Puffed Diamond Pillows)
+    function drawKingOysterChashu(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 32, bowlCenterY + 4 * scale + tY * 22);
+
+      function drawMedallion(cx, cy, radiusX, radiusY, rot) {
+        ctx.save();
+        ctx.translate(cx * scale, cy * scale);
+        ctx.rotate(rot);
+
+        // Contact shadow
+        ctx.beginPath();
+        ctx.ellipse(3 * scale, 8 * scale, radiusX * scale, radiusY * scale, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(15, 6, 2, 0.55)';
+        ctx.fill();
+
+        // 3D edge thickness (braised mushroom side)
+        ctx.beginPath();
+        ctx.ellipse(0, 8 * scale, radiusX * scale, radiusY * scale, 0, 0, Math.PI);
+        ctx.ellipse(0, 0, radiusX * scale, radiusY * scale, 0, Math.PI, 0, true);
+        ctx.closePath();
+        ctx.fillStyle = '#421d08';
+        ctx.fill();
+
+        // Top Caramelized Face
+        ctx.beginPath();
+        ctx.ellipse(0, 0, radiusX * scale, radiusY * scale, 0, 0, Math.PI * 2);
+
+        const chashuGrad = ctx.createRadialGradient(
+          lightVec.x * 20 * scale, -10 * scale + lightVec.y * 15 * scale, 6 * scale,
+          0, 0, radiusX * scale
+        );
+        chashuGrad.addColorStop(0, '#e59a54');
+        chashuGrad.addColorStop(0.42, '#b25d1e');
+        chashuGrad.addColorStop(0.82, '#6f320e');
+        chashuGrad.addColorStop(1, '#3c1805');
+
+        ctx.fillStyle = chashuGrad;
+        ctx.fill();
+
+        // Intricate Cross-Hatch Knife Scoring with Puffed Caramelized Pillows
+        ctx.save();
+        ctx.clip();
+
+        // Deep charred seams
+        ctx.strokeStyle = '#220801';
+        ctx.lineWidth = 2.6 * scale;
+        const gridStep = 11 * scale;
+        const extent = Math.max(radiusX, radiusY) * scale * 1.15;
+
+        for (let x = -extent; x <= extent; x += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(x - extent, -extent);
+          ctx.lineTo(x + extent, extent);
+          ctx.stroke();
+        }
+        for (let x = -extent; x <= extent; x += gridStep) {
+          ctx.beginPath();
+          ctx.moveTo(x + extent, -extent);
+          ctx.lineTo(x - extent, extent);
+          ctx.stroke();
+        }
+
+        // Render each scored diamond pillow with tender golden tare cushion
+        for (let ix = -extent + gridStep * 0.5; ix <= extent; ix += gridStep) {
+          for (let iy = -extent + gridStep * 0.5; iy <= extent; iy += gridStep) {
+            const px = (ix - iy) * 0.7071;
+            const py = (ix + iy) * 0.7071 * 0.85;
+
+            if ((px / (radiusX * scale)) * (px / (radiusX * scale)) + (py / (radiusY * scale)) * (py / (radiusY * scale)) < 0.82) {
+              const pillowGrad = ctx.createRadialGradient(
+                px - 1.2 * scale, py - 1.2 * scale, 0.5 * scale,
+                px, py, 4.2 * scale
+              );
+              pillowGrad.addColorStop(0, 'rgba(255, 235, 185, 0.75)');
+              pillowGrad.addColorStop(0.45, 'rgba(235, 160, 75, 0.55)');
+              pillowGrad.addColorStop(1, 'rgba(110, 45, 12, 0)');
+
+              ctx.fillStyle = pillowGrad;
+              ctx.beginPath();
+              ctx.ellipse(px, py, 3.8 * scale, 3.2 * scale, 0, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+
+        // Tare specular crest
+        const tareGlint = ctx.createRadialGradient(
+          lightVec.x * 25 * scale, -15 * scale + lightVec.y * 15 * scale, 4 * scale,
+          0, -10 * scale, radiusX * 0.7 * scale
+        );
+        tareGlint.addColorStop(0, 'rgba(255, 245, 220, 0.65)');
+        tareGlint.addColorStop(0.45, 'rgba(255, 180, 90, 0.16)');
+        tareGlint.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.fillStyle = tareGlint;
+        ctx.fill();
+
+        // Cracked black pepper specks
+        ctx.fillStyle = '#180a04';
+        for (let i = 0; i < 14; i++) {
+          const px = (Math.sin(i * 8.7) * 0.7) * radiusX * scale;
+          const py = (Math.cos(i * 5.2) * 0.6) * radiusY * scale;
+          ctx.beginPath();
+          ctx.arc(px, py, 1.2 * scale, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+        ctx.restore();
+      }
+
+      // Medallion 1 (Lower, left of center)
+      drawMedallion(-78, 38, 48, 42, -0.22);
+
+      // Medallion 2 (Upper left, overlapping)
+      drawMedallion(-102, -8, 45, 39, 0.32);
+
+      ctx.restore();
+    }
+
+    // TOPPING: Whole Braised Donko Shiitake Mushroom (Hanagiri Star Cut with realistic V-grooves)
+    function drawStarShiitake(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 34, bowlCenterY + 4 * scale + tY * 23);
+
+      ctx.save();
+      ctx.translate(-42 * scale, -75 * scale);
+      ctx.rotate(0.2);
+
+      const RX = 45 * scale;
+      const RY = 40 * scale;
+
+      // Contact shadow
+      ctx.beginPath();
+      ctx.ellipse(3 * scale, 8 * scale, RX, RY, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(15, 6, 2, 0.55)';
+      ctx.fill();
+
+      // Plump Umami Cap
+      ctx.beginPath();
+      ctx.ellipse(0, 0, RX, RY, 0, 0, Math.PI * 2);
+
+      const capGrad = ctx.createRadialGradient(
+        lightVec.x * 20 * scale, -12 * scale + lightVec.y * 15 * scale, 8 * scale,
+        0, 0, RX
+      );
+      capGrad.addColorStop(0, '#562d1a');
+      capGrad.addColorStop(0.5, '#361a0f');
+      capGrad.addColorStop(0.88, '#220f07');
+      capGrad.addColorStop(1, '#140703');
+
+      ctx.fillStyle = capGrad;
+      ctx.fill();
+
+      // Moist velvety specular highlight
+      const moistSheen = ctx.createRadialGradient(
+        lightVec.x * 22 * scale, -15 * scale + lightVec.y * 15 * scale, 4 * scale,
+        lightVec.x * 15 * scale, -10 * scale + lightVec.y * 15 * scale, RX * 0.65
+      );
+      moistSheen.addColorStop(0, 'rgba(255, 235, 210, 0.36)');
+      moistSheen.addColorStop(0.5, 'rgba(210, 150, 100, 0.12)');
+      moistSheen.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = moistSheen;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, RX, RY, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Traditional 6-Point Hanagiri Flower/Star Cut (6 graceful carved wedges)
+      const numPoints = 6;
+      for (let i = 0; i < numPoints; i++) {
+        const angle = (i * Math.PI * 2) / numPoints;
+        const nextAngle = angle + (Math.PI * 2) / numPoints;
+        const halfAngle = angle + (Math.PI / numPoints);
+
+        const x0 = 0;
+        const y0 = 0;
+        const x1 = Math.cos(halfAngle - 0.22) * 25 * scale;
+        const y1 = Math.sin(halfAngle - 0.22) * 22 * scale;
+        const xTip = Math.cos(halfAngle) * 28 * scale;
+        const yTip = Math.sin(halfAngle) * 25 * scale;
+        const x2 = Math.cos(halfAngle + 0.22) * 25 * scale;
+        const y2 = Math.sin(halfAngle + 0.22) * 22 * scale;
+
+        // Dark crease shadow
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.quadraticCurveTo(x1 * 1.05, y1 * 1.05, xTip * 1.05, yTip * 1.05);
+        ctx.quadraticCurveTo(x2 * 1.05, y2 * 1.05, x0, y0);
+        ctx.fillStyle = '#220a02';
+        ctx.fill();
+
+        // Tender ivory interior meat
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.quadraticCurveTo(x1, y1, xTip, yTip);
+        ctx.quadraticCurveTo(x2, y2, x0, y0);
+
+        const wedgeGrad = ctx.createRadialGradient(x0, y0, 2 * scale, xTip * 0.7, yTip * 0.7, 20 * scale);
+        wedgeGrad.addColorStop(0, '#fbf6ec');
+        wedgeGrad.addColorStop(0.7, '#eee0cc');
+        wedgeGrad.addColorStop(1, '#c9b197');
+
+        ctx.fillStyle = wedgeGrad;
+        ctx.fill();
+      }
+
+      // Dark center notch where knife cuts meet
+      ctx.beginPath();
+      ctx.arc(0, 0, 2.8 * scale, 0, Math.PI * 2);
+      ctx.fillStyle = '#220a02';
+      ctx.fill();
+
+      ctx.restore();
+      ctx.restore();
+    }
+
+    // TOPPING: Vegan Soy-Marinated Ajitsuke Tamago (Molten Pumpkin-Miso Yolk)
+    function drawVeganAjitsukeEgg(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 36, bowlCenterY + 4 * scale + tY * 24);
+
+      ctx.save();
+      ctx.translate(76 * scale, 24 * scale);
+      ctx.rotate(0.30);
+
+      const EGG_RX = 48 * scale;
+      const EGG_RY = 60 * scale;
+
+      // Contact shadow
+      ctx.beginPath();
+      ctx.ellipse(4 * scale, 8 * scale, EGG_RX, EGG_RY, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(20, 8, 2, 0.52)';
+      ctx.fill();
+
+      // 1. Silky Soy-Mirin Marinated "White"
+      ctx.beginPath();
+      ctx.ellipse(0, 0, EGG_RX, EGG_RY, 0, 0, Math.PI * 2);
+
+      const whiteGrad = ctx.createRadialGradient(0, 0, EGG_RX * 0.65, 0, 0, EGG_RX);
+      whiteGrad.addColorStop(0, '#fcfaf6');
+      whiteGrad.addColorStop(0.72, '#f6edd8');
+      whiteGrad.addColorStop(0.88, '#caa076');
+      whiteGrad.addColorStop(0.98, '#855630');
+      whiteGrad.addColorStop(1, '#502f16');
+
+      ctx.fillStyle = whiteGrad;
+      ctx.fill();
+
+      // 2. Molten Jammy Glowing Yolk (Kabocha Pumpkin & Miso)
+      const YOLK_RX = 26 * scale;
+      const YOLK_RY = 29 * scale;
+      const yolkCenterY = 4 * scale;
+
+      ctx.beginPath();
+      ctx.ellipse(0, yolkCenterY, YOLK_RX, YOLK_RY, 0, 0, Math.PI * 2);
+
+      const yolkGrad = ctx.createRadialGradient(
+        lightVec.x * 8 * scale, yolkCenterY - 6 * scale + lightVec.y * 8 * scale, 3 * scale,
+        0, yolkCenterY, YOLK_RX
+      );
+      yolkGrad.addColorStop(0, '#ffc042');
+      yolkGrad.addColorStop(0.42, '#ff8d12');
+      yolkGrad.addColorStop(0.82, '#e85400');
+      yolkGrad.addColorStop(1, '#9e3400');
+
+      ctx.fillStyle = yolkGrad;
+      ctx.fill();
+
+      // Yolk Liquid Gloss Highlight
+      const yolkGlint = ctx.createRadialGradient(
+        lightVec.x * 12 * scale - 4 * scale, yolkCenterY - 10 * scale + lightVec.y * 10 * scale, 1.5 * scale,
+        lightVec.x * 10 * scale - 4 * scale, yolkCenterY - 10 * scale + lightVec.y * 10 * scale, 16 * scale
+      );
+      yolkGlint.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+      yolkGlint.addColorStop(0.35, 'rgba(255, 235, 200, 0.45)');
+      yolkGlint.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+      ctx.fillStyle = yolkGlint;
+      ctx.beginPath();
+      ctx.ellipse(lightVec.x * 10 * scale - 4 * scale, yolkCenterY - 8 * scale + lightVec.y * 8 * scale, 12 * scale, 9 * scale, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+      ctx.restore();
+    }
+
+    // TOPPING: Seasoned Menma (Fermented Bamboo Shoots)
+    function drawMenma(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 34, bowlCenterY + 4 * scale + tY * 23);
+
+      const menmaStrips = [
+        { x: 65, y: -62, rot: 0.50, len: 46, w: 16 },
+        { x: 78, y: -50, rot: 0.40, len: 50, w: 17 },
+        { x: 88, y: -36, rot: 0.28, len: 48, w: 16 },
+        { x: 96, y: -20, rot: 0.16, len: 44, w: 15 }
+      ];
+
+      for (let s of menmaStrips) {
+        ctx.save();
+        ctx.translate(s.x * scale, s.y * scale);
+        ctx.rotate(s.rot);
+
+        ctx.beginPath();
+        ctx.roundRect(-s.w * 0.5 * scale, -s.len * 0.5 * scale, s.w * scale, s.len * scale, 3 * scale);
+
+        const mGrad = ctx.createLinearGradient(-s.w * 0.5 * scale, 0, s.w * 0.5 * scale, 0);
+        mGrad.addColorStop(0, '#c99550');
+        mGrad.addColorStop(0.35, '#deb372');
+        mGrad.addColorStop(0.85, '#b37c38');
+        mGrad.addColorStop(1, '#6b431a');
+
+        ctx.fillStyle = mGrad;
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(98, 58, 20, 0.36)';
+        ctx.lineWidth = 1 * scale;
+        for (let fx of [-3, 0, 3]) {
+          ctx.beginPath();
+          ctx.moveTo(fx * scale, -s.len * 0.45 * scale);
+          ctx.lineTo(fx * scale, s.len * 0.45 * scale);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = 'rgba(255, 245, 215, 0.58)';
+        ctx.lineWidth = 1.5 * scale;
+        ctx.beginPath();
+        ctx.moveTo(-2 * scale, -s.len * 0.38 * scale);
+        ctx.lineTo(-2 * scale, s.len * 0.28 * scale);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // Floating Oil Droplets & Aromatics (Rayu, Scallion Oil, Sesame Rings)
+    function drawOilDroplets(scale, tX, tY, time, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 24, bowlCenterY + 4 * scale + tY * 17);
+
+      const R_BROTH_X = 240 * scale;
+      const R_BROTH_Y = 194 * scale;
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, R_BROTH_X, R_BROTH_Y, 0, 0, Math.PI * 2);
+      ctx.clip();
+
+      const mouseInBowlX = (mouse.x - (bowlCenterX + tX * 24)) / scale;
+      const mouseInBowlY = (mouse.y - (bowlCenterY + 4 * scale + tY * 17)) / (scale * 0.78);
+
+      for (let i = 0; i < oilDroplets.length; i++) {
+        const d = oilDroplets[i];
+
+        if (!prefersReducedMotion) {
+          d.angle += d.angularSpeed;
+          d.dist = d.baseDist + Math.sin(time * 0.7 + d.radialPhase) * 4;
+
+          const targetX = Math.cos(d.angle) * d.dist;
+          const targetY = Math.sin(d.angle) * d.dist * 0.78;
+
+          const mdx = targetX - mouseInBowlX;
+          const mdy = targetY - mouseInBowlY;
+          const mdist = Math.hypot(mdx, mdy);
+          const pushRadius = 65;
+
+          if (mdist < pushRadius && mdist > 0.1) {
+            const force = (1 - mdist / pushRadius) * 22;
+            d.vx += (mdx / mdist) * force * 0.2;
+            d.vy += (mdy / mdist) * force * 0.2;
+          }
+
+          d.vx *= 0.91;
+          d.vy *= 0.91;
+
+          d.x = targetX + d.vx;
+          d.y = targetY + d.vy;
+        } else {
+          d.x = Math.cos(d.angle) * d.dist;
+          d.y = Math.sin(d.angle) * d.dist * 0.78;
+        }
+
+        const r = d.radius * scale;
+        const px = d.x * scale;
+        const py = d.y * scale;
+
+        if (d.type === 'chili') {
+          const rayuGrad = ctx.createRadialGradient(
+            px - r * 0.25 + lightVec.x * 2, py - r * 0.25 + lightVec.y * 2, r * 0.1,
+            px, py, r
+          );
+          rayuGrad.addColorStop(0, 'rgba(255, 65, 30, 0.95)');
+          rayuGrad.addColorStop(0.55, 'rgba(205, 20, 10, 0.85)');
+          rayuGrad.addColorStop(0.95, 'rgba(110, 8, 4, 0.9)');
+          rayuGrad.addColorStop(1, 'rgba(60, 4, 2, 0.4)');
+
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, Math.PI * 2);
+          ctx.fillStyle = rayuGrad;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(px - r * 0.32 + lightVec.x * 1.5, py - r * 0.32 + lightVec.y * 1.5, r * 0.28, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 245, 235, 0.85)';
+          ctx.fill();
+
+        } else if (d.type === 'scallion') {
+          const scGrad = ctx.createRadialGradient(
+            px - r * 0.2 + lightVec.x * 2, py - r * 0.2 + lightVec.y * 2, r * 0.1,
+            px, py, r
+          );
+          scGrad.addColorStop(0, 'rgba(140, 220, 60, 0.9)');
+          scGrad.addColorStop(0.6, 'rgba(60, 150, 30, 0.8)');
+          scGrad.addColorStop(1, 'rgba(20, 65, 10, 0.4)');
+
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, Math.PI * 2);
+          ctx.fillStyle = scGrad;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(px - r * 0.3 + lightVec.x * 1.2, py - r * 0.3 + lightVec.y * 1.2, r * 0.24, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 230, 0.8)';
+          ctx.fill();
+
+        } else {
+          ctx.beginPath();
+          ctx.arc(px, py, r, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(240, 175, 60, 0.55)';
+          ctx.lineWidth = 1.6 * scale;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(px, py, r * 0.75, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 200, 80, 0.15)';
+          ctx.fill();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // TOPPING: Fresh Negi (Scallion Rings & Curls) and Ito Togarashi (Spun Chili Silk)
+    function drawGarnish(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 38, bowlCenterY + 4 * scale + tY * 26);
+
+      // 1. Fresh Sliced Scallion Rounds (Scattered on noodles & broth)
+      const scallionRings = [
+        { x: -16, y: -26, r: 7.5, rot: 0.3 },
+        { x: 6, y: -38, r: 8.5, rot: -0.2 },
+        { x: 26, y: -18, r: 7.0, rot: 0.5 },
+        { x: -6, y: 15, r: 8.0, rot: -0.4 },
+        { x: -28, y: -6, r: 6.8, rot: 0.1 },
+        { x: 18, y: 8, r: 7.2, rot: 0.25 },
+        { x: 38, y: -8, r: 6.5, rot: -0.15 },
+        { x: -38, y: -30, r: 7.0, rot: 0.4 },
+        { x: 42, y: 38, r: 6.5, rot: 0.2 },
+        { x: -55, y: 85, r: 6.0, rot: -0.3 },
+        { x: 10, y: 55, r: 6.2, rot: -0.1 },
+        { x: -32, y: 65, r: 6.8, rot: 0.35 }
+      ];
+
+      for (let sc of scallionRings) {
+        ctx.save();
+        ctx.translate(sc.x * scale, sc.y * scale);
+        ctx.rotate(sc.rot);
+
+        const r = sc.r * scale;
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r, r * 0.85, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#2d6d29';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r * 0.82, r * 0.68, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#b7e8aa';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r * 0.52, r * 0.42, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#783609';
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.72)';
+        ctx.lineWidth = 1 * scale;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r, r * 0.85, 0, Math.PI * 0.9, Math.PI * 1.6);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // 2. Curly Scallion Ribbons in center
+      ctx.strokeStyle = '#439638';
+      ctx.lineWidth = 1.8 * scale;
+      ctx.lineCap = 'round';
+
+      const curls = [
+        [0, -10, 10, -25, 25, -20, 15, -5],
+        [-10, -5, -20, -18, -15, -30, 2, -28],
+        [8, 5, 20, 12, 18, -10, 5, -15]
+      ];
+      for (let c of curls) {
+        ctx.beginPath();
+        ctx.moveTo(c[0] * scale, c[1] * scale);
+        ctx.bezierCurveTo(c[2] * scale, c[3] * scale, c[4] * scale, c[5] * scale, c[6] * scale, c[7] * scale);
+        ctx.stroke();
+      }
+
+      // 3. Toasted Golden Sesame Seeds
+      const seeds = [
+        [-68, 22], [-85, 15], [-74, 52], [-62, 38], [-98, -16],
+        [-38, -68], [-52, -54], [74, -40], [84, -22], [68, 42],
+        [80, 54], [12, -22], [-18, 6], [32, 12], [2, 38], [-44, 84]
+      ];
+
+      for (let s of seeds) {
+        ctx.save();
+        ctx.translate(s[0] * scale, s[1] * scale);
+        ctx.rotate(s[0] * 0.1);
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 2.8 * scale, 1.6 * scale, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#faeacc';
+        ctx.fill();
+
+        ctx.strokeStyle = '#b88d4e';
+        ctx.lineWidth = 0.6 * scale;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // 4. Crown of Spun Chili Silk (Ito Togarashi - delicate bird's nest of spun fire silk)
+      const chiliThreads = [
+        [-12, -5, 2, -35, 18, -42, 28, -25],
+        [-8, 2, -15, -28, 5, -45, 12, -30],
+        [5, -2, 16, -20, -5, -38, -18, -22],
+        [-20, -12, -8, -32, 22, -36, 15, -15],
+        [-4, -8, 8, -25, 28, -28, 22, -8],
+        [-15, -2, 4, -18, 12, -32, -2, -40],
+        [8, -14, 22, -30, 2, -46, -10, -28],
+        [-6, -18, -18, -36, 6, -42, 20, -32],
+        [14, -8, 24, -24, 8, -38, -4, -36],
+        [-10, -22, 12, -40, 26, -34, 18, -18]
+      ];
+
+      ctx.lineWidth = 1.15 * scale;
+      for (let i = 0; i < chiliThreads.length; i++) {
+        const ct = chiliThreads[i];
+        ctx.beginPath();
+        ctx.moveTo(ct[0] * scale, ct[1] * scale);
+        ctx.bezierCurveTo(ct[2] * scale, ct[3] * scale, ct[4] * scale, ct[5] * scale, ct[6] * scale, ct[7] * scale);
+
+        ctx.strokeStyle = (i % 2 === 0) ? '#ff3e16' : (i % 3 === 0 ? '#ff8528' : '#e62208');
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // Artisanal Stoneware Rim Lip & Reactive Earth Glaze
+    function drawBowlRim(scale, tX, tY, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 18, bowlCenterY + tY * 13);
+
+      const R_OUTER_X = 265 * scale;
+      const R_OUTER_Y = 222 * scale;
+      const R_INNER_X = 246 * scale;
+      const R_INNER_Y = 203 * scale;
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, R_OUTER_X, R_OUTER_Y, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, R_INNER_X, R_INNER_Y, 0, 0, Math.PI * 2, true);
+
+      const rimGrad = ctx.createLinearGradient(-R_OUTER_X, -R_OUTER_Y, R_OUTER_X, R_OUTER_Y);
+      rimGrad.addColorStop(0, '#5a301a');
+      rimGrad.addColorStop(0.35, '#8c4e2a');
+      rimGrad.addColorStop(0.7, '#3a1d10');
+      rimGrad.addColorStop(1, '#1b110b');
+
+      ctx.fillStyle = rimGrad;
+      ctx.fill();
+
+      // Pottery ash speckles along rim
+      ctx.save();
+      ctx.clip();
+      ctx.fillStyle = 'rgba(235, 185, 130, 0.18)';
+      for (let a = 0; a < Math.PI * 2; a += 0.08) {
+        const rx = Math.cos(a) * (R_INNER_X + (R_OUTER_X - R_INNER_X) * 0.5);
+        const ry = Math.sin(a) * (R_INNER_Y + (R_OUTER_Y - R_INNER_Y) * 0.5);
+        ctx.fillRect(rx, ry, 2.5 * scale, 2.5 * scale);
+      }
+      ctx.restore();
+
+      // Specular highlight on glossy rim
+      const lightAngle = Math.atan2(lightVec.y, lightVec.x);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, (R_OUTER_X + R_INNER_X) * 0.5, (R_OUTER_Y + R_INNER_Y) * 0.5, 0, lightAngle - 0.72, lightAngle + 0.72);
+      ctx.strokeStyle = 'rgba(255, 242, 218, 0.7)';
+      ctx.lineWidth = 4 * scale;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, R_OUTER_X, R_OUTER_Y, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 235, 210, 0.09)';
+      ctx.lineWidth = 1.2 * scale;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Volumetric Whispering Steam Simulation
+    function updateAndDrawSteam(scale, tX, tY, time, lightVec) {
+      ctx.save();
+      ctx.translate(bowlCenterX + tX * 45, bowlCenterY + 4 * scale + tY * 30);
+
+      const mouseSteamX = (mouse.x - (bowlCenterX + tX * 45));
+      const mouseSteamY = (mouse.y - (bowlCenterY + 4 * scale + tY * 30));
+
+      ctx.globalCompositeOperation = 'screen';
+
+      for (let i = 0; i < steamParticles.length; i++) {
+        const p = steamParticles[i];
+        p.life++;
+
+        if (p.life >= p.maxLife) {
+          const fresh = createSteamParticle();
+          Object.assign(p, fresh);
+        }
+
+        const progress = p.life / p.maxLife;
+
+        if (!prefersReducedMotion) {
+          const curl = Math.sin(p.life * p.curlFreq + p.curlSeed) * p.curlAmp;
+          p.x += p.vx + curl * 0.6;
+          p.y += p.vy;
+
+          const distToMouse = Math.hypot(p.x * scale - mouseSteamX, p.y * scale - mouseSteamY);
+          const influenceR = 125 * scale;
+
+          if (distToMouse < influenceR && distToMouse > 1) {
+            const windStrength = (1 - distToMouse / influenceR);
+            p.vx += (mouse.vx * 0.16 + (p.x * scale - mouseSteamX) / distToMouse * 0.65) * windStrength;
+            p.vy += (mouse.vy * 0.16) * windStrength;
+          }
+
+          p.vx *= 0.96;
+        } else {
+          p.y += p.vy;
+        }
+
+        const currentSize = (p.size + (p.maxSize - p.size) * Math.pow(progress, 0.72)) * scale;
+
+        let alpha = 0;
+        if (progress < 0.22) {
+          alpha = (progress / 0.22) * p.maxAlpha;
+        } else if (progress < 0.65) {
+          alpha = p.maxAlpha;
+        } else {
+          alpha = (1 - (progress - 0.65) / 0.35) * p.maxAlpha;
+        }
+
+        if (alpha <= 0.002) continue;
+
+        const px = p.x * scale;
+        const py = p.y * scale;
+
+        const steamGrad = ctx.createRadialGradient(px, py, 0, px, py, currentSize);
+        if (py > -80 * scale) {
+          steamGrad.addColorStop(0, `rgba(255, 226, 185, ${alpha * 1.25})`);
+          steamGrad.addColorStop(0.45, `rgba(255, 212, 165, ${alpha * 0.72})`);
+          steamGrad.addColorStop(1, 'rgba(230, 210, 190, 0)');
+        } else {
+          steamGrad.addColorStop(0, `rgba(248, 242, 235, ${alpha * 0.92})`);
+          steamGrad.addColorStop(0.5, `rgba(235, 230, 225, ${alpha * 0.46})`);
+          steamGrad.addColorStop(1, 'rgba(210, 210, 210, 0)');
+        }
+
+        ctx.fillStyle = steamGrad;
+        ctx.beginPath();
+        ctx.arc(px, py, currentSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // Heat Haze & Cinematic Lighting Vignette
+    function drawVignetteAndGlow(time, lightVec) {
+      const pulse = Math.sin(time * 0.8) * 0.02 + light.warmthPulse;
+      light.warmthPulse *= 0.95;
+
+      const lanternGlow = ctx.createRadialGradient(
+        bowlCenterX + lightVec.x * 60 * baseScale, bowlCenterY - 100 * baseScale + lightVec.y * 50 * baseScale, 50 * baseScale,
+        bowlCenterX, bowlCenterY, 390 * baseScale
+      );
+      lanternGlow.addColorStop(0, `rgba(255, 178, 75, ${0.12 + pulse})`);
+      lanternGlow.addColorStop(0.5, `rgba(218, 122, 35, ${0.05 + pulse * 0.5})`);
+      lanternGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = lanternGlow;
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+
+      const vigGrad = ctx.createRadialGradient(
+        bowlCenterX, bowlCenterY, Math.min(width, height) * 0.36,
+        bowlCenterX, bowlCenterY, Math.max(width, height) * 0.76
+      );
+      vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vigGrad.addColorStop(0.65, 'rgba(3, 2, 2, 0.45)');
+      vigGrad.addColorStop(1, 'rgba(2, 1, 1, 0.94)');
+
+      ctx.fillStyle = vigGrad;
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    // 60FPS Render & Physics Loop
+    let lastTimestamp = performance.now();
+
+    function render(timestamp) {
+      const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.05);
+      lastTimestamp = timestamp;
+      const time = timestamp * 0.001;
+
+      // Mouse tracking
+      const dMouseX = mouse.targetX - mouse.x;
+      const dMouseY = mouse.targetY - mouse.y;
+      mouse.vx = dMouseX * 0.25;
+      mouse.vy = dMouseY * 0.25;
+      mouse.x += dMouseX * 0.18;
+      mouse.y += dMouseY * 0.18;
+
+      // 3D Parallax Tilt
+      if (!prefersReducedMotion) {
+        const normX = (mouse.x - bowlCenterX) / (width * 0.5);
+        const normY = (mouse.y - bowlCenterY) / (height * 0.5);
+        tilt.targetX = Math.max(-1, Math.min(1, normX)) * 0.75;
+        tilt.targetY = Math.max(-1, Math.min(1, normY)) * 0.55;
+
+        tilt.x += (tilt.targetX - tilt.x) * 0.06;
+        tilt.y += (tilt.targetY - tilt.y) * 0.06;
+
+        light.targetX = normX * 0.65;
+        light.targetY = -0.55 + normY * 0.35;
+        light.x += (light.targetX - light.x) * 0.08;
+        light.y += (light.targetY - light.y) * 0.08;
+      } else {
+        tilt.x = 0;
+        tilt.y = 0;
+        light.x = 0;
+        light.y = -0.65;
+      }
+
+      // Check hover over broth
+      const dxFromCenter = (mouse.x - bowlCenterX) / baseScale;
+      const dyFromCenter = (mouse.y - (bowlCenterY + 4 * baseScale)) / baseScale;
+      const distFromCenter = Math.hypot(dxFromCenter, dyFromCenter / 0.78);
+
+      if (distFromCenter < 210) {
+        if (!mouse.isHoveringBowl) {
+          mouse.isHoveringBowl = true;
+          addRipple(dxFromCenter, dyFromCenter, 85, 0.8);
+        } else if (Math.hypot(mouse.vx, mouse.vy) > 1.2 && Math.random() < 0.18) {
+          addRipple(dxFromCenter, dyFromCenter, 72, 0.5);
+        }
+      } else {
+        mouse.isHoveringBowl = false;
+      }
+
+      // Render Scene in depth order:
+      ctx.clearRect(0, 0, width, height);
+
+      drawDarkTable(time);
+      drawBowlShadow(baseScale, tilt.x, tilt.y);
+      drawInnerBowlWall(baseScale, tilt.x, tilt.y, light);
+      drawBrothSurface(baseScale, tilt.x, tilt.y, time, light);
+      drawNoriSheets(baseScale, tilt.x, tilt.y, light);
+      drawNoodles(baseScale, tilt.x, tilt.y, time);
+      drawBokChoy(baseScale, tilt.x, tilt.y, light);
+      drawKingOysterChashu(baseScale, tilt.x, tilt.y, light);
+      drawStarShiitake(baseScale, tilt.x, tilt.y, light);
+      drawVeganAjitsukeEgg(baseScale, tilt.x, tilt.y, light);
+      drawMenma(baseScale, tilt.x, tilt.y, light);
+      drawOilDroplets(baseScale, tilt.x, tilt.y, time, light);
+      drawGarnish(baseScale, tilt.x, tilt.y, light);
+      drawBowlRim(baseScale, tilt.x, tilt.y, light);
+      updateAndDrawSteam(baseScale, tilt.x, tilt.y, time, light);
+      drawVignetteAndGlow(time, light);
+
+      requestAnimationFrame(render);
+    }
+
+    render(performance.now());
+  })();
+  </script>
+</body>
+</html>

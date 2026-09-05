@@ -8,7 +8,7 @@
   },
   "model": {
     "slug": "gpt-5.6-luna",
-    "displayName": "GPT-5.6-Luna",
+    "displayName": "GPT 5.6 Luna",
     "providerModelId": "gpt-5.6-luna"
   },
   "variation": {
@@ -20,18 +20,17 @@
   "harness": {
     "name": "Codex CLI",
     "version": "0.153.2",
-    "runtime": "OpenAI Codex",
-    "invocation": "CODEX_HOME=~/.codex-personal codex exec --model gpt-5.6-luna --config model_reasoning_effort=xhigh PROMPT.md"
+    "runtime": "OpenAI Codex CLI",
+    "invocation": "codex exec --ephemeral --model gpt-5.6-luna --config model_reasoning_effort=xhigh PROMPT.md"
   },
   "artifacts": {
     "result": "index.html",
     "transcript": "transcript.json"
   },
   "timing": {
-    "startedAt": "2026-09-04T22:39:46Z",
-    "completedAt": "2026-09-04T22:39:46Z",
-    "wallDurationMs": 0,
-    "apiDurationMs": 0
+    "startedAt": "2026-09-04T22:12:22.504Z",
+    "completedAt": "2026-09-04T22:16:50.082Z",
+    "wallDurationMs": 267578
   },
   "usage": {
     "tokens": {
@@ -40,30 +39,39 @@
       "cacheCreationInput": 0,
       "reasoning": 0,
       "output": 0,
-      "total": 0
+      "total": 42971
     },
-    "cost": {
-      "currency": "USD",
-      "input": 0,
-      "cachedInput": 0,
-      "cacheCreationInput": 0,
-      "output": 0,
-      "other": 0,
-      "total": 0,
-      "estimated": true
-    },
-    "requests": 0,
-    "turns": 0,
-    "toolCalls": 0,
-    "providerReported": false
+    "cost": null,
+    "turns": 1,
+    "toolCalls": 12,
+    "providerReported": true,
+    "raw": {
+      "source": "Codex terminal tokens used summary",
+      "totalTokens": 42971,
+      "tokenCategoryBreakdownAvailable": false,
+      "pricing": {
+        "library": "litellm",
+        "version": "1.83.7",
+        "modelKey": "gpt-5.6-luna",
+        "ratesUsdPerToken": {
+          "input": 2e-07,
+          "cachedInput": 2e-08,
+          "cacheCreationInput": 2.5e-07,
+          "output": 1.2e-06
+        }
+      },
+      "costCalculation": {
+        "status": "not_calculated_missing_token_categories",
+        "reason": "The terminal record reports total tokens only; assigning input, cached input, reasoning, or output categories would require guessing."
+      }
+    }
   },
   "resultStats": {
     "bytes": 20809,
     "lines": 533
   },
   "provenance": {
-    "generatedAt": "2026-09-04T22:39:46Z",
-    "sourceCommit": "ba9e47b"
+    "pricingSource": "LiteLLM 1.83.7 model_cost[gpt-5.6-luna] (rates retained; cost not calculated because token categories are unavailable)"
   },
-  "notes": "Usage and timing were not captured by the artifact export; token and cost fields are zero estimates."
+  "notes": "The Codex terminal record reports an exact total token count without category breakdown. Input, cache, reasoning, and output fields remain zero and cost is unavailable rather than guessed. The public transcript contains recorded text and full recorded tool activity; hidden reasoning, credentials, and private local path prefixes are excluded."
 }

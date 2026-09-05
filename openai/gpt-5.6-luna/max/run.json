@@ -8,7 +8,7 @@
   },
   "model": {
     "slug": "gpt-5.6-luna",
-    "displayName": "GPT-5.6-Luna",
+    "displayName": "GPT 5.6 Luna",
     "providerModelId": "gpt-5.6-luna"
   },
   "variation": {
@@ -19,51 +19,74 @@
   },
   "harness": {
     "name": "Codex CLI",
-    "version": "0.153.2",
-    "runtime": "OpenAI Codex",
-    "invocation": "CODEX_HOME=~/.codex-personal codex exec --model gpt-5.6-luna --config model_reasoning_effort=max PROMPT.md"
+    "version": "0.152.1",
+    "runtime": "OpenAI Codex CLI",
+    "invocation": "Codex CLI session using gpt-5.6-luna; reasoning effort max"
   },
   "artifacts": {
     "result": "index.html",
     "transcript": "transcript.json"
   },
   "timing": {
-    "startedAt": "2026-09-04T22:39:46Z",
-    "completedAt": "2026-09-04T22:39:46Z",
-    "wallDurationMs": 0,
-    "apiDurationMs": 0
+    "startedAt": "2026-09-02T21:56:33.423Z",
+    "completedAt": "2026-09-02T22:01:14.022Z",
+    "wallDurationMs": 280599
   },
   "usage": {
     "tokens": {
-      "input": 0,
-      "cachedInput": 0,
+      "input": 275096,
+      "cachedInput": 242176,
       "cacheCreationInput": 0,
-      "reasoning": 0,
-      "output": 0,
-      "total": 0
+      "reasoning": 5656,
+      "output": 14952,
+      "total": 290048
     },
     "cost": {
       "currency": "USD",
-      "input": 0,
-      "cachedInput": 0,
-      "cacheCreationInput": 0,
-      "output": 0,
-      "other": 0,
-      "total": 0,
+      "input": 0.006584,
+      "cachedInput": 0.00484352,
+      "cacheCreationInput": 0.0,
+      "output": 0.0179424,
+      "total": 0.02936992,
       "estimated": true
     },
     "requests": 0,
-    "turns": 0,
-    "toolCalls": 0,
-    "providerReported": false
+    "turns": 1,
+    "toolCalls": 9,
+    "providerReported": true,
+    "raw": {
+      "source": "Codex final cumulative thread_token_usage",
+      "codexThreadTokenUsage": {
+        "input_tokens": 275096,
+        "cached_input_tokens": 242176,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 14952,
+        "reasoning_output_tokens": 5656,
+        "total_tokens": 290048
+      },
+      "pricing": {
+        "library": "litellm",
+        "version": "1.83.7",
+        "modelKey": "gpt-5.6-luna",
+        "ratesUsdPerToken": {
+          "input": 2e-07,
+          "cachedInput": 2e-08,
+          "cacheCreationInput": 2.5e-07,
+          "output": 1.2e-06
+        }
+      },
+      "costCalculation": {
+        "uncachedInputTokens": 32920,
+        "cachedInputIsSubsetOfInput": true
+      }
+    }
   },
   "resultStats": {
     "bytes": 20785,
     "lines": 619
   },
   "provenance": {
-    "generatedAt": "2026-09-04T22:39:46Z",
-    "sourceCommit": "ba9e47b"
+    "pricingSource": "LiteLLM 1.83.7 model_cost[gpt-5.6-luna]"
   },
-  "notes": "Usage and timing were not captured by the artifact export; token and cost fields are zero estimates."
+  "notes": "Codex recorded exact cumulative token categories. Cost was calculated from LiteLLM rates; cached input is a subset of Codex's input total. The public transcript omits hidden reasoning, private agent-mail activity, credentials, and private local path prefixes."
 }

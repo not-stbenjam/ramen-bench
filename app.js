@@ -6,9 +6,12 @@
   const ratingsApiUrl = String(window.RAMEN_BENCH_CONFIG?.ratingsApiUrl || "").replace(/\/+$/, "");
   const ratingsByRun = new Map();
   const submittedRatings = new Map();
+  const framesById = new Map();
+  const expandedModels = new Set();
 
   const elements = {
     sidebar: document.querySelector("#sidebar"),
+    brand: document.querySelector("#brand-home"),
     scrim: document.querySelector("#sidebar-scrim"),
     mobileMenu: document.querySelector("#mobile-menu"),
     singleMode: document.querySelector("#single-mode"),
@@ -28,9 +31,6 @@
     leaderboard: document.querySelector("#leaderboard"),
     copyPrompt: document.querySelector("#copy-prompt"),
     promptText: document.querySelector("#prompt-text"),
-    transcriptDialog: document.querySelector("#transcript-dialog"),
-    transcriptTitle: document.querySelector("#transcript-title"),
-    transcriptBody: document.querySelector("#transcript-body"),
     toast: document.querySelector("#toast")
   };
 
@@ -60,15 +60,20 @@
       name: run.model.displayName,
       creator: run.vendor.displayName,
       badge: run.variation.displayName,
-      harness: run.harness.version
-        ? `${run.harness.name} ${run.harness.version}`
-        : run.harness.name,
+      harness: formatHarness(run.harness),
       resultUrl: resolveArtifact(run.artifacts.result),
       transcriptUrl: resolveArtifact(run.artifacts.transcript),
       rawTranscriptUrl: resolveArtifact(run.artifacts.rawTranscript),
       manifestUrl,
       run
     };
+  }
+
+  function formatHarness(harness) {
+    if (!harness.version) return harness.name;
+    return String(harness.version).toLocaleLowerCase().startsWith(`${harness.name.toLocaleLowerCase()} `)
+      ? harness.version
+      : `${harness.name} ${harness.version}`;
   }
 
   async function loadEntries() {
@@ -104,6 +109,10 @@
   function entryFromHash() {
     const id = decodeURIComponent(window.location.hash.slice(1));
     return entries.find((entry) => entry.id === id);
+  }
+
+  function expandEntryModel(entry) {
+    if (entry) expandedModels.add(`${entry.creator}\u0000${entry.name}`);
   }
 
   async function fetchVotes({ quiet = true } = {}) {
@@ -212,14 +221,69 @@
       return;
     }
 
-    for (const [creator, groupRuns] of groupEntries(state.filteredEntries)) {
+    for (const [creator, models] of groupEntries(state.filteredEntries)) {
       const section = document.createElement("section");
       section.className = "model-group";
       const heading = document.createElement("h2");
       heading.className = "group-label";
-      heading.textContent = creator;
+      const vendorButton = document.createElement("button");
+      vendorButton.type = "button";
+      vendorButton.className = "vendor-button";
+      vendorButton.textContent = creator;
+      vendorButton.title = `Open the first ${creator} result`;
+      vendorButton.addEventListener("click", () => {
+        const firstEntry = entriesInModelOrder(models)[0];
+        if (firstEntry) chooseSingleEntry(firstEntry);
+      });
+      heading.append(vendorButton);
       section.append(heading);
-      for (const entry of groupRuns) section.append(createModelButton(entry));
+
+      let modelIndex = 0;
+      for (const [model, modelRuns] of [...models].sort(compareModels)) {
+        const modelSection = document.createElement("section");
+        modelSection.className = "model-family";
+        const modelHeading = document.createElement("h3");
+        modelHeading.className = "model-family-label";
+        const modelKey = `${creator}\u0000${model}`;
+        const effortsId = `efforts-${slugify(creator)}-${slugify(model)}-${modelIndex++}`;
+        const filtersActive = Boolean(
+          elements.search.value.trim()
+          || elements.creatorFilter.value
+          || elements.harnessFilter.value
+        );
+        const expanded = expandedModels.has(modelKey) || filtersActive;
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "model-family-toggle";
+        toggle.setAttribute("aria-controls", effortsId);
+        toggle.setAttribute("aria-expanded", String(expanded));
+        const chevron = document.createElement("span");
+        chevron.className = "model-family-chevron";
+        chevron.setAttribute("aria-hidden", "true");
+        chevron.textContent = "›";
+        const label = document.createElement("span");
+        label.textContent = model;
+        toggle.append(chevron, label);
+        modelHeading.append(toggle);
+
+        const efforts = document.createElement("div");
+        efforts.className = "effort-list";
+        efforts.id = effortsId;
+        efforts.hidden = !expanded;
+
+        for (const entry of [...modelRuns].sort(compareEffort)) {
+          efforts.append(createModelButton(entry));
+        }
+        toggle.addEventListener("click", () => {
+          const nextExpanded = !expandedModels.has(modelKey);
+          if (nextExpanded) expandedModels.add(modelKey);
+          else expandedModels.delete(modelKey);
+          toggle.setAttribute("aria-expanded", String(nextExpanded));
+          efforts.hidden = !nextExpanded;
+        });
+        modelSection.append(modelHeading, efforts);
+        section.append(modelSection);
+      }
       elements.list.append(section);
     }
   }
@@ -227,11 +291,59 @@
   function groupEntries(list) {
     const groups = new Map();
     for (const entry of list) {
-      const key = entry.creator || "Other";
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(entry);
+      const creator = entry.creator || "Other";
+      const model = entry.name || "Unknown model";
+      if (!groups.has(creator)) groups.set(creator, new Map());
+      const models = groups.get(creator);
+      if (!models.has(model)) models.set(model, []);
+      models.get(model).push(entry);
     }
     return groups;
+  }
+
+  function entriesInSidebarOrder(list = state.filteredEntries) {
+    const ordered = [];
+    for (const [, models] of groupEntries(list)) {
+      ordered.push(...entriesInModelOrder(models));
+    }
+    return ordered;
+  }
+
+  function entriesInModelOrder(models) {
+    const ordered = [];
+    for (const [, modelRuns] of [...models].sort(compareModels)) {
+      ordered.push(...[...modelRuns].sort(compareEffort));
+    }
+    return ordered;
+  }
+
+  function compareEffort(a, b) {
+    const effortOrder = ["ultra", "max", "xhigh", "high", "medium", "low"];
+    const rank = (entry) => {
+      const index = effortOrder.indexOf(String(entry.badge || "").toLocaleLowerCase());
+      return index === -1 ? effortOrder.length : index;
+    };
+    return rank(a) - rank(b) || String(a.badge || "").localeCompare(String(b.badge || ""));
+  }
+
+  function compareModels([nameA], [nameB]) {
+    const versionA = modelVersion(nameA);
+    const versionB = modelVersion(nameB);
+    const width = Math.max(versionA.length, versionB.length);
+    for (let index = 0; index < width; index += 1) {
+      const difference = (versionB[index] || 0) - (versionA[index] || 0);
+      if (difference) return difference;
+    }
+    return 0;
+  }
+
+  function modelVersion(name) {
+    const match = String(name).match(/\d+(?:\.\d+)*/);
+    return match ? match[0].split(".").map(Number) : [];
+  }
+
+  function slugify(value) {
+    return String(value).toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   }
 
   function createModelButton(entry) {
@@ -243,6 +355,7 @@
     button.className = `model-button${selected ? " active" : ""}`;
     button.dataset.entryId = entry.id;
     button.setAttribute("aria-pressed", String(selected));
+    button.setAttribute("aria-label", `${entry.name}, ${entry.badge || "default effort"}`);
 
     const mark = document.createElement("span");
     mark.className = "selection-mark";
@@ -255,15 +368,8 @@
     nameRow.className = "model-name-row";
     const name = document.createElement("span");
     name.className = "model-name";
-    name.textContent = entry.name;
+    name.textContent = entry.badge || "Default";
     nameRow.append(name);
-
-    if (entry.badge) {
-      const badge = document.createElement("span");
-      badge.className = "badge";
-      badge.textContent = entry.badge;
-      nameRow.append(badge);
-    }
 
     const harness = document.createElement("span");
     harness.className = "model-harness";
@@ -283,10 +389,7 @@
 
   function chooseEntry(entry) {
     if (state.mode === "single") {
-      state.activeId = entry.id;
-      window.history.replaceState(null, "", `#${encodeURIComponent(entry.id)}`);
-      render();
-      closeSidebar();
+      chooseSingleEntry(entry);
       return;
     }
 
@@ -298,6 +401,36 @@
       showToast("Grid view holds up to four bowls.");
     }
     render();
+  }
+
+  function chooseSingleEntry(entry) {
+    state.activeId = entry.id;
+    expandEntryModel(entry);
+    window.history.replaceState(null, "", `#${encodeURIComponent(entry.id)}`);
+    if (state.mode !== "single") setMode("single");
+    else render();
+    revealEntryInSidebar(entry.id);
+    closeSidebar();
+  }
+
+  function revealEntryInSidebar(entryId) {
+    window.requestAnimationFrame(() => {
+      const target = [...elements.list.querySelectorAll(".model-button")]
+        .find((button) => button.dataset.entryId === entryId);
+      if (!target) return;
+      const containerBounds = elements.list.getBoundingClientRect();
+      const targetBounds = target.getBoundingClientRect();
+      const modelToggle = target.closest(".model-family")?.querySelector(".model-family-toggle");
+      const toggleBounds = modelToggle?.getBoundingClientRect();
+
+      if (targetBounds.bottom > containerBounds.bottom) {
+        elements.list.scrollTop += targetBounds.bottom - containerBounds.bottom + 8;
+      } else if (toggleBounds && toggleBounds.top < containerBounds.top) {
+        elements.list.scrollTop += toggleBounds.top - containerBounds.top - 8;
+      } else if (targetBounds.top < containerBounds.top) {
+        elements.list.scrollTop += targetBounds.top - containerBounds.top - 8;
+      }
+    });
   }
 
   function setMode(mode) {
@@ -333,11 +466,11 @@
   }
 
   function renderViewer() {
-    elements.frames.replaceChildren();
     const hasEntries = entries.length > 0;
+    const navigationEntries = entriesInSidebarOrder();
     elements.welcome.hidden = hasEntries;
-    elements.previous.hidden = !hasEntries || state.mode !== "single" || entries.length < 2;
-    elements.next.hidden = !hasEntries || state.mode !== "single" || entries.length < 2;
+    elements.previous.hidden = !hasEntries || state.mode !== "single" || navigationEntries.length < 2;
+    elements.next.hidden = !hasEntries || state.mode !== "single" || navigationEntries.length < 2;
 
     if (!hasEntries) {
       setWelcome(
@@ -355,20 +488,44 @@
     if (!visibleEntries.length) {
       elements.welcome.hidden = false;
       setWelcome("Grid view", "Choose a bowl to compare.", "Select up to four models from the sidebar.", false);
-      return;
     }
 
-    for (const entry of visibleEntries) elements.frames.append(createFrame(entry));
+    const visibleIds = new Set(visibleEntries.map((entry) => entry.id));
+    for (const entry of entries) {
+      const frame = framesById.get(entry.id);
+      if (!frame) continue;
+      const iframe = frame.querySelector("iframe");
+      const visible = visibleIds.has(entry.id);
+      frame.classList.toggle("visible", visible);
+
+      if (visible) {
+        if (!iframe.hasAttribute("src")) iframe.src = iframe.dataset.src;
+      } else if (iframe.hasAttribute("src")) {
+        iframe.src = "";
+        iframe.removeAttribute("src");
+      }
+    }
+  }
+
+  function buildFrames() {
+    elements.frames.replaceChildren();
+    framesById.clear();
+    for (const entry of entries) {
+      const frame = createFrame(entry);
+      framesById.set(entry.id, frame);
+      elements.frames.append(frame);
+    }
   }
 
   function createFrame(entry) {
     const frame = document.createElement("article");
     frame.className = "frame";
+    frame.dataset.entryId = entry.id;
 
     const iframe = document.createElement("iframe");
-    iframe.src = entry.resultUrl;
+    iframe.dataset.src = entry.resultUrl;
     iframe.title = `${entry.name} ramen benchmark result`;
-    iframe.loading = "eager";
+    iframe.loading = "lazy";
     iframe.sandbox = "allow-scripts allow-pointer-lock";
 
     const label = document.createElement("div");
@@ -389,12 +546,13 @@
     addStat(stats, formatTokens(entry.run.usage?.tokens?.total), "Total tokens");
     addStat(stats, formatDuration(entry.run.timing?.wallDurationMs), "Wall time");
 
-    const transcript = document.createElement("button");
-    transcript.type = "button";
+    const transcript = document.createElement("a");
     transcript.className = "transcript-button";
     transcript.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6V3Z"></path><path d="M9 11h6M9 15h6M9 7h3"></path></svg><span>Transcript</span>';
-    transcript.disabled = !entry.transcriptUrl;
-    transcript.addEventListener("click", () => viewTranscript(entry));
+    transcript.href = `transcript.html#${encodeURIComponent(entry.id)}`;
+    transcript.target = "_blank";
+    transcript.rel = "noopener noreferrer";
+    transcript.setAttribute("aria-label", `Open ${entry.name} ${entry.badge} transcript`);
 
     const ratingControl = createRatingControl(entry);
     label.append(heading, stats, transcript, ratingControl);
@@ -504,11 +662,17 @@
   }
 
   function move(direction) {
-    const currentIndex = Math.max(0, entries.findIndex((entry) => entry.id === state.activeId));
-    const nextIndex = (currentIndex + direction + entries.length) % entries.length;
-    state.activeId = entries[nextIndex].id;
+    const navigationEntries = entriesInSidebarOrder();
+    if (navigationEntries.length < 2) return;
+    const currentIndex = navigationEntries.findIndex((entry) => entry.id === state.activeId);
+    const nextIndex = currentIndex === -1
+      ? (direction > 0 ? 0 : navigationEntries.length - 1)
+      : (currentIndex + direction + navigationEntries.length) % navigationEntries.length;
+    state.activeId = navigationEntries[nextIndex].id;
+    expandEntryModel(navigationEntries[nextIndex]);
     window.history.replaceState(null, "", `#${encodeURIComponent(state.activeId)}`);
     render();
+    revealEntryInSidebar(state.activeId);
   }
 
   function renderLeaderboard() {
@@ -550,221 +714,6 @@
       list.append(row);
     });
     elements.leaderboard.append(list);
-  }
-
-  function buildRunSummary(entry) {
-    const wrapper = document.createElement("section");
-    wrapper.className = "run-summary";
-    const cards = document.createElement("div");
-    cards.className = "summary-cards";
-    const tokens = entry.run.usage?.tokens || {};
-    addSummaryCard(cards, "Total cost", formatCost(entry.run.usage?.cost) || "Unknown");
-    addSummaryCard(cards, "Total tokens", formatTokens(tokens.total, false) || "Unknown");
-    addSummaryCard(cards, "Output tokens", formatTokens(tokens.output, false) || "Unknown");
-    addSummaryCard(cards, "Wall time", formatDuration(entry.run.timing?.wallDurationMs) || "Unknown");
-
-    const details = document.createElement("details");
-    details.className = "usage-details";
-    const summary = document.createElement("summary");
-    summary.textContent = "Full run and usage details";
-    const table = document.createElement("dl");
-    addDetail(table, "Run ID", entry.id);
-    addDetail(table, "Provider model", entry.run.model.providerModelId);
-    addDetail(table, "Variation", entry.run.variation.displayName);
-    addDetail(table, "Reasoning effort", entry.run.variation.reasoningEffort);
-    addDetail(table, "Harness", entry.harness);
-    addDetail(table, "Started", formatTimestamp(entry.run.timing?.startedAt));
-    addDetail(table, "API time", formatDuration(entry.run.timing?.apiDurationMs));
-    addDetail(table, "Input tokens", formatInteger(tokens.input));
-    addDetail(table, "Cached input", formatInteger(tokens.cachedInput));
-    addDetail(table, "Cache creation", formatInteger(tokens.cacheCreationInput));
-    addDetail(table, "Reasoning tokens", formatInteger(tokens.reasoning));
-    addDetail(table, "Output tokens", formatInteger(tokens.output));
-    addDetail(table, "Total tokens", formatInteger(tokens.total));
-    addCostDetails(table, entry.run.usage?.cost);
-    addDetail(table, "Requests", formatInteger(entry.run.usage?.requests));
-    addDetail(table, "Turns", formatInteger(entry.run.usage?.turns));
-    addDetail(table, "Tool calls", formatInteger(entry.run.usage?.toolCalls));
-    if (typeof entry.run.usage?.providerReported === "boolean") {
-      addDetail(table, "Usage source", entry.run.usage.providerReported ? "Provider reported" : "Reconstructed / estimated");
-    }
-    details.append(summary, table);
-    wrapper.append(cards, details);
-    return wrapper;
-  }
-
-  function addSummaryCard(container, label, value) {
-    const card = document.createElement("div");
-    const term = document.createElement("span");
-    term.textContent = label;
-    const data = document.createElement("strong");
-    data.textContent = value;
-    card.append(term, data);
-    container.append(card);
-  }
-
-  function addDetail(list, label, value) {
-    if (value === undefined || value === null || value === "") return;
-    const term = document.createElement("dt");
-    term.textContent = label;
-    const description = document.createElement("dd");
-    description.textContent = value;
-    list.append(term, description);
-  }
-
-  function addCostDetails(list, cost) {
-    if (!cost) return;
-    const suffix = cost.currency || "USD";
-    for (const [key, label] of [
-      ["input", "Input cost"],
-      ["cachedInput", "Cached input cost"],
-      ["cacheCreationInput", "Cache creation cost"],
-      ["output", "Output cost"],
-      ["other", "Other cost"],
-      ["total", "Total cost"]
-    ]) {
-      if (!Number.isFinite(cost[key])) continue;
-      addDetail(list, label, `${cost[key].toFixed(6)} ${suffix}${key === "total" && cost.estimated ? " (estimated)" : ""}`);
-    }
-  }
-
-  function formatInteger(value) {
-    return Number.isFinite(value) ? new Intl.NumberFormat("en-US").format(value) : "";
-  }
-
-  function formatTimestamp(value) {
-    if (!value) return "";
-    const date = new Date(value);
-    return Number.isNaN(date.valueOf()) ? value : date.toLocaleString();
-  }
-
-  async function viewTranscript(entry) {
-    elements.transcriptTitle.textContent = `${entry.name} · ${entry.badge}`;
-    elements.transcriptBody.replaceChildren(buildRunSummary(entry));
-    const loading = document.createElement("p");
-    loading.className = "transcript-status";
-    loading.textContent = "Loading session transcript…";
-    elements.transcriptBody.append(loading);
-    openDialog(elements.transcriptDialog);
-
-    try {
-      const response = await fetch(entry.transcriptUrl, { cache: "no-store" });
-      if (!response.ok) throw new Error(`Transcript request failed with ${response.status}`);
-      const text = await response.text();
-      loading.remove();
-      let transcript;
-      try {
-        transcript = JSON.parse(text);
-      } catch (_error) {
-        renderRawTranscript(text, entry);
-        return;
-      }
-      renderTranscript(transcript, entry);
-    } catch (error) {
-      loading.textContent = `Transcript unavailable: ${error.message}`;
-      loading.classList.add("error");
-    }
-  }
-
-  function renderTranscript(transcript, entry) {
-    const section = document.createElement("section");
-    section.className = "transcript";
-    const header = document.createElement("div");
-    header.className = "transcript-header";
-    const heading = document.createElement("h3");
-    heading.textContent = "Session events";
-    header.append(heading, artifactLink(entry.transcriptUrl, "View raw JSON"));
-    section.append(header);
-
-    const events = Array.isArray(transcript.events) ? transcript.events : [];
-    const toolNames = new Map(
-      events
-        .filter((event) => event.type === "tool_call")
-        .map((event) => [event.id, event.tool])
-    );
-
-    if (!events.length) {
-      const empty = document.createElement("p");
-      empty.className = "transcript-status";
-      empty.textContent = "This transcript contains no public events.";
-      section.append(empty);
-    } else {
-      events.forEach((event) => section.append(createTranscriptEvent(event, toolNames)));
-    }
-
-    if (entry.rawTranscriptUrl) {
-      const raw = document.createElement("p");
-      raw.className = "raw-transcript-link";
-      raw.append("An untouched harness export is also available: ", artifactLink(entry.rawTranscriptUrl, "raw transcript"), ".");
-      section.append(raw);
-    }
-    elements.transcriptBody.append(section);
-  }
-
-  function renderRawTranscript(text, entry) {
-    const section = document.createElement("section");
-    section.className = "transcript";
-    const header = document.createElement("div");
-    header.className = "transcript-header";
-    const heading = document.createElement("h3");
-    heading.textContent = "Raw session transcript";
-    header.append(heading, artifactLink(entry.transcriptUrl, "Open file"));
-    const pre = document.createElement("pre");
-    pre.className = "raw-transcript";
-    pre.textContent = text;
-    section.append(header, pre);
-    elements.transcriptBody.append(section);
-  }
-
-  function artifactLink(url, label) {
-    const link = document.createElement("a");
-    link.href = url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = label;
-    return link;
-  }
-
-  function createTranscriptEvent(event, toolNames) {
-    const isTool = event.type === "tool_call" || event.type === "tool_result";
-    const container = document.createElement(isTool ? "details" : "article");
-    container.className = `transcript-event event-${event.type || "unknown"}`;
-    const header = document.createElement(isTool ? "summary" : "header");
-    const label = document.createElement("strong");
-    label.textContent = eventLabel(event, toolNames);
-    header.append(label);
-    if (event.timestamp) {
-      const time = document.createElement("time");
-      time.dateTime = event.timestamp;
-      time.textContent = formatTimestamp(event.timestamp);
-      header.append(time);
-    }
-
-    const content = document.createElement("pre");
-    content.textContent = eventContent(event);
-    container.append(header, content);
-    return container;
-  }
-
-  function eventLabel(event, toolNames) {
-    if (event.type === "message") return event.role || "Message";
-    if (event.type === "tool_call") return `Tool call · ${event.tool}`;
-    if (event.type === "tool_result") return `Tool result · ${toolNames.get(event.callId) || event.callId}`;
-    if (event.type === "error") return "Error";
-    if (event.type === "note") return "Session note";
-    return event.type || "Event";
-  }
-
-  function eventContent(event) {
-    if (event.type === "message" || event.type === "note") return event.content || "";
-    if (event.type === "error") return event.message || "";
-    if (event.type === "tool_call") return stringify(event.input);
-    if (event.type === "tool_result") return stringify(event.output);
-    return stringify(event);
-  }
-
-  function stringify(value) {
-    return typeof value === "string" ? value : JSON.stringify(value, null, 2);
   }
 
   function openDialog(dialog) {
@@ -829,6 +778,13 @@
     elements.gridMode.addEventListener("click", () => setMode("grid"));
     elements.previous.addEventListener("click", () => move(-1));
     elements.next.addEventListener("click", () => move(1));
+    elements.brand.addEventListener("click", (event) => {
+      event.preventDefault();
+      const firstEntry = entriesInSidebarOrder()[0] || entriesInSidebarOrder(entries)[0];
+      if (!firstEntry) return;
+      chooseSingleEntry(firstEntry);
+      elements.list.scrollTop = 0;
+    });
     elements.mobileMenu.addEventListener("click", () => {
       elements.sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
     });
@@ -850,18 +806,26 @@
     });
 
     document.addEventListener("keydown", (event) => {
-      const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName);
-      if (typing || state.mode !== "single" || entries.length < 2) return;
-      if (event.key === "ArrowLeft") move(-1);
-      if (event.key === "ArrowRight") move(1);
+      const typing = /^(BUTTON|INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName);
+      if (typing || state.mode !== "single" || entriesInSidebarOrder().length < 2) return;
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        event.preventDefault();
+        move(-1);
+      }
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        event.preventDefault();
+        move(1);
+      }
     });
 
     window.addEventListener("hashchange", () => {
       const entry = entryFromHash();
       if (!entry) return;
       state.activeId = entry.id;
+      expandEntryModel(entry);
       if (state.mode !== "single") setMode("single");
       else render();
+      revealEntryInSidebar(entry.id);
     });
   }
 
@@ -873,12 +837,17 @@
 
     try {
       [entries] = await Promise.all([loadEntries(), fetchVotes()]);
-      state.activeId = entryFromHash()?.id || entries[0]?.id || null;
+      const hashEntry = entryFromHash();
+      const initialEntry = hashEntry || entriesInSidebarOrder(entries)[0] || null;
+      state.activeId = initialEntry?.id || null;
+      expandEntryModel(initialEntry);
       state.selectedIds = new Set(entries.slice(0, 4).map((entry) => entry.id));
       populateSelect(elements.creatorFilter, uniqueValues("creator"));
       populateSelect(elements.harnessFilter, uniqueValues("harness"));
+      buildFrames();
       applyFilters();
       renderViewer();
+      revealEntryInSidebar(state.activeId);
     } catch (error) {
       console.error(error);
       elements.filterCount.textContent = "Registry unavailable";

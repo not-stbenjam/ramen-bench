@@ -2,20 +2,503 @@
   "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
   "schemaVersion": 1,
   "runId": "openai/gpt-6-astra/max",
-  "sourceFormat": "codex-exec-public-summary",
+  "sessionId": "01a06e64-0e07-7793-9a85-7e983f733c88",
+  "sourceFormat": "codex-rollout-jsonl",
   "events": [
     {
       "type": "message",
       "role": "user",
       "content": "Create a single-file HTML page (index.html) with all CSS and JavaScript inline and zero external assets. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.",
-      "timestamp": "2026-09-04T22:39:46Z"
+      "timestamp": "2026-09-04T21:47:31.271Z"
     },
     {
       "type": "message",
       "role": "assistant",
-      "content": "Created the requested single-file ramen scene in index.html.",
-      "timestamp": "2026-09-04T22:39:46Z"
+      "content": "I’ll build a self-contained ramen scene with soft lighting, drifting steam, and gentle mouse response, then check the layout and reduced-motion behavior.",
+      "timestamp": "2026-09-04T21:47:44.028Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_2pjMtsJTeshzlWRoOxVqvPYq",
+      "tool": "exec",
+      "input": "const results = await Promise.allSettled([\n  tools.exec_command({cmd:\"ls -la\",workdir:\"<WORKSPACE>/openai/gpt-6-astra/max\",max_output_tokens:1000}),\n  tools.exec_command({cmd:\"node --version && python3 --version && command -v chromium && command -v chromium-browser && command -v google-chrome\",max_output_tokens:1000}),\n  tools.exec_command({cmd:\"node -e \\\"for (const name of ['playwright','puppeteer','@playwright/test']) { try { console.log(name + ': ' + require.resolve(name)) } catch {} }\\\"\",max_output_tokens:1000}),\n]);\nfor (let i=0;i<results.length;i++) text({index:i,...results[i]});\ntext(ALL_TOOLS.filter(x=>/browser|render|screenshot|terminal/.test(x.name+\" \"+x.description)).map(x=>({name:x.name,description:x.description.slice(0,150)})));\n",
+      "timestamp": "2026-09-04T21:48:09.921Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_2pjMtsJTeshzlWRoOxVqvPYq",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":0,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"6df050\",\"wall_time_seconds\":0.000003584,\"exit_code\":0,\"original_token_count\":69,\"output\":\"total 0\\ndrwxr-xr-x. 1 <USER> <USER> 34 Sep  4 17:48 .\\ndrwxr-xr-x. 1 <USER> <USER> 52 Sep  4 17:45 ..\\ndr-xr-xr-x. 2 <USER> <USER> 40 Sep  4 17:48 .agents\\ndr-xr-xr-x. 2 <USER> <USER> 40 Sep  4 17:48 .codex\\ndr-xr-xr-x. 2 <USER> <USER> 40 Sep  4 17:48 .git\\n\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":1,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"5a5fff\",\"wall_time_seconds\":0.00000225,\"exit_code\":1,\"original_token_count\":6,\"output\":\"v22.22.2\\nPython 3.14.5\\n\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":2,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"8e5e4b\",\"wall_time_seconds\":0.000001625,\"exit_code\":0,\"original_token_count\":0,\"output\":\"\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "[{\"name\":\"mcp__codex_apps__sites_add_custom_domain\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_change_site_slug\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_create_site\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_create_source_repository_write_credential\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_deploy_private_site_version\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_deploy_site_version\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_generate_siwc_bypass_token\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_get_deployment_status\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_get_environment_variables\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_get_site\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_get_site_version\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_get_site_worker_logs\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_list_custom_domains\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_list_site_versions\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_list_sites\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_read_database_overview\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_read_database_table_rows\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_refresh_custom_domain_status\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_remove_custom_domain\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_save_site_version\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_update_environment_variables\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_update_site_access\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__sites_update_site_metadata\",\"description\":\"Use Sites to build, save, deploy, and inspect websites such as landing pages, portfolios, dashboards, portals, trackers, hubs, games, and internal too\"},{\"name\":\"mcp__codex_apps__slack_slack_create_canvas\",\"description\":\"Send messages and fetch data\\n\\nCreates a Slack Canvas document from Canvas-flavored Markdown content. Return the canvas link to the user. Not available\"},{\"name\":\"mcp__codex_apps__slack_slack_update_canvas\",\"description\":\"Send messages and fetch data\\n\\nUpdates an existing Slack Canvas document with markdown content. Supports appending, prepending, or replacing content.\\n\\n\"},{\"name\":\"web__run\",\"description\":\"Tools in the web namespace.\\n\\nTool for accessing the internet.\\n\\n\\n---\\n\\n## Examples of different commands available in this tool\\n\\nExamples of different c\"}]"
+        }
+      ],
+      "timestamp": "2026-09-04T21:48:10.049Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "I’m shaping this as a warmly lit ceramic bowl in deep shadow, with golden broth, noodles, shiitake, bok choy, grilled tofu, and corn. The artwork will be inline SVG, with steam and subtle reflections that respond to the pointer.",
+      "timestamp": "2026-09-04T21:49:23.683Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_OzjgDM0Bz1aaq4bVkLEZiIwg",
+      "tool": "exec",
+      "input": "const results = await Promise.allSettled([\n  tools.exec_command({cmd:\"ls -d <TMP>/*playwright* <TMP>/*browser* <HOME>/.cache/ms-playwright /opt/google/chrome /usr/bin/*chrom* 2>/dev/null\",shell:\"bash\",login:false,max_output_tokens:1000}),\n  tools.exec_command({cmd:\"npm root -g && rg --files /usr/local/lib/node_modules /opt <TMP> -g '*playwright*/package.json' -g 'playwright-core/package.json' -g 'chrome-headless-shell' -g 'chromium' -g 'chrome' 2>/dev/null\",max_output_tokens:1000}),\n]);\nfor (let i=0;i<results.length;i++) text({index:i,...results[i]});\n",
+      "timestamp": "2026-09-04T21:49:23.686Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_OzjgDM0Bz1aaq4bVkLEZiIwg",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.6 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":0,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"86da83\",\"wall_time_seconds\":0.000004,\"exit_code\":0,\"original_token_count\":71,\"output\":\"<HOME>/.cache/ms-playwright\\n/opt/google/chrome\\n<TMP>/ember-browser\\n<TMP>/ember-browser-mobile\\n<TMP>/ember-browser.log\\n<TMP>/ember-browser.mjs\\n<TMP>/fedora-astra-visual-browser\\n<TMP>/playwright-artifacts-ifUzvE\\n<TMP>/playwright_chromiumdev_profile-ExV0I4\\n/usr/bin/chromium-browser\\n\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":1,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"b608d6\",\"wall_time_seconds\":0.469307021,\"exit_code\":2,\"original_token_count\":10,\"output\":\"<HOME>/.local/lib/node_modules\\n\"}}"
+        }
+      ],
+      "timestamp": "2026-09-04T21:49:24.340Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_KLEEFEDTaSdnOUNgOGu3ynAU",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"npm install --prefix <TMP>/ramen-page-check playwright\",workdir:\"<TMP>\",yield_time_ms:1000,max_output_tokens:1000}));\n",
+      "timestamp": "2026-09-04T21:49:43.058Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_KLEEFEDTaSdnOUNgOGu3ynAU",
+      "status": "error",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.7 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"96d18a\",\"wall_time_seconds\":0,\"exit_code\":1,\"original_token_count\":158,\"output\":\"npm error code EROFS\\nnpm error syscall open\\nnpm error path <HOME>/.npm/_cacache<TMP>/7f09087f\\nnpm error errno EROFS\\nnpm error rofs Invalid response body while trying to fetch https://registry.npmjs.org/playwright: EROFS: read-only file system, open '<HOME>/.npm/_cacache<TMP>/7f09087f'\\nnpm error rofs Often virtualized file systems, or other file systems\\nnpm error rofs that don't support symlinks, give this error.\\nnpm error Log files were not written due to an error writing to the directory: <HOME>/.npm/_logs\\nnpm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T21:49:43.726Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_i303O2l0a4BYWE8tIS1QT7CU",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"npm install --prefix <TMP>/ramen-page-check --cache <TMP>/ramen-npm-cache playwright\",workdir:\"<TMP>\",yield_time_ms:1000,max_output_tokens:1000}));\n",
+      "timestamp": "2026-09-04T21:55:20.941Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_i303O2l0a4BYWE8tIS1QT7CU",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"5b0907\",\"wall_time_seconds\":1.001985904,\"session_id\":43401,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T21:55:22.117Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_0QIRTZsmh4H9JCHPhDFHCKp2",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: <TMP>/build-ramen.py\\n+from pathlib import Path\\n+import math\\n+import random\\n+\\n+random.seed(41)\\n+parts = []\\n+def add(s):\\n+    parts.append(s)\\n+\\n+add('''<!doctype html>\\n+<html lang=\\\"en\\\">\\n+<head>\\n+  <meta charset=\\\"utf-8\\\">\\n+  <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\">\\n+  <meta name=\\\"theme-color\\\" content=\\\"#100e0b\\\">\\n+  <title>A quiet bowl of ramen</title>\\n+  <style>\\n+    :root { color-scheme: dark; background: #100e0b; }\\n+    * { box-sizing: border-box; }\\n+    html, body { margin: 0; width: 100%; min-height: 100%; }\\n+    body { overflow: hidden; }\\n+    .world {\\n+      position: relative; display: grid; place-items: center;\\n+      width: 100%; height: 100vh; height: 100svh; overflow: hidden;\\n+      isolation: isolate;\\n+      background:\\n+        radial-gradient(ellipse at 50% 71%, #30201470 0%, #20181038 29%, transparent 58%),\\n+        radial-gradient(ellipse at 37% 39%, #33302242 0%, transparent 51%),\\n+        linear-gradient(125deg, #151612, #11110e 43%, #100c09 100%);\\n+    }\\n+    .warmth {\\n+      position: absolute; width: min(1000px, 120vw); aspect-ratio: 1;\\n+      border-radius: 50%; pointer-events: none;\\n+      background: radial-gradient(ellipse, #a06a2520 0%, #97682c0b 35%, transparent 64%);\\n+      transform: translate(-8%, 2%); animation: warmth 12s ease-in-out infinite alternate;\\n+    }\\n+    .world::after {\\n+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 3;\\n+      background: radial-gradient(ellipse at 50% 48%, transparent 35%, #05060470 100%);\\n+      box-shadow: inset 0 0 100px #00000020;\\n+    }\\n+    .scene {\\n+      position: relative; width: min(1240px, 148vw, 154vh); width: min(1240px, 148vw, 154svh);\\n+      aspect-ratio: 6 / 5; flex-shrink: 0;\\n+      transform: perspective(1400px) translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0)\\n+        rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));\\n+      transform-origin: 50% 67%; will-change: transform;\\n+    }\\n+    .ramen, .steam { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }\\n+    .ramen { overflow: visible; }\\n+    .steam { pointer-events: none; }\\n+    .broth-light { animation: simmer 7s ease-in-out infinite alternate; }\\n+    .glaze-light { mix-blend-mode: screen; }\\n+    .still-steam { opacity: .72; }\\n+    .has-steam .still-steam { opacity: 0; }\\n+    @keyframes warmth { to { opacity: .6; } }\\n+    @keyframes simmer { from { opacity: .3; } to { opacity: .65; } }\\n+    @media (prefers-reduced-motion: reduce) {\\n+      *, *::before, *::after { animation: none !important; }\\n+      .scene { transform: none !important; will-change: auto; }\\n+      .broth-light { opacity: .45; }\\n+    }\\n+  </style>\\n+</head>\\n+<body>\\n+<main class=\\\"world\\\" aria-label=\\\"A steaming bowl of vegan ramen in warm, quiet light.\\\">\\n+  <div class=\\\"warmth\\\" aria-hidden=\\\"true\\\"></div>\\n+  <div class=\\\"scene\\\">\\n+  <svg class=\\\"ramen\\\" viewBox=\\\"0 0 1200 1000\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" role=\\\"img\\\" aria-labelledby=\\\"dish-title dish-description\\\">\\n+    <title id=\\\"dish-title\\\">Vegan ramen</title>\\n+    <desc id=\\\"dish-description\\\">Golden noodles in rich amber broth, with charred tofu, shiitake mushrooms, glossy bok choy, sweetcorn, seaweed, scallions and chili threads. Steam curls above a handmade dark ceramic bowl.</desc>\\n+    <defs>\\n+      <radialGradient id=\\\"ground\\\"><stop stop-color=\\\"#b27036\\\" stop-opacity=\\\".2\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#a26530\\\" stop-opacity=\\\"0\\\"/></radialGradient>\\n+      <radialGradient id=\\\"shadow\\\"><stop stop-color=\\\"#000\\\" stop-opacity=\\\".9\\\"/><stop offset=\\\".5\\\" stop-color=\\\"#000\\\" stop-opacity=\\\".65\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#000\\\" stop-opacity=\\\"0\\\"/></radialGradient>\\n+      <linearGradient id=\\\"foot\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#34241b\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#100f0c\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#473322\\\"/></linearGradient>\\n+      <linearGradient id=\\\"pottery\\\" x1=\\\".15\\\" y1=\\\".05\\\" x2=\\\".76\\\" y2=\\\".92\\\">\\n+        <stop stop-color=\\\"#746049\\\"/><stop offset=\\\".13\\\" stop-color=\\\"#584632\\\"/><stop offset=\\\".35\\\" stop-color=\\\"#343027\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#1d221e\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#111613\\\"/>\\n+      </linearGradient>\\n+      <radialGradient id=\\\"bowl-glow\\\" cx=\\\".2\\\" cy=\\\".04\\\" r=\\\".85\\\"><stop stop-color=\\\"#d0a273\\\" stop-opacity=\\\".31\\\"/><stop offset=\\\".48\\\" stop-color=\\\"#87613c\\\" stop-opacity=\\\".05\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#010805\\\" stop-opacity=\\\".45\\\"/></radialGradient>\\n+      <linearGradient id=\\\"rim\\\" x1=\\\".12\\\" y1=\\\"0\\\" x2=\\\".8\\\" y2=\\\"1\\\"><stop stop-color=\\\"#c6aa7b\\\"/><stop offset=\\\".18\\\" stop-color=\\\"#806949\\\"/><stop offset=\\\".47\\\" stop-color=\\\"#716348\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#3f4233\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#8e7955\\\"/></linearGradient>\\n+      <linearGradient id=\\\"rim-edge\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".75\\\" y2=\\\"1\\\"><stop stop-color=\\\"#e2c596\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#7f7856\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#373f30\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#a79566\\\"/></linearGradient>\\n+      <linearGradient id=\\\"inside\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#1b1b13\\\"/><stop offset=\\\".35\\\" stop-color=\\\"#3c3421\\\"/><stop offset=\\\".8\\\" stop-color=\\\"#91734b\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#c7a36a\\\"/></linearGradient>\\n+      <radialGradient id=\\\"broth\\\" cx=\\\".42\\\" cy=\\\".36\\\" r=\\\".68\\\"><stop stop-color=\\\"#ba6c1b\\\"/><stop offset=\\\".4\\\" stop-color=\\\"#98501a\\\"/><stop offset=\\\".8\\\" stop-color=\\\"#743b16\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#4b2912\\\"/></radialGradient>\\n+      <radialGradient id=\\\"broth-warm\\\"><stop stop-color=\\\"#e7a03c\\\" stop-opacity=\\\".4\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#a5571a\\\" stop-opacity=\\\"0\\\"/></radialGradient>\\n+      <linearGradient id=\\\"oil\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#ffcf70\\\" stop-opacity=\\\".7\\\"/><stop offset=\\\".5\\\" stop-color=\\\"#c46c13\\\" stop-opacity=\\\".1\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#dd8a26\\\" stop-opacity=\\\".3\\\"/></linearGradient>\\n+      <linearGradient id=\\\"noodle\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".16\\\" y2=\\\"1\\\"><stop stop-color=\\\"#f9d68a\\\"/><stop offset=\\\".36\\\" stop-color=\\\"#e6b456\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#d2973b\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#b87927\\\"/></linearGradient>\\n+      <linearGradient id=\\\"noodle-light\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#fff0b7\\\" stop-opacity=\\\".8\\\"/><stop offset=\\\".6\\\" stop-color=\\\"#ffde8a\\\" stop-opacity=\\\".35\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#e3b358\\\" stop-opacity=\\\".1\\\"/></linearGradient>\\n+      <linearGradient id=\\\"nori\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"1\\\"><stop stop-color=\\\"#3b4322\\\"/><stop offset=\\\".35\\\" stop-color=\\\"#202d1b\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#111e14\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#344024\\\"/></linearGradient>\\n+      <linearGradient id=\\\"leaf\\\" x1=\\\".2\\\" y1=\\\"0\\\" x2=\\\".7\\\" y2=\\\"1\\\"><stop stop-color=\\\"#778734\\\"/><stop offset=\\\".18\\\" stop-color=\\\"#3c651f\\\"/><stop offset=\\\".5\\\" stop-color=\\\"#204b1d\\\"/><stop offset=\\\".82\\\" stop-color=\\\"#193a19\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#6d913c\\\"/></linearGradient>\\n+      <linearGradient id=\\\"leaf-small\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"1\\\"><stop stop-color=\\\"#839943\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#3d722c\\\"/><stop offset=\\\".7\\\" stop-color=\\\"#1a4b21\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#09291a\\\"/></linearGradient>\\n+      <linearGradient id=\\\"stalk\\\" x1=\\\"0\\\" y1=\\\"1\\\" x2=\\\".9\\\" y2=\\\"0\\\"><stop stop-color=\\\"#ded397\\\"/><stop offset=\\\".2\\\" stop-color=\\\"#d5dd9d\\\"/><stop offset=\\\".55\\\" stop-color=\\\"#a6bd6e\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#427431\\\"/></linearGradient>\\n+      <radialGradient id=\\\"mushroom\\\" cx=\\\".35\\\" cy=\\\".16\\\" r=\\\".85\\\"><stop stop-color=\\\"#ae773f\\\"/><stop offset=\\\".22\\\" stop-color=\\\"#8c532d\\\"/><stop offset=\\\".65\\\" stop-color=\\\"#5e341f\\\"/><stop offset=\\\".9\\\" stop-color=\\\"#3b2418\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#251b13\\\"/></radialGradient>\\n+      <linearGradient id=\\\"mushroom-side\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#bca477\\\"/><stop offset=\\\".35\\\" stop-color=\\\"#978058\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#4e3724\\\"/></linearGradient>\\n+      <linearGradient id=\\\"cut\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#eddba6\\\"/><stop offset=\\\".45\\\" stop-color=\\\"#c5a36b\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#785234\\\"/></linearGradient>\\n+      <linearGradient id=\\\"tofu-top\\\" x1=\\\".1\\\" y1=\\\"0\\\" x2=\\\".9\\\" y2=\\\"1\\\"><stop stop-color=\\\"#f4d494\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#e9bf79\\\"/><stop offset=\\\".65\\\" stop-color=\\\"#d7a354\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#b9782d\\\"/></linearGradient>\\n+      <linearGradient id=\\\"tofu-front\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\"><stop stop-color=\\\"#eedbb0\\\"/><stop offset=\\\".4\\\" stop-color=\\\"#d6b47a\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#95632f\\\"/></linearGradient>\\n+      <linearGradient id=\\\"tofu-side\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"1\\\"><stop stop-color=\\\"#ac7335\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#674024\\\"/></linearGradient>\\n+      <radialGradient id=\\\"corn\\\" cx=\\\".3\\\" cy=\\\".2\\\" r=\\\".9\\\"><stop stop-color=\\\"#ffdf75\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#f3bc3e\\\"/><stop offset=\\\".75\\\" stop-color=\\\"#d5941e\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#a46815\\\"/></radialGradient>\\n+      <linearGradient id=\\\"scallion\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".7\\\" y2=\\\"1\\\"><stop stop-color=\\\"#d0df93\\\"/><stop offset=\\\".3\\\" stop-color=\\\"#8eaf50\\\"/><stop offset=\\\".6\\\" stop-color=\\\"#4c8133\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#1d5328\\\"/></linearGradient>\\n+      <linearGradient id=\\\"steam-ink\\\" x1=\\\"0\\\" y1=\\\"1\\\" x2=\\\"0\\\" y2=\\\"0\\\"><stop stop-color=\\\"#dddac0\\\" stop-opacity=\\\"0\\\"/><stop offset=\\\".25\\\" stop-color=\\\"#dddac0\\\" stop-opacity=\\\".23\\\"/><stop offset=\\\".65\\\" stop-color=\\\"#d0d2bd\\\" stop-opacity=\\\".12\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#cdd4c2\\\" stop-opacity=\\\"0\\\"/></linearGradient>\\n+      <filter id=\\\"ceramic\\\" x=\\\"-3%\\\" y=\\\"-3%\\\" width=\\\"106%\\\" height=\\\"106%\\\">\\n+        <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".55\\\" numOctaves=\\\"3\\\" seed=\\\"12\\\" result=\\\"noise\\\"/>\\n+        <feColorMatrix in=\\\"noise\\\" type=\\\"saturate\\\" values=\\\"0\\\"/>\\n+        <feComponentTransfer><feFuncA type=\\\"linear\\\" slope=\\\".22\\\"/></feComponentTransfer>\\n+        <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n+        <feBlend in=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n+      </filter>\\n+      <filter id=\\\"food-texture\\\" x=\\\"-5%\\\" y=\\\"-5%\\\" width=\\\"110%\\\" height=\\\"110%\\\">\\n+        <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".19\\\" numOctaves=\\\"3\\\" seed=\\\"27\\\"/>\\n+        <feColorMatrix type=\\\"saturate\\\" values=\\\"0\\\"/>\\n+        <feComponentTransfer><feFuncA type=\\\"linear\\\" slope=\\\".27\\\"/></feComponentTransfer>\\n+        <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n+        <feBlend in=\\\"SourceGraphic\\\" mode=\\\"soft-light\\\"/>\\n+      </filter>\\n+      <filter id=\\\"soft-shadow\\\" x=\\\"-30%\\\" y=\\\"-40%\\\" width=\\\"170%\\\" height=\\\"200%\\\"><feGaussianBlur stdDeviation=\\\"7\\\"/></filter>\\n+      <filter id=\\\"food-shadow\\\" x=\\\"-25%\\\" y=\\\"-35%\\\" width=\\\"160%\\\" height=\\\"190%\\\"><feDropShadow dx=\\\"2\\\" dy=\\\"6\\\" stdDeviation=\\\"4\\\" flood-color=\\\"#251708\\\" flood-opacity=\\\".65\\\"/></filter>\\n+      <filter id=\\\"steam-soft\\\" x=\\\"-100%\\\" y=\\\"-30%\\\" width=\\\"300%\\\" height=\\\"160%\\\"><feGaussianBlur stdDeviation=\\\"7\\\"/></filter>\\n+      <clipPath id=\\\"soup-clip\\\"><ellipse cx=\\\"600\\\" cy=\\\"507\\\" rx=\\\"319\\\" ry=\\\"134\\\"/></clipPath>\\n+      <clipPath id=\\\"body-clip\\\"><path d=\\\"M244 502 C251 621 319 733 434 787 C518 823 684 824 767 785 C882 730 945 612 956 502 Z\\\"/></clipPath>\\n+      <g id=\\\"shiitake\\\">\\n+        <ellipse cy=\\\"22\\\" rx=\\\"76\\\" ry=\\\"37\\\" fill=\\\"#24180c\\\" opacity=\\\".55\\\" filter=\\\"url(#soft-shadow)\\\"/>\\n+        <path d=\\\"M-70 0 C-70 26-43 46-6 48 C32 52 70 34 73 6 C65-23-48-26-70 0Z\\\" fill=\\\"url(#mushroom-side)\\\"/>\\n+        <g fill=\\\"none\\\" stroke=\\\"#563a22\\\" stroke-width=\\\"1.2\\\" opacity=\\\".55\\\">\\n+          <path d=\\\"M-63 13Q-33 39-5 44 M-53 11Q-28 37-5 44 M-40 9Q-20 34-5 44 M-26 11Q-13 32-5 44 M-10 12L-5 44 M7 10Q-1 33-5 44 M23 10Q8 33-5 44 M40 10Q15 36-5 44 M56 10Q20 38-5 44 M65 12Q33 38-5 44\\\"/>\\n+        </g>\\n+        <path d=\\\"M-74 3 C-79-17-58-45-21-51 C14-60 51-44 68-22 C86 0 76 20 56 28 C31 38 10 30-5 33 C-29 36-62 30-74 13Z\\\" fill=\\\"url(#mushroom)\\\" stroke=\\\"#56361e\\\" stroke-width=\\\"2\\\" filter=\\\"url(#food-texture)\\\"/>\\n+        <path d=\\\"M-61-11 C-50-36-21-46 2-44 M20-42Q42-35 52-26\\\" fill=\\\"none\\\" stroke=\\\"#d1a76c\\\" stroke-width=\\\"2\\\" stroke-linecap=\\\"round\\\" opacity=\\\".38\\\"/>\\n+        <path d=\\\"M-39-28 Q-16-14 8-9 L49 12 L27 10 Q4-2-10-7Z\\\" fill=\\\"#3e2718\\\" opacity=\\\".8\\\"/>\\n+        <path d=\\\"M-42-30 Q-9-17 12-5 L48 12 L28 7 Q1-6-17-13Z\\\" fill=\\\"url(#cut)\\\"/>\\n+        <path d=\\\"M28-35 L16-16 Q-4 9-32 21 L-22 7 Q-4-3 4-17Z\\\" fill=\\\"#382419\\\"/>\\n+        <path d=\\\"M27-37 L15-17 Q-3 7-33 18 L-24 7 Q-9 0 3-18Z\\\" fill=\\\"url(#cut)\\\"/>\\n+        <path d=\\\"M-41-30 Q-10-18 12-5 M27-37L14-17Q-6 7-33 18\\\" fill=\\\"none\\\" stroke=\\\"#f6e3b0\\\" stroke-width=\\\"1.4\\\" opacity=\\\".65\\\"/>\\n+''')\\n+for _ in range(72):\\n+    x=random.uniform(-67,67); y=random.uniform(-44,26)\\n+    if (x/72)**2+((y+7)/40)**2<1:\\n+        add(f'        <ellipse cx=\\\"{x:.1f}\\\" cy=\\\"{y:.1f}\\\" rx=\\\"{random.uniform(.6,1.8):.1f}\\\" ry=\\\".6\\\" fill=\\\"{random.choice([\\\"#c49353\\\",\\\"#301e13\\\",\\\"#d4b47e\\\"])}\\\" opacity=\\\".25\\\"/>\\\\n')\\n+add('''      </g>\\n+      <g id=\\\"tofu\\\">\\n+        <path d=\\\"M-52 1L14-31L63-1L62 33L-6 63L-53 34Z\\\" fill=\\\"#301a09\\\" opacity=\\\".5\\\" transform=\\\"translate(2 8)\\\" filter=\\\"url(#soft-shadow)\\\"/>\\n+        <path d=\\\"M-53-3 L-3 24 L-2 57 Q-26 49-52 30Z\\\" fill=\\\"url(#tofu-front)\\\"/>\\n+        <path d=\\\"M-3 24 L62-7 L60 27 L-2 57Z\\\" fill=\\\"url(#tofu-side)\\\"/>\\n+        <path d=\\\"M-53-3 Q-25-20 11-32 L62-7 L-3 24Z\\\" fill=\\\"url(#tofu-top)\\\" stroke=\\\"#ddb574\\\" stroke-width=\\\"1.4\\\" filter=\\\"url(#food-texture)\\\"/>\\n+        <path d=\\\"M-50-3L-3 22L59-7 M-51 1L-51 28\\\" fill=\\\"none\\\" stroke=\\\"#fff0be\\\" stroke-width=\\\"1.4\\\" opacity=\\\".6\\\"/>\\n+        <g fill=\\\"none\\\" stroke-linecap=\\\"round\\\">\\n+          <path d=\\\"M-31-12L16 13 M-14-21L34 5 M3-28L49-3\\\" stroke=\\\"#905321\\\" stroke-width=\\\"7\\\" opacity=\\\".65\\\"/>\\n+          <path d=\\\"M-31-12L16 13 M-14-21L34 5 M3-28L49-3\\\" stroke=\\\"#55351d\\\" stroke-width=\\\"3.1\\\" opacity=\\\".85\\\"/>\\n+          <path d=\\\"M-30-13L16 11 M-13-22L34 3 M4-29L50-4\\\" stroke=\\\"#5c3a1a\\\" stroke-width=\\\"1\\\"/>\\n+        </g>\\n+''')\\n+for _ in range(44):\\n+    x=random.uniform(-48,-5); y=random.uniform(3,49)\\n+    if y>(x+53)*.54 and y<31+(x+53)*.53:\\n+        add(f'        <ellipse cx=\\\"{x:.1f}\\\" cy=\\\"{y:.1f}\\\" rx=\\\"{random.uniform(.5,1.4):.1f}\\\" ry=\\\".7\\\" fill=\\\"#8a6235\\\" opacity=\\\".36\\\"/>\\\\n')\\n+add('''      </g>\\n+      <g id=\\\"kernel\\\">\\n+        <path d=\\\"M-7-5Q-8-10-1-10Q7-10 8-4L7 4Q4 9-2 8Q-8 8-7-5Z\\\" fill=\\\"url(#corn)\\\" stroke=\\\"#a66c1a\\\" stroke-width=\\\".8\\\"/>\\n+        <path d=\\\"M-4-5Q-2-8 3-6\\\" fill=\\\"none\\\" stroke=\\\"#ffedac\\\" stroke-width=\\\"2\\\" stroke-linecap=\\\"round\\\" opacity=\\\".8\\\"/>\\n+        <path d=\\\"M-4 5Q0 7 3 4\\\" fill=\\\"none\\\" stroke=\\\"#bf8019\\\" stroke-width=\\\".7\\\" opacity=\\\".7\\\"/>\\n+      </g>\\n+      <g id=\\\"onion\\\">\\n+        <path d=\\\"M-13-2C-12-11 5-14 12-6C22 7 1 14-9 8C-13 5-14 2-13-2ZM-7-1C-7 5 5 5 7 0C9-6-5-6-7-1Z\\\" fill=\\\"url(#scallion)\\\" fill-rule=\\\"evenodd\\\" stroke=\\\"#4f7b32\\\" stroke-width=\\\".7\\\"/>\\n+        <path d=\\\"M-11-3C-8-10 5-11 10-6\\\" fill=\\\"none\\\" stroke=\\\"#e0e7ab\\\" stroke-width=\\\"1.7\\\" opacity=\\\".85\\\"/>\\n+      </g>\\n+    </defs>\\n+\\n+    <!-- Light falls onto the table, then disappears into it. -->\\n+    <ellipse cx=\\\"581\\\" cy=\\\"796\\\" rx=\\\"469\\\" ry=\\\"141\\\" fill=\\\"url(#ground)\\\"/>\\n+    <ellipse cx=\\\"618\\\" cy=\\\"824\\\" rx=\\\"355\\\" ry=\\\"76\\\" fill=\\\"url(#shadow)\\\" opacity=\\\".85\\\"/>\\n+    <ellipse cx=\\\"605\\\" cy=\\\"822\\\" rx=\\\"177\\\" ry=\\\"30\\\" fill=\\\"#020504\\\" opacity=\\\".8\\\" filter=\\\"url(#soft-shadow)\\\"/>\\n+    <path d=\\\"M466 775Q600 747 735 775L725 809Q605 849 479 811Z\\\" fill=\\\"url(#foot)\\\" filter=\\\"url(#ceramic)\\\"/>\\n+    <path d=\\\"M480 808Q605 840 724 807\\\" fill=\\\"none\\\" stroke=\\\"#8d6d45\\\" stroke-width=\\\"2\\\" opacity=\\\".22\\\"/>\\n+\\n+    <!-- A deep, hand-thrown bowl with a softly lit, uneven glaze. -->\\n+    <path d=\\\"M244 502 C251 621 319 733 434 787 C518 823 684 824 767 785 C882 730 945 612 956 502Z\\\" fill=\\\"url(#pottery)\\\" filter=\\\"url(#ceramic)\\\"/>\\n+    <g clip-path=\\\"url(#body-clip)\\\">\\n+      <ellipse cx=\\\"577\\\" cy=\\\"518\\\" rx=\\\"409\\\" ry=\\\"340\\\" fill=\\\"url(#bowl-glow)\\\"/>\\n+''')\\n+# Imperfect wheel lines and fine glaze inclusions, clipped to the pottery.\\n+for i in range(32):\\n+    y=541+i*8.5\\n+    add(f'      <path d=\\\"M249 {y:.1f}Q592 {y+175-i*2:.1f} 951 {y-4:.1f}\\\" fill=\\\"none\\\" stroke=\\\"{random.choice([\\\"#dec291\\\",\\\"#b6a580\\\",\\\"#090f0b\\\"])}\\\" stroke-width=\\\"{random.uniform(.45,1.1):.2f}\\\" opacity=\\\"{random.uniform(.018,.056):.3f}\\\"/>\\\\n')\\n+for _ in range(540):\\n+    x=random.uniform(250,953); y=random.uniform(536,813)\\n+    add(f'      <ellipse cx=\\\"{x:.1f}\\\" cy=\\\"{y:.1f}\\\" rx=\\\"{random.uniform(.35,1.55):.2f}\\\" ry=\\\"{random.uniform(.3,.9):.2f}\\\" fill=\\\"{random.choice([\\\"#c9b28a\\\",\\\"#ceb488\\\",\\\"#0a100c\\\",\\\"#968e6c\\\"])}\\\" opacity=\\\"{random.uniform(.05,.17):.2f}\\\"/>\\\\n')\\n+add('''      <path d=\\\"M286 565C306 671 401 755 467 779\\\" fill=\\\"none\\\" stroke=\\\"#c4aa78\\\" stroke-width=\\\"15\\\" opacity=\\\".07\\\" filter=\\\"url(#soft-shadow)\\\"/>\\n+      <ellipse class=\\\"glaze-light\\\" cx=\\\"392\\\" cy=\\\"619\\\" rx=\\\"80\\\" ry=\\\"111\\\" fill=\\\"url(#ground)\\\" opacity=\\\".4\\\"/>\\n+    </g>\\n+\\n+    <ellipse cx=\\\"600\\\" cy=\\\"504\\\" rx=\\\"358\\\" ry=\\\"164\\\" fill=\\\"url(#rim)\\\" filter=\\\"url(#ceramic)\\\"/>\\n+    <ellipse cx=\\\"600\\\" cy=\\\"501\\\" rx=\\\"345\\\" ry=\\\"152\\\" fill=\\\"url(#inside)\\\"/>\\n+    <path d=\\\"M257 494C262 411 411 350 583 350C722 345 867 385 923 448\\\" fill=\\\"none\\\" stroke=\\\"#ebcf9b\\\" stroke-width=\\\"2.4\\\" opacity=\\\".45\\\"/>\\n+    <ellipse cx=\\\"600\\\" cy=\\\"507\\\" rx=\\\"319\\\" ry=\\\"134\\\" fill=\\\"url(#broth)\\\"/>\\n+    <g clip-path=\\\"url(#soup-clip)\\\">\\n+      <ellipse cx=\\\"556\\\" cy=\\\"519\\\" rx=\\\"273\\\" ry=\\\"119\\\" fill=\\\"url(#broth-warm)\\\"/>\\n+      <path d=\\\"M293 499C328 409 490 378 642 385\\\" fill=\\\"none\\\" stroke=\\\"#d89b40\\\" stroke-width=\\\"2.4\\\" opacity=\\\".45\\\"/>\\n+      <path d=\\\"M341 571C440 646 703 652 835 584\\\" fill=\\\"none\\\" stroke=\\\"#e7ad4d\\\" stroke-width=\\\"1.7\\\" opacity=\\\".33\\\"/>\\n+''')\\n+# Chili oil forms little irregular pools on the broth.\\n+for _ in range(150):\\n+    x=random.uniform(280,920); y=random.uniform(375,642)\\n+    if ((x-600)/313)**2+((y-507)/129)**2<1:\\n+        r=random.uniform(1.2,6)\\n+        add(f'      <ellipse cx=\\\"{x:.1f}\\\" cy=\\\"{y:.1f}\\\" rx=\\\"{r:.1f}\\\" ry=\\\"{r*.47:.1f}\\\" fill=\\\"url(#oil)\\\" stroke=\\\"#e9aa48\\\" stroke-opacity=\\\".25\\\" stroke-width=\\\".6\\\" opacity=\\\"{random.uniform(.3,.7):.2f}\\\"/>\\\\n')\\n+add('''      <g class=\\\"broth-light\\\" fill=\\\"none\\\" stroke=\\\"#f4cb85\\\" stroke-linecap=\\\"round\\\">\\n+        <path d=\\\"M303 488Q306 475 321 463 M316 540Q324 549 338 554\\\" stroke-width=\\\"2\\\"/>\\n+        <path d=\\\"M819 574Q845 562 855 550 M833 563L844 557 M537 629Q581 635 608 632\\\" stroke-width=\\\"1.5\\\"/>\\n+        <path d=\\\"M372 436L380 432 M704 401L730 405 M861 510L870 512\\\" stroke-width=\\\"1\\\"/>\\n+      </g>\\n+      <g id=\\\"ripples\\\" fill=\\\"none\\\" stroke=\\\"#f3ca80\\\" stroke-width=\\\"1.2\\\"></g>\\n+    </g>\\n+\\n+    <!-- Torn nori is standing in the broth at the back of the bowl. -->\\n+    <g transform=\\\"translate(411 414) rotate(-21)\\\">\\n+      <path d=\\\"M-81 32L-88-89L-79-95L-74-110L-57-104L-44-115L-33-108L-20-117L-9-111L5-114L9-103L21-108L28-92L33 23Z\\\" fill=\\\"url(#nori)\\\" stroke=\\\"#4b5030\\\" stroke-width=\\\"1.4\\\" filter=\\\"url(#food-texture)\\\"/>\\n+''')\\n+for _ in range(100):\\n+    x=random.uniform(-77,22); y=random.uniform(-100,24)\\n+    add(f'      <path d=\\\"M{x:.1f} {y:.1f}l{random.uniform(2,9):.1f} {random.uniform(-4,5):.1f}l{random.uniform(-4,4):.1f} 4\\\" fill=\\\"none\\\" stroke=\\\"{random.choice([\\\"#80915a\\\",\\\"#0a170f\\\",\\\"#748451\\\"])}\\\" stroke-width=\\\"{random.uniform(.6,1.7):.1f}\\\" opacity=\\\".24\\\"/>\\\\n')\\n+add('''      <path d=\\\"M-66 22Q-49-43-65-96 M-32 16Q-16-33-23-103 M8 17Q-3-31 8-88\\\" fill=\\\"none\\\" stroke=\\\"#82915a\\\" stroke-width=\\\"1\\\" opacity=\\\".19\\\"/>\\n+    </g>\\n+    <g transform=\\\"translate(463 392) rotate(4)\\\">\\n+      <path d=\\\"M-62 27L-53-86L-42-82L-32-91L-17-85L-5-91L8-84L21-87L31-77L48-78L57 22Z\\\" fill=\\\"url(#nori)\\\" stroke=\\\"#4d5531\\\" stroke-width=\\\"1.3\\\" filter=\\\"url(#food-texture)\\\"/>\\n+      <path d=\\\"M-41-77L-44 21 M-18-78L-22 17 M4-77L7 21 M29-73L35 15\\\" stroke=\\\"#758148\\\" stroke-width=\\\"2\\\" opacity=\\\".18\\\"/>\\n+      <path d=\\\"M-47-51L39-60 M-49-29L44-37 M-50-6L48-14\\\" stroke=\\\"#89935c\\\" stroke-width=\\\"1\\\" opacity=\\\".13\\\"/>\\n+    </g>\\n+\\n+    <!-- Wavy noodles nest in the broth; each strand has its own highlight. -->\\n+    <g clip-path=\\\"url(#soup-clip)\\\" fill=\\\"none\\\" stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\">\\n+      <ellipse cx=\\\"582\\\" cy=\\\"526\\\" rx=\\\"174\\\" ry=\\\"74\\\" fill=\\\"#653910\\\" opacity=\\\".65\\\" filter=\\\"url(#soft-shadow)\\\"/>\\n+''')\\n+def smooth_path(points):\\n+    d=f'M{points[0][0]:.1f} {points[0][1]:.1f}'\\n+    for i in range(len(points)-1):\\n+        p0=points[max(0,i-1)];p1=points[i];p2=points[i+1];p3=points[min(len(points)-1,i+2)]\\n+        c1=(p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6)\\n+        c2=(p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6)\\n+        d+=f'C{c1[0]:.1f} {c1[1]:.1f} {c2[0]:.1f} {c2[1]:.1f} {p2[0]:.1f} {p2[1]:.1f}'\\n+    return d\\n+\\n+# Loose, slightly wavy loops build an irregular mound instead of parallel rings.\\n+for i in range(51):\\n+    cx=random.uniform(544,623); cy=random.uniform(496,548)\\n+    rx=random.uniform(68,144); ry=random.uniform(18,55)\\n+    phase=random.uniform(-math.pi,math.pi)\\n+    turns=random.uniform(.8,1.3)\\n+    points=[]\\n+    for j in range(37):\\n+        t=phase+j/36*math.tau*turns\\n+        x=cx+rx*math.cos(t)+4.8*math.sin(t*11+i*.7)\\n+        y=cy+ry*math.sin(t)+3.4*math.sin(t*9+i*1.9)-j*.09\\n+        points.append((x,y))\\n+    d=smooth_path(points)\\n+    w=random.uniform(4.5,6.6)\\n+    add(f'      <path d=\\\"{d}\\\" stroke=\\\"#62370f\\\" stroke-width=\\\"{w+3.5:.1f}\\\" opacity=\\\".7\\\" transform=\\\"translate(0 2.3)\\\"/>\\\\n')\\n+    add(f'      <path d=\\\"{d}\\\" stroke=\\\"url(#noodle)\\\" stroke-width=\\\"{w:.1f}\\\"/>\\\\n')\\n+    add(f'      <path d=\\\"{d}\\\" stroke=\\\"url(#noodle-light)\\\" stroke-width=\\\"1.4\\\" transform=\\\"translate(-.5 -1.3)\\\"/>\\\\n')\\n+add('''    </g>\\n+\\n+    <!-- Bok choy: pale, tender stems and ruffled leaves, with fine veins. -->\\n+    <g filter=\\\"url(#food-shadow)\\\">\\n+      <path d=\\\"M727 497C752 461 789 456 827 426C858 408 870 378 850 365C856 345 833 328 814 335C804 312 776 319 766 335C747 323 727 342 731 358C709 365 716 387 713 403C713 439 702 461 698 478Z\\\" fill=\\\"url(#leaf)\\\" stroke=\\\"#263d19\\\" stroke-width=\\\"2\\\" filter=\\\"url(#food-texture)\\\"/>\\n+      <path d=\\\"M716 477C748 452 778 400 815 350\\\" fill=\\\"none\\\" stroke=\\\"#97b25d\\\" stroke-width=\\\"3\\\" opacity=\\\".65\\\"/>\\n+      <g fill=\\\"none\\\" stroke=\\\"#86a34e\\\" stroke-width=\\\"1.3\\\" opacity=\\\".52\\\">\\n+        <path d=\\\"M754 429Q772 435 814 414 M764 414Q782 418 834 390 M778 397Q805 400 847 373 M790 382Q823 377 831 343 M744 444Q729 420 734 385 M756 426Q742 394 749 350 M772 403Q756 367 773 337 M787 381Q777 350 796 335\\\"/>\\n+      </g>\\n+      <path d=\\\"M791 338Q800 325 814 338 M833 339Q848 345 845 357 M727 371Q719 384 724 395 M826 416Q849 404 852 388\\\" fill=\\\"none\\\" stroke=\\\"#b3bb69\\\" stroke-width=\\\"2.1\\\" opacity=\\\".35\\\"/>\\n+      <path d=\\\"M690 494C677 468 675 425 671 404C655 405 642 389 650 375C634 359 645 341 660 340C656 321 677 310 692 320C707 306 727 322 724 336C746 333 756 352 744 367C754 387 736 405 722 414L724 484Z\\\" fill=\\\"url(#leaf-small)\\\" stroke=\\\"#284f22\\\" stroke-width=\\\"1.8\\\" filter=\\\"url(#food-texture)\\\"/>\\n+      <path d=\\\"M707 479Q700 403 688 335\\\" fill=\\\"none\\\" stroke=\\\"#a0bd6d\\\" stroke-width=\\\"3\\\" opacity=\\\".7\\\"/>\\n+      <g fill=\\\"none\\\" stroke=\\\"#80a44e\\\" stroke-width=\\\"1.2\\\" opacity=\\\".65\\\"><path d=\\\"M699 401Q678 393 659 371 M696 386Q713 379 738 356 M693 365Q672 350 667 329 M691 351Q707 345 717 329 M702 421Q720 409 733 391\\\"/></g>\\n+      <path d=\\\"M666 333Q659 340 661 350 M680 319Q691 316 697 327 M726 341Q741 338 744 350\\\" fill=\\\"none\\\" stroke=\\\"#c2cc8a\\\" stroke-width=\\\"2\\\" opacity=\\\".38\\\"/>\\n+      <path d=\\\"M648 534C668 507 693 468 702 418Q708 405 716 413C725 440 720 476 706 511L683 544Z\\\" fill=\\\"url(#stalk)\\\"/>\\n+      <path d=\\\"M665 537C689 502 729 463 773 434Q785 427 786 439C760 470 736 519 693 554Z\\\" fill=\\\"url(#stalk)\\\"/>\\n+      <path d=\\\"M661 534Q701 485 709 424 M676 540Q720 486 777 439\\\" fill=\\\"none\\\" stroke=\\\"#eff0be\\\" stroke-width=\\\"3\\\" opacity=\\\".55\\\"/>\\n+      <path d=\\\"M685 542Q724 498 758 463 M677 531Q702 486 715 446\\\" fill=\\\"none\\\" stroke=\\\"#6d963e\\\" stroke-width=\\\"1.3\\\" opacity=\\\".7\\\"/>\\n+    </g>\\n+\\n+    <g filter=\\\"url(#food-shadow)\\\">\\n+      <use href=\\\"#shiitake\\\" transform=\\\"translate(486 426) rotate(-13) scale(.88)\\\"/>\\n+      <use href=\\\"#shiitake\\\" transform=\\\"translate(582 422) rotate(18) scale(.82)\\\"/>\\n+    </g>\\n+\\n+    <!-- Three golden pieces of grilled tofu. No egg, dairy or meat. -->\\n+    <g filter=\\\"url(#food-shadow)\\\">\\n+      <use href=\\\"#tofu\\\" transform=\\\"translate(394 488) rotate(-13) scale(.86)\\\"/>\\n+      <use href=\\\"#tofu\\\" transform=\\\"translate(369 535) rotate(-13) scale(.91)\\\"/>\\n+      <use href=\\\"#tofu\\\" transform=\\\"translate(448 536) rotate(4) scale(.93)\\\"/>\\n+    </g>\\n+\\n+    <!-- Sweetcorn, nestled against the greens. -->\\n+    <path d=\\\"M750 486Q806 471 846 501Q869 528 838 557Q804 583 746 563Q721 533 750 486Z\\\" fill=\\\"#59330d\\\" opacity=\\\".65\\\" filter=\\\"url(#soft-shadow)\\\"/>\\n+    <g>\\n+''')\\n+kernels=[]\\n+for row in range(7):\\n+    for col in range(8):\\n+        x=741+col*13.8+random.uniform(-4,4)+(row%2)*5\\n+        y=489+row*11+random.uniform(-4,4)\\n+        if ((x-793)/61)**2+((y-524)/44)**2 <1.15:\\n+            kernels.append((x,y,random.uniform(-29,29),random.uniform(.75,1.12)))\\n+for x,y,a,s in sorted(kernels,key=lambda k:k[1]):\\n+    add(f'      <use href=\\\"#kernel\\\" transform=\\\"translate({x:.1f} {y:.1f}) rotate({a:.1f}) scale({s:.2f})\\\"/>\\\\n')\\n+add('''    </g>\\n+    <use href=\\\"#shiitake\\\" transform=\\\"translate(742 586) rotate(16) scale(.79 .76)\\\" filter=\\\"url(#food-shadow)\\\"/>\\n+\\n+    <!-- Scallions, a few sesame seeds, and fine chili threads. -->\\n+    <g filter=\\\"url(#food-shadow)\\\">\\n+''')\\n+for x,y,s,a in [(541,494,.8,-19),(570,486,.69,30),(600,491,.8,-29),(625,482,.7,18),(585,510,.93,-34),(617,522,.68,23),(557,532,.75,48),(658,550,.69,-15),(490,581,.58,10),(540,604,.54,7),(651,457,.62,40),(695,561,.62,-32),(815,551,.55,26),(378,508,.58,-12),(671,592,.55,-20),(470,460,.58,-32)]:\\n+    add(f'      <use href=\\\"#onion\\\" transform=\\\"translate({x} {y}) rotate({a}) scale({s})\\\"/>\\\\n')\\n+add('''      <path d=\\\"M560 504Q576 479 610 472L611 478Q582 489 565 507Z\\\" fill=\\\"#5d933d\\\"/>\\n+      <path d=\\\"M577 525Q604 506 638 511L637 516Q606 512 580 529Z\\\" fill=\\\"#709e4a\\\"/>\\n+      <path d=\\\"M542 510L565 487L569 491L546 514Z\\\" fill=\\\"#c3ce88\\\"/>\\n+      <path d=\\\"M614 495Q628 478 645 474L647 478Q630 483 619 499Z\\\" fill=\\\"#83aa50\\\"/>\\n+    </g>\\n+''')\\n+for _ in range(57):\\n+    x=random.uniform(383,826); y=random.uniform(446,617)\\n+    if ((x-600)/231)**2+((y-528)/84)**2<1:\\n+        add(f'    <ellipse cx=\\\"{x:.1f}\\\" cy=\\\"{y:.1f}\\\" rx=\\\"{random.uniform(1.3,2.7):.1f}\\\" ry=\\\"{random.uniform(.65,1):.1f}\\\" transform=\\\"rotate({random.randrange(180)} {x:.1f} {y:.1f})\\\" fill=\\\"{random.choice([\\\"#e4cf93\\\",\\\"#edd9a8\\\",\\\"#181e11\\\",\\\"#f0d8a0\\\"])}\\\" stroke=\\\"#704721\\\" stroke-width=\\\".35\\\"/>\\\\n')\\n+add('''    <g fill=\\\"none\\\" stroke-linecap=\\\"round\\\" filter=\\\"url(#food-shadow)\\\">\\n+      <path d=\\\"M556 498C581 476 610 483 599 464C589 451 569 479 588 489C610 501 640 489 658 465 M570 494C607 453 613 475 621 496 M582 488C579 457 602 446 620 463C630 474 611 487 607 501 M595 490Q637 469 649 484 M567 483C597 494 627 455 638 467\\\" stroke=\\\"#6c2310\\\" stroke-width=\\\"3\\\"/>\\n+      <path d=\\\"M556 497C581 475 610 482 599 463C589 450 569 478 588 488C610 500 640 488 658 464 M570 493C607 452 613 474 621 495 M582 487C579 456 602 445 620 462C630 473 611 486 607 500 M595 489Q637 468 649 483 M567 482C597 493 627 454 638 466\\\" stroke=\\\"#c45429\\\" stroke-width=\\\"1.6\\\"/>\\n+      <path d=\\\"M557 496Q572 483 585 482 M596 458Q587 457 584 466 M589 487Q604 492 618 488 M584 472Q587 454 600 454 M612 465Q621 467 616 478\\\" stroke=\\\"#f4954f\\\" stroke-width=\\\".7\\\"/>\\n+    </g>\\n+\\n+    <!-- The near lip catches a continuous thread of soft amber light. -->\\n+    <path d=\\\"M244 505C245 592 404 668 600 669C796 669 954 594 956 505C947 586 793 653 600 654C408 653 254 587 244 505Z\\\" fill=\\\"url(#rim)\\\" filter=\\\"url(#ceramic)\\\"/>\\n+    <path d=\\\"M244 505C247 594 404 668 600 669C797 669 954 591 956 505\\\" fill=\\\"none\\\" stroke=\\\"url(#rim-edge)\\\" stroke-width=\\\"2.4\\\"/>\\n+    <path d=\\\"M259 535C292 601 439 650 577 654\\\" fill=\\\"none\\\" stroke=\\\"#c7b482\\\" stroke-width=\\\"1.6\\\" opacity=\\\".58\\\"/>\\n+    <path d=\\\"M296 583Q313 595 337 605 M347 610Q402 634 448 641\\\" fill=\\\"none\\\" stroke=\\\"#e3cea0\\\" stroke-width=\\\"1.8\\\" stroke-linecap=\\\"round\\\" opacity=\\\".48\\\"/>\\n+\\n+    <!-- This remains visible if scripting or the canvas is unavailable. -->\\n+    <g class=\\\"still-steam\\\" fill=\\\"none\\\" stroke=\\\"url(#steam-ink)\\\" stroke-linecap=\\\"round\\\" filter=\\\"url(#steam-soft)\\\" aria-hidden=\\\"true\\\">\\n+      <path d=\\\"M482 472C449 418 513 392 487 344S448 279 492 231S482 168 468 142\\\" stroke-width=\\\"19\\\"/>\\n+      <path d=\\\"M596 450C642 407 565 362 601 310S641 254 603 212S594 148 611 115\\\" stroke-width=\\\"25\\\"/>\\n+      <path d=\\\"M723 486C686 435 750 405 724 358S697 308 730 272S729 218 715 194\\\" stroke-width=\\\"15\\\"/>\\n+    </g>\\n+  </svg>\\n+  <canvas class=\\\"steam\\\" aria-hidden=\\\"true\\\"></canvas>\\n+  </div>\\n+</main>\\n+<script>\\n+(() => {\\n+  'use strict';\\n+  const scene = document.querySelector('.scene');\\n+  const canvas = document.querySelector('.steam');\\n+  const context = canvas.getContext('2d');\\n+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');\\n+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');\\n+  const rippleLayer = document.getElementById('ripples');\\n+  const glaze = document.querySelector('.glaze-light');\\n+  const pointer = { x: 0, y: 0, targetX: 0, targetY: 0, wind: 0, targetWind: 0 };\\n+  const ripples = [];\\n+  const plumes = [\\n+    { x: 477, y: 472, height: 307, width: 21, phase: 0.5, speed: 0.78 },\\n+    { x: 553, y: 464, height: 358, width: 27, phase: 2.7, speed: 0.63 },\\n+    { x: 624, y: 468, height: 327, width: 23, phase: 4.5, speed: 0.71 },\\n+    { x: 720, y: 482, height: 282, width: 18, phase: 1.8, speed: 0.82 },\\n+    { x: 576, y: 501, height: 254, width: 15, phase: 5.6, speed: 0.67 }\\n+  ];\\n+  let frame = 0;\\n+  let previousTime = 0;\\n+  let steamTime = 9;\\n+  let lastPaint = -Infinity;\\n+  let lastRipple = 0;\\n+  let lastPointerX = null;\\n+  let lastPointerTime = 0;\\n+  let canvasScale = 1;\\n+  let bounds = scene.getBoundingClientRect();\\n+\\n+  // A continuous ribbon grows, curls and disperses as it rises. Its edges\\n+  // are feathered instead of using opaque circles or looping smoke images.\\n+  function drawSteam(time) {\\n+    if (!context) return;\\n+    context.setTransform(canvasScale, 0, 0, canvasScale, 0, 0);\\n+    context.clearRect(0, 0, 1200, 1000);\\n+    context.globalCompositeOperation = 'screen';\\n+    for (const plume of plumes) {\\n+      const left = [], right = [], middle = [];\\n+      const phase = time * plume.speed + plume.phase;\\n+      for (let step = 0; step <= 48; step++) {\\n+        const rise = step / 48;\\n+        const wave = Math.sin(rise * 9.6 - phase);\\n+        const curl = Math.sin(rise * 18.5 - phase * 1.3 + plume.phase);\\n+        const spread = Math.sin(Math.PI * rise) ** 0.65;\\n+        const x = plume.x + wave * (11 + rise * 30) + curl * rise * 13\\n+          + pointer.wind * rise * rise * 58 + pointer.x * rise * 12;\\n+        const y = plume.y - rise * plume.height;\\n+        const width = (2 + plume.width * spread) * (0.76 + Math.sin(rise * 13 - phase) * 0.24);\\n+        middle.push([x, y]);\\n+        left.push([x - width, y]);\\n+        right.push([x + width, y]);\\n+      }\\n+      const ink = context.createLinearGradient(0, plume.y, 0, plume.y - plume.height);\\n+      ink.addColorStop(0, 'rgba(223, 222, 195, 0)');\\n+      ink.addColorStop(0.13, 'rgba(217, 216, 191, 0.038)');\\n+      ink.addColorStop(0.34, 'rgba(210, 215, 196, 0.064)');\\n+      ink.addColorStop(0.62, 'rgba(204, 212, 198, 0.039)');\\n+      ink.addColorStop(0.85, 'rgba(195, 207, 191, 0.015)');\\n+      ink.addColorStop(1, 'rgba(195, 207, 191, 0)');\\n+      context.fillStyle = ink;\\n+      context.filter = 'blur(8px)';\\n+      context.beginPath();\\n+      left.forEach(([x, y], i) => i ? context.lineTo(x, y) : context.moveTo(x, y));\\n+      right.reverse().forEach(([x, y]) => context.lineTo(x, y));\\n+      context.closePath();\\n+      context.fill();\\n+      context.strokeStyle = ink;\\n+      context.lineWidth = 7;\\n+      context.filter = 'blur(3px)';\\n+      context.beginPath();\\n+      middle.forEach(([x, y], i) => i ? context.lineTo(x, y) : context.moveTo(x, y));\\n+      context.stroke();\\n+    }\\n+    context.filter = 'none';\\n+    context.globalCompositeOperation = 'source-over';\\n+  }\\n+\\n+  function resize() {\\n+    bounds = scene.getBoundingClientRect();\\n+    if (context) {\\n+      // Cap raster resolution: the softly focused steam needs no 4K buffer.\\n+      const width = Math.min(1800, Math.round(scene.clientWidth * Math.min(devicePixelRatio || 1, 1.75)));\\n+      canvas.width = width;\\n+      canvas.height = Math.round(width * 5 / 6);\\n+      canvasScale = width / 1200;\\n+      drawSteam(steamTime);\\n+      scene.classList.add('has-steam');\\n+    }\\n+  }\\n+\\n+  function addRipple(x, y, now) {\\n+    if (now - lastRipple < 420 || ripples.length >= 4) return;\\n+    lastRipple = now;\\n+    const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');\\n+    ellipse.setAttribute('cx', x.toFixed(1));\\n+    ellipse.setAttribute('cy', y.toFixed(1));\\n+    ellipse.setAttribute('opacity', '0');\\n+    rippleLayer.append(ellipse);\\n+    ripples.push({ element: ellipse, age: 0 });\\n+  }\\n+\\n+  function onPointerMove(event) {\\n+    if (reducedMotion.matches || !finePointer.matches || event.pointerType === 'touch') return;\\n+    const now = performance.now();\\n+    pointer.targetX = Math.max(-1, Math.min(1, event.clientX / innerWidth * 2 - 1));\\n+    pointer.targetY = Math.max(-1, Math.min(1, event.clientY / innerHeight * 2 - 1));\\n+    if (lastPointerX !== null && now - lastPointerTime < 160) {\\n+      const velocity = (event.clientX - lastPointerX) / Math.max(now - lastPointerTime, 8);\\n+      pointer.targetWind = Math.max(-1.1, Math.min(1.1, velocity * 0.65));\\n+    }\\n+    lastPointerX = event.clientX;\\n+    lastPointerTime = now;\\n+    const x = (event.clientX - bounds.left) / bounds.width * 1200;\\n+    const y = (event.clientY - bounds.top) / bounds.height * 1000;\\n+    if (((x - 600) / 310) ** 2 + ((y - 507) / 130) ** 2 < 1) addRipple(x, y, now);\\n+  }\\n+\\n+  function resetPointer() {\\n+    pointer.targetX = pointer.targetY = pointer.targetWind = 0;\\n+    lastPointerX = null;\\n+  }\\n+\\n+  function animate(now) {\\n+    const dt = previousTime ? Math.min((now - previousTime) / 1000, 0.05) : 0;\\n+    previousTime = now;\\n+    steamTime += dt;\\n+    const ease = 1 - Math.exp(-dt * 3.5);\\n+    pointer.x += (pointer.targetX - pointer.x) * ease;\\n+    pointer.y += (pointer.targetY - pointer.y) * ease;\\n+    pointer.wind += (pointer.targetWind - pointer.wind) * ease;\\n+    pointer.targetWind *= Math.exp(-dt * 1.9);\\n+    scene.style.setProperty('--pan-x', `${(pointer.x * 5).toFixed(2)}px`);\\n+    scene.style.setProperty('--pan-y', `${(pointer.y * 2.5).toFixed(2)}px`);\\n+    scene.style.setProperty('--tilt-x', `${(-pointer.y * 0.55).toFixed(3)}deg`);\\n+    scene.style.setProperty('--tilt-y', `${(pointer.x * 0.8).toFixed(3)}deg`);\\n+    glaze.setAttribute('transform', `translate(${(pointer.x * 55).toFixed(1)} ${(pointer.y * 9).toFixed(1)})`);\\n+    for (let i = ripples.length - 1; i >= 0; i--) {\\n+      const ripple = ripples[i];\\n+      ripple.age += dt;\\n+      const progress = ripple.age / 2.8;\\n+      if (progress >= 1) {\\n+        ripple.element.remove();\\n+        ripples.splice(i, 1);\\n+      } else {\\n+        const radius = 8 + progress * 80;\\n+        ripple.element.setAttribute('rx', radius.toFixed(1));\\n+        ripple.element.setAttribute('ry', (radius * 0.4).toFixed(1));\\n+        ripple.element.setAttribute('opacity', (Math.sin(progress * Math.PI) * 0.19).toFixed(3));\\n+      }\\n+    }\\n+    // Steam is slow by nature. Thirty paints per second keeps it fluid and light.\\n+    if (now - lastPaint >= 32) {\\n+      drawSteam(steamTime);\\n+      lastPaint = now;\\n+    }\\n+    frame = requestAnimationFrame(animate);\\n+  }\\n+\\n+  function syncMotion() {\\n+    cancelAnimationFrame(frame);\\n+    frame = 0;\\n+    previousTime = 0;\\n+    lastPaint = -Infinity;\\n+    if (reducedMotion.matches) {\\n+      resetPointer();\\n+      pointer.x = pointer.y = pointer.wind = 0;\\n+      scene.removeAttribute('style');\\n+      glaze.removeAttribute('transform');\\n+      ripples.forEach(ripple => ripple.element.remove());\\n+      ripples.length = 0;\\n+      drawSteam(9);\\n+    } else if (!document.hidden) {\\n+      frame = requestAnimationFrame(animate);\\n+    }\\n+  }\\n+\\n+  window.addEventListener('pointermove', onPointerMove, { passive: true });\\n+  document.documentElement.addEventListener('pointerleave', resetPointer);\\n+  window.addEventListener('blur', resetPointer);\\n+  window.addEventListener('resize', resize, { passive: true });\\n+  document.addEventListener('visibilitychange', syncMotion);\\n+  reducedMotion.addEventListener('change', syncMotion);\\n+  finePointer.addEventListener('change', resetPointer);\\n+  resize();\\n+  syncMotion();\\n+})();\\n+</script>\\n+</body>\\n+</html>\\n+''')\\n+\\n+Path('<WORKSPACE>/openai/gpt-6-astra/max/index.html').write_text(''.join(parts))\\n+print(f'Wrote index.html: {sum(map(len, parts)):,} characters')\\n*** End Patch\"));\n",
+      "timestamp": "2026-09-04T22:35:59.638Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_0QIRTZsmh4H9JCHPhDFHCKp2",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:35:59.726Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The artwork is in place, including textured pottery and individually shaded ingredients. I’m now checking how it renders on desktop and mobile, along with the steam and mouse response. Reduced-motion mode will keep a still wisp of steam visible.",
+      "timestamp": "2026-09-04T22:36:16.647Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_NtSpN2a76ms5MvWOweED3fJ2",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 <TMP>/build-ramen.py\",workdir:\"<WORKSPACE>/openai/gpt-6-astra/max\",max_output_tokens:1000}));\nconst results = await Promise.allSettled([\n  tools.exec_command({cmd:\"python3 -m http.server 8765 --bind <LAN_IP>\",workdir:\"<WORKSPACE>/openai/gpt-6-astra/max\",yield_time_ms:1000,max_output_tokens:1000}),\n  tools.exec_command({cmd:\"ls -la /opt/google/chrome <HOME>/.cache/ms-playwright && file /usr/bin/chromium-browser\",max_output_tokens:1000}),\n  tools.write_stdin({session_id:43401,chars:\"\",yield_time_ms:1000,max_output_tokens:1000})\n]);\nfor (let i=0;i<results.length;i++) text({index:i,...results[i]});\n",
+      "timestamp": "2026-09-04T22:36:16.649Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_NtSpN2a76ms5MvWOweED3fJ2",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"c287b7\",\"wall_time_seconds\":0.000005334,\"exit_code\":0,\"original_token_count\":10,\"output\":\"Wrote index.html: 342,873 characters\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":0,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"343690\",\"wall_time_seconds\":1.000476255,\"session_id\":27809,\"original_token_count\":0,\"output\":\"\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":1,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"bda624\",\"wall_time_seconds\":0.000004083,\"exit_code\":0,\"original_token_count\":260,\"output\":\"<HOME>/.cache/ms-playwright:\\ntotal 0\\ndrwx------. 1 <USER> <USER>  262 Sep  1 13:08 .\\ndrwx------. 1 <USER> <USER> 2062 Aug 30 16:48 ..\\ndrwxr-xr-x. 1 <USER> <USER>   80 Sep  1 13:08 .links\\ndrwxr-xr-x. 1 <USER> <USER>  720 Aug 29 21:11 b\\ndrwxr-xr-x. 1 <USER> <USER>  110 Sep  1 13:08 chromium-1223\\ndrwxr-xr-x. 1 <USER> <USER>  110 Sep  1 13:08 chromium_headless_shell-1223\\ndrwxr-xr-x. 1 <USER> <USER>  142 Sep  1 13:08 ffmpeg-1011\\ndrwxr-xr-x. 1 <USER> <USER>  574 Aug 21 22:10 mcp-chrome-a3a424a\\ndrwxr-xr-x. 1 <USER> <USER>  440 Aug 25 21:28 mcp-chrome-adefc7f\\ndrwx------. 1 <USER> <USER>  574 Aug 23 10:26 mcp-chrome-c740bd3\\ndrwxr-xr-x. 1 <USER> <USER>  440 Aug 29 21:12 mcp-chrome-d8bcd8e\\n\\n/opt/google/chrome:\\ntotal 4\\ndrwxr-xr-x. 1 nobody nobody 12 May 11 09:41 .\\ndrwxr-xr-x. 1 nobody nobody 12 May 11 09:41 ..\\nlrwxrwxrwx. 1 nobody nobody 25 May 11 09:41 chrome -> /usr/bin/chromium-browser\\n/usr/bin/chromium-browser: symbolic link to ../../usr/lib64/chromium-browser/chromium-browser.sh\\n\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"index\":2,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"d398a5\",\"wall_time_seconds\":0.000002208,\"exit_code\":0,\"original_token_count\":6,\"output\":\"\\nadded 2 packages in 2s\\n\"}}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:36:17.901Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_NCYbgfxPqFTMR0LfMBGfNomH",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"ls <HOME>/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux <HOME>/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64 <HOME>/.cache/ms-playwright/chromium-1223/chrome-linux64 2>/dev/null\",shell:\"bash\",login:false,max_output_tokens:1000}));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: <TMP>/ramen-page-check/preview.mjs\\n+import { chromium } from 'playwright';\\n+const browser = await chromium.launch({headless:true, executablePath:'/usr/bin/chromium-browser', args:['--no-sandbox']});\\n+const page = await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});\\n+const errors = [];\\n+page.on('pageerror', error => errors.push(error.message));\\n+await page.goto('http://<LAN_IP>:8765/index.html');\\n+await page.waitForTimeout(1200);\\n+await page.screenshot({path:'<TMP>/ramen-desktop.png'});\\n+console.log(JSON.stringify({errors,dimensions:await page.evaluate(()=>({viewport:[innerWidth,innerHeight], document:[document.documentElement.scrollWidth,document.documentElement.scrollHeight],art:document.querySelector('.scene').getBoundingClientRect().toJSON(),nodes:document.querySelectorAll('*').length}))}));\\n+await page.setViewportSize({width:390,height:844});\\n+await page.waitForTimeout(200);\\n+await page.screenshot({path:'<TMP>/ramen-mobile.png'});\\n+await browser.close();\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"node <TMP>/ramen-page-check/preview.mjs\",yield_time_ms:1000,max_output_tokens:1000}));\n",
+      "timestamp": "2026-09-04T22:36:33.486Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_NCYbgfxPqFTMR0LfMBGfNomH",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.3 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"fe36e5\",\"wall_time_seconds\":0.000003083,\"exit_code\":2,\"original_token_count\":73,\"output\":\"<HOME>/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux:\\nheadless_command_resources.pak\\nheadless_lib_data.pak\\nheadless_lib_strings.pak\\nheadless_shell\\nicudtl.dat\\nlibEGL.so\\nlibGLESv2.so\\nlibvk_swiftshader.so\\nlibvulkan.so.1\\nv8_context_snapshot.bin\\nvk_swiftshader_icd.json\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"d8893e\",\"wall_time_seconds\":1.002413049,\"session_id\":99739,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:36:34.755Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_psFRaXV2ExxRCOM4cbZnyOPx",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:99739,chars:\"\",yield_time_ms:1000,max_output_tokens:2000}));\n",
+      "timestamp": "2026-09-04T22:36:38.889Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_psFRaXV2ExxRCOM4cbZnyOPx",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"67f1fc\",\"wall_time_seconds\":0.18513178,\"exit_code\":0,\"original_token_count\":50,\"output\":\"{\\\"errors\\\":[],\\\"dimensions\\\":{\\\"viewport\\\":[1440,1000],\\\"document\\\":[1440,1000],\\\"art\\\":{\\\"x\\\":100,\\\"y\\\":0,\\\"width\\\":1240,\\\"height\\\":1033.328125,\\\"top\\\":0,\\\"right\\\":1340,\\\"bottom\\\":1033.328125,\\\"left\\\":100},\\\"nodes\\\":1410}}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:36:39.093Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_hY18Eki7RnWR16xIQODu0YmO",
+      "tool": "exec",
+      "input": "for (const path of ['<TMP>/ramen-desktop.png','<TMP>/ramen-mobile.png']) {\n  const result = await tools.view_image({path});\n  image(result.image_url);\n}\n",
+      "timestamp": "2026-09-04T22:36:49.970Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_hY18Eki7RnWR16xIQODu0YmO",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"1585260\">",
+          "detail": "high"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"401092\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-09-04T22:36:50.153Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The first mobile preview exposed a centering issue with the oversized artwork; I’m correcting it. I’m also softening the food textures and refining the noodle curves so the warm highlights read more naturally at small sizes.",
+      "timestamp": "2026-09-04T22:37:42.271Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "I’m using the test-failures skill to trace the mobile issue and the Agent Mail skill for the required session inbox check. The layout problem comes from the grid expanding to fit the artwork; flex centering will keep the bowl centered within the viewport.",
+      "timestamp": "2026-09-04T22:38:13.101Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_Ngfc5oWw39UU5J2RMES3ndPV",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:1638,chars:\"\",yield_time_ms:1000,max_output_tokens:1000}));\nfor (const path of ['<TMP>/ramen-desktop.png','<TMP>/ramen-mobile.png']) {\n  const result = await tools.view_image({path});\n  image(result.image_url);\n}\n",
+      "timestamp": "2026-09-04T22:38:30.840Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_Ngfc5oWw39UU5J2RMES3ndPV",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"457f6f\",\"wall_time_seconds\":0.000002125,\"exit_code\":0,\"original_token_count\":54,\"output\":\"{\\\"errors\\\":[],\\\"dimensions\\\":{\\\"viewport\\\":[1440,1000],\\\"document\\\":[1440,1000],\\\"art\\\":{\\\"x\\\":100,\\\"y\\\":-16.65625,\\\"width\\\":1240,\\\"height\\\":1033.328125,\\\"top\\\":-16.65625,\\\"right\\\":1340,\\\"bottom\\\":1016.671875,\\\"left\\\":100},\\\"nodes\\\":1462}}\\n\"}"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"1540040\">",
+          "detail": "high"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"401392\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-09-04T22:38:30.975Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_y7f5BcT4pRQ1RvkDVrqWdTg9",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: <TMP>/build-ramen.py\\n@@\\n   <meta name=\\\"theme-color\\\" content=\\\"#100e0b\\\">\\n+  <link rel=\\\"icon\\\" href=\\\"data:,\\\">\\n@@\\n       <radialGradient id=\\\"bowl-glow\\\" cx=\\\".2\\\" cy=\\\".04\\\" r=\\\".85\\\"><stop stop-color=\\\"#d0a273\\\" stop-opacity=\\\".31\\\"/><stop offset=\\\".48\\\" stop-color=\\\"#87613c\\\" stop-opacity=\\\".05\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#010805\\\" stop-opacity=\\\".45\\\"/></radialGradient>\\n+      <radialGradient id=\\\"glaze-reflection\\\"><stop stop-color=\\\"#efd1a0\\\" stop-opacity=\\\".26\\\"/><stop offset=\\\".48\\\" stop-color=\\\"#cdb58d\\\" stop-opacity=\\\".07\\\"/><stop offset=\\\"1\\\" stop-color=\\\"#c7ae7e\\\" stop-opacity=\\\"0\\\"/></radialGradient>\\n@@\\n-          <path d=\\\"M-31-12L16 13 M-14-21L34 5 M3-28L49-3\\\" stroke=\\\"#55351d\\\" stroke-width=\\\"3.1\\\" opacity=\\\".85\\\"/>\\n+          <path d=\\\"M-31-12L16 13 M-14-21L34 5 M3-28L49-3\\\" stroke=\\\"#55351d\\\" stroke-width=\\\"2.6\\\" stroke-dasharray=\\\"1 1.1 6 1.5 16 1.3 15\\\" opacity=\\\".85\\\"/>\\n@@\\n ''')\\n+for _ in range(64):\\n+    u=random.random(); v=random.random()\\n+    x=-51+u*63+v*48; y=-3-u*28+v*25\\n+    add(f'        <ellipse cx=\\\"{x:.1f}\\\" cy=\\\"{y:.1f}\\\" rx=\\\"{random.uniform(.5,2):.1f}\\\" ry=\\\"{random.uniform(.3,.8):.1f}\\\" fill=\\\"{random.choice([\\\"#8c4d1c\\\",\\\"#b17630\\\",\\\"#fff0c0\\\"])}\\\" opacity=\\\"{random.uniform(.12,.36):.2f}\\\"/>\\\\n')\\n for _ in range(44):\\n@@\\n-      <ellipse class=\\\"glaze-light\\\" cx=\\\"392\\\" cy=\\\"619\\\" rx=\\\"80\\\" ry=\\\"111\\\" fill=\\\"url(#ground)\\\" opacity=\\\".4\\\"/>\\n+      <ellipse class=\\\"glaze-light\\\" cx=\\\"359\\\" cy=\\\"601\\\" rx=\\\"72\\\" ry=\\\"124\\\" fill=\\\"url(#glaze-reflection)\\\" opacity=\\\".6\\\"/>\\n@@\\n-    add(f'      <path d=\\\"{d}\\\" stroke=\\\"#63390f\\\" stroke-width=\\\"{w+2:.1f}\\\" opacity=\\\".7\\\" transform=\\\"translate(0 1.8)\\\"/>\\\\n')\\n-    add(f'      <path d=\\\"{d}\\\" stroke=\\\"url(#noodle)\\\" stroke-width=\\\"{w:.1f}\\\"/>\\\\n')\\n-    add(f'      <path d=\\\"{d}\\\" stroke=\\\"url(#noodle-light)\\\" stroke-width=\\\"1\\\" transform=\\\"translate(-.4 -.9)\\\"/>\\\\n')\\n+    add(f'      <defs><path id=\\\"strand-{i}\\\" d=\\\"{d}\\\"/></defs>\\\\n')\\n+    add(f'      <use href=\\\"#strand-{i}\\\" stroke=\\\"#63390f\\\" stroke-width=\\\"{w+2:.1f}\\\" opacity=\\\".7\\\" transform=\\\"translate(0 1.8)\\\"/>\\\\n')\\n+    add(f'      <use href=\\\"#strand-{i}\\\" stroke=\\\"url(#noodle)\\\" stroke-width=\\\"{w:.1f}\\\"/>\\\\n')\\n+    add(f'      <use href=\\\"#strand-{i}\\\" stroke=\\\"url(#noodle-light)\\\" stroke-width=\\\"1\\\" transform=\\\"translate(-.4 -.9)\\\"/>\\\\n')\\n@@\\n       <path d=\\\"M791 338Q800 325 814 338 M833 339Q848 345 845 357 M727 371Q719 384 724 395 M826 416Q849 404 852 388\\\" fill=\\\"none\\\" stroke=\\\"#b3bb69\\\" stroke-width=\\\"2.1\\\" opacity=\\\".35\\\"/>\\n+      <g fill=\\\"#0a2c16\\\" opacity=\\\".24\\\">\\n+        <path d=\\\"M719 457Q739 444 753 426Q741 421 731 401Q736 432 719 457Z\\\"/>\\n+        <path d=\\\"M758 421Q781 428 822 405Q782 419 765 411Z\\\"/>\\n+        <path d=\\\"M779 394Q811 402 844 377Q809 393 785 386Z\\\"/>\\n+        <path d=\\\"M772 393Q761 360 775 337Q754 356 766 402Z\\\"/>\\n+        <path d=\\\"M794 374Q799 353 815 339Q799 350 790 380Z\\\"/>\\n+      </g>\\n+      <g fill=\\\"none\\\" stroke=\\\"#b9cb76\\\" stroke-width=\\\".7\\\" opacity=\\\".3\\\">\\n+        <path d=\\\"M742 435L732 422 M748 431L739 412 M754 424L749 408 M780 428L788 420 M790 425L799 416 M804 420L813 411 M774 414L779 408 M787 412L794 404 M803 403L811 393 M818 395L825 384 M763 384L756 377 M766 371L759 363 M767 359L762 351 M799 377L807 369 M812 370L817 358 M790 363L786 354\\\"/>\\n+      </g>\\n@@\\n-        y=489+row*11+random.uniform(-4,4)\\n+        y=489+row*11+random.uniform(-5.5,5.5)\\n@@\\n-      drawSteam(steamTime);\\n+      drawSteam(reducedMotion.matches ? 9 : steamTime);\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"python3 <TMP>/build-ramen.py\",max_output_tokens:1000}));\n",
+      "timestamp": "2026-09-04T22:40:31.920Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_y7f5BcT4pRQ1RvkDVrqWdTg9",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"8d5599\",\"wall_time_seconds\":0.000003625,\"exit_code\":0,\"original_token_count\":10,\"output\":\"Wrote index.html: 318,191 characters\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:40:32.082Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The bowl now stays centered on narrow screens. I’m checking offline loading, pointer response, and reduced-motion behavior, including whether switching the motion preference freezes the scene immediately.",
+      "timestamp": "2026-09-04T22:42:13.718Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_iSO8060yQtnsJeAUwgHYyPKy",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: <TMP>/build-ramen.py\\n@@\\n   let lastPointerTime = 0;\\n+  let lastPose = '';\\n@@\\n-    scene.style.setProperty('--pan-x', `${(pointer.x * 5).toFixed(2)}px`);\\n-    scene.style.setProperty('--pan-y', `${(pointer.y * 2.5).toFixed(2)}px`);\\n-    scene.style.setProperty('--tilt-x', `${(-pointer.y * 0.55).toFixed(3)}deg`);\\n-    scene.style.setProperty('--tilt-y', `${(pointer.x * 0.8).toFixed(3)}deg`);\\n-    glaze.setAttribute('transform', `translate(${(pointer.x * 55).toFixed(1)} ${(pointer.y * 9).toFixed(1)})`);\\n+    const pose = `${pointer.x.toFixed(3)},${pointer.y.toFixed(3)}`;\\n+    if (pose !== lastPose) {\\n+      scene.style.setProperty('--pan-x', `${(pointer.x * 5).toFixed(2)}px`);\\n+      scene.style.setProperty('--pan-y', `${(pointer.y * 2.5).toFixed(2)}px`);\\n+      scene.style.setProperty('--tilt-x', `${(-pointer.y * 0.55).toFixed(3)}deg`);\\n+      scene.style.setProperty('--tilt-y', `${(pointer.x * 0.8).toFixed(3)}deg`);\\n+      glaze.setAttribute('transform', `translate(${(pointer.x * 55).toFixed(1)} ${(pointer.y * 9).toFixed(1)})`);\\n+      lastPose = pose;\\n+    }\\n@@\\n     lastPaint = -Infinity;\\n+    lastPose = '';\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"python3 <TMP>/build-ramen.py\",max_output_tokens:1000}));\ntext(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: <TMP>/ramen-page-check/check.mjs\\n+import assert from 'node:assert/strict';\\n+import { chromium } from 'playwright';\\n+\\n+const url = 'file://<WORKSPACE>/openai/gpt-6-astra/max/index.html';\\n+const browser = await chromium.launch({headless:true,executablePath:'/usr/bin/chromium-browser',args:['--no-sandbox']});\\n+const context = await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1,offline:true});\\n+const page = await context.newPage();\\n+const errors = [], externalRequests = [], results = [];\\n+page.on('pageerror',error=>errors.push(error.message));\\n+page.on('request',request=>{ if (/^https?:/.test(request.url())) externalRequests.push(request.url()); });\\n+await page.goto(url);\\n+\\n+// Test the visible bowl, not the deliberately oversized SVG's empty margins.\\n+for (const [width,height] of [[1440,900],[390,844],[320,568],[768,1024],[844,390],[2560,1440]]) {\\n+  await page.setViewportSize({width,height});\\n+  await page.waitForTimeout(120);\\n+  const geometry = await page.evaluate(() => {\\n+    const rect = document.querySelector('.scene').getBoundingClientRect();\\n+    return {\\n+      scrollWidth:document.documentElement.scrollWidth,\\n+      scrollHeight:document.documentElement.scrollHeight,\\n+      center:rect.left+rect.width/2,\\n+      bowlLeft:rect.left+rect.width*242/1200,\\n+      bowlRight:rect.left+rect.width*958/1200,\\n+      bowlTop:rect.top+rect.height*290/1000,\\n+      bowlBottom:rect.top+rect.height*850/1000,\\n+      visibleText:document.body.innerText.trim(),\\n+      controls:document.querySelectorAll('button,input,select,textarea,nav,menu').length,\\n+    };\\n+  });\\n+  assert.equal(geometry.scrollWidth,width,`horizontal overflow at ${width}x${height}`);\\n+  assert.equal(geometry.scrollHeight,height,`vertical overflow at ${width}x${height}`);\\n+  assert.ok(Math.abs(geometry.center-width/2)<1,`not centered at ${width}x${height}`);\\n+  assert.ok(geometry.bowlLeft>=0 && geometry.bowlRight<=width && geometry.bowlTop>=0 && geometry.bowlBottom<=height,`bowl clipped at ${width}x${height}: ${JSON.stringify(geometry)}`);\\n+  assert.equal(geometry.visibleText,'');\\n+  assert.equal(geometry.controls,0);\\n+  results.push(`layout ${width}×${height}: centered, unclipped, no scrolling or UI`);\\n+  if (width===1440 || width===390 || width===844) await page.screenshot({path:`<TMP>/ramen-final-${width}.png`});\\n+}\\n+\\n+await page.setViewportSize({width:1440,height:900});\\n+await page.waitForTimeout(100);\\n+const steamA = await page.locator('canvas').evaluate(el=>el.toDataURL());\\n+await page.waitForTimeout(600);\\n+const steamB = await page.locator('canvas').evaluate(el=>el.toDataURL());\\n+assert.notEqual(steamA,steamB,'steam must animate under normal motion preferences');\\n+const initialTransform = await page.locator('.scene').evaluate(el=>getComputedStyle(el).transform);\\n+await page.mouse.move(1100,400);\\n+await page.waitForTimeout(650);\\n+const movedTransform = await page.locator('.scene').evaluate(el=>getComputedStyle(el).transform);\\n+assert.notEqual(initialTransform,movedTransform,'bowl must respond to mouse position');\\n+const soupPoint = await page.locator('.scene').evaluate(el=>{\\n+  const r=el.getBoundingClientRect(); return {x:r.left+r.width*.5,y:r.top+r.height*.507};\\n+});\\n+await page.mouse.move(soupPoint.x,soupPoint.y);\\n+assert.ok(await page.locator('#ripples ellipse').count()>0,'hovering broth must create a ripple');\\n+results.push('motion: steam changes over time; pointer moves bowl and disturbs broth');\\n+\\n+// A preference change must stop existing motion as well as new interactions.\\n+await page.emulateMedia({reducedMotion:'reduce'});\\n+await page.waitForTimeout(150);\\n+const frozenA = await page.screenshot();\\n+await page.mouse.move(200,800);\\n+await page.waitForTimeout(650);\\n+const frozenB = await page.screenshot();\\n+assert.ok(frozenA.equals(frozenB),'reduced-motion scene must stay pixel-identical after time and pointer input');\\n+assert.equal(await page.locator('.scene').evaluate(el=>getComputedStyle(el).transform),'none');\\n+assert.equal(await page.locator('#ripples ellipse').count(),0);\\n+assert.equal(await page.evaluate(()=>document.getAnimations().filter(a=>a.playState==='running').length),0);\\n+results.push('reduced motion: pixel-identical after pointer input and elapsed time; zero running animations');\\n+\\n+await page.emulateMedia({reducedMotion:'no-preference'});\\n+const resumedA = await page.locator('canvas').evaluate(el=>el.toDataURL());\\n+await page.waitForTimeout(400);\\n+const resumedB = await page.locator('canvas').evaluate(el=>el.toDataURL());\\n+assert.notEqual(resumedA,resumedB,'animation must resume when preference changes back');\\n+results.push('live preference changes: animation resumes correctly');\\n+\\n+const noJS = await browser.newContext({javaScriptEnabled:false,offline:true,viewport:{width:390,height:844}});\\n+const fallback = await noJS.newPage();\\n+await fallback.goto(url);\\n+assert.equal(await fallback.locator('svg.ramen').count(),1);\\n+assert.equal(await fallback.locator('.has-steam').count(),0);\\n+assert.equal(await fallback.locator('.still-steam path').count(),3);\\n+await fallback.screenshot({path:'<TMP>/ramen-no-js.png'});\\n+results.push('offline and JavaScript-disabled fallback: complete artwork and static steam render');\\n+assert.deepEqual(errors,[],'browser runtime errors');\\n+assert.deepEqual(externalRequests,[],'external network requests');\\n+results.push('zero runtime errors; zero external requests');\\n+console.log(results.join('\\\\n'));\\n+await browser.close();\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"node <TMP>/ramen-page-check/check.mjs\",yield_time_ms:1000,max_output_tokens:2000}));\n",
+      "timestamp": "2026-09-04T22:42:13.753Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_iSO8060yQtnsJeAUwgHYyPKy",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.4 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"f22330\",\"wall_time_seconds\":0.000002917,\"exit_code\":0,\"original_token_count\":10,\"output\":\"Wrote index.html: 318,367 characters\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"5cb3d4\",\"wall_time_seconds\":1.000891589,\"session_id\":22410,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:42:15.127Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_wWyOI3IYRLS89M8mW7dj9woz",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:22410,chars:\"\",yield_time_ms:1000,max_output_tokens:2000}));\n",
+      "timestamp": "2026-09-04T22:42:21.094Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_wWyOI3IYRLS89M8mW7dj9woz",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 5.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"1da3a8\",\"wall_time_seconds\":5.000791776,\"session_id\":22410,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:42:26.102Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ZJPn8OqqhH8ShUiz0A9cLI74",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:22410,chars:\"\",yield_time_ms:1000,max_output_tokens:3000}));\n",
+      "timestamp": "2026-09-04T22:42:48.219Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ZJPn8OqqhH8ShUiz0A9cLI74",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"3b5a6b\",\"wall_time_seconds\":0.000002292,\"exit_code\":0,\"original_token_count\":173,\"output\":\"layout 1440×900: centered, unclipped, no scrolling or UI\\nlayout 390×844: centered, unclipped, no scrolling or UI\\nlayout 320×568: centered, unclipped, no scrolling or UI\\nlayout 768×1024: centered, unclipped, no scrolling or UI\\nlayout 844×390: centered, unclipped, no scrolling or UI\\nlayout 2560×1440: centered, unclipped, no scrolling or UI\\nmotion: steam changes over time; pointer moves bowl and disturbs broth\\nreduced motion: pixel-identical after pointer input and elapsed time; zero running animations\\nlive preference changes: animation resumes correctly\\noffline and JavaScript-disabled fallback: complete artwork and static steam render\\nzero runtime errors; zero external requests\\n\"}"
+        }
+      ],
+      "timestamp": "2026-09-04T22:42:48.267Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_81rzRZZX0QLXofzdfZeHM2RY",
+      "tool": "exec",
+      "input": "for (const path of ['<TMP>/ramen-final-1440.png','<TMP>/ramen-final-390.png','<TMP>/ramen-final-844.png']) {\n  const result = await tools.view_image({path});\n  image(result.image_url);\n}\n",
+      "timestamp": "2026-09-04T22:42:53.116Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_81rzRZZX0QLXofzdfZeHM2RY",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"1456596\">",
+          "detail": "high"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"401680\">",
+          "detail": "high"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"452452\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-09-04T22:42:53.312Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The checks passed across six viewport sizes. The page loads offline with no external requests, responds to the mouse, and stays completely still under reduced motion. The artwork and a static steam fallback also render with JavaScript disabled.",
+      "timestamp": "2026-09-04T22:43:21.459Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Created [index.html](<WORKSPACE>/openai/gpt-6-astra/max/index.html) with detailed vegan ramen, drifting steam, warm lighting, mouse parallax, and gentle broth ripples.\n\nAll CSS, JavaScript, and artwork are inline. No visible UI or external assets.\n\nVerified six screen sizes, offline loading, and reduced-motion behavior.",
+      "timestamp": "2026-09-04T22:43:37.344Z"
     }
   ],
-  "metadata": {}
+  "metadata": {
+    "sourceRecord": "rollout-2026-09-04T17-47-26-01a06e64-0e07-7793-9a85-7e983f733c88.jsonl",
+    "normalization": {
+      "excluded": [
+        "system and developer prompts",
+        "hidden thinking and reasoning",
+        "credentials and private agent-mail calls",
+        "large base64 and embedded image data (event retained with size marker)"
+      ],
+      "omittedPrivateToolCalls": 4
+    },
+    "eventCounts": {
+      "message": 9,
+      "tool_call": 15,
+      "tool_result": 15
+    }
+  }
 }

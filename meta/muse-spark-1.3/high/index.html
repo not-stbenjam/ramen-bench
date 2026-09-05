@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Vegan Ramen</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #060709;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    font-size: 0;
+    --mx: 0;
+    --my: 0;
+  }
+  .stage {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(120vmax 90vmax at 50% 118%, #1a1210 0%, #0b0a0d 42%, #060709 70%),
+      #060709;
+    perspective: 1100px;
+  }
+  /* deep vignette */
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none; z-index: 6;
+    background:
+      radial-gradient(90vmin 62vmin at 50% 52%, transparent 46%, rgba(0,0,0,.42) 74%, rgba(0,0,0,.82) 100%),
+      linear-gradient(to bottom, rgba(0,0,0,.55), transparent 22%, transparent 78%, rgba(0,0,0,.6));
+  }
+  /* warm halo behind bowl */
+  .halo {
+    position: absolute;
+    left: 50%; top: 54%;
+    width: 110vmin; height: 110vmin;
+    transform: translate(-50%, -50%);
+    background:
+      radial-gradient(circle, rgba(255,138,42,.20) 0%, rgba(255,110,30,.11) 26%, rgba(120,40,10,.05) 46%, transparent 66%);
+    filter: blur(6px);
+    animation: haloBreathe 7s ease-in-out infinite;
+    pointer-events: none; z-index: 1;
+    will-change: transform, opacity;
+  }
+  @keyframes haloBreathe {
+    0%, 100% { opacity: .85; transform: translate(-50%,-50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%,-51%) scale(1.045); }
+  }
+  .floor {
+    position: absolute; left: 50%; bottom: -24vmin;
+    width: 170vmin; height: 62vmin;
+    transform: translateX(-50%);
+    background:
+      radial-gradient(closest-side, rgba(255,130,40,.13), rgba(255,110,40,.045) 55%, transparent 75%);
+    filter: blur(10px);
+    z-index: 1; pointer-events: none;
+  }
+  .table-line {
+    position: absolute; left: 0; right: 0; top: 76%;
+    height: 1px; z-index: 1;
+    background: linear-gradient(90deg, transparent, rgba(255,150,70,.10), transparent);
+    filter: blur(.5px);
+  }
+  .tilt {
+    position: absolute; inset: 0; z-index: 3;
+    display: grid; place-items: center;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .bowl-scene {
+    position: relative;
+    width: min(80vmin, 600px);
+    height: min(80vmin, 600px);
+    display: grid; place-items: center;
+    animation: floatY 7.5s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1.2vmin); }
+  }
+  .shadow {
+    position: absolute;
+    left: 50%; bottom: 12%;
+    width: 72%; height: 7%;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(0,0,0,.75), rgba(0,0,0,.28) 60%, transparent 75%);
+    filter: blur(9px);
+    animation: shadowPulse 7.5s ease-in-out infinite;
+  }
+  @keyframes shadowPulse {
+    0%, 100% { transform: translateX(-50%) scaleX(1); opacity: .9; }
+    50% { transform: translateX(-50%) scaleX(.94); opacity: .75; }
+  }
+  .reflection {
+    position: absolute;
+    left: 50%; bottom: 6.5%;
+    width: 46%; height: 5.5%;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(255,140,50,.20), transparent 72%);
+    filter: blur(7px);
+  }
+  .bowl {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / .62;
+    transform: translateZ(40px);
+  }
+  /* ceramic body */
+  .bowl-body {
+    position: absolute; inset: 18% 2% 0 2%;
+    border-radius: 12% 12% 50% 50% / 18% 18% 100% 100%;
+    background:
+      radial-gradient(120% 60% at 18% 12%, rgba(255,255,255,.10), transparent 40%),
+      radial-gradient(100% 90% at 82% 8%, rgba(120,150,200,.10), transparent 45%),
+      linear-gradient(178deg, #323947 0%, #232936 9%, #161b26 34%, #0e121b 70%, #090c13 100%);
+    box-shadow:
+      0 3vmin 7vmin rgba(0,0,0,.75),
+      0 1vmin 2.5vmin rgba(0,0,0,.6),
+      inset 0 .4vmin 1vmin rgba(255,255,255,.14),
+      inset 0 -2vmin 4vmin rgba(0,0,0,.6);
+  }
+  .bowl-foot {
+    position: absolute;
+    left: 50%; bottom: -2.5%;
+    width: 34%; height: 9%;
+    transform: translateX(-50%);
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    background: linear-gradient(180deg, #10141d, #070a10);
+    box-shadow: 0 1vmin 2vmin rgba(0,0,0,.7), inset 0 .3vmin .6vmin rgba(255,255,255,.06);
+  }
+  /* rim */
+  .bowl-rim {
+    position: absolute;
+    left: 0; right: 0; top: 8%;
+    height: 34%;
+    border-radius: 50%;
+    background:
+      radial-gradient(60% 40% at 24% 30%, rgba(255,255,255,.16), transparent 55%),
+      linear-gradient(180deg, #3d4454 0%, #272d3b 30%, #141926 62%, #0a0d14 100%);
+    box-shadow:
+      0 .6vmin 1.6vmin rgba(0,0,0,.65),
+      inset 0 .5vmin .9vmin rgba(255,255,255,.20),
+      inset 0 -1vmin 2vmin rgba(0,0,0,.55);
+  }
+  .broth-well {
+    position: absolute;
+    left: 3.5%; right: 3.5%; top: 11.5%;
+    height: 27.5%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, #000 62%, transparent 73%);
+    filter: blur(1px);
+    opacity: .9;
+  }
+  .broth {
+    position: absolute;
+    left: 5%; right: 5%; top: 12.5%;
+    height: 25.5%;
+    border-radius: 50%;
+    overflow: hidden;
+    background:
+      radial-gradient(78% 90% at 50% 42%, #ffc46b 0%, #f59a3e 26%, #c65a1c 52%, #7c2f0e 76%, #4a1a08 100%);
+    box-shadow:
+      inset 0 -1.2vmin 2.6vmin rgba(60,15,0,.65),
+      inset 0 1vmin 2vmin rgba(255,220,150,.35),
+      0 .2vmin .8vmin rgba(255,150,60,.25);
+  }
+  .broth::after {
+    content: "";
+    position: absolute; inset: 0; border-radius: 50%;
+    box-shadow: inset 0 0 0 1vmin rgba(20,8,2,.35);
+    pointer-events: none;
+  }
+  .broth-shine {
+    position: absolute;
+    left: 8%; top: 8%;
+    width: 46%; height: 38%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255,240,210,.5), rgba(255,240,210,0) 70%);
+    filter: blur(2px);
+    transform: translate(calc(var(--mx) * 2.4vmin), calc(var(--my) * 1.2vmin));
+    animation: shineDrift 6s ease-in-out infinite;
+  }
+  @keyframes shineDrift {
+    0%, 100% { opacity: .75; }
+    50% { opacity: 1; }
+  }
+  .broth-sheen {
+    position: absolute; right: 10%; bottom: 6%;
+    width: 34%; height: 30%; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255,120,40,.35), transparent 70%);
+    filter: blur(3px);
+    animation: shineDrift 8s ease-in-out infinite reverse;
+  }
+  /* chili-oil glints */
+  .oil { position: absolute; border-radius: 50%; filter: blur(.4px); }
+  .oil.o1 { left: 62%; top: 58%; width: 11%; height: 20%;
+    background: radial-gradient(closest-side, rgba(190,40,8,.75), rgba(190,40,8,0) 72%); }
+  .oil.o2 { left: 30%; top: 64%; width: 8%; height: 15%;
+    background: radial-gradient(closest-side, rgba(220,70,12,.6), rgba(220,70,12,0) 72%); }
+  .oil.o3 { left: 48%; top: 30%; width: 6%; height: 11%;
+    background: radial-gradient(closest-side, rgba(255,150,60,.5), rgba(255,150,60,0) 70%); }
+  .noodles { position: absolute; inset: 2% 4%; width: 92%; height: 96%; overflow: visible; }
+  .noodles path {
+    fill: none; stroke-linecap: round;
+    animation: noodleSway 5.5s ease-in-out infinite;
+  }
+  .noodles path:nth-child(2n) { animation-delay: -1.8s; animation-duration: 6.4s; }
+  .noodles path:nth-child(3n) { animation-delay: -3.1s; animation-duration: 7.2s; }
+  @keyframes noodleSway {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1.6%); }
+  }
+  /* toppings */
+  .topping { position: absolute; will-change: transform; }
+  .bob-a { animation: bobA 6s ease-in-out infinite; }
+  .bob-b { animation: bobA 7.2s ease-in-out -2s infinite; }
+  .bob-c { animation: bobA 6.6s ease-in-out -4s infinite; }
+  @keyframes bobA {
+    0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+    50% { transform: translateY(-3.5%) rotate(var(--rot, 0deg)); }
+  }
+  /* nori sheet standing at back */
+  .nori {
+    left: 55%; top: -34%;
+    width: 17%; height: 52%;
+    --rot: 6deg;
+    background: linear-gradient(100deg, #1c2b1a 0%, #101a10 45%, #050805 100%);
+    border-radius: 18% 22% 12% 12%;
+    box-shadow: inset 0 0 2vmin rgba(60,120,60,.25), 0 .6vmin 1.2vmin rgba(0,0,0,.5);
+    transform: rotate(6deg);
+  }
+  .nori::after {
+    content: ""; position: absolute; inset: 12% 18%;
+    background: repeating-linear-gradient(180deg, transparent 0 18%, rgba(120,180,120,.06) 18% 22%);
+    border-radius: 20%;
+  }
+  /* bok choy */
+  .bok {
+    width: 21%; height: 30%;
+    filter: drop-shadow(0 .5vmin .8vmin rgba(0,0,0,.5));
+  }
+  .bok .leaf {
+    position: absolute; bottom: 0;
+    width: 62%; height: 78%;
+    background: radial-gradient(80% 80% at 40% 75%, #d9ecb0 0%, #8fbf5a 38%, #3f7a2a 72%, #1e4a15 100%);
+    border-radius: 50% 50% 48% 48% / 62% 62% 38% 38%;
+    box-shadow: inset -.4vmin -.6vmin 1vmin rgba(20,60,10,.5), inset .3vmin .4vmin .8vmin rgba(255,255,220,.35);
+  }
+  .bok .leaf::after {
+    content: ""; position: absolute; left: 50%; top: 12%; bottom: 8%;
+    width: 6%; transform: translateX(-50%);
+    background: linear-gradient(180deg, rgba(255,255,240,.7), rgba(255,255,240,.1));
+    border-radius: 50%;
+  }
+  .bok .stem {
+    position: absolute; bottom: -4%; left: 22%;
+    width: 56%; height: 34%;
+    background: linear-gradient(180deg, #f2f6da 0%, #cfe09a 55%, #9dbb62 100%);
+    border-radius: 30% 30% 40% 40%;
+    box-shadow: inset 0 -.4vmin .8vmin rgba(90,130,40,.5);
+  }
+  .bok.b1 { left: 8%; top: 38%; --rot: -14deg; transform: rotate(-14deg); }
+  .bok.b2 { left: 20%; top: 30%; --rot: -6deg; transform: rotate(-6deg) scale(.88); }
+  /* shiitake */
+  .shroom { width: 19%; height: 24%; }
+  .shroom .cap {
+    position: absolute; top: 0; left: 4%;
+    width: 92%; height: 72%;
+    background: radial-gradient(75% 70% at 42% 30%, #c9a173 0%, #8a5c33 45%, #4a2c14 80%, #2a1708 100%);
+    border-radius: 50%;
+    box-shadow: 0 .5vmin 1vmin rgba(0,0,0,.55), inset 0 .3vmin .6vmin rgba(255,230,190,.4);
+    overflow: hidden;
+  }
+  .shroom .cap::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(12% 10% at 38% 34%, rgba(255,240,220,.75), transparent 70%),
+      radial-gradient(9% 8% at 60% 44%, rgba(255,240,220,.55), transparent 70%),
+      radial-gradient(8% 7% at 48% 58%, rgba(255,240,220,.4), transparent 70%);
+  }
+  .shroom .gills {
+    position: absolute; bottom: 2%; left: 20%;
+    width: 60%; height: 34%;
+    background: repeating-linear-gradient(90deg, #e8d5b5 0 8%, #b99b72 8% 12%);
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    box-shadow: 0 .3vmin .6vmin rgba(0,0,0,.4);
+  }
+  .shroom.s1 { left: 36%; top: 22%; --rot: -8deg; transform: rotate(-8deg); }
+  .shroom.s2 { left: 66%; top: 34%; --rot: 10deg; transform: rotate(10deg) scale(.92); }
+  /* tofu */
+  .tofu {
+    width: 13%; height: 17%;
+    background: linear-gradient(135deg, #fffdf4 0%, #f3e8cf 50%, #d9c49c 100%);
+    border-radius: 18%;
+    box-shadow: 0 .5vmin 1vmin rgba(0,0,0,.5), inset 0 .3vmin .5vmin rgba(255,255,255,.9), inset 0 -.4vmin .8vmin rgba(150,120,70,.4);
+  }
+  .tofu.t1 { left: 47%; top: 56%; --rot: 8deg; transform: rotate(8deg); }
+  .tofu.t2 { left: 60%; top: 62%; --rot: -6deg; transform: rotate(-6deg) scale(.85); }
+  /* corn */
+  .corn { left: 74%; top: 56%; width: 18%; height: 26%; }
+  .corn i {
+    position: absolute; width: 26%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe89a 0%, #f7b733 55%, #b96a08 100%);
+    box-shadow: 0 .2vmin .4vmin rgba(0,0,0,.5), inset 0 .1vmin .2vmin rgba(255,255,255,.7);
+  }
+  .corn i:nth-child(1) { left: 34%; top: 0; }
+  .corn i:nth-child(2) { left: 8%; top: 22%; }
+  .corn i:nth-child(3) { left: 52%; top: 24%; }
+  .corn i:nth-child(4) { left: 22%; top: 48%; }
+  .corn i:nth-child(5) { left: 60%; top: 52%; }
+  .corn i:nth-child(6) { left: 40%; top: 72%; }
+  /* scallion rings */
+  .sc { position: absolute; border-radius: 50%; }
+  .sc i {
+    position: absolute; border-radius: 50%;
+    border: .55vmin solid #3f8f2e;
+    background: radial-gradient(circle, #d8f0b0 0 28%, #5da33c 30%, #2a5f1a 100%);
+    box-shadow: 0 .25vmin .5vmin rgba(0,0,0,.5), inset 0 .1vmin .25vmin rgba(255,255,255,.5);
+  }
+  .sc.sca { left: 30%; top: 52%; width: 22%; height: 30%; --rot: 0deg; }
+  .sc.sca i:nth-child(1) { left: 0; top: 10%; width: 44%; height: 52%; }
+  .sc.sca i:nth-child(2) { left: 46%; top: 0; width: 52%; height: 60%; }
+  .sc.sca i:nth-child(3) { left: 30%; top: 55%; width: 40%; height: 44%; }
+  .sc.scb { left: 52%; top: 44%; width: 14%; height: 20%; }
+  .sc.scb i:nth-child(1) { left: 0; top: 0; width: 90%; height: 90%; }
+  /* sesame + bubbles */
+  .sesame { position: absolute; inset: 0; }
+  .sesame i { position: absolute; border-radius: 50%; }
+  .sesame i.w { background: #f7ead0; box-shadow: 0 0 .3vmin rgba(0,0,0,.6); }
+  .sesame i.b { background: #241407; box-shadow: 0 0 .3vmin rgba(255,200,120,.4); }
+  .bubble { position: absolute; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(255,245,220,.85), rgba(255,200,130,.15) 60%, transparent 70%);
+    box-shadow: inset 0 0 .4vmin rgba(255,255,255,.5);
+    animation: bubbleUp 4.5s ease-in infinite;
+  }
+  @keyframes bubbleUp {
+    0% { transform: translateY(30%); opacity: 0; }
+    25% { opacity: .9; }
+    100% { transform: translateY(-160%); opacity: 0; }
+  }
+  /* steam + ember canvases */
+  canvas.atmo {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  #steam { z-index: 4; }
+  #glow-dust { z-index: 2; }
+  /* film grain (inline SVG data-uri, no external asset) */
+  .grain {
+    position: absolute; inset: 0; z-index: 7; pointer-events: none;
+    opacity: .07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
+  }
+  @media (max-width: 560px), (max-height: 560px) {
+    .bowl-scene { width: min(94vmin, 600px); height: min(94vmin, 600px); }
+    .halo { width: 140vmin; height: 140vmin; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    .bowl-scene, .tilt, .halo, .broth-shine { transform: none !important; }
+    .halo { transform: translate(-50%, -50%) !important; }
+    .bubble { opacity: .5 !important; }
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="halo" id="halo"></div>
+  <div class="floor"></div>
+  <div class="table-line"></div>
+  <canvas class="atmo" id="glow-dust"></canvas>
+  <div class="tilt" id="tilt">
+    <div class="bowl-scene" id="bowlScene">
+      <div class="shadow"></div>
+      <div class="reflection"></div>
+      <div class="bowl">
+        <div class="bowl-foot"></div>
+        <div class="bowl-body"></div>
+        <div class="bowl-rim"></div>
+        <div class="broth-well"></div>
+        <div class="broth" id="broth">
+          <div class="broth-sheen"></div>
+          <div class="oil o1"></div>
+          <div class="oil o2"></div>
+          <div class="oil o3"></div>
+          <svg class="noodles" viewBox="0 0 200 60" preserveAspectRatio="none">
+            <path d="M8,38 C30,30 44,46 66,38 S104,30 128,40 S172,44 194,34" stroke="#f7d789" stroke-width="3.4"/>
+            <path d="M6,46 C28,40 52,52 78,44 S122,38 150,46 S180,48 195,42" stroke="#eebd63" stroke-width="3"/>
+            <path d="M12,28 C34,22 52,32 76,26 S120,20 146,28 S178,30 192,26" stroke="#f9e2a8" stroke-width="2.6"/>
+            <path d="M20,52 C44,48 66,56 92,50 S140,46 168,52" stroke="#e8a94e" stroke-width="2.4"/>
+            <path d="M60,18 C84,12 108,20 132,15 S164,14 180,20" stroke="#f5cf82" stroke-width="2.2"/>
+          </svg>
+          <div class="topping nori bob-b"></div>
+          <div class="topping bok b1 bob-a"><div class="stem"></div><div class="leaf" style="left:2%"></div><div class="leaf" style="right:2%;left:auto;transform:scaleX(-1)"></div></div>
+          <div class="topping bok b2 bob-c"><div class="stem"></div><div class="leaf" style="left:2%"></div><div class="leaf" style="right:2%;left:auto;transform:scaleX(-1)"></div></div>
+          <div class="topping shroom s1 bob-b"><div class="gills"></div><div class="cap"></div></div>
+          <div class="topping shroom s2 bob-a"><div class="gills"></div><div class="cap"></div></div>
+          <div class="topping tofu t1 bob-c"></div>
+          <div class="topping tofu t2 bob-a"></div>
+          <div class="topping corn bob-b"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="topping sc sca bob-c"><i></i><i></i><i></i></div>
+          <div class="topping sc scb bob-a"><i></i></div>
+          <div class="sesame" id="sesame"></div>
+          <div class="bubble" style="left:24%;top:60%;width:3.4%;aspect-ratio:1;animation-delay:-.6s"></div>
+          <div class="bubble" style="left:56%;top:66%;width:2.6%;aspect-ratio:1;animation-delay:-2.2s"></div>
+          <div class="bubble" style="left:70%;top:62%;width:2%;aspect-ratio:1;animation-delay:-3.4s"></div>
+          <div class="bubble" style="left:42%;top:70%;width:2.2%;aspect-ratio:1;animation-delay:-1.4s"></div>
+          <div class="broth-shine"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <canvas class="atmo" id="steam"></canvas>
+  <div class="vignette"></div>
+  <div class="grain"></div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var stage = document.getElementById("stage");
+  var tilt = document.getElementById("tilt");
+  var halo = document.getElementById("halo");
+  var steam = document.getElementById("steam");
+  var dust = document.getElementById("glow-dust");
+  var sctx = steam.getContext("2d");
+  var dctx = dust.getContext("2d");
+
+  /* scatter sesame seeds (deterministic, no layout shift) */
+  (function seeds() {
+    var box = document.getElementById("sesame");
+    var rnd = [0.12, 0.31, 0.55, 0.71, 0.22, 0.44, 0.63, 0.82, 0.18, 0.5, 0.68, 0.86];
+    for (var i = 0; i < 12; i++) {
+      var s = document.createElement("i");
+      var w = (i % 2 ? "w" : "b");
+      s.className = w;
+      var sz = 3 + (i % 3);
+      s.style.cssText = "left:" + (8 + rnd[i] * 82) + "%;top:" + (18 + rnd[(i + 5) % 12] * 62) +
+        "%;width:" + sz + "px;height:" + (sz * 0.62) + "px;transform:rotate(" + (i * 47) + "deg);opacity:.9";
+      box.appendChild(s);
+    }
+  })();
+
+  function fit(canvas) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var r = stage.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.floor(r.width * dpr));
+    canvas.height = Math.max(1, Math.floor(r.height * dpr));
+    return { w: canvas.width, h: canvas.height, dpr: dpr };
+  }
+  var S = fit(steam), D = fit(dust);
+  window.addEventListener("resize", function () {
+    S = fit(steam); D = fit(dust);
+    seedPuffs(); seedDust();
+  });
+
+  /* mouse state with smoothing */
+  var tx = 0, ty = 0, mx = 0, my = 0, wind = 0, lastX = 0;
+  function point(cx, cy) {
+    var r = stage.getBoundingClientRect();
+    tx = ((cx - r.left) / r.width - 0.5) * 2;
+    ty = ((cy - r.top) / r.height - 0.5) * 2;
+    tx = Math.max(-1, Math.min(1, tx));
+    ty = Math.max(-1, Math.min(1, ty));
+  }
+  window.addEventListener("pointermove", function (e) {
+    wind += (e.clientX - lastX) * 0.002;
+    lastX = e.clientX;
+    point(e.clientX, e.clientY);
+  }, { passive: true });
+  window.addEventListener("pointerdown", function (e) { point(e.clientX, e.clientY); }, { passive: true });
+  stage.addEventListener("touchmove", function (e) {
+    if (e.touches.length) point(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  /* steam puffs */
+  var puffs = [];
+  function seedPuffs() {
+    puffs = [];
+    var n = reduceMotion ? 8 : 26;
+    for (var i = 0; i < n; i++) {
+      puffs.push({
+        life: Math.random(),
+        speed: 0.0016 + Math.random() * 0.0028,
+        sway: Math.random() * Math.PI * 2,
+        swayAmp: 12 + Math.random() * 34,
+        r: 26 + Math.random() * 66,
+        x: 0.36 + Math.random() * 0.28,
+        alpha: 0.05 + Math.random() * 0.09
+      });
+    }
+  }
+  /* warm embers / dust */
+  var motes = [];
+  function seedDust() {
+    motes = [];
+    var n = reduceMotion ? 10 : 42;
+    for (var i = 0; i < n; i++) {
+      motes.push({
+        x: Math.random(), y: Math.random(),
+        r: 0.6 + Math.random() * 1.9,
+        v: 0.00012 + Math.random() * 0.0005,
+        tw: Math.random() * Math.PI * 2,
+        warm: Math.random() < 0.55
+      });
+    }
+  }
+  seedPuffs(); seedDust();
+
+  function drawSteam(t) {
+    sctx.clearRect(0, 0, S.w, S.h);
+    var bowlY = S.h * 0.52, bowlW = S.w * 0.34;
+    for (var i = 0; i < puffs.length; i++) {
+      var p = puffs[i];
+      p.life += p.speed * 16;
+      if (p.life > 1) {
+        p.life = 0;
+        p.x = 0.36 + Math.random() * 0.28;
+        p.sway = Math.random() * Math.PI * 2;
+      }
+      var rise = p.life;
+      var y = bowlY - rise * S.h * 0.52;
+      var curl = Math.sin(p.sway + t * 0.0009 + rise * 5.2) * p.swayAmp * (0.3 + rise) * S.dpr;
+      var gust = (mx * 30 + wind * 60) * rise * S.dpr;
+      var x = p.x * S.w + curl + gust;
+      var fade = Math.sin(p.life * Math.PI);
+      var rad = p.r * S.dpr * (0.6 + rise * 1.5);
+      var g = sctx.createRadialGradient(x, y, 0, x, y, rad);
+      var a = p.alpha * fade;
+      g.addColorStop(0, "rgba(235,232,228," + a.toFixed(3) + ")");
+      g.addColorStop(0.55, "rgba(220,218,216," + (a * 0.45).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(220,218,216,0)");
+      sctx.fillStyle = g;
+      sctx.beginPath();
+      sctx.arc(x, y, rad, 0, 6.2832);
+      sctx.fill();
+      /* secondary wisp for curl */
+      var x2 = x + Math.cos(p.sway + rise * 6.0) * 22 * S.dpr;
+      var g2 = sctx.createRadialGradient(x2, y, 0, x2, y, rad * 0.6);
+      g2.addColorStop(0, "rgba(230,228,226," + (a * 0.5).toFixed(3) + ")");
+      g2.addColorStop(1, "rgba(230,228,226,0)");
+      sctx.fillStyle = g2;
+      sctx.beginPath();
+      sctx.arc(x2, y, rad * 0.6, 0, 6.2832);
+      sctx.fill();
+    }
+    void bowlW;
+  }
+
+  function drawDust(t) {
+    dctx.clearRect(0, 0, D.w, D.h);
+    for (var i = 0; i < motes.length; i++) {
+      var m = motes[i];
+      m.y -= m.v * 16;
+      if (m.y < -0.02) { m.y = 1.02; m.x = Math.random(); }
+      var tw = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(m.tw + t * 0.0012));
+      var x = (m.x + mx * 0.012) * D.w;
+      var y = (m.y + my * 0.008) * D.h;
+      dctx.beginPath();
+      dctx.arc(x, y, m.r * D.dpr, 0, 6.2832);
+      if (m.warm) dctx.fillStyle = "rgba(255,150,70," + (0.28 * tw).toFixed(3) + ")";
+      else dctx.fillStyle = "rgba(180,190,220," + (0.20 * tw).toFixed(3) + ")";
+      dctx.fill();
+    }
+  }
+
+  function applyParallax() {
+    mx += (tx - mx) * 0.055;
+    my += (ty - my) * 0.055;
+    wind *= 0.94;
+    document.body.style.setProperty("--mx", mx.toFixed(3));
+    document.body.style.setProperty("--my", my.toFixed(3));
+    tilt.style.transform =
+      "rotateY(" + (mx * 7).toFixed(2) + "deg) rotateX(" + (-my * 5).toFixed(2) + "deg)" +
+      " translate3d(" + (mx * 1.4).toFixed(2) + "vmin," + (my * 1).toFixed(2) + "vmin,0)";
+    halo.style.transform =
+      "translate(calc(-50% + " + (mx * 3).toFixed(2) + "vmin), calc(-50% + " + (my * 2).toFixed(2) + "vmin)) scale(1)";
+  }
+
+  if (reduceMotion) {
+    /* one calm static frame, no loops */
+    applyParallaxStatic();
+    function applyParallaxStatic() {
+      tilt.style.transform = "none";
+      halo.style.transform = "translate(-50%,-50%)";
+    }
+    drawSteam(1200);
+    drawDust(1200);
+    return;
+  }
+
+  var start = performance.now();
+  (function frame(now) {
+    var t = now - start;
+    applyParallax();
+    drawDust(now);
+    drawSteam(t);
+    requestAnimationFrame(frame);
+  })(start);
+})();
+</script>
+</body>
+</html>

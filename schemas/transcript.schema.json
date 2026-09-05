@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
   "title": "Ramen Bench public session transcript",
-  "description": "A normalized, secret-free record of messages and tool activity. Hidden chain-of-thought must not be included.",
+  "description": "A normalized, secret-free record of messages and tool activity. Plain-text reasoning intentionally shared as a message is allowed; hidden or encrypted reasoning fields are excluded.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "runId", "events"],

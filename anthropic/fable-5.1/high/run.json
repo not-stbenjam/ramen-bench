@@ -9,7 +9,7 @@
   "model": {
     "slug": "fable-5.1",
     "displayName": "Fable 5.1",
-    "providerModelId": "anthropic/fable-5.1"
+    "providerModelId": "claude-fable-5-1"
   },
   "variation": {
     "slug": "high",
@@ -18,52 +18,76 @@
     "parameters": {}
   },
   "harness": {
-    "name": "Ramen Bench",
-    "version": "1",
-    "runtime": "Static artifact",
-    "invocation": "Existing benchmark artifact registration"
+    "name": "Claude Code",
+    "version": "2.1.259",
+    "runtime": "Anthropic Claude Code CLI",
+    "invocation": "Claude Code session using claude-fable-5-1; effort high"
   },
   "artifacts": {
     "result": "index.html",
     "transcript": "transcript.json"
   },
   "timing": {
-    "startedAt": "2026-09-04T22:39:46Z",
-    "completedAt": "2026-09-04T22:39:46Z",
-    "wallDurationMs": 0,
-    "apiDurationMs": 0
+    "startedAt": "2026-09-02T22:16:09.628Z",
+    "completedAt": "2026-09-02T22:32:29.670Z",
+    "wallDurationMs": 980042,
+    "apiDurationMs": 767713
   },
   "usage": {
     "tokens": {
-      "input": 0,
-      "cachedInput": 0,
-      "cacheCreationInput": 0,
-      "reasoning": 0,
-      "output": 0,
-      "total": 0
+      "input": 2880,
+      "cachedInput": 1100313,
+      "cacheCreationInput": 84729,
+      "reasoning": 28496,
+      "output": 63620,
+      "total": 1251542
     },
     "cost": {
       "currency": "USD",
-      "input": 0,
-      "cachedInput": 0,
-      "cacheCreationInput": 0,
-      "output": 0,
-      "other": 0,
-      "total": 0,
-      "estimated": true
+      "total": 5.16023425,
+      "estimated": false
     },
-    "requests": 0,
-    "turns": 0,
-    "toolCalls": 0,
-    "providerReported": false
+    "requests": 12,
+    "turns": 1,
+    "toolCalls": 11,
+    "providerReported": true,
+    "raw": {
+      "source": "Claude Code final cost-state",
+      "requestCountBasis": "unique recorded assistant message ids",
+      "costState": {
+        "totalCostUSD": 5.16023425,
+        "totalAPIDurationMs": 767713,
+        "totalDurationMs": 1930080,
+        "startTimeEpochMs": 1788387368913,
+        "modelUsage": {
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 1986,
+            "outputTokens": 30,
+            "thinkingTokens": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 0.002136
+          },
+          "claude-fable-5-1": {
+            "inputTokens": 894,
+            "outputTokens": 63590,
+            "thinkingTokens": 28496,
+            "cacheReadInputTokens": 1100313,
+            "cacheCreationInputTokens": 84729,
+            "webSearchRequests": 0,
+            "costUSD": 5.15809825
+          }
+        }
+      }
+    }
   },
   "resultStats": {
     "bytes": 44945,
     "lines": 1392
   },
   "provenance": {
-    "generatedAt": "2026-09-04T22:39:46Z",
-    "sourceCommit": "ba9e47b"
+    "pricingSource": "Claude Code 2.1.259 final cost-state"
   },
-  "notes": "Usage and timing were not captured by the artifact export; token and cost fields are zero estimates."
+  "notes": "Token and cost totals are the exact final Claude Code cost-state totals. The public transcript omits hidden thinking, private agent-mail activity, credentials, and private local path prefixes."
 }
