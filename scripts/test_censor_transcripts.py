@@ -92,6 +92,23 @@ class TranscriptCensorTests(unittest.TestCase):
         self.assertNotIn(".claude", censored)
         self.assertEqual(censored.count("<CLAUDE_HOME>"), 4)
 
+    def test_elides_signed_asset_url(self) -> None:
+        url = (
+            "https://assets.example.test/private/session/image.png"
+            "?UCloudPublicKey=TOKEN_public-id&Expires=1788576996"
+            "&Signature=gPNPz3UZduc+J/FRMQIVTiavvVE="
+        )
+
+        censored = censor_text(f'{{"imageSource":"{url}"}}')
+
+        self.assertEqual(
+            censored,
+            (
+                '{"imageSource":"<OMITTED_SIGNED_URL host=assets.example.test '
+                f'original-characters={len(url)}>"}}'
+            ),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -54,7 +54,7 @@ python3 scripts/import_muse.py <redacted-export-directory>
 
 The importers recover recorded transcripts, timing, and token usage from the corresponding local harness stores. Provider-recorded costs take precedence; otherwise the scripts use the pinned LiteLLM catalog when the recorded token categories are sufficient for a calculation.
 
-Every entry point finishes by running `scripts/censor_transcripts.py`. This shared pass redacts personal paths, usernames, email and LAN addresses, and secret-like values, and replaces encrypted strings and large embedded media/base64 payloads with factual encoding-and-size markers. It leaves ordinary recorded messages, source code, and tool activity intact. Run `python3 scripts/censor_transcripts.py` by itself for a read-only audit, or add `--write` to normalize existing transcript JSON. Run `python3 scripts/validate_registry.py` to check the complete public registry, schemas, artifact paths, transcript provenance, and censoring state.
+Every entry point finishes by running `scripts/censor_transcripts.py`. This shared pass redacts personal paths, usernames, email and LAN addresses, secret-like values, and signed asset URLs, and replaces encrypted strings and large embedded media/base64 payloads with factual host, encoding, and size markers. It leaves ordinary recorded messages, source code, and tool activity intact. Run `python3 scripts/censor_transcripts.py` by itself for a read-only audit, or add `--write` to normalize existing transcript JSON. Run `python3 scripts/validate_registry.py` to check the complete public registry, schemas, artifact paths, transcript provenance, and censoring state.
 
 ## Shared ratings API
 

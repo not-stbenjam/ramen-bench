@@ -19,7 +19,7 @@ from collections import Counter
 from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any, Iterable, Mapping
-from urllib.parse import quote
+from urllib.parse import parse_qsl, quote, urlsplit
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +47,20 @@ LARGE_BASE64_RE = re.compile(
 FERNET_TOKEN_RE = re.compile(
     r"(?<![A-Za-z0-9_-])gAAAAA[A-Za-z0-9_-]{250,}={0,2}(?![A-Za-z0-9_=-])"
 )
+HTTP_URL_RE = re.compile(r"https?://[^\s\"'<>`]+")
+SIGNED_URL_QUERY_KEYS = {
+    "access_token",
+    "credential",
+    "googleaccessid",
+    "sig",
+    "signature",
+    "token",
+    "ucloudpublickey",
+    "x-amz-credential",
+    "x-amz-signature",
+    "x-goog-credential",
+    "x-goog-signature",
+}
 TRUNCATED_BINARY_TAIL_RE = re.compile(
     r'(?P<marker><OMITTED_BINARY_PAYLOAD\s+[^>]+>)'
     r'(?P<truncation>(?:…|\.\.\.)\s*\d+\s+tokens?\s+truncated\s*(?:…|\.\.\.))'
@@ -135,6 +149,35 @@ def _opaque_marker(encoding: str, payload: str) -> str:
     )
 
 
+def omit_signed_urls(
+    value: str, stats: MutableMapping[str, int] | None = None
+) -> str:
+    """Remove tokenized asset URLs without retaining private paths or query values."""
+
+    def replace(match: re.Match[str]) -> str:
+        candidate = match.group(0)
+        trailing = ""
+        while candidate and candidate[-1] in ".,;:!?)]}":
+            trailing = candidate[-1] + trailing
+            candidate = candidate[:-1]
+        try:
+            parsed = urlsplit(candidate)
+            query_keys = {key.lower() for key, _value in parse_qsl(parsed.query)}
+        except ValueError:
+            return match.group(0)
+        if not query_keys.intersection(SIGNED_URL_QUERY_KEYS):
+            return match.group(0)
+        _bump(stats, "signed_urls")
+        _bump(stats, "signed_url_characters", len(candidate))
+        host = parsed.hostname or "unknown"
+        return (
+            f"<OMITTED_SIGNED_URL host={host} "
+            f"original-characters={len(candidate)}>{trailing}"
+        )
+
+    return HTTP_URL_RE.sub(replace, value)
+
+
 def omit_binary_payloads(
     value: str, stats: MutableMapping[str, int] | None = None
 ) -> str:
@@ -189,6 +232,7 @@ def censor_text(
     """Return public-safe text without changing ordinary recorded content."""
 
     value = omit_binary_payloads(value, stats)
+    value = omit_signed_urls(value, stats)
     workspace_text = str(Path(workspace).resolve())
     home_text = str(Path(home).resolve())
     roots: dict[str, str] = {

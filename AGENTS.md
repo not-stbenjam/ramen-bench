@@ -13,7 +13,7 @@
 - Run `python3 scripts/censor_transcripts.py --write` after importing or changing public transcript data. Never rely on one-off manual redaction.
 - Run `python3 scripts/censor_transcripts.py` again in read-only mode and require zero files needing changes before publishing.
 - Preserve ordinary user and assistant messages, including plain-text reasoning that the model intentionally exposed. Preserve readable source code and tool activity.
-- Exclude structured hidden reasoning, system and developer prompts, encrypted or otherwise opaque payloads, private agent-mail activity, credentials, secret-like values, personal paths, usernames, email addresses, and private or LAN IP addresses.
+- Exclude structured hidden reasoning, system and developer prompts, encrypted or otherwise opaque payloads, private agent-mail activity, credentials, secret-like values, signed asset URLs, personal paths, usernames, email addresses, and private or LAN IP addresses.
 - Replace large embedded images, base64, binary, and opaque encrypted strings with the shared censor's factual encoding-and-size marker. Do not publish undecodable payload chunks.
 - Never fabricate, summarize, or reconstruct missing transcript content. A factual omission marker is allowed; invented model text is not.
 

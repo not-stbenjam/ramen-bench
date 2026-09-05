@@ -199,7 +199,7 @@
     {
       "type": "message",
       "role": "assistant",
-      "content": "**🌐 Z.ai Built-in Tool: analyze_image**\n\n**Input:**\n```json\n{\"imageSource\":\"https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/85757c43-1df7-4d13-978a-6d135545dc86/ramen-default.png?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1788575984&Signature=8TfXpVVYUfXTY4hHlWhI/VTtxXw=\",\"prompt\":\"Describe this rendered scene in detail: Is there a bowl of ramen visible? Is it centered and well-composed? Can you see: broth, noodles, tofu cubes, corn, mushrooms, scallion rings, nori sheet, chopsticks, steam/haze? Is the background dark and atmospheric with a warm glow? Any visual glitches, misplaced elements, blank areas, or rendering artifacts? Be specific about anything that looks wrong.\"}\n```\n*Executing on server...*\n",
+      "content": "**🌐 Z.ai Built-in Tool: analyze_image**\n\n**Input:**\n```json\n{\"imageSource\":\"<OMITTED_SIGNED_URL host=maas-log-prod.cn-wlcb.ufileos.com original-characters=223>\",\"prompt\":\"Describe this rendered scene in detail: Is there a bowl of ramen visible? Is it centered and well-composed? Can you see: broth, noodles, tofu cubes, corn, mushrooms, scallion rings, nori sheet, chopsticks, steam/haze? Is the background dark and atmospheric with a warm glow? Any visual glitches, misplaced elements, blank areas, or rendering artifacts? Be specific about anything that looks wrong.\"}\n```\n*Executing on server...*\n",
       "timestamp": "2026-09-05T02:09:48.372Z"
     },
     {
@@ -367,7 +367,7 @@
     {
       "type": "message",
       "role": "assistant",
-      "content": "**🌐 Z.ai Built-in Tool: analyze_image**\n\n**Input:**\n```json\n{\"imageSource\":\"https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/85757c43-1df7-4d13-978a-6d135545dc86/ramen-polished.png?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1788576038&Signature=fDEDl4FTXZuPaY9aItSMii4W6hI=\",\"prompt\":\"Describe the composition of this dark ramen scene image briefly. Specifically: is the nori (dark green sheet) now proportionate to the bowl? Are the chopsticks resting naturally near the bowl rim? Is steam visible rising from the bowl? Is the bowl fully visible and centered with all toppings (tofu, corn, mushrooms, scallions)? Any clipping, overlap glitches, or artifacts?\"}\n```\n*Executing on server...*\n",
+      "content": "**🌐 Z.ai Built-in Tool: analyze_image**\n\n**Input:**\n```json\n{\"imageSource\":\"<OMITTED_SIGNED_URL host=maas-log-prod.cn-wlcb.ufileos.com original-characters=224>\",\"prompt\":\"Describe the composition of this dark ramen scene image briefly. Specifically: is the nori (dark green sheet) now proportionate to the bowl? Are the chopsticks resting naturally near the bowl rim? Is steam visible rising from the bowl? Is the bowl fully visible and centered with all toppings (tofu, corn, mushrooms, scallions)? Any clipping, overlap glitches, or artifacts?\"}\n```\n*Executing on server...*\n",
       "timestamp": "2026-09-05T02:14:38.202Z"
     },
     {
@@ -454,7 +454,7 @@
     {
       "type": "message",
       "role": "assistant",
-      "content": "**🌐 Z.ai Built-in Tool: analyze_image**\n\n**Input:**\n```json\n{\"imageSource\":\"https://maas-log-prod.cn-wlcb.ufileos.com/anthropic/85757c43-1df7-4d13-978a-6d135545dc86/ramen-mobile.png?UCloudPublicKey=TOKEN_e15ba47a-d098-4fbd-9afc-a0dcf0e4e621&Expires=1788576307&Signature=ep4DW0+WxGJMgtNlejLIROXl5cI=\",\"prompt\":\"This is a narrow mobile viewport (390x844) render of a ramen scene. Check: Is the bowl fully visible and well-sized for the narrow screen (not cut off left/right)? Is the vertical composition good (bowl in lower half, steam above)? Are chopsticks clipped by the right edge, and if so does it look broken or natural? Any layout problems on this narrow canvas?\"}\n```\n*Executing on server...*\n",
+      "content": "**🌐 Z.ai Built-in Tool: analyze_image**\n\n**Input:**\n```json\n{\"imageSource\":\"<OMITTED_SIGNED_URL host=maas-log-prod.cn-wlcb.ufileos.com original-characters=222>\",\"prompt\":\"This is a narrow mobile viewport (390x844) render of a ramen scene. Check: Is the bowl fully visible and well-sized for the narrow screen (not cut off left/right)? Is the vertical composition good (bowl in lower half, steam above)? Are chopsticks clipped by the right edge, and if so does it look broken or natural? Any layout problems on this narrow canvas?\"}\n```\n*Executing on server...*\n",
       "timestamp": "2026-09-05T02:15:13.244Z"
     },
     {
