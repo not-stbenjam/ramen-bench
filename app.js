@@ -885,7 +885,7 @@
       const direction = event.data?.direction;
       if (
         state.mode !== "single"
-        || event.data?.type !== "ramen-bench:swipe"
+        || !["ramen-bench:swipe", "ramen-bench:key"].includes(event.data?.type)
         || (direction !== -1 && direction !== 1)
       ) {
         return;

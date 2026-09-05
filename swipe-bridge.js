@@ -80,4 +80,18 @@
   }, { capture: true, passive: true });
 
   window.addEventListener("touchcancel", resetGesture, { capture: true, passive: true });
+
+  window.addEventListener("keydown", (event) => {
+    const typing = event.target instanceof Element && Boolean(event.target.closest(
+      "button, input, select, textarea, [contenteditable]:not([contenteditable='false'])"
+    ));
+    if (typing || event.isComposing) return;
+
+    let direction = 0;
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") direction = -1;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") direction = 1;
+    if (!direction) return;
+
+    window.parent.postMessage({ type: "ramen-bench:key", direction }, "*");
+  }, { capture: true });
 }());
