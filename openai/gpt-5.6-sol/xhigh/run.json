@@ -41,7 +41,15 @@
       "output": 0,
       "total": 44468
     },
-    "cost": null,
+    "cost": {
+      "currency": "USD",
+      "input": 0.013024,
+      "cachedInput": 0.0159904,
+      "cacheCreationInput": 0.0,
+      "output": 0.02472,
+      "total": 0.0537344,
+      "estimated": true
+    },
     "turns": 1,
     "toolCalls": 11,
     "providerReported": true,
@@ -61,8 +69,19 @@
         }
       },
       "costCalculation": {
-        "status": "not_calculated_missing_token_categories",
-        "reason": "The terminal record reports total tokens only; assigning input, cached input, reasoning, or output categories would require guessing."
+        "status": "estimated_from_total_tokens",
+        "exactTotalTokens": 44468,
+        "referenceRunId": "openai/gpt-6-astra/xhigh",
+        "referenceRationale": "same Codex harness, task, date, and reasoning effort with recorded token categories",
+        "estimatedTokenAllocation": {
+          "input": 43232,
+          "cachedInput": 39976,
+          "cacheCreationInput": 0,
+          "reasoning": 466,
+          "output": 1236,
+          "total": 44468
+        },
+        "inputIncludesCachedInput": true
       }
     }
   },
@@ -71,7 +90,7 @@
     "lines": 681
   },
   "provenance": {
-    "pricingSource": "LiteLLM 1.83.7 model_cost[gpt-5.6-sol] (rates retained; cost not calculated because token categories are unavailable)"
+    "pricingSource": "LiteLLM 1.83.7 model_cost[gpt-5.6-sol]; token allocation estimated from openai/gpt-6-astra/xhigh"
   },
-  "notes": "The Codex terminal record reports an exact total token count without category breakdown. Input, cache, reasoning, and output fields remain zero and cost is unavailable rather than guessed. The public transcript contains recorded text and full recorded tool activity; hidden reasoning, credentials, and private local path prefixes are excluded."
+  "notes": "The Codex terminal record reports an exact total token count without category breakdown. Cost was estimated with this model's LiteLLM rates after allocating that total using the same-effort GPT 6 Astra run's recorded input, cache, and output proportions; the exact total token field is unchanged. The public transcript contains recorded text and full recorded tool activity; hidden reasoning, credentials, and private local path prefixes are excluded."
 }

@@ -331,6 +331,61 @@ def estimated_cost(
     }
 
 
+def estimated_total_only_cost(
+    pricing: dict[str, Any], *, total_tokens: int, effort: str
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Estimate a total-only Codex run using the same-effort Astra token mix."""
+    reference_id = f"openai/gpt-6-astra/{effort}"
+    reference_path = ROOT / reference_id / "run.json"
+    reference = json.loads(reference_path.read_text())
+    reference_tokens = reference["usage"]["tokens"]
+    reference_total = reference_tokens["total"]
+    reference_input = reference_tokens["input"]
+    if reference_total <= 0 or reference_input <= 0:
+        raise ValueError(f"{reference_id}: invalid token allocation reference")
+
+    output_tokens = round(
+        total_tokens * reference_tokens["output"] / reference_total
+    )
+    input_tokens = total_tokens - output_tokens
+    cached_input_tokens = round(
+        input_tokens * reference_tokens["cachedInput"] / reference_input
+    )
+    reasoning_tokens = round(
+        output_tokens
+        * reference_tokens.get("reasoning", 0)
+        / max(reference_tokens["output"], 1)
+    )
+    allocation = {
+        "input": input_tokens,
+        "cachedInput": cached_input_tokens,
+        "cacheCreationInput": 0,
+        "reasoning": reasoning_tokens,
+        "output": output_tokens,
+        "total": total_tokens,
+    }
+    cost = estimated_cost(
+        pricing,
+        input_tokens=input_tokens,
+        cached_input_tokens=cached_input_tokens,
+        cache_creation_input_tokens=0,
+        output_tokens=output_tokens,
+        input_includes_cached=True,
+    )
+    method = {
+        "status": "estimated_from_total_tokens",
+        "exactTotalTokens": total_tokens,
+        "referenceRunId": reference_id,
+        "referenceRationale": (
+            "same Codex harness, task, date, and reasoning effort with recorded token "
+            "categories"
+        ),
+        "estimatedTokenAllocation": allocation,
+        "inputIncludesCachedInput": True,
+    }
+    return cost, method
+
+
 def result_stats(run_id: str) -> dict[str, int]:
     data = (ROOT / run_id / "index.html").read_bytes()
     return {"bytes": len(data), "lines": data.count(b"\n")}
@@ -1119,6 +1174,9 @@ def build_codex_log(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
         raise ValueError(f"{run_id}: terminal header does not match run")
     total_tokens = log_total_tokens(text)
     pricing = litellm_rates(model_slug)
+    cost, cost_calculation = estimated_total_only_cost(
+        pricing, total_tokens=total_tokens, effort=effort
+    )
     events, omitted_calls = normalize_log_events(text, started_at, completed_at)
     tool_calls = sum(event["type"] == "tool_call" for event in events)
     tokens = {
@@ -1131,7 +1189,7 @@ def build_codex_log(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
     }
     usage = {
         "tokens": tokens,
-        "cost": None,
+        "cost": cost,
         "turns": 1,
         "toolCalls": tool_calls,
         "providerReported": True,
@@ -1140,13 +1198,7 @@ def build_codex_log(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
             "totalTokens": total_tokens,
             "tokenCategoryBreakdownAvailable": False,
             "pricing": pricing,
-            "costCalculation": {
-                "status": "not_calculated_missing_token_categories",
-                "reason": (
-                    "The terminal record reports total tokens only; assigning input, "
-                    "cached input, reasoning, or output categories would require guessing."
-                ),
-            },
+            "costCalculation": cost_calculation,
         },
     }
     timing = {
@@ -1164,15 +1216,16 @@ def build_codex_log(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
         ),
     }
     pricing_source = (
-        f"LiteLLM {EXPECTED_LITELLM_VERSION} model_cost[{model_slug}] "
-        "(rates retained; cost not calculated because token categories are unavailable)"
+        f"LiteLLM {EXPECTED_LITELLM_VERSION} model_cost[{model_slug}]; "
+        f"token allocation estimated from openai/gpt-6-astra/{effort}"
     )
     notes = (
         "The Codex terminal record reports an exact total token count without category "
-        "breakdown. Input, cache, reasoning, and output fields remain zero and cost is "
-        "unavailable rather than guessed. The public transcript contains recorded text "
-        "and full recorded tool activity; hidden reasoning, credentials, and private "
-        "local path prefixes are excluded."
+        "breakdown. Cost was estimated with this model's LiteLLM rates after allocating "
+        "that total using the same-effort GPT 6 Astra run's recorded input, cache, and "
+        "output proportions; the exact total token field is unchanged. The public "
+        "transcript contains recorded text and full recorded tool activity; hidden "
+        "reasoning, credentials, and private local path prefixes are excluded."
     )
     run = run_base(
         run_id,
@@ -1191,7 +1244,7 @@ def build_codex_log(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
         events,
         omitted_calls,
     )
-    return run, transcript, "unavailable"
+    return run, transcript, "estimated-total-only"
 
 
 def tracked_run_ids() -> list[str]:
@@ -1291,7 +1344,7 @@ def main(argv: list[str] | None = None) -> None:
         "claudeProviderCost": 0,
         "claudeLiteLLMCost": 0,
         "openaiLiteLLMCost": 0,
-        "openaiCostUnavailable": 0,
+        "openaiTotalOnlyEstimatedCost": 0,
         "events": 0,
         "base64Omissions": 0,
         "base64CharactersOmitted": 0,
@@ -1310,7 +1363,7 @@ def main(argv: list[str] | None = None) -> None:
             coverage["openaiLiteLLMCost"] += 1
         else:
             run, transcript, _ = build_codex_log(run_id)
-            coverage["openaiCostUnavailable"] += 1
+            coverage["openaiTotalOnlyEstimatedCost"] += 1
         coverage["events"] += len(transcript["events"])
         omission_sizes = [
             int(size) for size in BASE64_MARKER_RE.findall(json.dumps(transcript))
@@ -1330,7 +1383,8 @@ def main(argv: list[str] | None = None) -> None:
         f"Claude Code provider cost={coverage['claudeProviderCost']}, "
         f"Claude Code LiteLLM cost={coverage['claudeLiteLLMCost']}, "
         f"OpenAI LiteLLM cost={coverage['openaiLiteLLMCost']}, "
-        f"OpenAI cost unavailable (total tokens only)={coverage['openaiCostUnavailable']}."
+        "OpenAI total-only estimated cost="
+        f"{coverage['openaiTotalOnlyEstimatedCost']}."
     )
     print(f"Normalized transcript events: {coverage['events']}.")
     print(
