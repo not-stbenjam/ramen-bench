@@ -9,6 +9,31 @@
   const sessionVotes = new Map();
   const framesById = new Map();
   const expandedModels = new Set();
+  const swipeGesture = {
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    startedAt: 0
+  };
+
+  const swipeMinimumDistance = 56;
+  const swipeMaximumDuration = 650;
+  const swipeMinimumVelocity = 0.25;
+  const swipeAxisRatio = 1.35;
+  const swipeDirectionLockDistance = 12;
+  const swipeInteractiveSelector = [
+    "a",
+    "button",
+    "input",
+    "select",
+    "textarea",
+    "label",
+    "[contenteditable='true']",
+    "[role='button']",
+    "[role='link']"
+  ].join(",");
 
   const elements = {
     sidebar: document.querySelector("#sidebar"),
@@ -466,6 +491,7 @@
 
   function setMode(mode) {
     if (mode === state.mode) return;
+    resetSwipeGesture();
     state.mode = mode;
     elements.viewer.classList.toggle("mode-single", mode === "single");
     elements.viewer.classList.toggle("mode-grid", mode === "grid");
@@ -588,6 +614,8 @@
     const ratingControl = createRatingControl(entry);
     label.append(heading, stats, transcript, ratingControl);
     frame.append(iframe, label);
+    addSwipeEdge(frame, "left");
+    addSwipeEdge(frame, "right");
     return frame;
   }
 
@@ -713,6 +741,162 @@
     revealEntryInSidebar(state.activeId);
   }
 
+  function isInteractiveSwipeTarget(target) {
+    return target instanceof Element && Boolean(target.closest(swipeInteractiveSelector));
+  }
+
+  function resetSwipeGesture() {
+    const pointerId = swipeGesture.pointerId;
+    if (
+      Number.isInteger(pointerId)
+      && elements.viewer.hasPointerCapture?.(pointerId)
+    ) {
+      elements.viewer.releasePointerCapture(pointerId);
+    }
+    swipeGesture.pointerId = null;
+    swipeGesture.startX = 0;
+    swipeGesture.startY = 0;
+    swipeGesture.lastX = 0;
+    swipeGesture.lastY = 0;
+    swipeGesture.startedAt = 0;
+  }
+
+  function beginSwipeGesture(pointerId, clientX, clientY, target) {
+    if (
+      state.mode !== "single"
+      || entriesInSidebarOrder().length < 2
+      || isInteractiveSwipeTarget(target)
+    ) {
+      return false;
+    }
+
+    swipeGesture.pointerId = pointerId;
+    swipeGesture.startX = clientX;
+    swipeGesture.startY = clientY;
+    swipeGesture.lastX = clientX;
+    swipeGesture.lastY = clientY;
+    swipeGesture.startedAt = performance.now();
+    return true;
+  }
+
+  function updateSwipeGesture(pointerId, clientX, clientY) {
+    if (swipeGesture.pointerId !== pointerId) return false;
+    swipeGesture.lastX = clientX;
+    swipeGesture.lastY = clientY;
+
+    const horizontalDistance = Math.abs(clientX - swipeGesture.startX);
+    const verticalDistance = Math.abs(clientY - swipeGesture.startY);
+    if (
+      verticalDistance >= swipeDirectionLockDistance
+      && verticalDistance > horizontalDistance * swipeAxisRatio
+    ) {
+      resetSwipeGesture();
+      return false;
+    }
+
+    return horizontalDistance >= swipeDirectionLockDistance
+      && horizontalDistance > verticalDistance * swipeAxisRatio;
+  }
+
+  function finishSwipeGesture(pointerId, clientX, clientY) {
+    if (swipeGesture.pointerId !== pointerId) return;
+
+    const horizontalDistance = clientX - swipeGesture.startX;
+    const verticalDistance = clientY - swipeGesture.startY;
+    const elapsed = performance.now() - swipeGesture.startedAt;
+    const horizontalSpeed = Math.abs(horizontalDistance) / Math.max(elapsed, 1);
+    resetSwipeGesture();
+
+    if (
+      state.mode !== "single"
+      || Math.abs(horizontalDistance) < swipeMinimumDistance
+      || elapsed > swipeMaximumDuration
+      || horizontalSpeed < swipeMinimumVelocity
+      || Math.abs(horizontalDistance) < Math.abs(verticalDistance) * swipeAxisRatio
+    ) {
+      return;
+    }
+
+    move(horizontalDistance < 0 ? 1 : -1);
+  }
+
+  function addSwipeEdge(frame, position) {
+    const edge = document.createElement("div");
+    edge.dataset.swipeEdge = position;
+    edge.setAttribute("aria-hidden", "true");
+    Object.assign(edge.style, {
+      position: "absolute",
+      zIndex: "3",
+      top: "0",
+      bottom: "0",
+      width: "24px",
+      touchAction: "pan-y",
+      [position]: "0"
+    });
+    frame.append(edge);
+  }
+
+  function bindSwipeNavigation() {
+    if (window.PointerEvent) {
+      elements.viewer.addEventListener("pointerdown", (event) => {
+        if (event.pointerType !== "touch") return;
+        if (!event.isPrimary) {
+          resetSwipeGesture();
+          return;
+        }
+        if (!beginSwipeGesture(event.pointerId, event.clientX, event.clientY, event.target)) return;
+        try {
+          elements.viewer.setPointerCapture(event.pointerId);
+        } catch (_error) {
+          // Synthetic events and older browsers may not expose an active pointer to capture.
+        }
+      });
+      elements.viewer.addEventListener("pointermove", (event) => {
+        if (event.pointerType !== "touch") return;
+        if (updateSwipeGesture(event.pointerId, event.clientX, event.clientY) && event.cancelable) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      elements.viewer.addEventListener("pointerup", (event) => {
+        if (event.pointerType === "touch") {
+          finishSwipeGesture(event.pointerId, event.clientX, event.clientY);
+        }
+      });
+      elements.viewer.addEventListener("pointercancel", resetSwipeGesture);
+      elements.viewer.addEventListener("lostpointercapture", resetSwipeGesture);
+    } else {
+      elements.viewer.addEventListener("touchstart", (event) => {
+        if (event.touches.length !== 1) {
+          resetSwipeGesture();
+          return;
+        }
+        const touch = event.touches[0];
+        beginSwipeGesture(touch.identifier, touch.clientX, touch.clientY, event.target);
+      }, { passive: true });
+      elements.viewer.addEventListener("touchmove", (event) => {
+        if (event.touches.length !== 1) {
+          resetSwipeGesture();
+          return;
+        }
+        const touch = event.touches[0];
+        if (updateSwipeGesture(touch.identifier, touch.clientX, touch.clientY) && event.cancelable) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      elements.viewer.addEventListener("touchend", (event) => {
+        if (event.touches.length || !event.changedTouches.length) {
+          resetSwipeGesture();
+          return;
+        }
+        const touch = event.changedTouches[0];
+        finishSwipeGesture(touch.identifier, touch.clientX, touch.clientY);
+      });
+      elements.viewer.addEventListener("touchcancel", resetSwipeGesture);
+    }
+
+    window.addEventListener("blur", resetSwipeGesture);
+  }
+
   function renderLeaderboard() {
     elements.leaderboard.replaceChildren();
     const rated = entries
@@ -802,6 +986,7 @@
   }
 
   function bindEvents() {
+    bindSwipeNavigation();
     elements.search.addEventListener("input", applyFilters);
     elements.creatorFilter.addEventListener("change", applyFilters);
     elements.harnessFilter.addEventListener("change", applyFilters);

@@ -65,6 +65,7 @@ EFFORT_NAMES = {
 }
 
 CLAUDE_SOURCES = {
+    "anthropic/fable-5.1/max": "1aec6fb2-50f8-4922-a8be-fe1c7bd0c0f1.jsonl",
     "anthropic/fable-5.1/low": "7a98bbf8-3d05-488f-adcf-f5885320142e.jsonl",
     "anthropic/fable-5.1/medium": "8f4c534d-bc6b-4bad-b7cb-62035065f6b6.jsonl",
     "anthropic/fable-5.1/high": "146c3cb5-8250-43fd-8ad2-4fc433d907af.jsonl",
@@ -88,6 +89,7 @@ CLAUDE_REPLAY_VERIFICATION = {
     "z.ai/glm-5.3/high",
 }
 CLAUDE_EXPECTED_PROVIDER_MODELS = {
+    "anthropic/fable-5.1/max": "claude-fable-5-1",
     "z.ai/glm-5.3/max": "glm-5.3",
     "z.ai/glm-5.3/high": "glm-5.3",
 }

@@ -2,6 +2,7 @@
   "$schema": "./schemas/registry.schema.json",
   "schemaVersion": 1,
   "runs": [
+    "anthropic/fable-5.1/max/run.json",
     "anthropic/fable-5.1/xhigh/run.json",
     "anthropic/fable-5.1/high/run.json",
     "anthropic/fable-5.1/medium/run.json",

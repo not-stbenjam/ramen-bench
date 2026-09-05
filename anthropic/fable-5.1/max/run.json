@@ -1,0 +1,81 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "anthropic/fable-5.1/max",
+  "vendor": {
+    "slug": "anthropic",
+    "displayName": "Anthropic"
+  },
+  "model": {
+    "slug": "fable-5.1",
+    "displayName": "Fable 5.1",
+    "providerModelId": "claude-fable-5-1"
+  },
+  "variation": {
+    "slug": "max",
+    "displayName": "Max",
+    "reasoningEffort": "max",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Claude Code",
+    "version": "2.1.261",
+    "runtime": "Anthropic Claude Code CLI",
+    "invocation": "Claude Code session using claude-fable-5-1; effort max"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-05T02:28:36.984Z",
+    "completedAt": "2026-09-05T03:30:04.829Z",
+    "wallDurationMs": 3687845
+  },
+  "usage": {
+    "tokens": {
+      "input": 1448,
+      "cachedInput": 9304494,
+      "cacheCreationInput": 289241,
+      "reasoning": 184712,
+      "output": 260113,
+      "total": 9855296
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0.01448,
+      "cachedInput": 2.3261235,
+      "cacheCreationInput": 3.6155125,
+      "output": 13.00565,
+      "total": 18.961766,
+      "estimated": true
+    },
+    "requests": 48,
+    "turns": 1,
+    "toolCalls": 86,
+    "providerReported": true,
+    "raw": {
+      "source": "sum of final snapshots for unique Claude message ids",
+      "requestCountBasis": "unique recorded assistant message ids",
+      "pricing": {
+        "library": "litellm",
+        "version": "1.83.7",
+        "modelKey": "claude-fable-5-1",
+        "ratesUsdPerToken": {
+          "input": 1e-05,
+          "cachedInput": 2.5e-07,
+          "cacheCreationInput": 1.25e-05,
+          "output": 5e-05
+        }
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 54281,
+    "lines": 853
+  },
+  "provenance": {
+    "pricingSource": "LiteLLM 1.83.7 model_cost[claude-fable-5-1]"
+  },
+  "notes": "Claude Code recorded exact token categories but no final cost-state. Cost was calculated from LiteLLM rates; the public transcript omits hidden thinking, private agent-mail activity, credentials, and private local path prefixes."
+}
