@@ -158,7 +158,7 @@
       ["total", "Total cost"]
     ]) {
       if (!Number.isFinite(cost[key])) continue;
-      addDetail(list, label, `${cost[key].toFixed(6)} ${currency}${key === "total" && cost.estimated ? " (estimated)" : ""}`);
+      addDetail(list, label, `${cost[key].toFixed(2)} ${currency}${key === "total" && cost.estimated ? " (estimated)" : ""}`);
     }
   }
 
@@ -252,17 +252,15 @@
 
   function formatCost(cost) {
     if (!cost || !Number.isFinite(cost.total)) return "";
-    const digits = cost.total > 0 && cost.total < 0.01 ? 4 : 2;
     try {
-      const amount = new Intl.NumberFormat("en-US", {
+      return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: cost.currency || "USD",
-        minimumFractionDigits: digits,
-        maximumFractionDigits: Math.max(digits, 4)
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(cost.total);
-      return `${cost.estimated ? "~" : ""}${amount}`;
     } catch (_error) {
-      return `${cost.estimated ? "~" : ""}${cost.total} ${cost.currency || "USD"}`;
+      return `${cost.total.toFixed(2)} ${cost.currency || "USD"}`;
     }
   }
 
