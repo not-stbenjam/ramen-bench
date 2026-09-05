@@ -58,7 +58,7 @@ Every entry point finishes by running `scripts/censor_transcripts.py`. This shar
 
 ## Shared ratings API
 
-Community votes are stored in Cloudflare D1 through the Worker in `api/`. No ratings are stored in the browser. A salted hash of the connecting IP and user agent prevents duplicate votes without retaining either raw value; voting again updates that visitor's existing rating.
+Community votes are stored in Cloudflare D1 through the Worker in `api/`. The browser keeps a per-run local vote marker, following Fedora Showdown's one-vote UI behavior. A salted hash of the connecting IP and user agent also prevents duplicate D1 rows without retaining either raw value; repeat submissions keep the visitor's first rating.
 
 To provision it:
 

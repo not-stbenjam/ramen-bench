@@ -72,7 +72,7 @@ async function postVote(request, env, cors) {
     `INSERT INTO votes (run_id, voter_hash, rating)
      VALUES (?, ?, ?)
      ON CONFLICT (run_id, voter_hash)
-     DO UPDATE SET rating = excluded.rating, updated_at = datetime('now')`
+     DO NOTHING`
   ).bind(runId, voterHash, rating).run();
 
   return json({ ok: true }, 200, {

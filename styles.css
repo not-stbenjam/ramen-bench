@@ -866,7 +866,9 @@ select:focus-visible {
 }
 
 .star:hover,
-.star.filled {
+.star.hover,
+.star.filled,
+.star.voted {
   color: var(--gold);
   text-shadow: 0 0 10px rgba(240, 186, 85, 0.28);
   transform: translateY(-1px);
@@ -876,7 +878,7 @@ select:focus-visible {
   cursor: not-allowed;
 }
 
-.star:disabled:not(.filled):hover {
+.star:disabled:not(.filled):not(.voted):hover {
   color: #4f4127;
   text-shadow: none;
   transform: none;

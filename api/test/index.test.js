@@ -13,7 +13,8 @@ function environment() {
         bind(runId, voterHash, rating) {
           return {
             async run() {
-              votes.set(`${runId}:${voterHash}`, { runId, rating });
+              const key = `${runId}:${voterHash}`;
+              if (!votes.has(key)) votes.set(key, { runId, rating });
               return { success: true };
             }
           };
@@ -70,7 +71,7 @@ test("stores and aggregates a vote", async () => {
   ]);
 });
 
-test("updates the same visitor's vote", async () => {
+test("keeps the same visitor's first vote", async () => {
   const env = environment();
   for (const rating of [2, 4]) {
     await worker.fetch(request("/vote", {
@@ -81,7 +82,7 @@ test("updates the same visitor's vote", async () => {
   }
   const response = await worker.fetch(request("/votes"), env);
   assert.deepEqual(await response.json(), [
-    { runId: "openai/gpt-5.6-luna/max", count: 1, average: 4 }
+    { runId: "openai/gpt-5.6-luna/max", count: 1, average: 2 }
   ]);
 });
 

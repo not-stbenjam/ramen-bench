@@ -3,9 +3,10 @@
 
   let entries = [];
   let toastTimer;
+  const voteStoragePrefix = "rb-vote-";
   const ratingsApiUrl = String(window.RAMEN_BENCH_CONFIG?.ratingsApiUrl || "").replace(/\/+$/, "");
   const ratingsByRun = new Map();
-  const submittedRatings = new Map();
+  const sessionVotes = new Map();
   const framesById = new Map();
   const expandedModels = new Set();
 
@@ -137,13 +138,15 @@
   }
 
   async function submitVote(entry, rating, control) {
+    if (getVote(entry.id)) return;
     if (!ratingsApiUrl) {
       showToast("The shared ratings API has not been configured yet.");
       return;
     }
 
+    saveVote(entry.id, rating);
+    refreshRatingControls();
     control.classList.add("submitting");
-    control.querySelectorAll("button").forEach((button) => { button.disabled = true; });
     try {
       const response = await fetch(`${ratingsApiUrl}/vote`, {
         method: "POST",
@@ -154,7 +157,6 @@
         const body = await response.json().catch(() => ({}));
         throw new Error(body.error || `Vote request failed with ${response.status}`);
       }
-      submittedRatings.set(entry.id, rating);
       await fetchVotes();
       renderList();
       refreshRatingControls();
@@ -164,8 +166,37 @@
       showToast("Your rating could not be saved. Please try again.");
     } finally {
       control.classList.remove("submitting");
-      control.querySelectorAll("button").forEach((button) => { button.disabled = false; });
     }
+  }
+
+  function getVote(runId) {
+    try {
+      const rating = Number.parseInt(window.localStorage.getItem(`${voteStoragePrefix}${runId}`), 10);
+      if (rating >= 1 && rating <= 5) return rating;
+    } catch (_error) {
+      // Fall through to the in-memory lock when storage is unavailable.
+    }
+    return sessionVotes.get(runId) || 0;
+  }
+
+  function saveVote(runId, rating) {
+    sessionVotes.set(runId, rating);
+    try {
+      window.localStorage.setItem(`${voteStoragePrefix}${runId}`, String(rating));
+    } catch (_error) {
+      // Voting still proceeds when storage is unavailable; the Worker also de-duplicates voters.
+    }
+  }
+
+  function hoverStars(control, rating) {
+    if (getVote(control.dataset.runId)) return;
+    control.querySelectorAll(".star").forEach((star, index) => {
+      star.classList.toggle("hover", index < rating);
+    });
+  }
+
+  function unhoverStars(control) {
+    control.querySelectorAll(".star").forEach((star) => star.classList.remove("hover"));
   }
 
   function uniqueValues(key) {
@@ -609,18 +640,20 @@
     const wrapper = document.createElement("span");
     wrapper.className = "stars";
     wrapper.setAttribute("aria-label", `Rate ${entry.name}`);
-    const current = submittedRatings.get(entry.id) || 0;
+    const current = getVote(entry.id);
 
     for (let score = 1; score <= 5; score += 1) {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = `star${score <= current ? " filled" : ""}`;
+      button.className = `star${score <= current ? " voted" : ""}`;
       button.textContent = "★";
       button.title = `${score} star${score === 1 ? "" : "s"}`;
       button.setAttribute("aria-label", `${score} star${score === 1 ? "" : "s"}`);
       button.setAttribute("aria-pressed", String(score <= current));
-      button.disabled = !ratingsApiUrl;
+      button.disabled = !ratingsApiUrl || Boolean(current);
       button.addEventListener("click", () => submitVote(entry, score, control));
+      button.addEventListener("mouseenter", () => hoverStars(control, score));
+      button.addEventListener("mouseleave", () => unhoverStars(control));
       wrapper.append(button);
     }
 
@@ -637,20 +670,25 @@
 
   function updateRatingControl(control) {
     const runId = control.dataset.runId;
-    const current = submittedRatings.get(runId) || 0;
+    const current = getVote(runId);
     const community = ratingsByRun.get(runId);
     control.querySelectorAll(".star").forEach((star, index) => {
       const selected = index < current;
-      star.classList.toggle("filled", selected);
+      star.classList.toggle("voted", selected);
+      star.classList.remove("hover");
       star.setAttribute("aria-pressed", String(selected));
+      star.disabled = !ratingsApiUrl || Boolean(current);
     });
     const summary = control.querySelector(".vote-summary");
     if (!ratingsApiUrl) {
       summary.textContent = "Offline";
       control.title = "Shared ratings API not configured";
     } else if (community?.count) {
-      summary.textContent = `${formatAverage(community.average)} · ${community.count}`;
+      summary.textContent = `${current ? "Voted · " : ""}${formatAverage(community.average)} · ${community.count}`;
       control.title = `${formatAverage(community.average)} from ${community.count} vote${community.count === 1 ? "" : "s"}`;
+    } else if (current) {
+      summary.textContent = "Voted";
+      control.title = "Your vote has been recorded";
     } else {
       summary.textContent = "Rate";
       control.title = "No community votes yet";
