@@ -8,33 +8,22 @@
   const ratingsByRun = new Map();
   const sessionVotes = new Map();
   const framesById = new Map();
+  const frameLoads = new WeakMap();
   const expandedModels = new Set();
   const swipeGesture = {
     pointerId: null,
     startX: 0,
     startY: 0,
-    lastX: 0,
-    lastY: 0,
     startedAt: 0
   };
+  const swipeSurfaces = new WeakSet();
 
   const swipeMinimumDistance = 56;
   const swipeMaximumDuration = 650;
   const swipeMinimumVelocity = 0.25;
   const swipeAxisRatio = 1.35;
   const swipeDirectionLockDistance = 12;
-  const swipeInteractiveSelector = [
-    "a",
-    "button",
-    "input",
-    "select",
-    "textarea",
-    "label",
-    "[contenteditable='true']",
-    "[role='button']",
-    "[role='link']"
-  ].join(",");
-
+  const swipeBridgeUrl = new URL("swipe-bridge.js", document.baseURI).href;
   const elements = {
     sidebar: document.querySelector("#sidebar"),
     brand: document.querySelector("#brand-home"),
@@ -556,11 +545,67 @@
       frame.classList.toggle("visible", visible);
 
       if (visible) {
-        if (!iframe.hasAttribute("src")) iframe.src = iframe.dataset.src;
-      } else if (iframe.hasAttribute("src")) {
-        iframe.src = "";
-        iframe.removeAttribute("src");
+        loadFrameContent(iframe);
+      } else {
+        unloadFrameContent(iframe);
       }
+    }
+  }
+
+  function escapeAttribute(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function injectSwipeBridge(html, sourceUrl) {
+    const baseUrl = new URL(".", sourceUrl).href;
+    const support = `<base href="${escapeAttribute(baseUrl)}">`
+      + `<script src="${escapeAttribute(swipeBridgeUrl)}"></script>`;
+    const head = /<head(?:\s[^>]*)?>/i.exec(html);
+    if (!head) return `${support}${html}`;
+    const position = head.index + head[0].length;
+    return `${html.slice(0, position)}${support}${html.slice(position)}`;
+  }
+
+  async function loadFrameContent(iframe) {
+    if (
+      iframe.hasAttribute("srcdoc")
+      || iframe.hasAttribute("src")
+      || frameLoads.has(iframe)
+    ) {
+      return;
+    }
+
+    const controller = new AbortController();
+    frameLoads.set(iframe, controller);
+    try {
+      const response = await fetch(iframe.dataset.src, { signal: controller.signal });
+      if (!response.ok) throw new Error(`Result request failed with ${response.status}`);
+      const html = await response.text();
+      if (controller.signal.aborted || !iframe.closest(".frame")?.classList.contains("visible")) return;
+      iframe.srcdoc = injectSwipeBridge(html, response.url);
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      console.warn("Full-surface swipe support could not be loaded; opening the result directly:", error);
+      if (iframe.closest(".frame")?.classList.contains("visible")) iframe.src = iframe.dataset.src;
+    } finally {
+      if (frameLoads.get(iframe) === controller) frameLoads.delete(iframe);
+    }
+  }
+
+  function unloadFrameContent(iframe) {
+    frameLoads.get(iframe)?.abort();
+    frameLoads.delete(iframe);
+    if (iframe.hasAttribute("srcdoc")) {
+      iframe.srcdoc = "";
+      iframe.removeAttribute("srcdoc");
+    }
+    if (iframe.hasAttribute("src")) {
+      iframe.src = "";
+      iframe.removeAttribute("src");
     }
   }
 
@@ -614,8 +659,6 @@
     const ratingControl = createRatingControl(entry);
     label.append(heading, stats, transcript, ratingControl);
     frame.append(iframe, label);
-    addSwipeEdge(frame, "left");
-    addSwipeEdge(frame, "right");
     return frame;
   }
 
@@ -741,31 +784,17 @@
     revealEntryInSidebar(state.activeId);
   }
 
-  function isInteractiveSwipeTarget(target) {
-    return target instanceof Element && Boolean(target.closest(swipeInteractiveSelector));
-  }
-
   function resetSwipeGesture() {
-    const pointerId = swipeGesture.pointerId;
-    if (
-      Number.isInteger(pointerId)
-      && elements.viewer.hasPointerCapture?.(pointerId)
-    ) {
-      elements.viewer.releasePointerCapture(pointerId);
-    }
     swipeGesture.pointerId = null;
     swipeGesture.startX = 0;
     swipeGesture.startY = 0;
-    swipeGesture.lastX = 0;
-    swipeGesture.lastY = 0;
     swipeGesture.startedAt = 0;
   }
 
-  function beginSwipeGesture(pointerId, clientX, clientY, target) {
+  function beginSwipeGesture(pointerId, clientX, clientY) {
     if (
       state.mode !== "single"
       || entriesInSidebarOrder().length < 2
-      || isInteractiveSwipeTarget(target)
     ) {
       return false;
     }
@@ -773,16 +802,12 @@
     swipeGesture.pointerId = pointerId;
     swipeGesture.startX = clientX;
     swipeGesture.startY = clientY;
-    swipeGesture.lastX = clientX;
-    swipeGesture.lastY = clientY;
     swipeGesture.startedAt = performance.now();
     return true;
   }
 
   function updateSwipeGesture(pointerId, clientX, clientY) {
     if (swipeGesture.pointerId !== pointerId) return false;
-    swipeGesture.lastX = clientX;
-    swipeGesture.lastY = clientY;
 
     const horizontalDistance = Math.abs(clientX - swipeGesture.startX);
     const verticalDistance = Math.abs(clientY - swipeGesture.startY);
@@ -820,79 +845,55 @@
     move(horizontalDistance < 0 ? 1 : -1);
   }
 
-  function addSwipeEdge(frame, position) {
-    const edge = document.createElement("div");
-    edge.dataset.swipeEdge = position;
-    edge.setAttribute("aria-hidden", "true");
-    Object.assign(edge.style, {
-      position: "absolute",
-      zIndex: "3",
-      top: "0",
-      bottom: "0",
-      width: "24px",
-      touchAction: "pan-y",
-      [position]: "0"
-    });
-    frame.append(edge);
+  function bindSwipeSurface(surface) {
+    if (!surface || swipeSurfaces.has(surface)) return;
+    swipeSurfaces.add(surface);
+
+    surface.addEventListener("touchstart", (event) => {
+      if (event.touches.length !== 1) {
+        resetSwipeGesture();
+        return;
+      }
+      const touch = event.touches[0];
+      beginSwipeGesture(touch.identifier, touch.clientX, touch.clientY);
+    }, { capture: true, passive: true });
+    surface.addEventListener("touchmove", (event) => {
+      if (event.touches.length !== 1) {
+        resetSwipeGesture();
+        return;
+      }
+      const touch = event.touches[0];
+      updateSwipeGesture(touch.identifier, touch.clientX, touch.clientY);
+    }, { capture: true, passive: true });
+    surface.addEventListener("touchend", (event) => {
+      if (event.touches.length || !event.changedTouches.length) {
+        resetSwipeGesture();
+        return;
+      }
+      const touch = Array.from(event.changedTouches)
+        .find((candidate) => candidate.identifier === swipeGesture.pointerId);
+      if (touch) finishSwipeGesture(touch.identifier, touch.clientX, touch.clientY);
+      else resetSwipeGesture();
+    }, { capture: true, passive: true });
+    surface.addEventListener("touchcancel", resetSwipeGesture, { capture: true, passive: true });
   }
 
   function bindSwipeNavigation() {
-    if (window.PointerEvent) {
-      elements.viewer.addEventListener("pointerdown", (event) => {
-        if (event.pointerType !== "touch") return;
-        if (!event.isPrimary) {
-          resetSwipeGesture();
-          return;
-        }
-        if (!beginSwipeGesture(event.pointerId, event.clientX, event.clientY, event.target)) return;
-        try {
-          elements.viewer.setPointerCapture(event.pointerId);
-        } catch (_error) {
-          // Synthetic events and older browsers may not expose an active pointer to capture.
-        }
-      });
-      elements.viewer.addEventListener("pointermove", (event) => {
-        if (event.pointerType !== "touch") return;
-        if (updateSwipeGesture(event.pointerId, event.clientX, event.clientY) && event.cancelable) {
-          event.preventDefault();
-        }
-      }, { passive: false });
-      elements.viewer.addEventListener("pointerup", (event) => {
-        if (event.pointerType === "touch") {
-          finishSwipeGesture(event.pointerId, event.clientX, event.clientY);
-        }
-      });
-      elements.viewer.addEventListener("pointercancel", resetSwipeGesture);
-      elements.viewer.addEventListener("lostpointercapture", resetSwipeGesture);
-    } else {
-      elements.viewer.addEventListener("touchstart", (event) => {
-        if (event.touches.length !== 1) {
-          resetSwipeGesture();
-          return;
-        }
-        const touch = event.touches[0];
-        beginSwipeGesture(touch.identifier, touch.clientX, touch.clientY, event.target);
-      }, { passive: true });
-      elements.viewer.addEventListener("touchmove", (event) => {
-        if (event.touches.length !== 1) {
-          resetSwipeGesture();
-          return;
-        }
-        const touch = event.touches[0];
-        if (updateSwipeGesture(touch.identifier, touch.clientX, touch.clientY) && event.cancelable) {
-          event.preventDefault();
-        }
-      }, { passive: false });
-      elements.viewer.addEventListener("touchend", (event) => {
-        if (event.touches.length || !event.changedTouches.length) {
-          resetSwipeGesture();
-          return;
-        }
-        const touch = event.changedTouches[0];
-        finishSwipeGesture(touch.identifier, touch.clientX, touch.clientY);
-      });
-      elements.viewer.addEventListener("touchcancel", resetSwipeGesture);
-    }
+    bindSwipeSurface(elements.viewer);
+
+    window.addEventListener("message", (event) => {
+      const direction = event.data?.direction;
+      if (
+        state.mode !== "single"
+        || event.data?.type !== "ramen-bench:swipe"
+        || (direction !== -1 && direction !== 1)
+      ) {
+        return;
+      }
+      const activeIframe = framesById.get(state.activeId)?.querySelector("iframe");
+      if (!activeIframe || event.source !== activeIframe.contentWindow) return;
+      move(direction);
+    });
 
     window.addEventListener("blur", resetSwipeGesture);
   }
