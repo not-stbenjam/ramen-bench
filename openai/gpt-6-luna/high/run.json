@@ -1,0 +1,92 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "openai/gpt-6-luna/high",
+  "vendor": {
+    "slug": "openai",
+    "displayName": "OpenAI"
+  },
+  "model": {
+    "slug": "gpt-6-luna",
+    "displayName": "GPT 6 Luna",
+    "providerModelId": "gpt-6-luna"
+  },
+  "variation": {
+    "slug": "high",
+    "displayName": "High",
+    "reasoningEffort": "high",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Codex CLI",
+    "version": "0.155.1",
+    "runtime": "OpenAI Codex CLI",
+    "invocation": "Codex CLI session using gpt-6-luna; reasoning effort high"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-22T23:18:45.008Z",
+    "completedAt": "2026-09-22T23:20:48.532Z",
+    "wallDurationMs": 123524
+  },
+  "usage": {
+    "tokens": {
+      "input": 72928,
+      "cachedInput": 60416,
+      "cacheCreationInput": 0,
+      "reasoning": 1029,
+      "output": 6618,
+      "total": 79546
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0.0012512,
+      "cachedInput": 0.00060416,
+      "cacheCreationInput": 0.0,
+      "output": 0.003309,
+      "total": 0.00516436,
+      "estimated": true
+    },
+    "requests": 4,
+    "turns": 1,
+    "toolCalls": 3,
+    "providerReported": true,
+    "raw": {
+      "source": "Codex final cumulative thread_token_usage",
+      "codexThreadTokenUsage": {
+        "input_tokens": 72928,
+        "cached_input_tokens": 60416,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 6618,
+        "reasoning_output_tokens": 1029,
+        "total_tokens": 79546
+      },
+      "pricing": {
+        "library": "litellm",
+        "version": "1.83.7",
+        "modelKey": "gpt-6-luna",
+        "ratesUsdPerToken": {
+          "input": 1e-07,
+          "cachedInput": 1e-08,
+          "cacheCreationInput": 1.25e-07,
+          "output": 5e-07
+        }
+      },
+      "costCalculation": {
+        "uncachedInputTokens": 12512,
+        "cachedInputIsSubsetOfInput": true
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 12765,
+    "lines": 215
+  },
+  "provenance": {
+    "pricingSource": "LiteLLM 1.83.7 model_cost[gpt-6-luna]"
+  },
+  "notes": "Codex recorded exact cumulative token categories. Cost was calculated from LiteLLM rates; cached input is a subset of Codex's input total. The public transcript omits hidden reasoning, private agent-mail activity, credentials, and private local path prefixes. The result matches its recorded file-operation replay (3 operations)."
+}

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "anthropic/opus-5.5/xhigh",
+  "vendor": {
+    "slug": "anthropic",
+    "displayName": "Anthropic"
+  },
+  "model": {
+    "slug": "opus-5.5",
+    "displayName": "Opus 5.5",
+    "providerModelId": "claude-opus-5-5"
+  },
+  "variation": {
+    "slug": "xhigh",
+    "displayName": "XHigh",
+    "reasoningEffort": "xhigh",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Claude Code",
+    "version": "2.1.280",
+    "runtime": "Anthropic Claude Code CLI",
+    "invocation": "Claude Code session using claude-opus-5-5; effort xhigh"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-22T23:39:16.192Z",
+    "completedAt": "2026-09-23T00:12:40.037Z",
+    "wallDurationMs": 2003845,
+    "apiDurationMs": 1890282
+  },
+  "usage": {
+    "tokens": {
+      "input": 86,
+      "cachedInput": 8929678,
+      "cacheCreationInput": 259668,
+      "reasoning": 123301,
+      "output": 209160,
+      "total": 9398592
+    },
+    "cost": {
+      "currency": "USD",
+      "total": 8.0468236,
+      "estimated": false
+    },
+    "requests": 43,
+    "turns": 1,
+    "toolCalls": 50,
+    "providerReported": true,
+    "raw": {
+      "source": "Claude Code final cost-state",
+      "requestCountBasis": "unique recorded assistant message ids",
+      "costState": {
+        "totalCostUSD": 8.0468236,
+        "totalAPIDurationMs": 1890282,
+        "totalDurationMs": 2004423,
+        "startTimeEpochMs": 1790120355622,
+        "hasUnknownModelCost": false,
+        "modelUsage": {
+          "claude-opus-5-5": {
+            "inputTokens": 86,
+            "outputTokens": 209160,
+            "thinkingTokens": 123301,
+            "cacheReadInputTokens": 8929678,
+            "cacheCreationInputTokens": 259668,
+            "webSearchRequests": 0,
+            "costUSD": 8.0468236
+          }
+        }
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 86922,
+    "lines": 2085
+  },
+  "provenance": {
+    "pricingSource": "Claude Code 2.1.280 final cost-state"
+  },
+  "notes": "Token and cost totals are the exact final Claude Code cost-state totals. The public transcript omits hidden thinking, private agent-mail activity, credentials, and private local path prefixes. The result matches its recorded file-operation replay (17 operations)."
+}

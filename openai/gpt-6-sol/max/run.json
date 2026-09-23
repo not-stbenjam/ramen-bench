@@ -1,0 +1,92 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "openai/gpt-6-sol/max",
+  "vendor": {
+    "slug": "openai",
+    "displayName": "OpenAI"
+  },
+  "model": {
+    "slug": "gpt-6-sol",
+    "displayName": "GPT 6 Sol",
+    "providerModelId": "gpt-6-sol"
+  },
+  "variation": {
+    "slug": "max",
+    "displayName": "Max",
+    "reasoningEffort": "max",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Codex CLI",
+    "version": "0.155.1",
+    "runtime": "OpenAI Codex CLI",
+    "invocation": "Codex CLI session using gpt-6-sol; reasoning effort max"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-22T23:18:45.633Z",
+    "completedAt": "2026-09-22T23:24:20.340Z",
+    "wallDurationMs": 334707
+  },
+  "usage": {
+    "tokens": {
+      "input": 410034,
+      "cachedInput": 364928,
+      "cacheCreationInput": 0,
+      "reasoning": 5313,
+      "output": 17409,
+      "total": 427443
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0.090212,
+      "cachedInput": 0.0729856,
+      "cacheCreationInput": 0.0,
+      "output": 0.17409,
+      "total": 0.3372876,
+      "estimated": true
+    },
+    "requests": 14,
+    "turns": 1,
+    "toolCalls": 13,
+    "providerReported": true,
+    "raw": {
+      "source": "Codex final cumulative thread_token_usage",
+      "codexThreadTokenUsage": {
+        "input_tokens": 410034,
+        "cached_input_tokens": 364928,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 17409,
+        "reasoning_output_tokens": 5313,
+        "total_tokens": 427443
+      },
+      "pricing": {
+        "library": "litellm",
+        "version": "1.83.7",
+        "modelKey": "gpt-6-sol",
+        "ratesUsdPerToken": {
+          "input": 2e-06,
+          "cachedInput": 2e-07,
+          "cacheCreationInput": 2.5e-06,
+          "output": 1e-05
+        }
+      },
+      "costCalculation": {
+        "uncachedInputTokens": 45106,
+        "cachedInputIsSubsetOfInput": true
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 24894,
+    "lines": 465
+  },
+  "provenance": {
+    "pricingSource": "LiteLLM 1.83.7 model_cost[gpt-6-sol]"
+  },
+  "notes": "Codex recorded exact cumulative token categories. Cost was calculated from LiteLLM rates; cached input is a subset of Codex's input total. The public transcript omits hidden reasoning, private agent-mail activity, credentials, and private local path prefixes. The result matches its recorded file-operation replay (6 operations)."
+}
