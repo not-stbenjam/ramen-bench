@@ -28,9 +28,9 @@
     "transcript": "transcript.json"
   },
   "timing": {
-    "startedAt": "2026-09-04T22:13:43.976Z",
+    "startedAt": "2026-09-04T22:13:43.991Z",
     "completedAt": "2026-09-04T23:10:19.360Z",
-    "wallDurationMs": 3395384,
+    "wallDurationMs": 3395369,
     "apiDurationMs": 2613358
   },
   "usage": {
@@ -59,6 +59,7 @@
         "totalAPIDurationMs": 2613358,
         "totalDurationMs": 14255508,
         "startTimeEpochMs": 1788560023255,
+        "hasUnknownModelCost": false,
         "modelUsage": {
           "claude-haiku-4-5-20251001": {
             "inputTokens": 1986,
@@ -83,8 +84,8 @@
     }
   },
   "resultStats": {
-    "bytes": 73329,
-    "lines": 2207
+    "bytes": 68129,
+    "lines": 2083
   },
   "provenance": {
     "pricingSource": "Claude Code 2.1.261 final cost-state"

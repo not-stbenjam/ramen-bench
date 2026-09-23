@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10110f">
+<title></title>
+<style>
+  :root { color-scheme: dark; background: #10110f; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #10110f; }
+  body { min-height: 100svh; }
+  canvas { display: block; width: 100%; height: 100%; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="A steaming bowl of vegan ramen in a dark, warmly lit scene"></canvas>
+<script>
+(() => {
+  'use strict';
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let w = 0, h = 0, dpr = 1, time = 0, last = 0;
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const rnd = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = innerWidth; h = innerHeight;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    pointer.x = pointer.tx = w * .5; pointer.y = pointer.ty = h * .5;
+    draw(0);
+  }
+  addEventListener('resize', resize, { passive: true });
+  addEventListener('pointermove', e => { pointer.tx = e.clientX; pointer.ty = e.clientY; }, { passive: true });
+  addEventListener('pointerleave', () => { pointer.tx = w * .5; pointer.ty = h * .5; }, { passive: true });
+
+  function ellipse(x, y, rx, ry, fill, stroke, sw=1) {
+    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = sw; ctx.stroke(); }
+  }
+  function rounded(x,y,ww,hh,r,fill,stroke,sw=1) {
+    ctx.beginPath(); ctx.roundRect(x,y,ww,hh,r);
+    if(fill){ctx.fillStyle=fill;ctx.fill();} if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.stroke();}
+  }
+  function gradient(x0,y0,x1,y1,stops) {
+    const g=ctx.createLinearGradient(x0,y0,x1,y1); for(const [p,c] of stops)g.addColorStop(p,c); return g;
+  }
+  function drawBackground() {
+    const bg=ctx.createRadialGradient(w*.5,h*.48,Math.min(w,h)*.03,w*.5,h*.48,Math.max(w,h)*.72);
+    bg.addColorStop(0,'#24211a'); bg.addColorStop(.38,'#191915'); bg.addColorStop(1,'#090b0b');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+    // Diffuse, out-of-focus lantern warmth.
+    const glow=ctx.createRadialGradient(w*.52,h*.46,0,w*.52,h*.46,Math.min(w,h)*.56);
+    glow.addColorStop(0,'rgba(205,112,39,.13)');glow.addColorStop(.36,'rgba(120,70,34,.07)');glow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+    // Quiet grain gives the darkness a tactile, photographic feel.
+    for(let i=0;i<480;i++){
+      const x=rnd(i+2)*w,y=rnd(i+1400)*h,a=.012+rnd(i+800)*.027;
+      ctx.fillStyle=`rgba(239,213,167,${a})`;ctx.fillRect(x,y,1.1,1.1);
+    }
+  }
+  function drawTable(cx, bowlY, scale) {
+    const horizon=bowlY+scale*88;
+    const table=gradient(0,horizon,0,h);
+    ctx.fillStyle=gradient(0,horizon,0,h,[[0,'#201b15'],[.23,'#171512'],[1,'#10100f']]);
+    ctx.fillRect(0,horizon,w,h-horizon);
+    // Soft pool of reflected amber beneath the bowl.
+    const pool=ctx.createRadialGradient(cx,horizon+scale*52,scale*4,cx,horizon+scale*52,scale*280);
+    pool.addColorStop(0,'rgba(230,133,57,.17)');pool.addColorStop(.38,'rgba(144,78,32,.07)');pool.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=pool;ctx.fillRect(0,horizon,w,h-horizon);
+    ctx.strokeStyle='rgba(218,166,104,.055)';ctx.lineWidth=1;
+    for(let i=0;i<5;i++){const yy=horizon+scale*(25+i*i*13);ctx.beginPath();ctx.moveTo(w*.1,yy);ctx.bezierCurveTo(w*.35,yy-scale*8,w*.63,yy+scale*7,w*.92,yy-scale*2);ctx.stroke();}
+  }
+  function drawBowl(cx, cy, rx, ry, t, leanX, leanY) {
+    ctx.save();ctx.translate(leanX,leanY);
+    const bottom=cy+ry*1.02;
+    // Grounding shadow.
+    ctx.save();ctx.filter=`blur(${Math.max(8,rx*.11)}px)`;ellipse(cx,bottom+ry*.46,rx*1.02,ry*.36,'rgba(0,0,0,.68)');ctx.restore();
+    // Exterior ceramic body.
+    ctx.beginPath();ctx.moveTo(cx-rx*.94,cy);ctx.bezierCurveTo(cx-rx*.91,cy+ry*1.03,cx-rx*.6,bottom+ry*.38,cx,bottom+ry*.4);ctx.bezierCurveTo(cx+rx*.6,bottom+ry*.38,cx+rx*.91,cy+ry*1.03,cx+rx*.94,cy);ctx.closePath();
+    ctx.fillStyle=gradient(cx-rx,cy,cx+rx,bottom,[[0,'#321d16'],[.18,'#8c4223'],[.34,'#c36a36'],[.5,'#8d3e22'],[.78,'#552819'],[1,'#241713']]);ctx.fill();
+    ctx.strokeStyle='rgba(255,193,123,.55)';ctx.lineWidth=Math.max(1.4,rx*.014);ctx.stroke();
+    // Glancing highlights along the glaze.
+    ctx.beginPath();ctx.moveTo(cx-rx*.76,cy+ry*.42);ctx.quadraticCurveTo(cx-rx*.71,cy+ry*1.03,cx-rx*.32,bottom+ry*.24);
+    ctx.strokeStyle='rgba(255,190,124,.34)';ctx.lineWidth=rx*.022;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx+rx*.71,cy+ry*.38);ctx.quadraticCurveTo(cx+rx*.65,cy+ry*.94,cx+rx*.37,bottom+ry*.19);
+    ctx.strokeStyle='rgba(35,13,9,.45)';ctx.lineWidth=rx*.055;ctx.stroke();
+    // Decorative hand-painted double ring at the foot.
+    ellipse(cx,bottom+ry*.22,rx*.56,ry*.16,null,'rgba(255,194,124,.38)',Math.max(1,rx*.009));
+    ellipse(cx,bottom+ry*.22,rx*.49,ry*.135,null,'rgba(54,24,17,.35)',Math.max(1,rx*.009));
+    // Rim and open soup surface.
+    ellipse(cx,cy,rx,ry,'#6c321f','rgba(241,174,104,.83)',Math.max(2,rx*.027));
+    ellipse(cx,cy+ry*.035,rx*.91,ry*.81,gradient(cx,cy-ry,cx,cy+ry,[[0,'#d18a42'],[.26,'#a45227'],[.65,'#632d1b'],[1,'#321a13']]),'rgba(54,24,15,.82)',Math.max(1,rx*.014));
+    // Broth surface glints.
+    ctx.save();ctx.globalAlpha=.28+.06*Math.sin(t*1.3);ellipse(cx-rx*.05,cy-ry*.08,rx*.78,ry*.66,null,'rgba(255,205,120,.56)',Math.max(1,rx*.009));ctx.restore();
+    drawToppings(cx,cy,rx,ry,t);
+    // Rim in front, to seat toppings naturally in the bowl.
+    ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI);ctx.strokeStyle='rgba(247,180,107,.9)';ctx.lineWidth=Math.max(2,rx*.024);ctx.stroke();
+    ctx.restore();
+  }
+  function drawToppings(cx,cy,rx,ry,t){
+    const sx=rx/230, sy=ry/92;
+    ctx.save();ctx.translate(cx,cy);
+    // Noodles: loose ivory ribbons, curled through the broth.
+    ctx.lineCap='round';ctx.lineJoin='round';
+    for(let i=0;i<7;i++){
+      const x=(-.42+i*.13)*rx, y=(-.12+(i%3)*.1)*ry;
+      ctx.beginPath();ctx.moveTo(x-rx*.23,y+ry*.14);
+      ctx.bezierCurveTo(x-rx*.23,y-ry*.52,x+rx*.25,y-ry*.48,x+rx*.2,y-ry*.05);
+      ctx.bezierCurveTo(x+rx*.16,y+ry*.33,x-rx*.16,y+ry*.36,x-rx*.1,y-ry*.05);
+      ctx.strokeStyle='rgba(66,34,17,.53)';ctx.lineWidth=rx*.063;ctx.stroke();
+      ctx.strokeStyle=gradient(x-rx*.2,y,x+rx*.2,y,[[0,'#d89b52'],[.32,'#ffe2a0'],[.75,'#f0c276'],[1,'#a96330']]);ctx.lineWidth=rx*.042;ctx.stroke();
+      ctx.strokeStyle='rgba(255,237,190,.48)';ctx.lineWidth=rx*.008;ctx.stroke();
+    }
+    // Charred king oyster mushroom slices.
+    const mushrooms=[[-.5,-.25,.19],[-.08,-.38,.18],[.43,-.2,.2]];
+    mushrooms.forEach(([x,y,r],i)=>{
+      ctx.save();ctx.translate(x*rx,y*ry);ctx.rotate((i-1)*.21);
+      ellipse(0,0,r*rx,r*.55*ry,'#44251a','rgba(36,18,12,.8)',rx*.012);
+      ellipse(0,-ry*.055,r*rx*.78,r*.37*ry,'#c37a3b','rgba(241,180,103,.65)',rx*.013);
+      ellipse(0,-ry*.07,r*rx*.53,r*.23*ry,'#edbd70','rgba(255,222,154,.55)',rx*.009);
+      for(let j=-1;j<=1;j++){ctx.beginPath();ctx.moveTo(j*r*rx*.38,-ry*.04);ctx.lineTo(j*r*rx*.3,ry*.04);ctx.strokeStyle='rgba(105,54,27,.56)';ctx.lineWidth=rx*.012;ctx.stroke();}
+      ctx.restore();
+    });
+    // Soy-marinated tofu, warmly seared edges.
+    [[-.61,.12],[.18,.24],[.58,.11]].forEach(([x,y],i)=>{
+      ctx.save();ctx.translate(x*rx,y*ry);ctx.rotate((i-1)*.19);
+      rounded(-rx*.075,-ry*.095,rx*.15,ry*.19,rx*.025,'#e8bd7e','rgba(114,60,28,.9)',rx*.014);
+      rounded(-rx*.059,-ry*.08,rx*.118,ry*.135,rx*.018,'#f3d293','rgba(255,229,170,.48)',rx*.007);
+      ctx.restore();
+    });
+    // Bok choy, overlapping jade leaves and pale stems.
+    for(let i=0;i<3;i++){
+      const x=(-.34+i*.32)*rx,y=(-.1+(i%2)*.22)*ry;
+      ctx.save();ctx.translate(x,y);ctx.rotate((i-1)*.3);
+      ctx.beginPath();ctx.moveTo(0,ry*.29);ctx.quadraticCurveTo(-rx*.02,-ry*.03,-rx*.15,-ry*.22);ctx.quadraticCurveTo(-rx*.09,-ry*.4,rx*.02,-ry*.22);ctx.quadraticCurveTo(rx*.24,-ry*.44,rx*.2,-ry*.2);ctx.quadraticCurveTo(rx*.13,ry*.05,rx*.055,ry*.29);ctx.closePath();
+      ctx.fillStyle=gradient(0,-ry*.3,0,ry*.3,[[0,'#78934d'],[.48,'#41663a'],[1,'#bdd18a']]);ctx.fill();ctx.strokeStyle='rgba(24,48,29,.72)';ctx.lineWidth=rx*.012;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,ry*.27);ctx.quadraticCurveTo(rx*.02,0,rx*.05,-ry*.17);ctx.strokeStyle='rgba(224,225,163,.84)';ctx.lineWidth=rx*.022;ctx.stroke();
+      ctx.restore();
+    }
+    // Chili oil droplets on the broth.
+    for(let i=0;i<19;i++){
+      const a=rnd(i+30)*Math.PI*2,rr=Math.sqrt(rnd(i+90))*.72;
+      const x=Math.cos(a)*rr*rx,y=Math.sin(a)*rr*ry*.72;
+      const r=(.006+rnd(i+201)*.014)*rx;
+      ellipse(x,y,r,r*.7,i%3===0?'rgba(221,107,32,.8)':'rgba(245,181,69,.67)','rgba(255,224,131,.28)',.7);
+    }
+    // Scallion rings.
+    for(let i=0;i<12;i++){
+      const x=(rnd(i+500)-.5)*rx*1.34,y=(rnd(i+900)-.5)*ry*.98,r=rx*(.018+rnd(i+1200)*.011);
+      ellipse(x,y,r,r*.72,'rgba(147,169,88,.86)','rgba(223,221,144,.66)',rx*.007);
+      ellipse(x,y,r*.49,r*.34,'rgba(78,95,49,.84)');
+    }
+    // Toasted sesame.
+    for(let i=0;i<16;i++){
+      const x=(rnd(i+1900)-.5)*rx*1.48,y=(rnd(i+2200)-.5)*ry*1.05;
+      ctx.save();ctx.translate(x,y);ctx.rotate(rnd(i+2700)*2);ellipse(0,0,rx*.013,ry*.026,'#f2d69a');ctx.restore();
+    }
+    ctx.restore();
+  }
+  function drawSteam(cx, top, rx, t, amount=1){
+    ctx.save();ctx.globalCompositeOperation='screen';
+    for(let i=0;i<5;i++){
+      const baseX=cx+(i-2)*rx*.25;
+      const phase=t*.68+i*1.74;
+      const drift=Math.sin(phase)*rx*.12;
+      ctx.beginPath();ctx.moveTo(baseX,top);
+      ctx.bezierCurveTo(baseX+Math.sin(phase+.6)*rx*.16,top-rx*.28,baseX+drift-rx*.17,top-rx*.55,baseX+drift,top-rx*(.82+(i%3)*.12));
+      ctx.bezierCurveTo(baseX+drift+Math.sin(phase+1.2)*rx*.22,top-rx*1.1,baseX+drift-rx*.18,top-rx*1.34,baseX+drift+Math.sin(phase+2)*rx*.12,top-rx*(1.55+(i%2)*.1));
+      const width=rx*(.037+(i%2)*.01);
+      ctx.strokeStyle=`rgba(255,211,156,${.09*amount})`;ctx.lineWidth=width*2.6;ctx.lineCap='round';ctx.shadowColor='rgba(246,168,91,.28)';ctx.shadowBlur=18;ctx.stroke();
+      ctx.strokeStyle=`rgba(255,233,197,${.18*amount})`;ctx.lineWidth=width;ctx.shadowBlur=0;ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function draw(t){
+    if(!w||!h)return;
+    drawBackground();
+    const compact=Math.min(w,h);
+    const scale=clamp(compact/700,.52,1.12);
+    const cx=w*.5 + (pointer.x-w*.5)*.018;
+    const bowlW=Math.min(w*.69,Math.min(w,h)*.67,520);
+    const rx=bowlW*.5, ry=rx*.255;
+    const cy=clamp(h*.58,h*.46,h*.66);
+    drawTable(cx,cy,scale);
+    // Floating cinematic backlight.
+    const halo=ctx.createRadialGradient(cx,cy-ry,2,cx,cy,rx*1.85);
+    halo.addColorStop(0,'rgba(240,151,70,.17)');halo.addColorStop(.45,'rgba(191,96,41,.07)');halo.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=halo;ctx.fillRect(cx-rx*2,cy-rx*2,rx*4,rx*4);
+    drawSteam(cx,cy-ry*.55,rx,t,reduced.matches?0:1);
+    const leanX=(pointer.x-w*.5)*.026, leanY=(pointer.y-h*.5)*.015;
+    drawBowl(cx,cy,rx,ry,t,leanX,leanY);
+    // Delicate heat shimmer above the soup.
+    if(!reduced.matches){ctx.save();ctx.globalAlpha=.06+.025*Math.sin(t*2.2);ctx.strokeStyle='#ffd69a';ctx.lineWidth=1;
+      for(let i=0;i<4;i++){const yy=cy-ry*(.78+i*.16);ctx.beginPath();ctx.ellipse(cx+Math.sin(t+i)*rx*.06,yy,rx*(.36+i*.07),ry*(.17+i*.025),0,Math.PI*1.08,Math.PI*1.92);ctx.stroke();}ctx.restore();}
+    // Subtle edge falloff.
+    const vignette=ctx.createRadialGradient(cx,h*.48,Math.min(w,h)*.22,cx,h*.48,Math.max(w,h)*.7);
+    vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.57)');ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
+  }
+  function frame(now){
+    if(reduced.matches){draw(0);return;}
+    const dt=Math.min((now-last)/1000,.05);last=now;time+=dt;
+    pointer.x=lerp(pointer.x,pointer.tx,Math.min(1,dt*3.5));pointer.y=lerp(pointer.y,pointer.ty,Math.min(1,dt*3.5));
+    draw(time);requestAnimationFrame(frame);
+  }
+  reduced.addEventListener?.('change',()=>{if(!reduced.matches){last=performance.now();requestAnimationFrame(frame);}else draw(0);});
+  resize(); if(!reduced.matches){last=performance.now();requestAnimationFrame(frame);}
+})();
+</script>
+</body>
+</html>

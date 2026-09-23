@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100e10">
+  <title>Vegan ramen</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; min-height: 100%; margin: 0; }
+    body { overflow: hidden; background: #100e10; }
+    .scene {
+      --light-x: 50%; --light-y: 48%;
+      position: relative; display: grid; place-items: center;
+      width: 100%; min-height: 100svh; overflow: hidden; isolation: isolate;
+      background:
+        radial-gradient(ellipse 48% 42% at var(--light-x) var(--light-y), #62402a3b 0%, #34231d30 42%, transparent 100%),
+        radial-gradient(ellipse 85% 65% at 50% 95%, #27201d 0%, #171416 53%, #0d0c0f 100%);
+    }
+    .scene::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 65% 50% at 50% 103%, transparent 35%, #09090b95 100%);
+      z-index: 3;
+    }
+    .scene::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .16;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+      mix-blend-mode: screen; z-index: 4;
+    }
+    .art { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: block; width: min(1200px, 155vw, 160vh); height: auto; overflow: visible; touch-action: pan-y; }
+    .dish { transform-origin: 600px 590px; will-change: transform; }
+    .steam { fill: none; stroke: url(#steam); stroke-linecap: round; filter: url(#steam-blur); transform-box: fill-box; transform-origin: center bottom; animation: drift 6s ease-in-out infinite; }
+    .steam.s2 { animation-duration: 7.4s; animation-delay: -2.9s; }
+    .steam.s3 { animation-duration: 6.8s; animation-delay: -4.5s; }
+    .steam.s4 { animation-duration: 8.2s; animation-delay: -1.6s; }
+    .steam.s5 { animation-duration: 7.7s; animation-delay: -5.4s; }
+    .surface-shimmer { animation: shimmer 5s ease-in-out infinite alternate; transform-origin: center; }
+    .leaf { animation: breathe 5.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 85%; }
+    .leaf.two { animation-delay: -2.4s; }
+    .leaf.three { animation-delay: -3.8s; }
+    .ember { animation: twinkle 4s ease-in-out infinite; }
+    .ember:nth-of-type(2n) { animation-delay: -2s; }
+    @keyframes drift {
+      0% { opacity: 0; transform: translate(0, 15px) scale(.94); }
+      20% { opacity: .75; }
+      72% { opacity: .48; }
+      100% { opacity: 0; transform: translate(16px, -36px) scale(1.12); }
+    }
+    @keyframes shimmer { from { opacity: .36; transform: scale(.98); } to { opacity: .8; transform: scale(1.025); } }
+    @keyframes breathe { from { transform: rotate(-1.4deg); } to { transform: rotate(1.5deg); } }
+    @keyframes twinkle { 0%, 100% { opacity: .1; transform: translateY(5px); } 50% { opacity: .55; transform: translateY(-7px); } }
+    @media (max-width: 600px) { .art { width: min(155vw, 160vh); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .steam { opacity: .36; }
+      .ember { opacity: .18; }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene" aria-label="A warm bowl of steaming vegan ramen in a dark room">
+    <svg class="art" viewBox="0 0 1200 900" role="img" aria-label="Steaming vegan ramen with noodles, tofu, mushrooms, greens, chili and scallions" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="halo"><stop stop-color="#d4813b" stop-opacity=".34"/><stop offset=".42" stop-color="#b25a29" stop-opacity=".12"/><stop offset="1" stop-color="#a05b28" stop-opacity="0"/></radialGradient>
+        <radialGradient id="table"><stop stop-color="#69432c" stop-opacity=".38"/><stop offset=".65" stop-color="#3d2b24" stop-opacity=".12"/><stop offset="1" stop-color="#201b1b" stop-opacity="0"/></radialGradient>
+        <linearGradient id="bowl" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#61433c"/><stop offset=".18" stop-color="#272b2d"/><stop offset=".5" stop-color="#14191c"/><stop offset=".82" stop-color="#252729"/><stop offset="1" stop-color="#493129"/></linearGradient>
+        <linearGradient id="bowlFront" x1="0" x2=".1" y1="0" y2="1"><stop stop-color="#343838"/><stop offset=".25" stop-color="#20282a"/><stop offset=".67" stop-color="#101719"/><stop offset="1" stop-color="#302b28"/></linearGradient>
+        <linearGradient id="rim" x1="0" x2=".9" y1="0" y2=".7"><stop stop-color="#9b7160"/><stop offset=".22" stop-color="#333b3a"/><stop offset=".63" stop-color="#202727"/><stop offset="1" stop-color="#9f7151"/></linearGradient>
+        <radialGradient id="broth" cx=".48" cy=".42" r=".7"><stop stop-color="#a96b31"/><stop offset=".42" stop-color="#8e4b21"/><stop offset=".8" stop-color="#5f321c"/><stop offset="1" stop-color="#321f19"/></radialGradient>
+        <linearGradient id="noodle" x1="0" x2=".2" y1="0" y2="1"><stop stop-color="#ffe9ab"/><stop offset=".5" stop-color="#dba75b"/><stop offset="1" stop-color="#a66b33"/></linearGradient>
+        <linearGradient id="tofu" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f7d99d"/><stop offset=".55" stop-color="#dcaf69"/><stop offset="1" stop-color="#a87342"/></linearGradient>
+        <linearGradient id="leaf" x1="0" x2="1" y1="1" y2="0"><stop stop-color="#254431"/><stop offset=".48" stop-color="#46784a"/><stop offset="1" stop-color="#88a85c"/></linearGradient>
+        <linearGradient id="steam" x1="0" x2="0" y1="1" y2="0"><stop stop-color="#ebc693" stop-opacity="0"/><stop offset=".35" stop-color="#eacaa5" stop-opacity=".5"/><stop offset=".8" stop-color="#d7c4b4" stop-opacity=".25"/><stop offset="1" stop-color="#d7c4b4" stop-opacity="0"/></linearGradient>
+        <filter id="shadow" x="-60%" y="-100%" width="220%" height="300%"><feGaussianBlur stdDeviation="24"/></filter>
+        <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="24"/></filter>
+        <filter id="steam-blur" x="-100%" y="-60%" width="300%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+        <clipPath id="soupClip"><ellipse cx="600" cy="516" rx="274" ry="100"/></clipPath>
+        <clipPath id="bowlClip"><path d="M304 517 C307 651 383 765 512 801 Q600 829 688 801 C817 765 893 651 896 517Z"/></clipPath>
+      </defs>
+
+      <ellipse cx="600" cy="482" rx="440" ry="318" fill="url(#halo)"/>
+      <ellipse cx="600" cy="805" rx="540" ry="130" fill="url(#table)"/>
+      <path d="M0 764 Q590 738 1200 764" fill="none" stroke="#8d6040" stroke-opacity=".11" stroke-width="2"/>
+      <ellipse cx="600" cy="792" rx="302" ry="42" fill="#050708" opacity=".8" filter="url(#shadow)"/>
+
+      <g class="dish">
+        <!-- Heat rises behind the rim. -->
+        <g stroke-width="11">
+          <path class="steam s1" d="M458 434 C430 396 466 363 451 330 C438 301 449 270 465 246"/>
+          <path class="steam s2" d="M520 426 C548 393 507 365 534 333 C556 306 528 276 550 238"/>
+          <path class="steam s3" d="M594 427 C567 393 612 365 592 327 C574 295 602 269 592 224"/>
+          <path class="steam s4" d="M668 429 C693 397 648 366 675 332 C698 301 663 275 685 246"/>
+          <path class="steam s5" d="M737 433 C713 399 758 369 737 335 C722 307 752 277 744 257"/>
+        </g>
+        <g opacity=".38" stroke-width="22">
+          <path class="steam s2" d="M481 438 C464 402 492 372 486 339 C478 302 507 278 499 254"/>
+          <path class="steam s4" d="M632 435 C649 395 621 366 643 331 C665 296 635 264 651 236"/>
+        </g>
+
+        <!-- The heavy ceramic silhouette stays slightly irregular and hand made. -->
+        <path d="M304 517 C307 651 383 765 512 801 Q600 829 688 801 C817 765 893 651 896 517Z" fill="url(#bowl)"/>
+        <path d="M315 540 C332 659 400 758 519 790 Q600 817 681 790 C800 758 868 659 885 540 C844 619 736 668 600 671 C464 668 356 619 315 540Z" fill="url(#bowlFront)"/>
+        <path d="M326 575 C356 678 421 753 523 781" fill="none" stroke="#b38c70" stroke-opacity=".17" stroke-width="8" stroke-linecap="round"/>
+        <path d="M854 581 C827 681 766 750 695 778" fill="none" stroke="#d99361" stroke-opacity=".12" stroke-width="7" stroke-linecap="round"/>
+        <g clip-path="url(#bowlClip)" opacity=".18">
+          <path d="M342 668 C451 714 747 722 858 666" fill="none" stroke="#d7a77c" stroke-width="2"/>
+          <path d="M378 716 C468 748 723 751 823 713" fill="none" stroke="#d7a77c" stroke-width="2"/>
+        </g>
+        <ellipse cx="600" cy="512" rx="302" ry="119" fill="#121719"/>
+        <ellipse cx="600" cy="516" rx="284" ry="108" fill="url(#rim)"/>
+        <ellipse cx="600" cy="516" rx="274" ry="100" fill="url(#broth)"/>
+
+        <!-- Broth, noodles and small glints of chili oil. -->
+        <g clip-path="url(#soupClip)">
+          <ellipse cx="600" cy="526" rx="270" ry="91" fill="#ab672f" opacity=".17"/>
+          <path d="M358 498 C426 445 509 456 555 491 S683 563 797 491" fill="none" stroke="#db9c4b" stroke-opacity=".23" stroke-width="12"/>
+          <path class="surface-shimmer" d="M362 526 C428 478 478 485 530 526 S649 565 709 524 S811 497 850 527" fill="none" stroke="#f5b96c" stroke-opacity=".27" stroke-width="4"/>
+          <g fill="none" stroke="url(#noodle)" stroke-width="8" stroke-linecap="round">
+            <path d="M350 526 C390 482 421 479 455 515 S519 566 567 525 S643 481 696 521 S772 560 847 520"/>
+            <path d="M353 543 C400 499 435 506 474 543 S552 572 593 535 S673 501 714 539 S787 568 848 539"/>
+            <path d="M372 559 C412 521 457 523 496 557 S568 582 610 551 S687 523 731 558 S806 578 842 555"/>
+            <path d="M392 484 C447 452 491 463 518 489 S587 537 637 494 S748 459 799 490"/>
+            <path d="M408 576 C450 547 477 556 509 579 S589 596 625 573 S719 552 762 578"/>
+            <path d="M477 455 C519 439 544 459 567 481 S628 515 660 476 S720 450 747 467"/>
+          </g>
+          <g fill="none" stroke="#ffe2a2" stroke-opacity=".54" stroke-width="2" stroke-linecap="round">
+            <path d="M358 524 C393 487 421 482 451 514"/><path d="M571 523 C604 490 644 484 684 513"/>
+            <path d="M412 574 C450 548 480 560 503 579"/><path d="M716 542 C749 562 786 567 817 550"/>
+          </g>
+          <g fill="#d78b3e" opacity=".65">
+            <ellipse cx="388" cy="512" rx="13" ry="4" transform="rotate(-20 388 512)"/>
+            <ellipse cx="737" cy="495" rx="18" ry="5" transform="rotate(17 737 495)"/>
+            <ellipse cx="800" cy="544" rx="12" ry="3" transform="rotate(-12 800 544)"/>
+            <ellipse cx="471" cy="566" rx="14" ry="3" transform="rotate(11 471 566)"/>
+          </g>
+
+          <!-- A dark nori sheet anchors the back of the bowl. -->
+          <g transform="rotate(-14 715 444)">
+            <path d="M678 404 Q714 396 752 402 L766 499 Q729 510 690 497Z" fill="#1d302b" stroke="#648066" stroke-opacity=".42" stroke-width="3"/>
+            <path d="M690 410 L705 490 M708 407 L725 498 M730 407 L747 497" stroke="#86a072" stroke-opacity=".19" stroke-width="3"/>
+          </g>
+
+          <!-- Bok choy fans out from the left. -->
+          <g class="leaf">
+            <path d="M483 541 C430 496 414 454 427 427 C468 429 501 462 500 520Z" fill="url(#leaf)" stroke="#a2b76f" stroke-width="2"/>
+            <path d="M484 530 C462 489 449 458 433 438" fill="none" stroke="#b3cb7c" stroke-opacity=".66" stroke-width="4"/>
+            <path d="M468 506 L440 475 M480 517 L474 469" stroke="#b5c683" stroke-opacity=".36" stroke-width="2"/>
+          </g>
+          <g class="leaf two">
+            <path d="M468 554 C410 540 378 504 386 473 C430 458 475 487 493 529Z" fill="url(#leaf)" stroke="#90ad65" stroke-width="2"/>
+            <path d="M480 539 C442 523 409 497 390 480" fill="none" stroke="#b7cb82" stroke-opacity=".61" stroke-width="4"/>
+            <path d="M439 518 L418 477 M461 529 L452 489" stroke="#c3d28e" stroke-opacity=".34" stroke-width="2"/>
+          </g>
+          <g class="leaf three">
+            <path d="M509 523 C494 479 502 443 527 426 C554 445 558 484 530 528Z" fill="url(#leaf)" stroke="#9ab877" stroke-width="2"/>
+            <path d="M518 515 C529 478 531 451 527 435" fill="none" stroke="#c2d08b" stroke-opacity=".6" stroke-width="4"/>
+          </g>
+          <path d="M474 557 Q495 533 518 522 Q537 532 535 549 Q507 569 474 557Z" fill="#d7d29b" stroke="#a8a773" stroke-width="3"/>
+
+          <!-- Seared tofu: warm tops, browned sides. -->
+          <g transform="rotate(-14 572 464)">
+            <path d="M537 450 L581 440 L608 456 L564 470Z" fill="url(#tofu)" stroke="#f8db9d" stroke-width="2"/>
+            <path d="M564 470 L608 456 L605 482 L563 496Z" fill="#ad7240"/>
+            <path d="M537 450 L564 470 L563 496 L537 476Z" fill="#d29a59"/>
+            <path d="M550 453 L583 447" stroke="#935b32" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+          </g>
+          <g transform="rotate(11 634 493)">
+            <path d="M610 477 L653 472 L677 490 L633 500Z" fill="url(#tofu)" stroke="#f4d599" stroke-width="2"/>
+            <path d="M633 500 L677 490 L674 516 L631 528Z" fill="#a56b39"/>
+            <path d="M610 477 L633 500 L631 528 L609 503Z" fill="#d7a365"/>
+            <path d="M622 482 L652 479" stroke="#975f35" stroke-width="3" stroke-linecap="round" opacity=".62"/>
+          </g>
+          <g transform="rotate(-9 559 552)">
+            <path d="M537 537 L573 529 L592 544 L555 554Z" fill="url(#tofu)" stroke="#f5d89b" stroke-width="2"/>
+            <path d="M555 554 L592 544 L590 565 L554 575Z" fill="#9d6338"/>
+            <path d="M537 537 L555 554 L554 575 L536 558Z" fill="#cb9355"/>
+          </g>
+
+          <!-- Shiitake caps with pale gills. -->
+          <g transform="rotate(18 748 551)">
+            <path d="M714 563 Q710 534 740 519 Q772 522 784 547 Q753 550 714 563Z" fill="#39281e" stroke="#bc885c" stroke-width="3"/>
+            <path d="M717 558 Q750 540 783 547" fill="none" stroke="#e3b980" stroke-width="5"/>
+            <path d="M744 535 L736 550 M757 534 L758 547 M768 539 L771 547" stroke="#cba679" stroke-width="2"/>
+          </g>
+          <g transform="rotate(-25 777 483)">
+            <path d="M748 495 Q750 464 780 456 Q805 467 811 488 Q778 485 748 495Z" fill="#3b291e" stroke="#c19668" stroke-width="3"/>
+            <path d="M749 492 Q781 480 809 487" fill="none" stroke="#dfb47e" stroke-width="5"/>
+            <path d="M766 474 L766 488 M781 467 L783 484 M795 472 L798 484" stroke="#caa67a" stroke-width="2"/>
+          </g>
+
+          <!-- Chili, scallion, and sesame finish the surface. -->
+          <g fill="none" stroke="#a9cb7a" stroke-width="8">
+            <ellipse cx="671" cy="555" rx="12" ry="5" transform="rotate(26 671 555)"/>
+            <ellipse cx="696" cy="572" rx="10" ry="4" transform="rotate(-14 696 572)"/>
+            <ellipse cx="594" cy="553" rx="11" ry="4" transform="rotate(22 594 553)"/>
+            <ellipse cx="530" cy="496" rx="9" ry="4" transform="rotate(-19 530 496)"/>
+            <ellipse cx="811" cy="515" rx="10" ry="4" transform="rotate(23 811 515)"/>
+            <ellipse cx="459" cy="557" rx="10" ry="4" transform="rotate(25 459 557)"/>
+          </g>
+          <g fill="#d5472f" stroke="#f5784b" stroke-width="1.5">
+            <path d="M653 459 Q671 453 684 460 Q675 468 657 469Z"/>
+            <path d="M694 521 Q711 515 720 522 Q710 531 696 529Z"/>
+            <path d="M510 580 Q525 573 535 580 Q528 587 514 587Z"/>
+            <path d="M788 570 Q800 564 809 570 Q799 577 789 576Z"/>
+          </g>
+          <g fill="#f4d5a4" opacity=".85">
+            <ellipse cx="620" cy="441" rx="3" ry="1.6" transform="rotate(29 620 441)"/>
+            <ellipse cx="694" cy="483" rx="3" ry="1.6" transform="rotate(-20 694 483)"/>
+            <ellipse cx="745" cy="580" rx="3" ry="1.6" transform="rotate(38 745 580)"/>
+            <ellipse cx="574" cy="585" rx="3" ry="1.6" transform="rotate(-35 574 585)"/>
+            <ellipse cx="414" cy="552" rx="3" ry="1.6" transform="rotate(16 414 552)"/>
+            <ellipse cx="717" cy="455" rx="3" ry="1.6" transform="rotate(-16 717 455)"/>
+          </g>
+          <path d="M339 531 C423 601 757 620 861 531" fill="none" stroke="#e8a454" stroke-opacity=".19" stroke-width="7"/>
+        </g>
+
+        <!-- The lip sits above the ingredients at the near edge. -->
+        <path d="M298 514 C302 580 429 625 600 628 C771 625 898 580 902 514 C892 583 765 611 600 614 C435 611 308 583 298 514Z" fill="url(#rim)"/>
+        <path d="M311 536 C362 593 470 617 600 618 C730 617 838 593 889 536" fill="none" stroke="#b28768" stroke-opacity=".56" stroke-width="3"/>
+        <path d="M350 572 C410 601 492 612 590 615" fill="none" stroke="#ddaf83" stroke-opacity=".26" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="600" cy="799" rx="75" ry="13" fill="#141617" opacity=".82"/>
+        <path d="M543 802 Q600 819 657 802" fill="none" stroke="#8b6a55" stroke-opacity=".44" stroke-width="3"/>
+      </g>
+
+      <g fill="#e5ac71" filter="url(#glow)" opacity=".6">
+        <circle class="ember" cx="342" cy="359" r="3"/><circle class="ember" cx="854" cy="389" r="2"/>
+        <circle class="ember" cx="777" cy="305" r="2.5"/><circle class="ember" cx="415" cy="285" r="1.5"/>
+      </g>
+    </svg>
+  </main>
+  <script>
+    (() => {
+      const scene = document.querySelector('.scene');
+      const dish = document.querySelector('.dish');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let targetX = 0, targetY = 0, currentX = 0, currentY = 0, frame = 0;
+
+      function animate() {
+        currentX += (targetX - currentX) * 0.075;
+        currentY += (targetY - currentY) * 0.075;
+        dish.style.transform = `translate(${(currentX * 8).toFixed(2)}px, ${(currentY * 5).toFixed(2)}px) rotate(${(currentX * 0.75).toFixed(2)}deg)`;
+        scene.style.setProperty('--light-x', `${50 + currentX * 8}%`);
+        scene.style.setProperty('--light-y', `${48 + currentY * 5}%`);
+        if (Math.abs(targetX - currentX) + Math.abs(targetY - currentY) > 0.003) {
+          frame = requestAnimationFrame(animate);
+        } else {
+          frame = 0;
+        }
+      }
+      function move(event) {
+        if (reduceMotion.matches || event.pointerType === 'touch') return;
+        targetX = Math.max(-1, Math.min(1, (event.clientX / innerWidth - .5) * 2));
+        targetY = Math.max(-1, Math.min(1, (event.clientY / innerHeight - .5) * 2));
+        if (!frame) frame = requestAnimationFrame(animate);
+      }
+      scene.addEventListener('pointermove', move, { passive: true });
+      scene.addEventListener('pointerleave', () => {
+        targetX = targetY = 0;
+        if (!reduceMotion.matches && !frame) frame = requestAnimationFrame(animate);
+      });
+      reduceMotion.addEventListener('change', () => {
+        if (reduceMotion.matches) {
+          if (frame) cancelAnimationFrame(frame);
+          frame = 0; targetX = targetY = currentX = currentY = 0;
+          dish.style.transform = '';
+          scene.style.removeProperty('--light-x');
+          scene.style.removeProperty('--light-y');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -9,9 +9,11 @@ excluded; complete non-sensitive recorded tool payloads are retained.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import os
 import re
+import shlex
 import subprocess
 from datetime import datetime, timezone
 from importlib.metadata import version as package_version
@@ -41,12 +43,15 @@ PROMPT = (
 )
 
 DISPLAY_NAMES = {
+    "gpt-6-sol": "GPT 6 Sol",
+    "gpt-6-luna": "GPT 6 Luna",
     "gpt-6-astra": "GPT 6 Astra",
     "gpt-5.6-sol": "GPT 5.6 Sol",
     "gpt-5.6-terra": "GPT 5.6 Terra",
     "gpt-5.6-luna": "GPT 5.6 Luna",
     "gpt-5.5": "GPT 5.5",
     "fable-5.1": "Fable 5.1",
+    "opus-5.5": "Opus 5.5",
     "opus-5": "Opus 5",
     "glm-5.3": "GLM-5.3",
 }
@@ -65,6 +70,11 @@ EFFORT_NAMES = {
 }
 
 CLAUDE_SOURCES = {
+    "anthropic/opus-5.5/low": "ee5d151b-3aa4-4665-9edb-c8221098d7dd.jsonl",
+    "anthropic/opus-5.5/medium": "f5588de3-8761-48e5-814c-0406b5a454d2.jsonl",
+    "anthropic/opus-5.5/high": "e8585317-8097-4061-8f28-bab99dbf2011.jsonl",
+    "anthropic/opus-5.5/xhigh": "a4f3c8e1-2b7d-4c9a-8e56-1f0d3b9c72aa.jsonl",
+    "anthropic/opus-5.5/max": "72fad481-148f-4b58-b000-cf98db3d4ad4.jsonl",
     "anthropic/fable-5.1/max": "1aec6fb2-50f8-4922-a8be-fe1c7bd0c0f1.jsonl",
     "anthropic/fable-5.1/low": "7a98bbf8-3d05-488f-adcf-f5885320142e.jsonl",
     "anthropic/fable-5.1/medium": "8f4c534d-bc6b-4bad-b7cb-62035065f6b6.jsonl",
@@ -85,16 +95,86 @@ CLAUDE_SOURCE_ROOTS = {
     "z.ai/glm-5.3/high": ".claude",
 }
 CLAUDE_REPLAY_VERIFICATION = {
+    "anthropic/opus-5.5/low",
+    "anthropic/opus-5.5/medium",
+    "anthropic/opus-5.5/high",
+    "anthropic/opus-5.5/xhigh",
+    "anthropic/opus-5.5/max",
     "z.ai/glm-5.3/max",
     "z.ai/glm-5.3/high",
 }
+CLAUDE_COMPONENT_BUILDS = {
+    "anthropic/opus-5.5/max": (
+        "01-head.html",
+        "02-util.js",
+        "03-geom.js",
+        "04-scene.js",
+        "05-shaders.js",
+        "06-gl.js",
+        "07-main.js",
+        "08-loop.js",
+        "99-tail.html",
+    )
+}
 CLAUDE_EXPECTED_PROVIDER_MODELS = {
+    "anthropic/opus-5.5/low": "claude-opus-5-5",
+    "anthropic/opus-5.5/medium": "claude-opus-5-5",
+    "anthropic/opus-5.5/high": "claude-opus-5-5",
+    "anthropic/opus-5.5/xhigh": "claude-opus-5-5",
+    "anthropic/opus-5.5/max": "claude-opus-5-5",
     "anthropic/fable-5.1/max": "claude-fable-5-1",
     "z.ai/glm-5.3/max": "glm-5.3",
     "z.ai/glm-5.3/high": "glm-5.3",
 }
+CLAUDE_REQUIRE_FINAL_COST_STATE = {
+    run_id for run_id in CLAUDE_SOURCES if run_id.startswith("anthropic/opus-5.5/")
+}
 
 CODEX_SESSION_SOURCES = {
+    "openai/gpt-6-sol/low": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-43-01a0cb6a-1a4a-7900-8e19-4c5d5d229bbb.jsonl",
+    ),
+    "openai/gpt-6-sol/medium": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-46-01a0cb6a-2510-7c40-87b3-e2ca93cd0b99.jsonl",
+    ),
+    "openai/gpt-6-sol/high": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-45-01a0cb6a-23a0-7eb3-bd85-a6bba00767c4.jsonl",
+    ),
+    "openai/gpt-6-sol/xhigh": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-45-01a0cb6a-22f2-7fe3-877b-d8cc42f0619b.jsonl",
+    ),
+    "openai/gpt-6-sol/max": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-45-01a0cb6a-2237-7db3-8cb8-996e6523dfe9.jsonl",
+    ),
+    "openai/gpt-6-sol/ultra": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-45-01a0cb6a-2158-72b3-af4e-7fe0a3703565.jsonl",
+    ),
+    "openai/gpt-6-luna/low": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-45-01a0cb6a-20a9-73a1-98be-8e7012ef0ac6.jsonl",
+    ),
+    "openai/gpt-6-luna/medium": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-44-01a0cb6a-1feb-7943-87f9-e95b91063bc7.jsonl",
+    ),
+    "openai/gpt-6-luna/high": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-44-01a0cb6a-1fd3-7822-97f2-47bef79f9f3e.jsonl",
+    ),
+    "openai/gpt-6-luna/xhigh": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-44-01a0cb6a-1d8b-7933-8a53-9c8f8b6018aa.jsonl",
+    ),
+    "openai/gpt-6-luna/max": (
+        "2026/09/22",
+        "rollout-2026-09-22T19-18-43-01a0cb6a-1bff-73e1-b058-0ae32faa4d38.jsonl",
+    ),
     "openai/gpt-5.6-luna/max": (
         "2026/09/02",
         "rollout-2026-09-02T17-56-12-01a0641f-5e5a-7280-82cc-af4372cb1a35.jsonl",
@@ -126,6 +206,20 @@ CODEX_SESSION_SOURCES = {
         "rollout-2026-09-04T17-47-38-01a06e64-3cc2-7683-9899-b23ee13ada47.jsonl",
     ),
 }
+GPT_6_CODEX_RUNS = {
+    run_id
+    for run_id in CODEX_SESSION_SOURCES
+    if run_id.startswith(("openai/gpt-6-sol/", "openai/gpt-6-luna/"))
+}
+CODEX_SOURCE_ROOTS: dict[str, Path] = {
+    run_id: HOME / ".codex-personal2" for run_id in GPT_6_CODEX_RUNS
+}
+CODEX_EXPECTED_CWDS: dict[str, Path] = {
+    run_id: Path("/tmp/ramen-bench-runs-20260922")
+    / Path(run_id).relative_to("openai")
+    for run_id in GPT_6_CODEX_RUNS
+}
+CODEX_REPLAY_VERIFICATION = GPT_6_CODEX_RUNS
 
 LOG_STARTS = {
     "openai/gpt-5.6-luna/low": "2026-09-04T22:12:22.504Z",
@@ -502,7 +596,9 @@ def benchmark_claude_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def verify_claude_result(rows: list[dict[str, Any]], run_id: str) -> str:
-    """Replay recorded Write/Edit operations and require the final artifact to match."""
+    """Replay recorded file operations and require the final artifact to match."""
+    if run_id in CLAUDE_COMPONENT_BUILDS:
+        return verify_claude_component_result(rows, run_id)
     content: str | None = None
     operation_count = 0
     for row in rows:
@@ -517,7 +613,7 @@ def verify_claude_result(rows: list[dict[str, Any]], run_id: str) -> str:
             if not isinstance(tool_input, dict):
                 continue
             file_path = str(tool_input.get("file_path", ""))
-            if Path(file_path).name != "index.html":
+            if tool in {"Write", "Edit"} and Path(file_path).name != "index.html":
                 continue
             if tool == "Write":
                 recorded = tool_input.get("content")
@@ -539,12 +635,19 @@ def verify_claude_result(rows: list[dict[str, Any]], run_id: str) -> str:
                     )
                 content = content.replace(old, new, -1 if replace_all else 1)
                 operation_count += 1
+            elif tool == "Bash" and content is not None:
+                command = tool_input.get("command")
+                if isinstance(command, str):
+                    content, count = replay_recorded_shell_mutation(
+                        content, command, run_id
+                    )
+                    operation_count += count
     if content is None:
         raise ValueError(f"{run_id}: no recorded index.html Write found")
     artifact = (ROOT / run_id / "index.html").read_text()
     if content != artifact:
         raise ValueError(f"{run_id}: index.html differs from the final recorded write")
-    return f"recorded Write/Edit replay ({operation_count} operations)"
+    return f"recorded file-operation replay ({operation_count} operations)"
 
 
 def normalize_claude_events(
@@ -752,6 +855,10 @@ def build_claude(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
     source_root = CLAUDE_SOURCE_ROOTS.get(run_id, ".claude-personal")
     source = HOME / source_root / "projects" / project_directory / filename
     rows = read_jsonl(source)
+    if run_id in CLAUDE_REQUIRE_FINAL_COST_STATE and not any(
+        row.get("type") == "cost-state" for row in rows
+    ):
+        raise ValueError(f"{run_id}: source session has no final cost-state")
     public_rows = benchmark_claude_rows(rows)
     events, omitted_calls = normalize_claude_events(public_rows)
     usage, provider_model_id, cost_kind = claude_usage(rows)
@@ -835,6 +942,559 @@ def decode_tool_value(value: Any) -> Any:
         except (json.JSONDecodeError, TypeError):
             return value
     return value
+
+
+def javascript_string_after(source: str, pattern: str) -> str | None:
+    """Decode a JSON-compatible JavaScript string following ``pattern``."""
+    match = re.search(pattern, source)
+    if not match:
+        return None
+    remainder = source[match.end() :].lstrip()
+    if not remainder.startswith('"'):
+        return None
+    value, _ = json.JSONDecoder().raw_decode(remainder)
+    return value if isinstance(value, str) else None
+
+
+def recorded_codex_patch(source: str) -> str | None:
+    patch = javascript_string_after(source, r"const\s+patch\s*=\s*")
+    if patch is not None:
+        return patch
+    return javascript_string_after(source, r"tools\.apply_patch\(\s*")
+
+
+def recorded_codex_command(source: str) -> str | None:
+    return javascript_string_after(source, r"\bcmd\s*:\s*")
+
+
+def find_unique_line_region(
+    content: list[str], old_lines: list[str], run_id: str
+) -> int:
+    matches = [
+        index
+        for index in range(len(content) - len(old_lines) + 1)
+        if content[index : index + len(old_lines)] == old_lines
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            f"{run_id}: recorded patch region matched {len(matches)} locations"
+        )
+    return matches[0]
+
+
+def replay_codex_patch(
+    content: list[str] | None, patch: str, run_id: str
+) -> tuple[list[str] | None, int]:
+    """Replay index.html mutations from one recorded apply_patch payload."""
+    lines = patch.splitlines()
+    if not lines or lines[0] != "*** Begin Patch":
+        raise ValueError(f"{run_id}: malformed recorded apply_patch payload")
+    operation_count = 0
+    index = 1
+    while index < len(lines):
+        line = lines[index]
+        if line == "*** End Patch":
+            return content, operation_count
+        if line.startswith("*** Add File: "):
+            target = line.split(": ", 1)[1]
+            index += 1
+            added: list[str] = []
+            while index < len(lines) and not lines[index].startswith("*** "):
+                if not lines[index].startswith("+"):
+                    raise ValueError(f"{run_id}: malformed recorded Add File patch")
+                added.append(lines[index][1:])
+                index += 1
+            if Path(target).name == "index.html":
+                if content is not None:
+                    raise ValueError(f"{run_id}: recorded index.html was added twice")
+                content = added
+                operation_count += 1
+            continue
+        if line.startswith("*** Update File: "):
+            target = line.split(": ", 1)[1]
+            index += 1
+            is_index = Path(target).name == "index.html"
+            if is_index and content is None:
+                raise ValueError(f"{run_id}: recorded update precedes index.html creation")
+            while index < len(lines) and not lines[index].startswith("*** "):
+                if not lines[index].startswith("@@"):
+                    raise ValueError(f"{run_id}: malformed recorded Update File patch")
+                index += 1
+                old_lines: list[str] = []
+                new_lines: list[str] = []
+                while (
+                    index < len(lines)
+                    and not lines[index].startswith("@@")
+                    and not lines[index].startswith("*** ")
+                ):
+                    hunk_line = lines[index]
+                    index += 1
+                    if not hunk_line or hunk_line[0] not in " +-":
+                        raise ValueError(f"{run_id}: malformed recorded patch hunk")
+                    if hunk_line[0] in " -":
+                        old_lines.append(hunk_line[1:])
+                    if hunk_line[0] in " +":
+                        new_lines.append(hunk_line[1:])
+                if is_index:
+                    assert content is not None
+                    start = find_unique_line_region(content, old_lines, run_id)
+                    content[start : start + len(old_lines)] = new_lines
+                    operation_count += 1
+            continue
+        raise ValueError(f"{run_id}: unsupported recorded patch directive {line!r}")
+    raise ValueError(f"{run_id}: recorded patch has no End Patch marker")
+
+
+def replay_safe_python_write(content: str, script: str, run_id: str) -> str:
+    """Execute a tightly validated string-only repair against an in-memory file."""
+    tree = ast.parse(script)
+    allowed_nodes = (
+        ast.Module,
+        ast.Import,
+        ast.alias,
+        ast.Assign,
+        ast.FunctionDef,
+        ast.arguments,
+        ast.arg,
+        ast.Global,
+        ast.Assert,
+        ast.Expr,
+        ast.Call,
+        ast.Name,
+        ast.Load,
+        ast.Store,
+        ast.Constant,
+        ast.Attribute,
+        ast.Compare,
+        ast.Eq,
+        ast.GtE,
+        ast.In,
+        ast.IfExp,
+        ast.List,
+        ast.Tuple,
+        ast.For,
+        ast.Subscript,
+        ast.Slice,
+        ast.BinOp,
+        ast.Add,
+        ast.keyword,
+    )
+    allowed_methods = {"read", "write", "replace", "count", "index"}
+    for node in ast.walk(tree):
+        if not isinstance(node, allowed_nodes):
+            raise ValueError(
+                f"{run_id}: unsupported {type(node).__name__} in recorded repair"
+            )
+        if isinstance(node, ast.Import):
+            if [alias.name for alias in node.names] != ["re"]:
+                raise ValueError(f"{run_id}: unsupported import in recorded repair")
+        elif isinstance(node, ast.FunctionDef):
+            if node.name != "rep" or node.decorator_list:
+                raise ValueError(f"{run_id}: unsupported helper in recorded repair")
+        elif isinstance(node, ast.Attribute) and node.attr not in allowed_methods:
+            raise ValueError(f"{run_id}: unsupported method in recorded repair")
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id not in {"open", "rep"}:
+                raise ValueError(f"{run_id}: unsupported call in recorded repair")
+        elif isinstance(node, ast.BinOp) and not isinstance(node.op, ast.Add):
+            raise ValueError(f"{run_id}: unsupported operation in recorded repair")
+        elif isinstance(node, ast.Name) and node.id.startswith("__"):
+            raise ValueError(f"{run_id}: private name in recorded repair")
+
+    tree.body = [statement for statement in tree.body if not isinstance(statement, ast.Import)]
+    file_content = content
+    write_count = 0
+
+    class MemoryFile:
+        def read(self) -> str:
+            return file_content
+
+        def write(self, value: str) -> int:
+            nonlocal file_content, write_count
+            if not isinstance(value, str):
+                raise ValueError(f"{run_id}: recorded write is not text")
+            file_content = value
+            write_count += 1
+            return len(value)
+
+    def safe_open(path: str, mode: str = "r") -> MemoryFile:
+        if path != "index.html" or mode not in {"r", "w"}:
+            raise ValueError(f"{run_id}: repair accesses an unexpected file")
+        return MemoryFile()
+
+    namespace = {"__builtins__": {"open": safe_open}}
+    exec(compile(tree, "<recorded-repair>", "exec"), namespace)  # noqa: S102
+    if write_count != 1:
+        raise ValueError(f"{run_id}: recorded repair did not write index.html")
+    return file_content
+
+
+def replay_recorded_shell_mutation(
+    content: str, command: str, run_id: str
+) -> tuple[str, int]:
+    """Replay narrowly supported shell mutations without executing recorded code."""
+    for marker, terminator in (
+        ("python3 - <<'PY'\n", "PY"),
+        ("python3 - <<'EOF'\n", "EOF"),
+    ):
+        start = command.find(marker)
+        if start >= 0:
+            script_start = start + len(marker)
+            match = re.search(
+                rf"(?m)^{re.escape(terminator)}$", command[script_start:]
+            )
+            end = script_start + match.start() if match else -1
+            if end >= 0 and "open(p,'w').write" in command[:end]:
+                script = command[script_start:end]
+                return replay_safe_python_write(content, script, run_id), 1
+
+    first_command = command.split(" && ", 1)[0]
+    if not first_command.startswith("sed -i "):
+        return content, 0
+    arguments = shlex.split(first_command)
+    if (
+        len(arguments) == 4
+        and arguments[:2] == ["sed", "-i"]
+        and arguments[3] == "index.html"
+    ):
+        if not re.fullmatch(r"s/(?:\\.|[^/])*/(?:\\.|[^/])*/g?", arguments[2]):
+            raise ValueError(f"{run_id}: unsupported recorded sed expression")
+        result = subprocess.run(
+            ["sed", arguments[2]],
+            input=content,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        return result.stdout, 1
+    return content, 0
+
+
+def component_file_key(
+    path: str, cwd: Path, components: tuple[str, ...]
+) -> str | None:
+    """Return a known component name for a path inside the recorded build tree."""
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = cwd / candidate
+    candidate = candidate.resolve()
+    component_root = Path("/tmp/ramen/src")
+    if candidate.parent != component_root or candidate.name not in components:
+        return None
+    return candidate.name
+
+
+def replay_safe_component_python(
+    files: dict[str, str],
+    script: str,
+    cwd: Path,
+    components: tuple[str, ...],
+    run_id: str,
+) -> int:
+    """Replay a validated string-only Python edit against in-memory components."""
+    tree = ast.parse(script)
+    allowed_nodes = (
+        ast.Module,
+        ast.Import,
+        ast.alias,
+        ast.Assign,
+        ast.Assert,
+        ast.Expr,
+        ast.Call,
+        ast.Name,
+        ast.Load,
+        ast.Store,
+        ast.Constant,
+        ast.Attribute,
+        ast.Compare,
+        ast.Eq,
+        ast.GtE,
+        ast.In,
+        ast.NotIn,
+        ast.IfExp,
+        ast.List,
+        ast.Tuple,
+        ast.For,
+        ast.Subscript,
+        ast.Slice,
+        ast.BinOp,
+        ast.Add,
+        ast.BoolOp,
+        ast.And,
+        ast.ListComp,
+        ast.comprehension,
+        ast.keyword,
+    )
+    allowed_methods = {
+        "read",
+        "write",
+        "replace",
+        "count",
+        "index",
+        "split",
+        "startswith",
+    }
+    for node in ast.walk(tree):
+        if not isinstance(node, allowed_nodes):
+            raise ValueError(
+                f"{run_id}: unsupported {type(node).__name__} in component repair"
+            )
+        if isinstance(node, ast.Import):
+            if [alias.name for alias in node.names] != ["re"]:
+                raise ValueError(f"{run_id}: unsupported import in component repair")
+        elif isinstance(node, ast.Attribute) and node.attr not in allowed_methods:
+            raise ValueError(f"{run_id}: unsupported method in component repair")
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id not in {"open", "print"}:
+                raise ValueError(f"{run_id}: unsupported call in component repair")
+        elif isinstance(node, ast.BinOp) and not isinstance(node.op, ast.Add):
+            raise ValueError(f"{run_id}: unsupported operation in component repair")
+        elif isinstance(node, ast.Name) and node.id.startswith("__"):
+            raise ValueError(f"{run_id}: private name in component repair")
+
+    tree.body = [statement for statement in tree.body if not isinstance(statement, ast.Import)]
+    write_count = 0
+
+    class MemoryFile:
+        def __init__(self, key: str) -> None:
+            self.key = key
+
+        def read(self) -> str:
+            return files[self.key]
+
+        def write(self, value: str) -> int:
+            nonlocal write_count
+            if not isinstance(value, str):
+                raise ValueError(f"{run_id}: recorded component write is not text")
+            files[self.key] = value
+            write_count += 1
+            return len(value)
+
+    def safe_open(path: str, mode: str = "r") -> MemoryFile:
+        if not isinstance(path, str) or mode not in {"r", "w"}:
+            raise ValueError(f"{run_id}: component repair uses unsupported open")
+        key = component_file_key(path, cwd, components)
+        if key is None or key not in files:
+            raise ValueError(f"{run_id}: component repair accesses an unexpected file")
+        return MemoryFile(key)
+
+    namespace = {
+        "__builtins__": {
+            "open": safe_open,
+            "print": lambda *args, **kwargs: None,
+        }
+    }
+    exec(compile(tree, "<recorded-component-repair>", "exec"), namespace)  # noqa: S102
+    if write_count == 0:
+        raise ValueError(f"{run_id}: recorded component repair wrote no files")
+    return write_count
+
+
+def replay_component_python_heredocs(
+    files: dict[str, str],
+    command: str,
+    components: tuple[str, ...],
+    run_id: str,
+) -> int:
+    """Find and replay Python heredocs that mutate known build components."""
+    operation_count = 0
+    pattern = re.compile(r"python3 - <<'([^']+)'\n")
+    for match in pattern.finditer(command):
+        terminator = match.group(1)
+        script_start = match.end()
+        end_match = re.search(
+            rf"(?m)^{re.escape(terminator)}$", command[script_start:]
+        )
+        if not end_match:
+            raise ValueError(f"{run_id}: malformed recorded Python heredoc")
+        script = command[script_start : script_start + end_match.start()]
+        constants = {
+            Path(node.value).name
+            for node in ast.walk(ast.parse(script))
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        }
+        if not constants.intersection(components):
+            continue
+        prefix = command[: match.start()]
+        cwd_matches = re.findall(
+            r"(?:^|[;\n])\s*cd\s+([^\s;&]+)\s+&&", prefix
+        )
+        cwd = Path(cwd_matches[-1]) if cwd_matches else Path("/tmp/ramen")
+        operation_count += replay_safe_component_python(
+            files, script, cwd, components, run_id
+        )
+    return operation_count
+
+
+def replay_component_sed(
+    files: dict[str, str],
+    command: str,
+    components: tuple[str, ...],
+    run_id: str,
+) -> int:
+    """Replay simple recorded sed substitutions against build components."""
+    operation_count = 0
+    pattern = re.compile(
+        r"\bsed\s+-i\s+(?P<expr>'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\")"
+        r"\s+(?P<path>[^\s;&]+)"
+    )
+    for match in pattern.finditer(command):
+        arguments = shlex.split(
+            f"sed -i {match.group('expr')} {match.group('path')}"
+        )
+        if len(arguments) != 4:
+            raise ValueError(f"{run_id}: malformed recorded component sed")
+        prefix = command[: match.start()]
+        cwd_matches = re.findall(
+            r"(?:^|[;\n])\s*cd\s+([^\s;&]+)\s+&&", prefix
+        )
+        cwd = Path(cwd_matches[-1]) if cwd_matches else Path("/tmp/ramen")
+        key = component_file_key(arguments[3], cwd, components)
+        if key is None:
+            continue
+        expression = arguments[2]
+        if not re.fullmatch(r"s/(?:\\.|[^/])*/(?:\\.|[^/])*/g?", expression):
+            raise ValueError(f"{run_id}: unsupported recorded component sed")
+        result = subprocess.run(
+            ["sed", expression],
+            input=files[key],
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        files[key] = result.stdout
+        operation_count += 1
+    return operation_count
+
+
+def replay_component_tail(
+    files: dict[str, str], command: str, run_id: str
+) -> int:
+    """Replay the recorded tail-component heredoc used by the modular build."""
+    marker = "cat > src/99-tail.html <<'"
+    start = command.find(marker)
+    if start < 0:
+        return 0
+    delimiter_start = start + len(marker)
+    delimiter_end = command.find("'\n", delimiter_start)
+    if delimiter_end < 0:
+        raise ValueError(f"{run_id}: malformed recorded tail heredoc")
+    terminator = command[delimiter_start:delimiter_end]
+    content_start = delimiter_end + 2
+    end_match = re.search(
+        rf"(?m)^{re.escape(terminator)}$", command[content_start:]
+    )
+    if not end_match:
+        raise ValueError(f"{run_id}: unterminated recorded tail heredoc")
+    files["99-tail.html"] = command[
+        content_start : content_start + end_match.start()
+    ]
+    return 1
+
+
+def verify_claude_component_result(
+    rows: list[dict[str, Any]], run_id: str
+) -> str:
+    """Replay a recorded modular Claude build and require an exact artifact match."""
+    components = CLAUDE_COMPONENT_BUILDS[run_id]
+    files: dict[str, str] = {}
+    content: str | None = None
+    operation_count = 0
+    for row in rows:
+        if row.get("type") != "assistant":
+            continue
+        blocks = row.get("message", {}).get("content", [])
+        for block in blocks if isinstance(blocks, list) else []:
+            if not isinstance(block, dict) or block.get("type") != "tool_use":
+                continue
+            tool = block.get("name")
+            tool_input = block.get("input", {})
+            if not isinstance(tool_input, dict):
+                continue
+            if tool == "Write":
+                file_path = str(tool_input.get("file_path", ""))
+                key = component_file_key(file_path, Path("/"), components)
+                if key is None:
+                    continue
+                recorded = tool_input.get("content")
+                if not isinstance(recorded, str):
+                    raise ValueError(f"{run_id}: component Write has no text content")
+                files[key] = recorded
+                operation_count += 1
+            elif tool == "Bash":
+                command = tool_input.get("command")
+                if not isinstance(command, str):
+                    continue
+                operation_count += replay_component_tail(files, command, run_id)
+                operation_count += replay_component_python_heredocs(
+                    files, command, components, run_id
+                )
+                operation_count += replay_component_sed(
+                    files, command, components, run_id
+                )
+                if "./build.sh" in command:
+                    missing = [name for name in components if name not in files]
+                    if missing:
+                        raise ValueError(
+                            f"{run_id}: recorded build is missing components {missing}"
+                        )
+                    content = "".join(files[name] for name in components)
+                    operation_count += 1
+    if content is None:
+        raise ValueError(f"{run_id}: no recorded component build found")
+    artifact = (ROOT / run_id / "index.html").read_text()
+    if content != artifact:
+        raise ValueError(f"{run_id}: index.html differs from recorded component build")
+    return f"recorded component-build replay ({operation_count} operations)"
+
+
+def replay_codex_command(
+    content: str | None, command: str, run_id: str
+) -> tuple[str | None, int]:
+    """Replay supported direct index.html writes from recorded shell commands."""
+    heredoc_start = "cat > index.html <<'EOF'\n"
+    if command.startswith(heredoc_start):
+        delimiter = "\nEOF\n"
+        end = command.find(delimiter, len(heredoc_start))
+        if end < 0:
+            raise ValueError(f"{run_id}: malformed recorded index.html heredoc")
+        return command[len(heredoc_start) : end] + "\n", 1
+
+    if content is not None:
+        return replay_recorded_shell_mutation(content, command, run_id)
+    return content, 0
+
+
+def verify_codex_result(rows: list[dict[str, Any]], run_id: str) -> str:
+    """Replay recorded Codex file mutations and require an exact artifact match."""
+    content: str | None = None
+    operation_count = 0
+    for row in rows:
+        payload = row.get("payload", {})
+        if row.get("type") != "response_item" or payload.get(
+            "type"
+        ) not in {"custom_tool_call", "function_call"}:
+            continue
+        source = str(payload.get("input", payload.get("arguments", "")))
+        patch = recorded_codex_patch(source)
+        if patch is not None:
+            line_content = content.splitlines() if content is not None else None
+            line_content, count = replay_codex_patch(line_content, patch, run_id)
+            content = (
+                "\n".join(line_content) + "\n" if line_content is not None else None
+            )
+            operation_count += count
+            continue
+        command = recorded_codex_command(source)
+        if command is not None:
+            content, count = replay_codex_command(content, command, run_id)
+            operation_count += count
+    if content is None:
+        raise ValueError(f"{run_id}: no recorded index.html creation found")
+    artifact = (ROOT / run_id / "index.html").read_text()
+    if content != artifact:
+        raise ValueError(f"{run_id}: index.html differs from recorded file operations")
+    return f"recorded file-operation replay ({operation_count} operations)"
 
 
 def normalize_codex_events(
@@ -927,12 +1587,19 @@ def final_codex_usage(rows: list[dict[str, Any]]) -> dict[str, int]:
 
 def build_codex_session(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
     date_dir, filename = CODEX_SESSION_SOURCES[run_id]
-    source = HOME / ".codex-personal/sessions" / date_dir / filename
+    source_root = CODEX_SOURCE_ROOTS.get(run_id, HOME / ".codex-personal")
+    source = source_root / "sessions" / date_dir / filename
     rows = read_jsonl(source)
     meta = next(row["payload"] for row in rows if row.get("type") == "session_meta")
     context = next(row["payload"] for row in rows if row.get("type") == "turn_context")
-    expected_cwd = str(ROOT / run_id)
-    if meta.get("cwd") != expected_cwd or context.get("model") != run_id.split("/")[1]:
+    expected_cwd = CODEX_EXPECTED_CWDS.get(run_id, ROOT / run_id)
+    expected_model = run_id.split("/")[1]
+    expected_effort = run_id.rsplit("/", 1)[1]
+    if (
+        meta.get("cwd") != str(expected_cwd)
+        or context.get("model") != expected_model
+        or context.get("effort") != expected_effort
+    ):
         raise ValueError(f"{run_id}: source session does not match run")
     provider_model_id = context["model"]
     raw_tokens = final_codex_usage(rows)
@@ -998,6 +1665,9 @@ def build_codex_session(run_id: str) -> tuple[dict[str, Any], dict[str, Any], st
         "transcript omits hidden reasoning, private agent-mail activity, credentials, "
         "and private local path prefixes."
     )
+    if run_id in CODEX_REPLAY_VERIFICATION:
+        verification = verify_codex_result(rows, run_id)
+        notes += f" The result matches its {verification}."
     events, omitted_calls = normalize_codex_events(rows)
     run = run_base(
         run_id,

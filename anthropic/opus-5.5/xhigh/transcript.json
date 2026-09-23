@@ -1,0 +1,1182 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
+  "schemaVersion": 1,
+  "runId": "anthropic/opus-5.5/xhigh",
+  "sessionId": "a4f3c8e1-2b7d-4c9a-8e56-1f0d3b9c72aa",
+  "sourceFormat": "claude-code-jsonl",
+  "events": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": "Create a single-file HTML page (index.html) with all CSS and JavaScript inline and zero external assets. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.",
+      "timestamp": "2026-09-22T23:39:16.193Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Pp9ZdXMVBatSakFiaWBuLg",
+      "tool": "Bash",
+      "input": {
+        "command": "ls -la && cat <CLAUDE_HOME>/projects/-home-<USER>-git-ramen-bench/memory/*.md",
+        "description": "List run dir and read memory notes"
+      },
+      "timestamp": "2026-09-22T23:39:19.101Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Pp9ZdXMVBatSakFiaWBuLg",
+      "status": "success",
+      "output": "total 0\ndrwxr-xr-x. 1 <USER> <USER>  0 Sep 22 19:14 .\ndrwxr-xr-x. 1 <USER> <USER> 42 Sep 22 19:14 ..\n- [Headless screenshots for ramen-bench pages](ramen-bench-headless-screenshots.md) — playwright-core via @playwright/mcp + chromium-1223; screenshot before fps probes; swiftshader trips adaptive throttles\n- [Ramen-bench run layout](ramen-bench-run-layout.md) — a session writes only index.html; run.json/transcript/registry come from the importer scripts\n---\nname: ramen-bench-headless-screenshots\ndescription: How to screenshot and drive a ramen-bench index.html headlessly on this machine (playwright-core via the global @playwright/mcp package, Chromium 1223)\nmetadata:\n  type: reference\n---\n\nOn this machine, `playwright-core` is reachable from Node by creating a require from\n`<HOME>/.local/lib/node_modules/@playwright/mcp/node_modules/`, and a headless Chromium\nlives at `<HOME>/.cache/ms-playwright/chromium-1223/chrome-linux/chrome` (launch with `--no-sandbox`\nand `--use-gl=swiftshader`). `chromium-browser --headless=new --screenshot` also works but its\nvirtual-time budget barely advances requestAnimationFrame, so use playwright-core for animated\nor mouse-driven states (mouse.move / click, then waitForTimeout, then screenshot).\n\n**Why:** Ramen-bench entries are single-file canvas/WebGL scenes; iterating on them visually was\nthe only reliable way to catch rendering bugs (clipping, faint effects, throttles kicking in\nunder software rendering).\n\n**How to apply:** Write a small `.mjs` harness in the scratchpad (viewport, deviceScaleFactor,\nreducedMotion, moves, click, wait, screenshot), take the screenshot BEFORE any frame-rate probe,\nand remember swiftshader frame times are 2-3x slower than a real GPU browser, so any adaptive\nquality throttle in the page will engage in headless even when it would not on real hardware.\nRelated: [[ramen-bench-run-layout]].\n---\nname: ramen-bench-run-layout\ndescription: In the ramen-bench repo a model session only writes <vendor>/<model>/<variation>/index.html; run.json, transcript.json and registry.json are produced afterwards by the importer scripts\nmetadata:\n  type: project\n---\n\nFor a ramen-bench benchmark session (as of September 2026) the deliverable is only\n`<vendor>/<model>/<variation>/index.html`, the model's unmodified final answer. `run.json`,\n`transcript.json`, and the `registry.json` entry are generated afterwards by\n`scripts/import_claude_code.py` (and siblings), which also runs the transcript censoring pass.\n\n**Why:** The README describes the layout, but it is easy to assume the session should also\nhand-write the manifest; doing so would conflict with the importer's provenance and timing data.\n\n**How to apply:** Do not create run.json/transcript.json or edit registry.json during a run;\n`python3 scripts/validate_registry.py` should still pass with the new directory untracked.\nRelated: [[ramen-bench-headless-screenshots]].",
+      "timestamp": "2026-09-22T23:39:19.263Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HMa8G35w3Vtsvjs3e7uXVs",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <WORKSPACE> && ls && ls anthropic/ anthropic/*/ | head -50 && ls <HOME>/.cache/ms-playwright/ && ls <HOME>/.local/lib/node_modules/@playwright/mcp/node_modules/ | head",
+        "description": "Check repo layout and playwright availability"
+      },
+      "timestamp": "2026-09-22T23:55:38.490Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HMa8G35w3Vtsvjs3e7uXVs",
+      "status": "success",
+      "output": "AGENTS.md\nPROMPT.md\nREADME.md\nanthropic\napi\napp.js\ngoogle\nindex.html\nmeta\nopenai\nregistry.json\nrequirements-backfill.txt\nschemas\nscripts\nsite.config.js\nstyles.css\nswipe-bridge.js\ntemplates\ntranscript.css\ntranscript.html\ntranscript.js\nz.ai\nanthropic/:\nfable-5.1\nopus-5\nopus-5.5\n\nanthropic/fable-5.1/:\nhigh\nlow\nmax\nmedium\nxhigh\n\nanthropic/opus-5.5/:\nhigh\nlow\nmax\nmedium\nxhigh\n\nanthropic/opus-5/:\nhigh\nlow\nmax\nmedium\nxhigh\nb\nchromium-1223\nchromium_headless_shell-1223\nffmpeg-1011\nmcp-chrome-1f58d63\nmcp-chrome-2f65fce\nmcp-chrome-4424b5f\nmcp-chrome-5de03f9\nmcp-chrome-60752e4\nmcp-chrome-7da2d88\nmcp-chrome-a368358\nmcp-chrome-a3a424a\nmcp-chrome-adefc7f\nmcp-chrome-b4a77fb\nmcp-chrome-bb47b34\nmcp-chrome-c740bd3\nmcp-chrome-d8bcd8e\nmcp-chrome-e4b80ee\nmcp-chrome-e742125\nmcp-chrome-ef3d927\nplaywright\nplaywright-core\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-22T23:55:38.566Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now I'll write the scene. It'll be a painted Canvas 2D bowl with cached layers, plus a WebGL steam layer on top that reacts to the pointer.",
+      "timestamp": "2026-09-22T23:55:41.041Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Hhnrq8ZeTjTvPpFY5PDgwD",
+      "tool": "Write",
+      "input": {
+        "file_path": "<WORKSPACE>/anthropic/opus-5.5/xhigh/index.html",
+        "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\n<meta name=\"color-scheme\" content=\"dark\">\n<meta name=\"theme-color\" content=\"#070403\">\n<title>Vegan Ramen</title>\n<style>\n  html, body {\n    margin: 0;\n    height: 100%;\n    overflow: hidden;\n    background: #070403;\n  }\n  body {\n    touch-action: none;\n    -webkit-tap-highlight-color: transparent;\n    -webkit-user-select: none;\n    user-select: none;\n  }\n  canvas {\n    position: fixed;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    display: block;\n  }\n  #steam { pointer-events: none; }\n</style>\n</head>\n<body>\n<canvas id=\"scene\" role=\"img\" aria-label=\"A steaming bowl of vegan ramen on a dark wooden table: wavy noodles in golden miso broth, seared tofu, shiitake, bok choy, sweet corn, bean sprouts, nori and scallions.\"></canvas>\n<canvas id=\"steam\" aria-hidden=\"true\"></canvas>\n<script>\n(() => {\n'use strict';\n\n/* ------------------------------------------------------------------ *\n *  Basics\n * ------------------------------------------------------------------ */\nconst scene = document.getElementById('scene');\nconst ctx = scene.getContext('2d', { alpha: false });\nlet steamCanvas = document.getElementById('steam');\n\nconst TAU = Math.PI * 2;\nconst clamp = (x, a, b) => (x < a ? a : x > b ? b : x);\nconst lerp = (a, b, t) => a + (b - a) * t;\nconst smoothstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };\n\nlet seed = 1;\nconst srand = (s) => { seed = s >>> 0; };\nfunction rnd() {\n  seed = (seed + 0x6D2B79F5) | 0;\n  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);\n  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;\n  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;\n}\nconst rr = (a, b) => a + (b - a) * rnd();\nfunction gauss() { let u = 0; while (u === 0) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * rnd()); }\n\nfunction hash2(x, y) {\n  let h = (Math.imul(x | 0, 374761393) + Math.imul(y | 0, 668265263)) | 0;\n  h = Math.imul(h ^ (h >>> 13), 1274126177);\n  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;\n}\nfunction vnoise(x, y) {\n  const xi = Math.floor(x), yi = Math.floor(y);\n  const xf = x - xi, yf = y - yi;\n  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);\n  const a = hash2(xi, yi), b = hash2(xi + 1, yi), c = hash2(xi, yi + 1), d = hash2(xi + 1, yi + 1);\n  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;\n}\nfunction fbm(x, y, oct) {\n  let s = 0, a = 0.5, f = 1, n = 0;\n  for (let i = 0; i < oct; i++) { s += a * vnoise(x * f + i * 17.1, y * f - i * 9.3); n += a; f *= 2.03; a *= 0.5; }\n  return s / n;\n}\n\nconst mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];\nconst rgb = (c, a) => (a === undefined\n  ? `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`\n  : `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`);\n\n/* ------------------------------------------------------------------ *\n *  State\n * ------------------------------------------------------------------ */\nlet W = 1, H = 1, DPR = 1;\nconst G = {};                       // scene geometry (CSS px)\nconst L = {};                       // cached layers\nlet T = [];                         // toppings\nlet glints = [];\nlet drops = [], ripples = [], bokeh = [], motes = [], shimmer = [];\nconst S = {\n  time: 0, last: 0,\n  cam: { x: 0, y: 0 }, camT: { x: 0, y: 0 },\n  flick: 1, boost: 0, nextSimmer: 2,\n};\nconst pointer = { x: 0, y: 0, active: false, last: -1e9, fdx: 0, fdy: 0, travel: 0, type: 'mouse' };\nconst quality = { maxDpr: 2, steamScale: 0.6, slow: 0, fast: 0 };\n\nconst reduceMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;\nlet reduced = !!(reduceMQ && reduceMQ.matches);\n\n/* ------------------------------------------------------------------ *\n *  Geometry\n * ------------------------------------------------------------------ */\nconst K = 0.52;                     // ellipse ratio (camera elevation)\nconst Z_BODY = 0.585, Z_FOOT0 = 0.56, Z_FOOT = 0.665;\nconst rBody = (z) => { const s = clamp(z / Z_BODY, 0, 1); return 0.43 + 0.57 * Math.pow(1 - Math.pow(s, 2.3), 0.62); };\nconst rFoot = (z) => 0.405 - (z - Z_FOOT0) * 0.22;\n\nfunction computeGeometry() {\n  const portrait = H > W * 1.08;\n  let R = portrait ? Math.min(W * 0.44, H * 0.30) : Math.min(W * 0.40, H * 0.36);\n  R = Math.max(R, 40);\n  const k = K, cosE = Math.sqrt(1 - k * k);\n  let cy = H * (portrait ? 0.57 : 0.6);\n  const bottom = cy + (Z_FOOT * cosE + 0.4 * k) * R + 0.12 * R;\n  if (bottom > H * 0.975) cy -= bottom - H * 0.975;\n  Object.assign(G, {\n    R, k, cosE, cx: W * 0.5, cy,\n    Rin: 0.955 * R, Rb: 0.915 * R, cyB: cy + 0.13 * cosE * R,\n    margin: Math.ceil(Math.min(W, H) * 0.04 + 10),\n    unit: R / 400,\n  });\n}\n\n// broth-plane projection: u (right), v (towards viewer), h (up), all in broth radii\nfunction P(u, v, h) { return [G.cx + u * G.Rb, G.cyB + v * G.Rb * G.k - (h || 0) * G.Rb * G.cosE]; }\nfunction surf(z, phi, rf) { const r = (rf || rBody)(z) * G.R; return [G.cx + r * Math.cos(phi), G.cy + z * G.cosE * G.R + r * G.k * Math.sin(phi)]; }\n\n/* ------------------------------------------------------------------ *\n *  Drawing helpers\n * ------------------------------------------------------------------ */\nfunction makeLayer(x0, y0, w, h, scale) {\n  const sc = scale || DPR;\n  x0 = Math.floor(x0); y0 = Math.floor(y0); w = Math.ceil(w); h = Math.ceil(h);\n  const c = document.createElement('canvas');\n  c.width = Math.max(1, Math.ceil(w * sc)); c.height = Math.max(1, Math.ceil(h * sc));\n  const g = c.getContext('2d');\n  g.setTransform(sc, 0, 0, sc, -x0 * sc, -y0 * sc);\n  return { c, g, x0, y0, w, h };\n}\nfunction blit(Ly, dx, dy) { ctx.drawImage(Ly.c, Ly.x0 + (dx || 0), Ly.y0 + (dy || 0), Ly.w, Ly.h); }\n\nfunction radialEllipse(g, x, y, r, sy, stops, comp, fillAll) {\n  g.save();\n  g.translate(x, y); g.scale(1, sy);\n  const gr = g.createRadialGradient(0, 0, 0, 0, 0, r);\n  for (const s of stops) gr.addColorStop(s[0], s[1]);\n  g.fillStyle = gr;\n  if (comp) g.globalCompositeOperation = comp;\n  const e = fillAll ? r * 12 : r;\n  g.fillRect(-e, -e, 2 * e, 2 * e);\n  g.restore();\n}\nfunction softEll(g, x, y, r, sy, rgbs, a, comp) {\n  g.save();\n  g.translate(x, y); g.scale(1, sy);\n  const gr = g.createRadialGradient(0, 0, 0, 0, 0, r);\n  gr.addColorStop(0, `rgba(${rgbs},${a})`);\n  gr.addColorStop(1, `rgba(${rgbs},0)`);\n  g.fillStyle = gr;\n  if (comp) g.globalCompositeOperation = comp;\n  g.fillRect(-r, -r, 2 * r, 2 * r);\n  g.restore();\n}\nfunction ellipsePath(g, x, y, rx, ry) { g.beginPath(); g.ellipse(x, y, Math.max(rx, 0.01), Math.max(ry, 0.01), 0, 0, TAU); }\nfunction poly(g, pts, close = true) {\n  g.beginPath();\n  g.moveTo(pts[0][0], pts[0][1]);\n  for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);\n  if (close) g.closePath();\n}\nfunction smoothPoly(g, pts) {\n  const n = pts.length;\n  g.beginPath();\n  const m0 = [(pts[n - 1][0] + pts[0][0]) / 2, (pts[n - 1][1] + pts[0][1]) / 2];\n  g.moveTo(m0[0], m0[1]);\n  for (let i = 0; i < n; i++) {\n    const p = pts[i], q = pts[(i + 1) % n];\n    g.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2);\n  }\n  g.closePath();\n}\nfunction spriteCanvas(size, draw) {\n  const c = document.createElement('canvas');\n  c.width = c.height = size;\n  draw(c.getContext('2d'), size);\n  return c;\n}\nfunction revolvePath(g, z0, z1, rf, n) {\n  const { cx, cy, R, k, cosE } = G;\n  g.beginPath();\n  for (let i = 0; i <= n; i++) {\n    const z = z0 + (z1 - z0) * i / n, r = rf(z) * R, y = cy + z * cosE * R;\n    g.moveTo(cx + r, y);\n    g.ellipse(cx, y, r, r * k, 0, 0, TAU);\n  }\n}\n\n/* ------------------------------------------------------------------ *\n *  Shared sprites (built once)\n * ------------------------------------------------------------------ */\nconst SPR = {};\nfunction buildSprites() {\n  const soft = (rgbs) => spriteCanvas(64, (g, s) => {\n    const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);\n    gr.addColorStop(0, `rgba(${rgbs},1)`);\n    gr.addColorStop(0.35, `rgba(${rgbs},0.45)`);\n    gr.addColorStop(1, `rgba(${rgbs},0)`);\n    g.fillStyle = gr; g.fillRect(0, 0, s, s);\n  });\n  SPR.warm = soft('255,214,160');\n  SPR.white = soft('255,246,232');\n  SPR.amber = soft('255,170,90');\n\n  SPR.sparkle = spriteCanvas(64, (g, s) => {\n    const c = s / 2;\n    let gr = g.createRadialGradient(c, c, 0, c, c, c * 0.5);\n    gr.addColorStop(0, 'rgba(255,250,235,1)'); gr.addColorStop(1, 'rgba(255,220,170,0)');\n    g.fillStyle = gr; g.fillRect(0, 0, s, s);\n    g.globalCompositeOperation = 'lighter';\n    for (const [w, h] of [[s, s * 0.06], [s * 0.06, s * 0.7]]) {\n      gr = g.createRadialGradient(c, c, 0, c, c, Math.max(w, h) / 2);\n      gr.addColorStop(0, 'rgba(255,245,225,0.9)'); gr.addColorStop(1, 'rgba(255,220,170,0)');\n      g.fillStyle = gr;\n      g.fillRect(c - w / 2, c - h / 2, w, h);\n    }\n  });\n\n  SPR.bokeh = ['255,168,82', '255,120,64', '255,206,140'].map((c) => spriteCanvas(128, (g, s) => {\n    const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);\n    gr.addColorStop(0, `rgba(${c},0.55)`);\n    gr.addColorStop(0.72, `rgba(${c},0.62)`);\n    gr.addColorStop(0.86, `rgba(${c},0.75)`);\n    gr.addColorStop(0.95, `rgba(${c},0.25)`);\n    gr.addColorStop(1, `rgba(${c},0)`);\n    g.fillStyle = gr; g.fillRect(0, 0, s, s);\n  }));\n\n  // oil droplet on the broth surface (drawn squashed by K)\n  SPR.oil = spriteCanvas(64, (g, s) => {\n    const c = s / 2, r = s * 0.46;\n    let gr = g.createRadialGradient(c, c, 0, c, c, r);\n    gr.addColorStop(0, 'rgba(255,214,130,0.30)');\n    gr.addColorStop(0.72, 'rgba(255,196,110,0.34)');\n    gr.addColorStop(0.9, 'rgba(120,58,10,0.40)');\n    gr.addColorStop(1, 'rgba(120,58,10,0)');\n    g.fillStyle = gr; g.fillRect(0, 0, s, s);\n    gr = g.createRadialGradient(c - r * 0.35, c - r * 0.4, 0, c - r * 0.35, c - r * 0.4, r * 0.32);\n    gr.addColorStop(0, 'rgba(255,250,235,0.9)'); gr.addColorStop(1, 'rgba(255,240,210,0)');\n    g.fillStyle = gr; g.fillRect(0, 0, s, s);\n  });\n\n  // chili-oil blobs\n  srand(505);\n  SPR.chili = [0, 1, 2, 3].map(() => spriteCanvas(96, (g, s) => {\n    const c = s / 2, pts = [];\n    const n = 14, p1 = rnd() * TAU, p2 = rnd() * TAU;\n    for (let i = 0; i < n; i++) {\n      const a = i / n * TAU;\n      const r = s * 0.36 * (1 + 0.16 * Math.sin(a * 2 + p1) + 0.1 * Math.sin(a * 3 + p2));\n      pts.push([c + Math.cos(a) * r, c + Math.sin(a) * r]);\n    }\n    smoothPoly(g, pts);\n    const gr = g.createRadialGradient(c - s * 0.08, c - s * 0.08, 0, c, c, s * 0.46);\n    gr.addColorStop(0, 'rgba(236,98,30,0.55)');\n    gr.addColorStop(0.75, 'rgba(206,58,18,0.62)');\n    gr.addColorStop(1, 'rgba(150,30,8,0.7)');\n    g.fillStyle = gr; g.fill();\n    g.save(); g.clip();\n    for (let i = 0; i < 9; i++) {\n      g.fillStyle = rnd() < 0.5 ? 'rgba(110,14,6,0.8)' : 'rgba(170,30,10,0.8)';\n      g.beginPath();\n      g.ellipse(c + gauss() * s * 0.12, c + gauss() * s * 0.12, s * rr(0.015, 0.035), s * rr(0.01, 0.025), rnd() * TAU, 0, TAU);\n      g.fill();\n    }\n    g.restore();\n    const hg = g.createRadialGradient(c - s * 0.14, c - s * 0.15, 0, c - s * 0.14, c - s * 0.15, s * 0.12);\n    hg.addColorStop(0, 'rgba(255,236,200,0.8)'); hg.addColorStop(1, 'rgba(255,200,150,0)');\n    g.fillStyle = hg; g.fillRect(0, 0, s, s);\n  }));\n\n  // film grain tile\n  srand(77);\n  SPR.grain = spriteCanvas(160, (g, s) => {\n    const img = g.createImageData(s, s), d = img.data;\n    for (let i = 0; i < d.length; i += 4) {\n      const v = rnd() < 0.5 ? 0 : 255;\n      d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = Math.floor(rnd() * 11);\n    }\n    g.putImageData(img, 0, 0);\n  });\n}\n\n/* ------------------------------------------------------------------ *\n *  Wood texture (generated once, projected onto the table per resize)\n * ------------------------------------------------------------------ */\nlet woodTex = null;\nfunction makeWood() {\n  const TW = 1024, TH = 384;\n  const c = document.createElement('canvas'); c.width = TW; c.height = TH;\n  const g = c.getContext('2d');\n  const img = g.createImageData(TW, TH), d = img.data;\n  const seams = [0, 118, 262, TH];\n  const tones = [1.0, 0.84, 1.07];\n  for (let y = 0; y < TH; y++) {\n    let p = 0; while (y >= seams[p + 1]) p++;\n    const tone = tones[p];\n    const edge = Math.min(y - seams[p], seams[p + 1] - 1 - y);\n    for (let x = 0; x < TW; x++) {\n      const w = fbm(x * 0.0035 + p * 17.3, y * 0.02 + p * 3.1, 3);\n      const lines = 0.5 + 0.5 * Math.sin(y * 0.42 + w * 16 + Math.sin(x * 0.003 + p * 2) * 2.5);\n      const grain = Math.pow(lines, 6);\n      const fleck = fbm(x * 0.03 + p * 5, y * 0.5, 2);\n      let v = tone * (0.74 + 0.34 * fleck - 0.3 * grain + 0.16 * (w - 0.5));\n      if (edge < 3) v *= 0.3 + edge * 0.2;\n      const i = (y * TW + x) * 4;\n      d[i] = clamp(v * 70, 0, 255); d[i + 1] = clamp(v * 43, 0, 255); d[i + 2] = clamp(v * 27, 0, 255); d[i + 3] = 255;\n    }\n  }\n  g.putImageData(img, 0, 0);\n  woodTex = c;\n}\n\n/* ------------------------------------------------------------------ *\n *  Background & table\n * ------------------------------------------------------------------ */\nfunction buildBackground() {\n  const M = G.margin;\n  const Ly = makeLayer(-M, -M, W + 2 * M, H + 2 * M, Math.min(DPR, 1.5));\n  const g = Ly.g;\n  const { cx, cy, R } = G;\n  const gr = g.createLinearGradient(0, -M, 0, H + M);\n  gr.addColorStop(0, '#060302'); gr.addColorStop(0.45, '#0d0806'); gr.addColorStop(1, '#070403');\n  g.fillStyle = gr; g.fillRect(-M, -M, W + 2 * M, H + 2 * M);\n\n  // a distant warm lamp somewhere behind the bowl\n  radialEllipse(g, cx - 0.5 * R, cy - 1.5 * R, 2.9 * R, 0.78,\n    [[0, 'rgba(150,70,26,0.32)'], [0.4, 'rgba(92,40,14,0.15)'], [1, 'rgba(0,0,0,0)']]);\n\n  // table top, receding into the dark\n  const yTop = cy - 1.25 * R, yBot = H + M;\n  const yH = cy - 5.0 * R;\n  const TW = woodTex.width, TH = woodTex.height;\n  const sTop = yTop - yH, sBot = yBot - yH;\n  const C = (TW * 0.98 * sTop) / (W + 2 * M);\n  const zTop = 1 / sTop, zBot = 1 / sBot;\n  for (let y = Math.floor(yTop); y < yBot; y += 1) {\n    const s = y - yH, z = 1 / s;\n    const tv = (zTop - z) / (zTop - zBot) * (TH - 2);\n    const sw = (W + 2 * M) * C / s;\n    const sx = TW / 2 - (cx + M) * C / s;\n    g.globalAlpha = smoothstep(yTop, cy - 0.15 * R, y);\n    g.drawImage(woodTex, sx, tv, sw, 1, -M, y, W + 2 * M, 1.5);\n  }\n  g.globalAlpha = 1;\n\n  // warm pool of light around the bowl, darkness beyond\n  radialEllipse(g, cx - 0.2 * R, cy + 0.45 * R, 2.2 * R, 0.42,\n    [[0, 'rgba(255,150,70,0.22)'], [0.5, 'rgba(200,96,40,0.09)'], [1, 'rgba(0,0,0,0)']], 'lighter');\n  radialEllipse(g, cx, cy + 0.3 * R, Math.max(W, H) * 0.8, 0.6,\n    [[0, 'rgba(0,0,0,0)'], [0.3, 'rgba(0,0,0,0.18)'], [0.75, 'rgba(0,0,0,0.72)'], [1, 'rgba(0,0,0,0.9)']], null, true);\n  return Ly;\n}\n\nfunction buildGlow() {\n  const { cx, cy, R } = G;\n  const r = 2.4 * R;\n  const Ly = makeLayer(cx - 0.45 * R - r, cy - 1.4 * R - r * 0.8, 2 * r, 1.6 * r, 1);\n  radialEllipse(Ly.g, cx - 0.45 * R, cy - 1.4 * R, r, 0.8,\n    [[0, 'rgba(255,140,60,0.10)'], [0.5, 'rgba(200,90,30,0.04)'], [1, 'rgba(0,0,0,0)']]);\n  return Ly;\n}\n\nfunction buildVignette() {\n  const Ly = makeLayer(0, 0, W, H, 1);\n  const g = Ly.g;\n  radialEllipse(g, G.cx, G.cy - 0.3 * G.R, Math.hypot(W, H) * 0.6, 0.78,\n    [[0, 'rgba(0,0,0,0)'], [0.5, 'rgba(0,0,0,0.06)'], [0.82, 'rgba(0,0,0,0.42)'], [1, 'rgba(0,0,0,0.68)']], null, true);\n  g.fillStyle = g.createPattern(SPR.grain, 'repeat');\n  g.fillRect(0, 0, W, H);\n  return Ly;\n}\n\n/* ------------------------------------------------------------------ *\n *  The bowl: shadow, foot, body, interior, back rim\n * ------------------------------------------------------------------ */\nfunction rimRing(g) {\n  const { cx, cy, R, k, Rin } = G;\n  g.beginPath();\n  g.ellipse(cx, cy, R, R * k, 0, 0, TAU);\n  g.moveTo(cx + Rin, cy);\n  g.ellipse(cx, cy, Rin, Rin * k, 0, 0, TAU);\n  const gr = g.createLinearGradient(cx - R, cy - R * k, cx + R, cy + R * k);\n  gr.addColorStop(0, '#8e4f23'); gr.addColorStop(0.3, '#6e3a19'); gr.addColorStop(0.65, '#4b260f'); gr.addColorStop(1, '#5d3014');\n  g.fillStyle = gr;\n  g.fill('evenodd');\n  const Rm = (R + Rin) / 2;\n  g.lineWidth = (R - Rin) * 0.4;\n  g.strokeStyle = 'rgba(255,196,140,0.10)';\n  ellipsePath(g, cx, cy - 0.003 * R, Rm, Rm * k); g.stroke();\n  g.lineWidth = Math.max(0.8, R * 0.003);\n  g.strokeStyle = 'rgba(16,7,2,0.75)';\n  ellipsePath(g, cx, cy, R, R * k); g.stroke();\n  g.strokeStyle = 'rgba(12,5,2,0.85)';\n  ellipsePath(g, cx, cy, Rin, Rin * k); g.stroke();\n}\n\nfunction buildBowl() {\n  const { cx, cy, R, k, cosE, Rin, Rb, cyB } = G;\n  const footY = cy + Z_FOOT * cosE * R;\n  const x0 = cx - 1.7 * R, y0 = cy - 1.05 * R;\n  const Ly = makeLayer(x0, y0, 3.4 * R, footY - y0 + 0.75 * R);\n  const g = Ly.g;\n  srand(1234);\n\n  // shadows on the table\n  radialEllipse(g, cx + 0.2 * R, footY + 0.02 * R, 1.45 * R, 0.36,\n    [[0, 'rgba(0,0,0,0.66)'], [0.45, 'rgba(0,0,0,0.4)'], [1, 'rgba(0,0,0,0)']]);\n  radialEllipse(g, cx + 0.04 * R, footY + 0.005 * R, 0.56 * R, 0.3,\n    [[0, 'rgba(0,0,0,0.92)'], [0.72, 'rgba(0,0,0,0.6)'], [1, 'rgba(0,0,0,0)']]);\n  // faint warm bounce from the glaze onto the wood\n  radialEllipse(g, cx - 0.6 * R, footY - 0.04 * R, 0.5 * R, 0.3,\n    [[0, 'rgba(255,140,60,0.06)'], [1, 'rgba(255,140,60,0)']], 'lighter');\n\n  // unglazed foot ring\n  revolvePath(g, Z_FOOT0, Z_FOOT, rFoot, 14);\n  let gr = g.createLinearGradient(cx - 0.41 * R, 0, cx + 0.41 * R, 0);\n  gr.addColorStop(0, '#6f5442'); gr.addColorStop(0.3, '#5a4435'); gr.addColorStop(0.7, '#33251b'); gr.addColorStop(1, '#1b130e');\n  g.fillStyle = gr; g.fill();\n  g.save(); g.clip();\n  gr = g.createLinearGradient(0, cy + Z_FOOT0 * cosE * R, 0, footY + 0.4 * k * R);\n  gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.6)');\n  g.fillStyle = gr; g.fillRect(x0, y0, 3.4 * R, 3 * R);\n  g.restore();\n\n  // glazed body\n  revolvePath(g, 0, Z_BODY, rBody, 96);\n  g.save(); g.clip();\n  gr = g.createLinearGradient(cx - R, 0, cx + R, 0);\n  gr.addColorStop(0, '#3b2215'); gr.addColorStop(0.07, '#25150d'); gr.addColorStop(0.3, '#150c08');\n  gr.addColorStop(0.62, '#0e0806'); gr.addColorStop(0.9, '#140b07'); gr.addColorStop(1, '#26150b');\n  g.fillStyle = gr; g.fillRect(cx - 1.2 * R, cy - R, 2.4 * R, 2 * R);\n\n  // \"hare's fur\" streaks running down from the rim\n  g.lineCap = 'round';\n  for (let i = 0; i < 170; i++) {\n    const phi = rr(0.03, 0.97) * Math.PI;\n    const z1 = rr(0.06, 0.42);\n    const warmS = rnd() < 0.7;\n    g.strokeStyle = warmS ? `rgba(160,86,36,${rr(0.05, 0.2)})` : `rgba(0,0,0,${rr(0.1, 0.3)})`;\n    g.lineWidth = R * rr(0.002, 0.006);\n    g.beginPath();\n    for (let j = 0; j <= 12; j++) {\n      const z = z1 * j / 12;\n      const [x, y] = surf(z, phi + Math.sin(z * 9 + i) * 0.004);\n      if (j) g.lineTo(x, y); else g.moveTo(x, y);\n    }\n    g.stroke();\n  }\n  // iron-rust band where the glaze thins at the rim\n  for (let z = 0; z < 0.16; z += 0.004) {\n    const r = rBody(z) * R, yc = cy + z * cosE * R;\n    g.strokeStyle = `rgba(132,66,26,${0.5 * Math.pow(1 - z / 0.16, 2.4)})`;\n    g.lineWidth = 0.007 * R;\n    g.beginPath(); g.ellipse(cx, yc, r, r * k, 0, 0, Math.PI); g.stroke();\n  }\n  // ambient occlusion toward the base\n  gr = g.createLinearGradient(0, cy, 0, cy + Z_BODY * cosE * R + 0.43 * k * R);\n  gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(0.5, 'rgba(0,0,0,0.12)'); gr.addColorStop(1, 'rgba(0,0,0,0.55)');\n  g.fillStyle = gr; g.fillRect(cx - 1.2 * R, cy, 2.4 * R, 2 * R);\n\n  // glossy reflections\n  g.globalCompositeOperation = 'lighter';\n  for (let z = 0.04; z < 0.44; z += 0.008) {\n    const [x, y] = surf(z, 0.34 * Math.PI);\n    softEll(g, x, y, 0.1 * R, 1, '255,190,140', 0.016 * (1 - z / 0.5));\n  }\n  for (let z = 0.05; z < 0.36; z += 0.005) {\n    const [x, y] = surf(z, 0.355 * Math.PI);\n    softEll(g, x, y, 0.028 * R, 1, '255,222,190', 0.05 * Math.sin(Math.PI * (z - 0.05) / 0.31));\n  }\n  for (let z = 0.01; z < 0.5; z += 0.006) {\n    const [x, y] = surf(z, 0.955 * Math.PI);\n    softEll(g, x, y, 0.035 * R, 1, '255,160,90', 0.045 * (1 - z / 0.55));\n  }\n  g.globalCompositeOperation = 'source-over';\n\n  // speckles in the glaze\n  for (let i = 0; i < 260; i++) {\n    const [x, y] = surf(rr(0.02, 0.5), rr(0.04, 0.96) * Math.PI);\n    g.fillStyle = rnd() < 0.6 ? `rgba(210,150,90,${rr(0.08, 0.22)})` : `rgba(0,0,0,${rr(0.2, 0.4)})`;\n    g.beginPath(); g.arc(x, y, R * rr(0.0015, 0.0045), 0, TAU); g.fill();\n  }\n\n  // glaze stops above the foot: bare clay below a wavy, drippy edge\n  const drips = [];\n  for (let i = 0; i < 7; i++) drips.push([rr(0.08, 0.92) * Math.PI, rr(0.015, 0.04), rr(0.02, 0.05)]);\n  const zb = (phi) => {\n    let z = 0.475 + 0.016 * Math.sin(phi * 7 + 1.3) + 0.01 * Math.sin(phi * 17 + 0.2);\n    for (const [p, a, w] of drips) z += a * Math.exp(-(((phi - p) / w) ** 2));\n    return z;\n  };\n  const edge = [];\n  for (let i = 0; i <= 160; i++) { const phi = Math.PI * i / 160; edge.push(surf(zb(phi), phi)); }\n  g.beginPath();\n  g.moveTo(edge[0][0], edge[0][1]);\n  for (const p of edge) g.lineTo(p[0], p[1]);\n  g.lineTo(cx - 1.2 * R, cy + 1.5 * R); g.lineTo(cx + 1.2 * R, cy + 1.5 * R); g.closePath();\n  gr = g.createLinearGradient(cx - 0.8 * R, 0, cx + 0.8 * R, 0);\n  gr.addColorStop(0, '#76573f'); gr.addColorStop(0.35, '#5c4331'); gr.addColorStop(0.75, '#35261b'); gr.addColorStop(1, '#241910');\n  g.fillStyle = gr; g.fill();\n  g.save(); g.clip();\n  gr = g.createLinearGradient(0, cy + 0.42 * cosE * R, 0, cy + Z_BODY * cosE * R + 0.43 * k * R);\n  gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.55)');\n  g.fillStyle = gr; g.fillRect(cx - 1.2 * R, cy, 2.4 * R, 2 * R);\n  for (let i = 0; i < 160; i++) {\n    const [x, y] = surf(rr(0.47, 0.585), rr(0.05, 0.95) * Math.PI);\n    g.fillStyle = rnd() < 0.5 ? 'rgba(0,0,0,0.25)' : 'rgba(200,170,130,0.14)';\n    g.fillRect(x, y, R * 0.004, R * 0.004);\n  }\n  g.restore();\n  // thick glaze lip along the edge\n  g.lineJoin = 'round';\n  g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 0.012 * R;\n  g.beginPath(); edge.forEach((p, i) => (i ? g.lineTo(p[0], p[1] + 0.004 * R) : g.moveTo(p[0], p[1] + 0.004 * R))); g.stroke();\n  g.strokeStyle = 'rgba(255,170,110,0.13)'; g.lineWidth = 0.004 * R;\n  g.beginPath(); edge.forEach((p, i) => (i ? g.lineTo(p[0], p[1] - 0.004 * R) : g.moveTo(p[0], p[1] - 0.004 * R))); g.stroke();\n  // groove between body and foot\n  g.strokeStyle = 'rgba(0,0,0,0.5)'; g.lineWidth = 0.008 * R;\n  const zf = Z_BODY, rf = rBody(zf) * R;\n  g.beginPath(); g.ellipse(cx, cy + zf * cosE * R, rf, rf * k, 0, 0.05, Math.PI - 0.05); g.stroke();\n  g.restore();\n\n  // interior\n  g.save();\n  ellipsePath(g, cx, cy, Rin, Rin * k); g.clip();\n  g.fillStyle = '#0d0604'; g.fillRect(cx - R, cy - R, 2 * R, 2 * R);\n  radialEllipse(g, cx + 0.74 * Rin, cy + 0.02 * R, 0.72 * R, 0.85,\n    [[0, 'rgba(150,78,32,0.6)'], [1, 'rgba(150,78,32,0)']]);\n  radialEllipse(g, cx - 0.2 * R, cy - Rin * k, 0.9 * R, 0.25,\n    [[0, 'rgba(0,0,0,0.45)'], [1, 'rgba(0,0,0,0)']]);\n  radialEllipse(g, cx, cyB, 1.2 * Rb, k,\n    [[0, 'rgba(200,110,42,0.34)'], [0.83, 'rgba(200,110,42,0.3)'], [1, 'rgba(200,110,42,0)']]);\n  g.globalCompositeOperation = 'lighter';\n  for (let i = 0; i <= 20; i++) {\n    const th = -0.2 + i * 0.012;\n    const x = cx + Rin * 0.975 * Math.cos(th), y = cy + 0.05 * R + Rin * 0.975 * k * Math.sin(th);\n    softEll(g, x, y, 0.035 * R, 1.6, '255,200,150', 0.05);\n  }\n  g.restore();\n\n  // back half of the rim\n  g.save();\n  g.beginPath(); g.rect(cx - 1.3 * R, cy - R, 2.6 * R, R + 1); g.clip();\n  rimRing(g);\n  g.restore();\n  return Ly;\n}\n\nfunction buildRimFront() {\n  const { cx, cy, R, k } = G;\n  const Ly = makeLayer(cx - 1.1 * R, cy - 0.1 * R, 2.2 * R, R * k + 0.25 * R);\n  const g = Ly.g;\n  g.save();\n  g.beginPath(); g.rect(cx - 1.3 * R, cy, 2.6 * R, R); g.clip();\n  rimRing(g);\n  g.restore();\n  return Ly;\n}\n\n/* ------------------------------------------------------------------ *\n *  Noodles\n * ------------------------------------------------------------------ */\nconst NOODLE_COLS = [[242, 212, 142], [236, 202, 124], [245, 220, 158], [232, 196, 118]];\nconst BROTH = [204, 138, 70];\n\nfunction bez(c, s) {\n  const m = 1 - s, a = m * m * m, b = 3 * m * m * s, d = 3 * m * s * s, e = s * s * s;\n  return [a * c[0][0] + b * c[1][0] + d * c[2][0] + e * c[3][0], a * c[0][1] + b * c[1][1] + d * c[2][1] + e * c[3][1]];\n}\nfunction makeBundle(spec) {\n  const N = 110, out = [];\n  let len = 0, prev = bez(spec.c, 0);\n  for (let j = 1; j <= 40; j++) { const p = bez(spec.c, j / 40); len += Math.hypot(p[0] - prev[0], p[1] - prev[1]); prev = p; }\n  for (let i = 0; i < spec.n; i++) {\n    const f = spec.n > 1 ? i / (spec.n - 1) - 0.5 : 0;\n    const off0 = f * spec.width + gauss() * 0.006;\n    const waves = len / rr(0.05, 0.066);\n    const ph = rnd() * TAU, amp = rr(0.007, 0.013), wd = rnd() * TAU;\n    const hb = spec.hmax * (1 - 0.6 * (2 * f) * (2 * f)) * rr(0.85, 1.1);\n    const s0 = rr(0, 0.05), s1 = 1 - rr(0, 0.05);\n    const pts = [];\n    for (let j = 0; j <= N; j++) {\n      const s = lerp(s0, s1, j / N);\n      const p = bez(spec.c, s), q1 = bez(spec.c, Math.min(1, s + 0.002)), q0 = bez(spec.c, Math.max(0, s - 0.002));\n      let tx = q1[0] - q0[0], ty = q1[1] - q0[1];\n      const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;\n      const ph2 = s * waves * TAU + ph;\n      const off = off0 + amp * Math.sin(ph2) + 0.016 * Math.sin(s * 4 + wd);\n      const h = hb * Math.pow(Math.sin(Math.PI * s), 0.75) - 0.024 + 0.005 * Math.cos(ph2);\n      pts.push([p[0] - ty * off, p[1] + tx * off, h, Math.cos(ph2)]);\n    }\n    pts.col = NOODLE_COLS[Math.floor(rnd() * NOODLE_COLS.length)];\n    out.push(pts);\n  }\n  return out;\n}\nfunction strokeRuns(g, sp, vis, thr, dx, dy) {\n  let open = false;\n  g.beginPath();\n  for (let j = 0; j < sp.length; j++) {\n    if (vis[j] > thr) {\n      if (!open) { g.moveTo(sp[j][0] + dx, sp[j][1] + dy); open = true; } else g.lineTo(sp[j][0] + dx, sp[j][1] + dy);\n    } else open = false;\n  }\n  g.stroke();\n}\nfunction drawStrands(g, strands, nw) {\n  g.lineCap = 'round'; g.lineJoin = 'round';\n  for (const st of strands) {\n    const sp = st.map((p) => { const q = P(p[0], p[1], p[2]); return [q[0], q[1], p[2], p[3]]; });\n    const vis = sp.map((p) => smoothstep(-0.02, 0.022, p[2]));\n    g.strokeStyle = 'rgba(78,36,6,0.32)'; g.lineWidth = nw * 1.75;\n    strokeRuns(g, sp, vis, 0.5, nw * 0.15, nw * 0.5);\n    g.lineWidth = nw;\n    for (let j = 0; j < sp.length - 1; j++) {\n      const t = (vis[j] + vis[j + 1]) / 2;\n      if (t < 0.03) continue;\n      const lum = 0.9 + 0.1 * sp[j][3];\n      const c = mixc(BROTH, [st.col[0] * lum, st.col[1] * lum, st.col[2] * lum], Math.pow(t, 0.8) * 0.97);\n      g.strokeStyle = rgb(c);\n      g.beginPath(); g.moveTo(sp[j][0], sp[j][1]); g.lineTo(sp[j + 1][0], sp[j + 1][1]); g.stroke();\n    }\n    g.strokeStyle = 'rgba(255,250,228,0.5)'; g.lineWidth = nw * 0.3;\n    strokeRuns(g, sp, vis, 0.75, -nw * 0.08, -nw * 0.24);\n  }\n}\nfunction drawNoodles(g) {\n  const nw = 0.025 * G.Rb;\n  const bundles = [\n    { c: [[-0.66, -0.46], [-0.28, -0.26], [0.06, 0.04], [0.4, 0.42]], n: 17, width: 0.25, hmax: 0.07 },\n    { c: [[-0.58, 0.4], [-0.22, 0.2], [0.14, -0.06], [0.44, -0.48]], n: 16, width: 0.23, hmax: 0.095 },\n    { c: [[-0.4, -0.04], [-0.14, -0.2], [0.14, 0.14], [0.34, -0.02]], n: 11, width: 0.15, hmax: 0.13 },\n  ];\n  // soft contact shadow of the mound\n  const [mx, my] = P(-0.02, 0.03, 0);\n  softEll(g, mx + 0.02 * G.Rb, my + 0.03 * G.Rb, 0.5 * G.Rb, G.k * 0.95, '70,30,4', 0.32);\n  for (const b of bundles) drawStrands(g, makeBundle(b), nw);\n}\nfunction drawSubmergedNoodles(g) {\n  const nw = 0.024 * G.Rb;\n  g.lineCap = 'round'; g.lineJoin = 'round';\n  for (let i = 0; i < 26; i++) {\n    const a = rnd() * TAU, r0 = rr(0.05, 0.4);\n    const u0 = Math.cos(a) * r0, v0 = Math.sin(a) * r0;\n    const dir = rnd() * TAU, len = rr(0.4, 0.9);\n    const ph = rnd() * TAU, amp = rr(0.008, 0.014), waves = len / 0.058, bend = rr(-0.5, 0.5);\n    g.strokeStyle = `rgba(246,214,150,${rr(0.1, 0.2)})`;\n    g.lineWidth = nw * rr(0.9, 1.1);\n    g.beginPath();\n    for (let j = 0; j <= 60; j++) {\n      const s = j / 60 - 0.5;\n      const d = dir + bend * s;\n      const off = amp * Math.sin(s * waves * TAU + ph);\n      const u = u0 + Math.cos(d) * s * len - Math.sin(d) * off;\n      const v = v0 + Math.sin(d) * s * len + Math.cos(d) * off;\n      const [x, y] = P(u, v, -0.03);\n      if (j) g.lineTo(x, y); else g.moveTo(x, y);\n    }\n    g.stroke();\n  }\n}\n\n/* ------------------------------------------------------------------ *\n *  Broth base\n * ------------------------------------------------------------------ */\nfunction buildBroth() {\n  const { cx, cy, cyB, Rb, Rin, k } = G;\n  const Ly = makeLayer(cx - Rb * 1.06, cyB - Rb * k * 1.12, Rb * 2.12, Rb * k * 2.24);\n  const g = Ly.g;\n  srand(4321);\n  g.save();\n  ellipsePath(g, cx, cy, Rin, Rin * k); g.clip();\n  ellipsePath(g, cx, cyB, Rb, Rb * k); g.clip();\n  radialEllipse(g, cx - 0.12 * Rb, cyB - 0.1 * Rb * k, 1.1 * Rb, k,\n    [[0, '#dea35c'], [0.42, '#d19146'], [0.78, '#b47133'], [1, '#86491b']]);\n  // emulsion mottling\n  for (let i = 0; i < 300; i++) {\n    const a = rnd() * TAU, r = Math.sqrt(rnd()) * 1.05;\n    const [x, y] = P(Math.cos(a) * r, Math.sin(a) * r, 0);\n    const light = rnd() < 0.55;\n    softEll(g, x, y, rr(0.02, 0.09) * Rb, k, light ? '255,214,150' : '120,56,16', rr(0.04, 0.1));\n  }\n  drawSubmergedNoodles(g);\n  // tint over the submerged noodles\n  radialEllipse(g, cx, cyB, 1.1 * Rb, k, [[0, 'rgba(204,138,70,0.25)'], [1, 'rgba(204,138,70,0.35)']]);\n  // shadow cast by the back-left wall, darker rim all round\n  radialEllipse(g, cx + 0.2 * Rb, cyB + 0.2 * Rb * k, 1.22 * Rb, k,\n    [[0, 'rgba(40,14,0,0)'], [0.7, 'rgba(40,14,0,0)'], [0.93, 'rgba(40,14,0,0.35)'], [1, 'rgba(30,10,0,0.6)']]);\n  g.restore();\n  // wet line where broth meets the glaze\n  g.save();\n  ellipsePath(g, cx, cy, Rin, Rin * k); g.clip();\n  g.lineWidth = Math.max(1, Rb * 0.004);\n  g.strokeStyle = 'rgba(255,208,140,0.38)';\n  g.beginPath(); g.ellipse(cx, cyB, Rb, Rb * k, 0, Math.PI, TAU); g.stroke();\n  g.strokeStyle = 'rgba(0,0,0,0.35)';\n  g.beginPath(); g.ellipse(cx, cyB - Rb * 0.008, Rb * 1.002, Rb * k * 1.002, 0, Math.PI * 1.02, TAU - 0.02); g.stroke();\n  g.restore();\n  return Ly;\n}\n\n/* ------------------------------------------------------------------ *\n *  Toppings\n * ------------------------------------------------------------------ */\nfunction topLayer(u, v, wU, upU, downU) {\n  const [x, y] = P(u, v, 0);\n  return makeLayer(x - wU * G.Rb, y - upU * G.Rb, 2 * wU * G.Rb, (upU + downU) * G.Rb);\n}\nfunction addTop(Ly, u, v, bob, order) {\n  const [ax, ay] = P(u, v, 0);\n  const tp = { L: Ly, u, v, bob, order, ax, ay, ph: rnd() * TAU, w: rr(0.55, 0.9), kick: 0 };\n  T.push(tp);\n  return tp;\n}\nfunction addGlint(tp, x, y, size, pref) { glints.push({ tp, x, y, size, pref: pref === undefined ? rr(-1, 1) : pref, ph: rnd() * TAU }); }\n\n// --- nori --------------------------------------------------------------\nfunction drawNori(g, sp) {\n  const ca = Math.cos(sp.tilt), sa = Math.sin(sp.tilt), hw = sp.w / 2;\n  const pt = (a, b) => {\n    const cu = lerp(sp.bu, sp.tu, b) + a * hw * ca;\n    const cv = lerp(sp.bv, sp.tv, b) + a * hw * sa + 0.03 * Math.sin(b * Math.PI) * (1 - a * a * 0.4);\n    return P(cu, cv, lerp(-0.03, sp.th, b));\n  };\n  const out = [];\n  const n = 24;\n  for (let i = 0; i <= n; i++) { const a = -1 + 2 * i / n; out.push(pt(a, 1 - 0.012 * vnoise(i * 1.7, sp.s))); }\n  for (let i = 1; i <= n; i++) out.push(pt(1 - 0.004 * vnoise(i, sp.s + 3), 1 - i / n));\n  for (let i = 1; i <= n; i++) out.push(pt(1 - 2 * i / n, 0));\n  for (let i = 1; i < n; i++) out.push(pt(-1 + 0.004 * vnoise(i, sp.s + 7), i / n));\n\n  // shadow thrown forward onto the broth\n  const bl = pt(-1, 0), br = pt(1, 0);\n  const sh = [bl, br, [br[0] + 0.1 * G.Rb, br[1] + 0.12 * G.Rb], [bl[0] + 0.1 * G.Rb, bl[1] + 0.12 * G.Rb]];\n  const sg = g.createLinearGradient(0, bl[1], 0, bl[1] + 0.12 * G.Rb);\n  sg.addColorStop(0, 'rgba(40,14,0,0.42)'); sg.addColorStop(1, 'rgba(40,14,0,0)');\n  g.fillStyle = sg; poly(g, sh); g.fill();\n\n  const top = pt(0, 1), bot = pt(0, 0);\n  poly(g, out);\n  const gr = g.createLinearGradient(top[0], top[1], bot[0], bot[1]);\n  gr.addColorStop(0, '#202c1d'); gr.addColorStop(0.5, '#141d13'); gr.addColorStop(1, '#0a100a');\n  g.fillStyle = gr; g.fill();\n  g.save(); g.clip();\n  let minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9;\n  for (const p of out) { minx = Math.min(minx, p[0]); maxx = Math.max(maxx, p[0]); miny = Math.min(miny, p[1]); maxy = Math.max(maxy, p[1]); }\n  const fl = G.Rb / 300;\n  for (let i = 0; i < 700; i++) {\n    const x = rr(minx, maxx), y = rr(miny, maxy), a = rnd() * TAU, l = rr(1.5, 5) * fl;\n    g.strokeStyle = rnd() < 0.55 ? `rgba(90,120,70,${rr(0.05, 0.14)})` : `rgba(0,0,0,${rr(0.15, 0.3)})`;\n    g.lineWidth = rr(0.5, 1.2) * fl;\n    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();\n  }\n  for (let i = 0; i < 26; i++) softEll(g, rr(minx, maxx), rr(miny, maxy), rr(3, 9) * fl, 1, '80,110,56', rr(0.08, 0.18));\n  // backlit translucency near the top edge\n  let tg = g.createLinearGradient(top[0], top[1], bot[0], bot[1]);\n  tg.addColorStop(0, 'rgba(120,140,70,0.26)'); tg.addColorStop(0.3, 'rgba(90,110,50,0.06)'); tg.addColorStop(1, 'rgba(0,0,0,0)');\n  g.fillStyle = tg; g.fillRect(minx, miny, maxx - minx, maxy - miny);\n  // wet, darker lower part with a glossy band\n  tg = g.createLinearGradient(top[0], top[1], bot[0], bot[1]);\n  tg.addColorStop(0, 'rgba(0,0,0,0)'); tg.addColorStop(0.62, 'rgba(0,0,0,0)'); tg.addColorStop(0.85, 'rgba(0,0,0,0.3)');\n  tg.addColorStop(0.95, 'rgba(160,96,40,0.35)'); tg.addColorStop(1, 'rgba(200,130,60,0.7)');\n  g.fillStyle = tg; g.fillRect(minx, miny, maxx - minx, maxy - miny);\n  g.strokeStyle = 'rgba(220,200,160,0.10)'; g.lineWidth = 2 * fl;\n  const g1 = pt(-1, 0.2), g2 = pt(1, 0.22);\n  g.beginPath(); g.moveTo(g1[0], g1[1]); g.lineTo(g2[0], g2[1]); g.stroke();\n  g.restore();\n  // rim light along the top edge\n  g.lineCap = 'round';\n  g.strokeStyle = 'rgba(236,196,136,0.42)'; g.lineWidth = 1.1 * fl;\n  g.beginPath(); for (let i = 0; i <= n; i++) { const p = out[i]; if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); } g.stroke();\n  g.strokeStyle = 'rgba(236,196,136,0.14)';\n  g.beginPath(); for (let i = 3 * n; i < out.length; i++) { const p = out[i]; if (i > 3 * n) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); } g.stroke();\n  // meniscus\n  g.strokeStyle = 'rgba(255,214,160,0.45)'; g.lineWidth = 1.3 * fl;\n  g.beginPath(); g.moveTo(bl[0], bl[1]); g.lineTo(br[0], br[1]); g.stroke();\n}\n\n// --- bok choy ----------------------------------------------------------\nfunction drawBokChoy(g, sp, tp) {\n  const { u, v, ang, len } = sp;\n  const ca = Math.cos(ang), sa = Math.sin(ang);\n  const Rb = G.Rb, fl = Rb / 300;\n  const hAt = (a) => 0.02 + 0.03 * a + 0.38 * Math.pow(Math.max(0, a - 0.5), 2);\n  const pt = (a, b, dh) => P(u + (a * ca - b * sa) * len, v + (a * sa + b * ca) * len, hAt(a) + (dh || 0));\n  const s1 = rnd() * 10, s2 = rnd() * 10;\n  const wl = (a, side) => {\n    const x = clamp((a - 0.22) / 0.8, 0, 1);\n    return 0.29 * Math.pow(Math.sin(Math.PI * x), 0.7) *\n      (1 + 0.08 * Math.sin(a * 43 + s1 + side * 2.1) + 0.05 * Math.sin(a * 97 + s2 + side));\n  };\n  const leaf = [];\n  for (let i = 0; i <= 48; i++) { const a = 0.22 + 0.8 * i / 48; leaf.push(pt(a, -wl(a, -1))); }\n  for (let i = 48; i >= 0; i--) { const a = 0.22 + 0.8 * i / 48; leaf.push(pt(a, wl(a, 1))); }\n\n  // shadow\n  g.save(); g.translate(0.035 * Rb, 0.05 * Rb);\n  g.fillStyle = 'rgba(46,18,2,0.3)'; poly(g, leaf); g.fill();\n  g.restore();\n\n  // leaf blade\n  const p0 = pt(0.25, 0), p1 = pt(1, 0);\n  poly(g, leaf);\n  let gr = g.createLinearGradient(p0[0], p0[1], p1[0], p1[1]);\n  gr.addColorStop(0, '#2f6224'); gr.addColorStop(0.5, '#3d7e2c'); gr.addColorStop(1, '#2a5a1f');\n  g.fillStyle = gr; g.fill();\n  g.save(); g.clip();\n  for (let i = 0; i < 60; i++) {\n    const a = rr(0.3, 1), b = rr(-0.25, 0.25);\n    const [x, y] = pt(a, b);\n    softEll(g, x, y, rr(4, 11) * fl, 0.7, rnd() < 0.5 ? '120,170,70' : '10,30,6', rr(0.08, 0.2));\n  }\n  // veins\n  g.lineCap = 'round';\n  g.strokeStyle = 'rgba(160,200,110,0.55)'; g.lineWidth = 0.018 * len * Rb;\n  g.beginPath(); for (let i = 0; i <= 20; i++) { const [x, y] = pt(0.26 + 0.7 * i / 20, 0); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke();\n  g.lineWidth = 0.006 * len * Rb;\n  for (let a = 0.34; a < 0.94; a += 0.075) {\n    for (const side of [-1, 1]) {\n      g.strokeStyle = `rgba(150,195,100,${rr(0.22, 0.4)})`;\n      g.beginPath();\n      for (let i = 0; i <= 8; i++) {\n        const t = i / 8;\n        const [x, y] = pt(a + 0.11 * t, side * wl(a + 0.11 * t, side) * 0.85 * t);\n        if (i) g.lineTo(x, y); else g.moveTo(x, y);\n      }\n      g.stroke();\n    }\n  }\n  g.restore();\n  g.strokeStyle = 'rgba(12,30,8,0.6)'; g.lineWidth = 1.1 * fl;\n  poly(g, leaf); g.stroke();\n  // leaf gloss\n  g.globalCompositeOperation = 'lighter';\n  for (let i = 0; i < 7; i++) {\n    const [x, y] = pt(rr(0.45, 0.9), rr(-0.18, 0.05));\n    softEll(g, x, y, rr(6, 14) * fl, 0.45, '200,240,160', 0.12);\n  }\n  g.globalCompositeOperation = 'source-over';\n\n  // nested stalks\n  const ws = (a) => (0.1 + 0.06 * Math.sin(Math.PI * clamp(a / 0.5, 0, 1))) * (1 - 0.8 * smoothstep(0.4, 0.68, a));\n  const stalks = [\n    { w: 1.0, a1: 0.7, edge: '#95b862', mid: '#cfe2a0' },\n    { w: 0.74, a1: 0.62, edge: '#b5cf86', mid: '#e3eec4' },\n    { w: 0.48, a1: 0.54, edge: '#cfdda8', mid: '#f2f5de' },\n  ];\n  for (const st of stalks) {\n    const pts = [];\n    for (let i = 0; i <= 10; i++) { const th = -Math.PI / 2 + Math.PI * i / 10; pts.push(pt(-Math.cos(th) * 0.05 * st.w, Math.sin(th) * ws(0) * st.w)); }\n    for (let i = 1; i <= 24; i++) { const a = st.a1 * i / 24; pts.push(pt(a, ws(a) * st.w)); }\n    for (let i = 24; i >= 1; i--) { const a = st.a1 * i / 24; pts.push(pt(a, -ws(a) * st.w)); }\n    const e1 = pt(0.25, -ws(0.25) * st.w), e2 = pt(0.25, ws(0.25) * st.w);\n    gr = g.createLinearGradient(e1[0], e1[1], e2[0], e2[1]);\n    gr.addColorStop(0, st.edge); gr.addColorStop(0.45, st.mid); gr.addColorStop(0.7, st.mid); gr.addColorStop(1, st.edge);\n    poly(g, pts); g.fillStyle = gr; g.fill();\n    g.save(); g.clip();\n    for (let f = -0.8; f <= 0.8; f += 0.27) {\n      g.strokeStyle = f < 0 ? 'rgba(255,255,240,0.28)' : 'rgba(110,140,60,0.25)';\n      g.lineWidth = 0.9 * fl;\n      g.beginPath();\n      for (let i = 0; i <= 12; i++) { const a = st.a1 * 0.9 * i / 12; const [x, y] = pt(a, f * ws(a) * st.w); if (i) g.lineTo(x, y); else g.moveTo(x, y); }\n      g.stroke();\n    }\n    g.restore();\n    g.strokeStyle = 'rgba(96,126,56,0.55)'; g.lineWidth = 0.9 * fl; poly(g, pts); g.stroke();\n  }\n  // cut base\n  const [bx, by] = pt(0.01, 0);\n  softEll(g, bx, by, 0.05 * len * Rb, 0.8, '230,220,150', 0.5);\n  // stalk gloss + glints\n  g.strokeStyle = 'rgba(255,255,250,0.5)'; g.lineWidth = 1.4 * fl; g.lineCap = 'round';\n  g.beginPath(); for (let i = 0; i <= 10; i++) { const a = 0.06 + 0.4 * i / 10; const [x, y] = pt(a, -ws(a) * 0.45); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke();\n  const gp = pt(0.28, -ws(0.28) * 0.45);\n  addGlint(tp, gp[0], gp[1], 0.05 * Rb);\n  const gl2 = pt(0.7, -0.08);\n  addGlint(tp, gl2[0], gl2[1], 0.04 * Rb);\n}\n\n// --- tofu --------------------------------------------------------------\nfunction drawTofu(g, sp, tp) {\n  const { u, v, s, rot } = sp;\n  const Rb = G.Rb, fl = Rb / 300;\n  const c = Math.cos(rot), sn = Math.sin(rot), hs = s / 2, ht = s * 0.82;\n  const base = [[-hs, -hs], [hs, -hs], [hs, hs], [-hs, hs]].map(([a, b]) => [u + a * c - b * sn, v + a * sn + b * c]);\n  const B = base.map(([a, b]) => P(a, b, 0));\n  const Tt = base.map(([a, b]) => P(a, b, ht));\n  // shadow on the broth\n  const [sx, sy] = P(u + 0.05, v + 0.07, 0);\n  softEll(g, sx, sy, s * 0.85 * Rb, G.k, '50,18,0', 0.45);\n\n  const light = [-0.6, -0.8], fill = [0.5, 0.86];\n  const faces = [];\n  for (let i = 0; i < 4; i++) {\n    const j = (i + 1) % 4;\n    const eu = base[j][0] - base[i][0], ev = base[j][1] - base[i][1];\n    let nx = ev, ny = -eu;\n    const nl = Math.hypot(nx, ny); nx /= nl; ny /= nl;\n    const mu = (base[i][0] + base[j][0]) / 2 - u, mv = (base[i][1] + base[j][1]) / 2 - v;\n    if (nx * mu + ny * mv < 0) { nx = -nx; ny = -ny; }\n    if (ny > 0.02) faces.push({ i, j, nx, ny });\n  }\n  for (const f of faces) {\n    const lam = Math.max(0, f.nx * light[0] + f.ny * light[1]);\n    const fil = Math.max(0, f.nx * fill[0] + f.ny * fill[1]);\n    const br = 0.5 + 0.35 * lam + 0.32 * fil;\n    const col = [206 * br, 134 * br, 56 * br];\n    const quad = [B[f.i], B[f.j], Tt[f.j], Tt[f.i]];\n    poly(g, quad);\n    const gy = g.createLinearGradient(0, Tt[f.i][1], 0, B[f.i][1]);\n    gy.addColorStop(0, rgb(mixc(col, [240, 180, 100], 0.2)));\n    gy.addColorStop(0.7, rgb(col));\n    gy.addColorStop(1, rgb(mixc(col, [150, 80, 30], 0.5)));\n    g.fillStyle = gy; g.fill();\n    g.save(); g.clip();\n    for (let k2 = 0; k2 < 50; k2++) {\n      const a = rnd(), b = rnd();\n      const x = lerp(lerp(B[f.i][0], B[f.j][0], a), lerp(Tt[f.i][0], Tt[f.j][0], a), b);\n      const y = lerp(lerp(B[f.i][1], B[f.j][1], a), lerp(Tt[f.i][1], Tt[f.j][1], a), b);\n      softEll(g, x, y, rr(1.5, 4.5) * fl, 1, rnd() < 0.6 ? '120,60,14' : '255,210,140', rr(0.2, 0.45));\n    }\n    // broth creeping up the side\n    const wg = g.createLinearGradient(0, B[f.i][1] - 0.035 * Rb, 0, B[f.i][1]);\n    wg.addColorStop(0, 'rgba(200,130,60,0)'); wg.addColorStop(1, 'rgba(190,120,55,0.75)');\n    g.fillStyle = wg; g.fillRect(Math.min(B[f.i][0], B[f.j][0]) - 2, B[f.i][1] - 0.2 * Rb, Math.abs(B[f.j][0] - B[f.i][0]) + 4, 0.3 * Rb);\n    g.restore();\n    g.strokeStyle = 'rgba(255,214,160,0.45)'; g.lineWidth = 1.2 * fl;\n    g.beginPath(); g.moveTo(B[f.i][0], B[f.i][1]); g.lineTo(B[f.j][0], B[f.j][1]); g.stroke();\n  }\n  // top face\n  poly(g, Tt);\n  let lx = 1e9, ly = 1e9, hx = -1e9, hy = -1e9;\n  for (const p of Tt) { lx = Math.min(lx, p[0]); ly = Math.min(ly, p[1]); hx = Math.max(hx, p[0]); hy = Math.max(hy, p[1]); }\n  const tg = g.createLinearGradient(lx, ly, hx, hy);\n  tg.addColorStop(0, '#f0b762'); tg.addColorStop(0.55, '#d89545'); tg.addColorStop(1, '#b8732e');\n  g.fillStyle = tg; g.fill();\n  g.save(); g.clip();\n  for (let k2 = 0; k2 < 70; k2++) {\n    const x = rr(lx, hx), y = rr(ly, hy);\n    softEll(g, x, y, rr(2, 6) * fl, 0.7, rnd() < 0.55 ? '140,70,16' : '255,220,150', rr(0.15, 0.4));\n  }\n  // glaze sheen toward the light\n  const cxT = (Tt[0][0] + Tt[1][0] + Tt[2][0] + Tt[3][0]) / 4, cyT = (Tt[0][1] + Tt[1][1] + Tt[2][1] + Tt[3][1]) / 4;\n  softEll(g, cxT - (hx - lx) * 0.12, cyT - (hy - ly) * 0.2, (hx - lx) * 0.4, 0.5, '255,240,210', 0.35, 'lighter');\n  g.restore();\n  // soft rounded edges\n  g.lineJoin = 'round';\n  g.strokeStyle = 'rgba(255,222,160,0.55)'; g.lineWidth = 1.6 * fl;\n  poly(g, Tt); g.stroke();\n  g.strokeStyle = 'rgba(90,40,8,0.35)'; g.lineWidth = 0.8 * fl;\n  for (const f of faces) { g.beginPath(); g.moveTo(Tt[f.i][0], Tt[f.i][1]); g.lineTo(B[f.i][0], B[f.i][1]); g.stroke(); }\n  addGlint(tp, cxT - (hx - lx) * 0.18, cyT - (hy - ly) * 0.22, 0.06 * Rb);\n}\n\n// --- shiitake ----------------------------------------------------------\nfunction drawShiitake(g, sp, tp) {\n  const { u, v, r, rot } = sp;\n  const Rb = G.Rb, fl = Rb / 300;\n  const [x, y] = P(u, v, 0.015);\n  const rx = r * Rb, ry = r * Rb * G.k;\n  const dome = r * 0.5 * Rb * G.cosE;\n  const cyc = y - dome * 0.45, ryc = ry + dome * 0.45;\n  // shadow\n  softEll(g, x + rx * 0.3, y + ry * 0.55, rx * 1.25, G.k * 1.1, '40,14,0', 0.5);\n  // underside peeking at the front\n  g.fillStyle = '#a88258';\n  ellipsePath(g, x, y + ry * 0.12, rx * 0.97, ry * 0.92); g.fill();\n  g.strokeStyle = 'rgba(80,50,24,0.6)'; g.lineWidth = 0.7 * fl;\n  for (let i = 0; i < 26; i++) {\n    const a = Math.PI * (0.08 + 0.84 * i / 25);\n    g.beginPath(); g.moveTo(x + Math.cos(a) * rx * 0.3, y + ry * 0.12 + Math.sin(a) * ry * 0.3);\n    g.lineTo(x + Math.cos(a) * rx * 0.95, y + ry * 0.12 + Math.sin(a) * ry * 0.9); g.stroke();\n  }\n  // cap\n  ellipsePath(g, x, cyc, rx, ryc);\n  const gr = g.createRadialGradient(x - rx * 0.35, cyc - ryc * 0.45, rx * 0.05, x, cyc, rx * 1.05);\n  gr.addColorStop(0, '#94613a'); gr.addColorStop(0.45, '#5d361a'); gr.addColorStop(0.85, '#361d0b'); gr.addColorStop(1, '#241206');\n  g.fillStyle = gr; g.fill();\n  g.save(); g.clip();\n  for (let i = 0; i < 40; i++) {\n    const a = rnd() * TAU, d = Math.sqrt(rnd());\n    softEll(g, x + Math.cos(a) * d * rx, cyc + Math.sin(a) * d * ryc, rr(2, 6) * fl, 1, rnd() < 0.5 ? '20,8,0' : '170,110,60', rr(0.15, 0.35));\n  }\n  // curled margin\n  g.strokeStyle = 'rgba(196,146,94,0.45)'; g.lineWidth = rx * 0.07;\n  g.beginPath(); g.ellipse(x, cyc, rx * 0.98, ryc * 0.97, 0, 0.1, Math.PI - 0.1); g.stroke();\n  g.restore();\n  // hanakasa star cut\n  const scx = x - rx * 0.04, scy = cyc - ryc * 0.12;\n  for (let i = 0; i < 3; i++) {\n    const a = rot + i * Math.PI / 3;\n    const dx = Math.cos(a) * rx * 0.55, dy = Math.sin(a) * ryc * 0.55 * 0.9;\n    const nx = -Math.sin(a) * rx * 0.07, ny = Math.cos(a) * ryc * 0.07;\n    g.beginPath();\n    g.moveTo(scx - dx, scy - dy);\n    g.quadraticCurveTo(scx + nx, scy + ny, scx + dx, scy + dy);\n    g.quadraticCurveTo(scx - nx, scy - ny, scx - dx, scy - dy);\n    g.fillStyle = '#e2cca2'; g.fill();\n    g.strokeStyle = 'rgba(70,36,12,0.7)'; g.lineWidth = 0.7 * fl;\n    g.beginPath(); g.moveTo(scx - dx * 0.9, scy - dy * 0.9); g.lineTo(scx + dx * 0.9, scy + dy * 0.9); g.stroke();\n  }\n  // gloss\n  softEll(g, x - rx * 0.4, cyc - ryc * 0.5, rx * 0.34, 0.6, '255,228,190', 0.4, 'lighter');\n  addGlint(tp, x - rx * 0.42, cyc - ryc * 0.55, 0.05 * Rb);\n}\n\n// --- corn --------------------------------------------------------------\nfunction drawCorn(g, sp, tp) {\n  const { u, v, rad, n } = sp;\n  const Rb = G.Rb;\n  const [sx, sy] = P(u + 0.04, v + 0.06, 0);\n  softEll(g, sx, sy, rad * 1.25 * Rb, G.k, '60,24,0', 0.5);\n  const ks = [];\n  for (let i = 0; i < n; i++) {\n    const a = rnd() * TAU, d = Math.sqrt(rnd()) * rad;\n    const ku = u + Math.cos(a) * d, kv = v + Math.sin(a) * d * 0.9;\n    ks.push({ ku, kv, kh: 0.065 * (1 - (d / rad) ** 2) + rr(0, 0.012), rot: rnd() * TAU, sz: rr(0.85, 1.15) });\n  }\n  ks.sort((a, b) => (a.kh - b.kh) + (a.kv - b.kv) * 0.25);\n  let gi = 0;\n  for (const kn of ks) {\n    const [x, y] = P(kn.ku, kn.kv, kn.kh);\n    const w = 0.036 * Rb * kn.sz, h = w * 0.78;\n    g.save(); g.translate(x, y); g.rotate(kn.rot);\n    g.fillStyle = 'rgba(110,52,0,0.55)';\n    ellipsePath(g, 0, h * 0.25, w * 0.58, h * 0.55); g.fill();\n    const gr = g.createRadialGradient(-w * 0.18, -h * 0.2, 0, 0, 0, w * 0.6);\n    gr.addColorStop(0, '#fff2a8'); gr.addColorStop(0.45, '#f7c93a'); gr.addColorStop(1, '#d28c0e');\n    g.fillStyle = gr;\n    g.beginPath();\n    g.moveTo(-w * 0.5, -h * 0.1);\n    g.bezierCurveTo(-w * 0.5, -h * 0.6, w * 0.5, -h * 0.6, w * 0.5, -h * 0.1);\n    g.bezierCurveTo(w * 0.52, h * 0.5, -w * 0.52, h * 0.5, -w * 0.5, -h * 0.1);\n    g.fill();\n    g.fillStyle = 'rgba(255,252,230,0.8)';\n    ellipsePath(g, -w * 0.16, -h * 0.2, w * 0.1, h * 0.08); g.fill();\n    g.restore();\n    if (kn.kh > 0.05 && gi < 3 && rnd() < 0.4) { addGlint(tp, x - w * 0.15, y - h * 0.2, 0.035 * Rb); gi++; }\n  }\n}\n\n// --- edamame -----------------------------------------------------------\nfunction drawEdamame(g, sp) {\n  const Rb = G.Rb;\n  for (const b of sp.beans) {\n    const [x, y] = P(b[0], b[1], 0.012);\n    const w = 0.052 * Rb, h = w * 0.66;\n    softEll(g, x + w * 0.2, y + h * 0.5, w * 0.8, 0.6, '40,20,0', 0.45);\n    g.save(); g.translate(x, y); g.rotate(b[2]);\n    const gr = g.createRadialGradient(-w * 0.2, -h * 0.3, 0, 0, 0, w * 0.6);\n    gr.addColorStop(0, '#c6e97a'); gr.addColorStop(0.5, '#86c043'); gr.addColorStop(1, '#3f7a1d');\n    g.fillStyle = gr;\n    g.beginPath();\n    g.moveTo(-w * 0.5, 0);\n    g.bezierCurveTo(-w * 0.5, -h * 0.75, w * 0.5, -h * 0.8, w * 0.5, 0);\n    g.bezierCurveTo(w * 0.5, h * 0.7, -w * 0.5, h * 0.75, -w * 0.5, 0);\n    g.fill();\n    g.fillStyle = 'rgba(245,255,220,0.65)';\n    ellipsePath(g, -w * 0.15, -h * 0.28, w * 0.14, h * 0.1); g.fill();\n    g.restore();\n  }\n}\n\n// --- bean sprouts ------------------------------------------------------\nfunction drawSprouts(g, sp) {\n  const Rb = G.Rb, fl = Rb / 300;\n  const list = [];\n  for (let i = 0; i < sp.n; i++) {\n    const u0 = sp.u + gauss() * 0.09, v0 = sp.v + gauss() * 0.13;\n    const a = sp.dir + gauss() * 0.7, L2 = rr(0.17, 0.3), bend = rr(-0.08, 0.08);\n    list.push({ u0, v0, a, L2, bend, h: rr(0.01, 0.05) });\n  }\n  list.sort((p, q) => p.h - q.h);\n  g.lineCap = 'round';\n  for (const s of list) {\n    const pts = [];\n    for (let j = 0; j <= 14; j++) {\n      const t = j / 14 - 0.5;\n      const uu = s.u0 + Math.cos(s.a) * t * s.L2 - Math.sin(s.a) * s.bend * (0.25 - t * t) * 4;\n      const vv = s.v0 + Math.sin(s.a) * t * s.L2 + Math.cos(s.a) * s.bend * (0.25 - t * t) * 4;\n      pts.push(P(uu, vv, s.h + 0.02 * (0.25 - t * t)));\n    }\n    const line = (w, style, dx, dy) => {\n      g.strokeStyle = style; g.lineWidth = w;\n      g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(p[0] + dx, p[1] + dy) : g.moveTo(p[0] + dx, p[1] + dy))); g.stroke();\n    };\n    line(0.03 * Rb, 'rgba(70,40,10,0.3)', 0.006 * Rb, 0.012 * Rb);\n    line(0.022 * Rb, '#e8dfc4', 0, 0);\n    line(0.014 * Rb, '#f6f1e2', -0.002 * Rb, -0.003 * Rb);\n    line(0.005 * Rb, 'rgba(255,255,255,0.8)', -0.003 * Rb, -0.006 * Rb);\n    // yellow head and a thin root tail\n    const hp = pts[0];\n    g.fillStyle = '#e2cf76';\n    ellipsePath(g, hp[0], hp[1], 0.02 * Rb, 0.014 * Rb); g.fill();\n    g.fillStyle = 'rgba(255,250,210,0.7)';\n    ellipsePath(g, hp[0] - 0.005 * Rb, hp[1] - 0.004 * Rb, 0.007 * Rb, 0.005 * Rb); g.fill();\n    const tp2 = pts[pts.length - 1], tp1 = pts[pts.length - 3];\n    g.strokeStyle = 'rgba(215,200,165,0.8)'; g.lineWidth = 0.9 * fl;\n    g.beginPath(); g.moveTo(tp2[0], tp2[1]); g.lineTo(tp2[0] + (tp2[0] - tp1[0]) * 1.6, tp2[1] + (tp2[1] - tp1[1]) * 1.6 + 2 * fl); g.stroke();\n  }\n}\n\n// --- garnish: scallions, sesame, chili threads ---------------------------\nfunction scallion(g, x, y, r, ang, squash, green) {\n  g.save(); g.translate(x, y); g.rotate(ang); g.scale(1, squash);\n  g.fillStyle = 'rgba(60,28,4,0.35)';\n  ellipsePath(g, r * 0.2, r * 0.45, r * 1.05, r * 1.05); g.fill();\n  const gr = g.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.1, 0, 0, r * 1.05);\n  if (green) { gr.addColorStop(0, '#a7e060'); gr.addColorStop(0.6, '#62ad32'); gr.addColorStop(1, '#2f7418'); }\n  else { gr.addColorStop(0, '#fbfdea'); gr.addColorStop(0.6, '#dfeab8'); gr.addColorStop(1, '#a9c07a'); }\n  g.fillStyle = gr;\n  ellipsePath(g, 0, 0, r, r); g.fill();\n  g.fillStyle = green ? 'rgba(200,232,150,0.95)' : 'rgba(236,243,208,0.95)';\n  ellipsePath(g, r * 0.04, r * 0.05, r * 0.58, r * 0.58); g.fill();\n  g.fillStyle = green ? 'rgba(90,150,50,0.7)' : 'rgba(180,200,140,0.6)';\n  ellipsePath(g, r * 0.1, r * 0.12, r * 0.3, r * 0.3); g.fill();\n  g.strokeStyle = 'rgba(255,255,240,0.55)'; g.lineWidth = r * 0.14;\n  g.beginPath(); g.arc(0, 0, r * 0.8, Math.PI * 1.05, Math.PI * 1.6); g.stroke();\n  g.restore();\n}\nfunction sesame(g, x, y, s, ang, black) {\n  g.save(); g.translate(x, y); g.rotate(ang);\n  g.fillStyle = 'rgba(60,28,4,0.3)';\n  ellipsePath(g, s * 0.2, s * 0.4, s, s * 0.6); g.fill();\n  g.beginPath(); g.moveTo(-s, 0);\n  g.quadraticCurveTo(-s * 0.1, -s * 0.8, s, 0);\n  g.quadraticCurveTo(-s * 0.1, s * 0.8, -s, 0);\n  g.fillStyle = black ? '#241c16' : '#f1e2ba'; g.fill();\n  g.fillStyle = black ? 'rgba(200,190,170,0.5)' : 'rgba(255,255,245,0.9)';\n  ellipsePath(g, -s * 0.15, -s * 0.18, s * 0.35, s * 0.14); g.fill();\n  g.restore();\n}\nfunction moundH(u, v) { return 0.085 * Math.exp(-((u + 0.04) ** 2 + (v - 0.0) ** 2) / 0.09); }\nfunction drawGarnish(g, tp) {\n  const Rb = G.Rb, fl = Rb / 300;\n  // scallions: mostly on the noodles, a few floating\n  const rings = [];\n  for (let i = 0; i < 34; i++) {\n    const u = -0.05 + gauss() * 0.16, v = 0.02 + gauss() * 0.16;\n    rings.push([u, v, moundH(u, v) + 0.03]);\n  }\n  for (let i = 0; i < 14; i++) {\n    const a = rnd() * TAU, d = rr(0.35, 0.8);\n    const u = Math.cos(a) * d, v = Math.sin(a) * d;\n    if (v < -0.55) continue;\n    rings.push([u, v, 0.005]);\n  }\n  rings.sort((a, b) => a[2] - b[2]);\n  for (const [u, v, h] of rings) {\n    const [x, y] = P(u, v, h);\n    scallion(g, x, y, rr(0.019, 0.026) * Rb, rnd() * TAU, rr(0.5, 0.95), rnd() < 0.72);\n  }\n  // sesame\n  for (let i = 0; i < 90; i++) {\n    const u = -0.02 + gauss() * 0.25, v = 0.04 + gauss() * 0.24;\n    if (u * u + v * v > 0.8) continue;\n    const [x, y] = P(u, v, moundH(u, v) + 0.035);\n    sesame(g, x, y, rr(0.0075, 0.0095) * Rb, rnd() * TAU, rnd() < 0.22);\n  }\n  // chili threads on the crest\n  const [cx0, cy0] = P(-0.02, -0.02, moundH(-0.02, -0.02) + 0.05);\n  g.lineCap = 'round';\n  for (let i = 0; i < 46; i++) {\n    const x = cx0 + gauss() * 0.045 * Rb, y = cy0 + gauss() * 0.025 * Rb;\n    const a = rnd() * TAU, l = rr(0.04, 0.1) * Rb, b = rr(-0.5, 0.5);\n    const x2 = x + Math.cos(a) * l, y2 = y + Math.sin(a) * l * 0.6;\n    const mx = (x + x2) / 2 - Math.sin(a) * l * b * 0.4, my = (y + y2) / 2 + Math.cos(a) * l * b * 0.3;\n    g.strokeStyle = 'rgba(60,10,0,0.35)'; g.lineWidth = Math.max(1, 1.8 * fl);\n    g.beginPath(); g.moveTo(x + fl, y + 1.5 * fl); g.quadraticCurveTo(mx + fl, my + 1.5 * fl, x2 + fl, y2 + 1.5 * fl); g.stroke();\n    g.strokeStyle = ['#d8251b', '#b81a14', '#ec4a2a', '#c92f1b'][i % 4]; g.lineWidth = Math.max(0.7, 1.1 * fl);\n    g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(mx, my, x2, y2); g.stroke();\n  }\n  for (let i = 0; i < 6; i++) addGlint(tp, cx0 + gauss() * 0.2 * Rb, cy0 + gauss() * 0.1 * Rb + 0.04 * Rb, 0.03 * Rb);\n}\n\nfunction buildToppings() {\n  T = []; glints = [];\n  const Rb = G.Rb;\n\n  srand(11);\n  const nori = [\n    { bu: 0.05, bv: -0.74, tu: 0.08, tv: -0.95, th: 0.44, w: 0.34, tilt: 0.18, s: 11 },\n    { bu: -0.26, bv: -0.69, tu: -0.29, tv: -0.92, th: 0.54, w: 0.4, tilt: -0.1, s: 23 },\n  ];\n  nori.forEach((sp, i) => {\n    const Ly = topLayer(sp.bu, sp.bv, 0.52, 0.9, 0.4);\n    drawNori(Ly.g, sp);\n    addTop(Ly, sp.bu, sp.bv, 0.12, -10 + i);\n  });\n\n  srand(21);\n  const Ln = topLayer(-0.05, 0, 0.9, 0.62, 0.62);\n  drawNoodles(Ln.g);\n  addTop(Ln, -0.05, 0, 0, -5);\n\n  srand(31);\n  const spr = { u: -0.6, v: -0.2, n: 26, dir: 1.2 };\n  const Ls = topLayer(spr.u, spr.v, 0.4, 0.34, 0.36);\n  drawSprouts(Ls.g, spr);\n  addTop(Ls, spr.u, spr.v, 0.4, -4);\n\n  srand(41);\n  const boks = [\n    { u: 0.14, v: -0.24, ang: -1.12, len: 0.64 },\n    { u: 0.34, v: -0.12, ang: -0.62, len: 0.58 },\n  ];\n  boks.forEach((sp, i) => {\n    const Ly = topLayer(sp.u, sp.v, 0.75, 0.75, 0.3);\n    const tp = addTop(Ly, sp.u, sp.v, 0.5, -3 + i * 0.1);\n    drawBokChoy(Ly.g, sp, tp);\n  });\n\n  srand(51);\n  const tofus = [\n    { u: 0.64, v: 0.08, s: 0.18, rot: 0.25 },\n    { u: 0.7, v: 0.4, s: 0.17, rot: -0.2 },\n    { u: 0.43, v: 0.32, s: 0.165, rot: 0.62 },\n  ];\n  tofus.forEach((sp) => {\n    const Ly = topLayer(sp.u, sp.v, 0.24, 0.34, 0.2);\n    const tp = addTop(Ly, sp.u, sp.v, 1, sp.v);\n    drawTofu(Ly.g, sp, tp);\n  });\n\n  srand(61);\n  const shi = [\n    { u: -0.56, v: 0.2, r: 0.125, rot: 0.3 },\n    { u: -0.4, v: 0.48, r: 0.13, rot: 1.1 },\n    { u: -0.14, v: 0.58, r: 0.12, rot: 0.7 },\n  ];\n  shi.forEach((sp) => {\n    const Ly = topLayer(sp.u, sp.v, 0.2, 0.22, 0.2);\n    const tp = addTop(Ly, sp.u, sp.v, 1, sp.v);\n    drawShiitake(Ly.g, sp, tp);\n  });\n\n  srand(71);\n  const corn = { u: 0.3, v: 0.64, rad: 0.17, n: 64 };\n  const Lc = topLayer(corn.u, corn.v, 0.3, 0.26, 0.24);\n  const tpc = addTop(Lc, corn.u, corn.v, 0.8, 0.9);\n  drawCorn(Lc.g, corn, tpc);\n\n  srand(81);\n  const ed = { beans: [[0.06, 0.66, 0.4], [0.12, 0.74, -0.3], [0.0, 0.76, 1.2], [0.08, 0.8, 0.1]] };\n  const Le = topLayer(0.07, 0.72, 0.16, 0.14, 0.14);\n  drawEdamame(Le.g, ed);\n  addTop(Le, 0.07, 0.72, 0.9, 0.95);\n\n  srand(91);\n  const Lg = topLayer(0, 0.05, 0.95, 0.66, 0.6);\n  const tpg = addTop(Lg, 0, 0.05, 0, 5);\n  drawGarnish(Lg.g, tpg);\n\n  T.sort((a, b) => a.order - b.order);\n  void Rb;\n}\n\n/* ------------------------------------------------------------------ *\n *  Dynamic elements\n * ------------------------------------------------------------------ */\nfunction buildDynamics() {\n  srand(606);\n  drops = [];\n  for (let i = 0; i < 90; i++) {\n    const a = rnd() * TAU, d = Math.sqrt(rnd()) * 0.94;\n    drops.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, r: 0.006 + Math.pow(rnd(), 2.6) * 0.03, chili: false, s: rnd() * 50 });\n  }\n  for (let i = 0; i < 16; i++) {\n    const a = rr(1.9, 4.1), d = rr(0.45, 0.9);\n    drops.push({ u: Math.cos(a) * d, v: Math.sin(a) * d * 0.9, r: rr(0.028, 0.06), chili: true, spr: i % 4, s: rnd() * 50 });\n  }\n  shimmer = [];\n  for (let i = 0; i < 30; i++) {\n    shimmer.push({ du: gauss() * 0.22, dv: gauss() * 0.12, len: rr(0.02, 0.07), w: rr(0.6, 1.8), ph: rnd() * TAU, sp: rr(1.2, 3.2) });\n  }\n  bokeh = [];\n  const md = Math.min(W, H);\n  for (let i = 0; i < 13; i++) {\n    let x = rnd() * W;\n    const y = rr(0.02, 0.5) * H;\n    if (Math.abs(x - G.cx) < G.R * 0.8 && rnd() < 0.75) x = G.cx + (rnd() < 0.5 ? -1 : 1) * (G.R * 0.8 + rnd() * W * 0.35);\n    bokeh.push({ x, y, r: rr(0.03, 0.085) * md, spr: Math.floor(rnd() * 3), a: rr(0.05, 0.14), ph: rnd() * TAU, sp: rr(0.15, 0.4), depth: rr(0.6, 1.4) });\n  }\n  motes = [];\n  for (let i = 0; i < 26; i++) motes.push(newMote(true));\n}\nfunction newMote(init) {\n  const { cx, cy, R } = G;\n  return {\n    x: cx + rr(-1.7, 1.7) * R,\n    y: init ? cy - rr(0.3, 2.2) * R : cy - rr(0.2, 0.5) * R,\n    vx: rr(-4, 4) * G.unit, vy: -rr(4, 12) * G.unit,\n    s: rr(1.2, 3.2) * Math.max(0.7, G.unit), a: rr(0.08, 0.3), life: 0, max: rr(8, 18), ph: rnd() * TAU,\n  };\n}\n\nfunction sheenPos() { return { u: -0.12 + 0.36 * S.cam.x, v: -0.44 + 0.16 * S.cam.y }; }\nfunction sheenAt(u, v) {\n  const s = sheenPos();\n  const du = (u - s.u) / 0.5, dv = (v - s.v) / 0.2;\n  return Math.exp(-(du * du + dv * dv));\n}\n\nfunction addRipple(u, v, amp, speed) {\n  if (ripples.length > 26) ripples.shift();\n  ripples.push({ u, v, t0: S.time, amp, speed: speed || 0.34 });\n}\n\n/* ------------------------------------------------------------------ *\n *  Steam flow field (mouse wind), advected upward with the steam\n * ------------------------------------------------------------------ */\nconst FW = 48, FH = 32, FN = FW * FH;\nconst Fdx = new Float32Array(FN), Fdy = new Float32Array(FN), Fvx = new Float32Array(FN), Fvy = new Float32Array(FN), Fst = new Float32Array(FN);\nconst Ftmp = new Float32Array(FN);\nconst flowBytes = new Uint8Array(FN * 4);\nconst FLOW_SCALE = 1.2;\n\nfunction flowInject(px, py, mvx, mvy, radius, mode) {\n  const cw = W / FW, ch = H / FH;\n  const gx = px / cw - 0.5, gy = py / ch - 0.5;\n  const rx = radius / cw, ry = radius / ch;\n  const i0 = Math.max(0, Math.floor(gx - 2.2 * rx)), i1 = Math.min(FW - 1, Math.ceil(gx + 2.2 * rx));\n  const j0 = Math.max(0, Math.floor(gy - 2.2 * ry)), j1 = Math.min(FH - 1, Math.ceil(gy + 2.2 * ry));\n  for (let j = j0; j <= j1; j++) {\n    for (let i = i0; i <= i1; i++) {\n      const dx = (i - gx) / rx, dy = (j - gy) / ry;\n      const w = Math.exp(-(dx * dx + dy * dy));\n      if (w < 0.01) continue;\n      const n = j * FW + i;\n      if (mode === 'burst') {\n        const d = Math.hypot(dx, dy) + 0.3;\n        Fvx[n] += (dx / d) * mvx * w;\n        Fvy[n] += (-dy / d) * mvx * w + mvy * w;\n      } else {\n        Fvx[n] += (mvx - Fvx[n]) * w * 0.55;\n        Fvy[n] += (mvy - Fvy[n]) * w * 0.55;\n      }\n    }\n  }\n}\nfunction advectUp(A, shift) {\n  for (let j = 0; j < FH; j++) {\n    const src = j + shift, j0 = Math.floor(src), f = src - j0;\n    for (let i = 0; i < FW; i++) {\n      const a = j0 < FH ? A[j0 * FW + i] : 0;\n      const b = j0 + 1 < FH ? A[(j0 + 1) * FW + i] : 0;\n      Ftmp[j * FW + i] = a + (b - a) * f;\n    }\n  }\n  A.set(Ftmp);\n}\nfunction blurField(A, amt) {\n  for (let j = 0; j < FH; j++) {\n    for (let i = 0; i < FW; i++) {\n      const n = j * FW + i;\n      const l = i > 0 ? A[n - 1] : A[n], r = i < FW - 1 ? A[n + 1] : A[n];\n      const u = j > 0 ? A[n - FW] : A[n], d = j < FH - 1 ? A[n + FW] : A[n];\n      Ftmp[n] = A[n] + ((l + r + u + d) * 0.25 - A[n]) * amt;\n    }\n  }\n  A.set(Ftmp);\n}\nfunction flowStep(dt) {\n  if (pointer.fdx || pointer.fdy) {\n    const sdt = Math.max(dt, 1 / 120);\n    const mvx = clamp(pointer.fdx / G.Rb / sdt, -7, 7), mvy = clamp(-pointer.fdy / G.Rb / sdt, -7, 7);\n    flowInject(pointer.x, pointer.y, mvx, mvy, 0.3 * G.Rb, 'drag');\n    pointer.fdx = pointer.fdy = 0;\n  }\n  const dv = Math.exp(-dt * 2.0), dd = Math.exp(-dt * 0.3), ds = Math.exp(-dt * 1.1);\n  for (let n = 0; n < FN; n++) {\n    Fdx[n] = clamp((Fdx[n] + Fvx[n] * dt) * dd, -FLOW_SCALE, FLOW_SCALE);\n    Fdy[n] = clamp((Fdy[n] + Fvy[n] * dt) * dd, -FLOW_SCALE, FLOW_SCALE);\n    Fvx[n] *= dv; Fvy[n] *= dv;\n    Fst[n] = Math.max(Fst[n] * ds, Math.min(1, Math.hypot(Fvx[n], Fvy[n]) * 0.3));\n  }\n  const shift = 0.24 * G.Rb * dt / (H / FH);\n  advectUp(Fdx, shift); advectUp(Fdy, shift); advectUp(Fvx, shift); advectUp(Fvy, shift); advectUp(Fst, shift);\n  blurField(Fdx, 0.25); blurField(Fdy, 0.25); blurField(Fst, 0.2);\n  for (let n = 0; n < FN; n++) {\n    const o = n * 4;\n    flowBytes[o] = clamp(Math.round(127.5 + Fdx[n] / FLOW_SCALE * 127), 0, 255);\n    flowBytes[o + 1] = clamp(Math.round(127.5 + Fdy[n] / FLOW_SCALE * 127), 0, 255);\n    flowBytes[o + 2] = clamp(Math.round(Fst[n] * 255), 0, 255);\n    flowBytes[o + 3] = 255;\n  }\n}\nfunction flowVelAt(x, y) {\n  const i = clamp(Math.floor(x / W * FW), 0, FW - 1), j = clamp(Math.floor(y / H * FH), 0, FH - 1);\n  const n = j * FW + i;\n  return [Fvx[n] * G.Rb, -Fvy[n] * G.Rb];\n}\nfunction resetFlow() {\n  Fdx.fill(0); Fdy.fill(0); Fvx.fill(0); Fvy.fill(0); Fst.fill(0);\n  for (let n = 0; n < FN; n++) { flowBytes[n * 4] = 128; flowBytes[n * 4 + 1] = 128; flowBytes[n * 4 + 2] = 0; flowBytes[n * 4 + 3] = 255; }\n}\n\n/* ------------------------------------------------------------------ *\n *  Steam renderer (WebGL, with a 2D fallback)\n * ------------------------------------------------------------------ */\nconst STEAM_VS = `\nattribute vec2 aPos;\nvarying vec2 vUv;\nvoid main() { vUv = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }`;\nconst STEAM_FS = `\n#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\nvarying vec2 vUv;\nuniform vec2 uRes;\nuniform float uTime;\nuniform vec4 uBowl;\nuniform sampler2D uFlow;\nuniform float uFlowScale;\nuniform float uBoost;\nuniform float uLight;\nuniform vec2 uCam;\n\nfloat hash(vec2 p) {\n  vec3 p3 = fract(vec3(p.xyx) * 0.1031);\n  p3 += dot(p3, p3.yzx + 33.33);\n  return fract((p3.x + p3.y) * p3.z);\n}\nfloat noise(vec2 p) {\n  vec2 i = floor(p);\n  vec2 f = fract(p);\n  vec2 u = f * f * (3.0 - 2.0 * f);\n  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),\n             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);\n}\nfloat fbm(vec2 p) {\n  float s = 0.0;\n  float a = 0.5;\n  mat2 m = mat2(1.6, 1.2, -1.2, 1.6);\n  for (int i = 0; i < 5; i++) {\n    s += a * noise(p);\n    p = m * p + vec2(3.1, 1.7);\n    a *= 0.5;\n  }\n  return s;\n}\nvoid main() {\n  vec2 sp = vec2(vUv.x, 1.0 - vUv.y);\n  vec2 px = sp * uRes;\n  float Rb = uBowl.z;\n  float k = uBowl.w;\n  vec2 q = (px - uBowl.xy) / Rb;\n  float h = -q.y;\n  float ax = abs(q.x);\n  float yFront = k * sqrt(max(0.0, 1.0 - ax * ax));\n  float s = h + yFront;\n  float hh = max(h, 0.0);\n  float t = uTime;\n  float sway = (0.08 * sin(t * 0.21) + 0.05 * sin(t * 0.47 + 1.3)) * hh * hh;\n  float width = 0.8 + 0.34 * hh;\n  float env = 1.0 - smoothstep(0.3 * width, width, abs(q.x - sway));\n  float grow = smoothstep(0.02, 0.8, s) * step(ax, 1.25 + hh);\n  float fade = 1.0 - smoothstep(0.5, 2.7, h);\n  float mask = env * grow * fade;\n  if (mask < 0.003) { gl_FragColor = vec4(0.0); return; }\n\n  vec4 fl = texture2D(uFlow, sp);\n  vec2 disp = (fl.rg * 2.0 - 1.0) * uFlowScale;\n  float stir = fl.b;\n\n  vec2 p = vec2(q.x - sway, h) - disp;\n  float rise = t * 0.2;\n  vec2 wq = p * vec2(1.3, 0.75);\n  vec2 warp = vec2(fbm(wq + vec2(0.0, -rise * 1.2)), fbm(wq + vec2(4.7, -rise * 1.05 + 2.3)));\n  float turb = 0.32 + 0.5 * hh + 0.9 * stir;\n  vec2 pp = p + (warp - 0.5) * turb * vec2(1.0, 0.6);\n  float n1 = fbm(vec2(pp.x * 3.4, pp.y * 1.1 - rise * 2.0));\n  float ridge = 1.0 - abs(2.0 * n1 - 1.0);\n  ridge = ridge * ridge * ridge * ridge;\n  float n2 = fbm(pp * vec2(1.8, 0.9) + vec2(9.1, -rise * 1.7));\n  float body = smoothstep(0.42, 0.82, n2);\n  float d = (ridge * 0.8 + body * 0.55) * mask;\n  d *= (1.0 - 0.45 * stir) * (0.9 + 0.9 * uBoost);\n\n  vec2 lp = vec2(-0.75 + uCam.x * 0.45, 1.5 - uCam.y * 0.25);\n  vec2 dl = vec2(q.x, h) - lp;\n  float lamp = exp(-dot(dl, dl) * 0.32);\n  float a = clamp(d * (0.28 + 0.4 * lamp) * uLight, 0.0, 0.9);\n  vec3 col = mix(vec3(1.0, 0.8, 0.6), vec3(0.97, 0.94, 0.9), smoothstep(0.0, 1.8, h));\n  col = mix(col, vec3(1.0, 0.87, 0.7), lamp * 0.45);\n  gl_FragColor = vec4(col * a, a);\n}`;\n\nconst steam = (() => {\n  let gl = null, prog = null, tex = null, U = {}, g2 = null, ready = false;\n  let cw = 1, ch = 1, sc = 1;\n  const parts = [];\n  let puff = null;\n\n  function compile(type, src) {\n    const s = gl.createShader(type);\n    gl.shaderSource(s, src); gl.compileShader(s);\n    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) || 'shader');\n    return s;\n  }\n  function initGL() {\n    let c = null;\n    try {\n      c = steamCanvas.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false })\n        || steamCanvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: true });\n    } catch (e) { c = null; }\n    if (!c) return false;\n    gl = c;\n    try {\n      prog = gl.createProgram();\n      gl.attachShader(prog, compile(gl.VERTEX_SHADER, STEAM_VS));\n      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, STEAM_FS));\n      gl.linkProgram(prog);\n      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error('link');\n    } catch (e) { gl = null; return false; }\n    gl.useProgram(prog);\n    const buf = gl.createBuffer();\n    gl.bindBuffer(gl.ARRAY_BUFFER, buf);\n    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);\n    const loc = gl.getAttribLocation(prog, 'aPos');\n    gl.enableVertexAttribArray(loc);\n    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);\n    for (const n of ['uRes', 'uTime', 'uBowl', 'uFlow', 'uFlowScale', 'uBoost', 'uLight', 'uCam']) U[n] = gl.getUniformLocation(prog, n);\n    tex = gl.createTexture();\n    gl.bindTexture(gl.TEXTURE_2D, tex);\n    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);\n    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);\n    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);\n    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);\n    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);\n    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, FW, FH, 0, gl.RGBA, gl.UNSIGNED_BYTE, flowBytes);\n    gl.uniform1i(U.uFlow, 0);\n    gl.uniform1f(U.uFlowScale, FLOW_SCALE);\n    gl.clearColor(0, 0, 0, 0);\n    return true;\n  }\n  function init() {\n    steamCanvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); ready = false; }, false);\n    steamCanvas.addEventListener('webglcontextrestored', () => { ready = initGL(); resize(); requestRender(); }, false);\n    ready = initGL();\n    if (!ready) {\n      // a canvas that already produced a GL context can't hand out a 2D one\n      const fresh = document.createElement('canvas');\n      fresh.id = 'steam'; fresh.setAttribute('aria-hidden', 'true');\n      steamCanvas.replaceWith(fresh);\n      steamCanvas = fresh;\n      g2 = steamCanvas.getContext('2d');\n      puff = spriteCanvas(128, (g, s) => {\n        const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);\n        gr.addColorStop(0, 'rgba(255,238,220,0.5)'); gr.addColorStop(0.5, 'rgba(255,230,205,0.18)'); gr.addColorStop(1, 'rgba(255,230,205,0)');\n        g.fillStyle = gr; g.fillRect(0, 0, s, s);\n      });\n    }\n  }\n  function resize() {\n    sc = g2 ? Math.min(1, DPR) : clamp(quality.steamScale * Math.min(DPR, 1.5), 0.3, 1);\n    const maxW = g2 ? 1400 : 1100;\n    if (W * sc > maxW) sc = maxW / W;\n    cw = Math.max(1, Math.round(W * sc)); ch = Math.max(1, Math.round(H * sc));\n    steamCanvas.width = cw; steamCanvas.height = ch;\n    if (gl && ready) gl.viewport(0, 0, cw, ch);\n  }\n  function render(ox, oy, t) {\n    if (gl && ready) {\n      gl.bindTexture(gl.TEXTURE_2D, tex);\n      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, FW, FH, gl.RGBA, gl.UNSIGNED_BYTE, flowBytes);\n      gl.uniform2f(U.uRes, cw, ch);\n      gl.uniform1f(U.uTime, t);\n      gl.uniform4f(U.uBowl, (G.cx + ox) * sc, (G.cyB + oy) * sc, G.Rb * sc, G.k);\n      gl.uniform1f(U.uBoost, S.boost);\n      gl.uniform1f(U.uLight, S.flick);\n      gl.uniform2f(U.uCam, S.cam.x, S.cam.y);\n      gl.clear(gl.COLOR_BUFFER_BIT);\n      gl.drawArrays(gl.TRIANGLES, 0, 3);\n    } else if (g2) {\n      render2d(ox, oy);\n    }\n  }\n  function render2d(ox, oy) {\n    const g = g2;\n    g.setTransform(sc, 0, 0, sc, 0, 0);\n    g.clearRect(0, 0, W, H);\n    const Rb = G.Rb;\n    if (!reduced) {\n      const rate = 26 * (1 + S.boost);\n      let n = Math.floor(rate * S.dt + Math.random());\n      while (n-- > 0 && parts.length < 170) {\n        const a = Math.random() * TAU, d = Math.sqrt(Math.random()) * 0.85;\n        parts.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, y: 0, x: 0, life: 0, max: 3 + Math.random() * 3, s: 0.12 + Math.random() * 0.12, ph: Math.random() * TAU });\n      }\n    } else if (!parts.length) {\n      for (let i = 0; i < 90; i++) {\n        const a = Math.random() * TAU, d = Math.sqrt(Math.random()) * 0.85;\n        parts.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, y: 0, x: 0, life: Math.random() * 4, max: 6, s: 0.12 + Math.random() * 0.12, ph: Math.random() * TAU });\n      }\n    }\n    g.globalCompositeOperation = 'lighter';\n    for (let i = parts.length - 1; i >= 0; i--) {\n      const p = parts[i];\n      if (!reduced) {\n        p.life += S.dt;\n        if (p.life > p.max) { parts.splice(i, 1); continue; }\n      }\n      const [bx, by] = P(p.u, p.v, 0);\n      const rise = p.life * 0.28 * Rb;\n      const x = bx + ox + Math.sin(p.life * 0.9 + p.ph) * 0.08 * Rb * p.life;\n      const y = by + oy - rise;\n      const [fvx] = flowVelAt(x, y);\n      p.x += fvx * S.dt * 0.6;\n      const size = (p.s + p.life * 0.09) * Rb;\n      g.globalAlpha = 0.16 * Math.sin(Math.PI * p.life / p.max) * S.flick * (1 + S.boost * 0.5);\n      g.drawImage(puff, x + p.x - size / 2, y - size / 2, size, size);\n    }\n    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';\n  }\n  return { init, resize, render, get scale() { return sc; } };\n})();\n\n/* ------------------------------------------------------------------ *\n *  Frame: update + render\n * ------------------------------------------------------------------ */\nfunction update(dt) {\n  S.time += dt; S.dt = dt;\n  const t = S.time;\n\n  // camera / light follows the pointer; drifts gently when idle\n  const idle = !pointer.active || (pointer.type !== 'mouse' && t - pointer.last > 4);\n  if (idle) {\n    S.camT.x = 0.42 * Math.sin(t * 0.083) + 0.12 * Math.sin(t * 0.21);\n    S.camT.y = 0.22 * Math.sin(t * 0.061 + 1.2);\n  } else {\n    S.camT.x = clamp((pointer.x - W / 2) / (W / 2), -1, 1);\n    S.camT.y = clamp((pointer.y - H / 2) / (H / 2), -1, 1);\n  }\n  const e = 1 - Math.exp(-dt * (idle ? 0.8 : 2.6));\n  S.cam.x += (S.camT.x - S.cam.x) * e;\n  S.cam.y += (S.camT.y - S.cam.y) * e;\n\n  S.flick = 0.93 + 0.09 * (vnoise(t * 1.1, 3.3) - 0.5) + 0.05 * (vnoise(t * 4.3, 7.1) - 0.5) + 0.02 * Math.sin(t * 0.7);\n  S.boost *= Math.exp(-dt * 0.8);\n\n  // a gentle simmer: the odd ripple from nowhere\n  if (t > S.nextSimmer) {\n    const a = rnd() * TAU, d = Math.sqrt(rnd()) * 0.85;\n    addRipple(Math.cos(a) * d, Math.sin(a) * d, rr(0.12, 0.28), rr(0.2, 0.3));\n    S.nextSimmer = t + rr(1.8, 4.5);\n  }\n\n  // ripples: age & retire\n  for (let i = ripples.length - 1; i >= 0; i--) {\n    const r = ripples[i];\n    const age = t - r.t0;\n    r.rad = age * r.speed;\n    r.fade = r.amp * Math.exp(-age * 1.05) * smoothstep(0, 0.06, age);\n    if (age > 0.5 && r.fade < 0.008) ripples.splice(i, 1);\n  }\n\n  // oil drifts in slow eddies and is nudged by passing ripples\n  for (const d of drops) {\n    const ang = vnoise(d.u * 1.3 + t * 0.03, d.v * 1.3 - t * 0.02 + d.s) * TAU * 2;\n    const sp = d.chili ? 0.6 : 1;\n    let vu = (-d.v * 0.014 + Math.cos(ang) * 0.01) * sp, vv = (d.u * 0.014 + Math.sin(ang) * 0.01) * sp;\n    for (const r of ripples) {\n      const du = d.u - r.u, dv = d.v - r.v, dist = Math.hypot(du, dv) + 1e-4;\n      const w = r.fade * Math.exp(-(((dist - r.rad) / 0.05) ** 2));\n      vu += (du / dist) * w * 0.3; vv += (dv / dist) * w * 0.3;\n    }\n    d.u += vu * dt; d.v += vv * dt;\n    const m2 = d.u * d.u + d.v * d.v;\n    if (m2 > 0.92) { const m = Math.sqrt(0.92 / m2); d.u *= m; d.v *= m; }\n  }\n\n  // toppings bob with passing ripples\n  for (const tp of T) {\n    if (!tp.bob) continue;\n    let k2 = 0;\n    for (const r of ripples) {\n      const dist = Math.hypot(tp.u - r.u, tp.v - r.v);\n      const x = dist - r.rad;\n      k2 += r.fade * Math.exp(-((x / 0.09) ** 2)) * Math.sin(x * 38);\n    }\n    tp.kick = k2 * G.R * 0.012 * tp.bob;\n  }\n\n  // dust motes in the lamplight\n  for (let i = 0; i < motes.length; i++) {\n    const m = motes[i];\n    const [fvx, fvy] = flowVelAt(m.x, m.y);\n    m.x += (m.vx + fvx * 0.5 + Math.sin(t * 0.3 + m.ph) * 3 * G.unit) * dt;\n    m.y += (m.vy + fvy * 0.5) * dt;\n    m.life += dt;\n    if (m.life > m.max || m.y < G.cy - 2.6 * G.R || Math.abs(m.x - G.cx) > 2.2 * G.R) motes[i] = newMote(false);\n  }\n\n  flowStep(dt);\n}\n\nfunction drawToppingClip() {\n  const { cx, cy, Rin, k } = G, M = G.margin * 3;\n  ctx.beginPath();\n  ctx.rect(-M, -M, W + 2 * M, cy + M);\n  ctx.moveTo(cx + Rin, cy);\n  ctx.ellipse(cx, cy, Rin, Rin * k, 0, 0, TAU);\n  ctx.clip();\n}\n\nfunction drawBrothDynamic() {\n  const { cx, cy, Rb, Rin, k } = G;\n  const f = S.flick;\n  ctx.save();\n  ctx.beginPath(); ctx.ellipse(cx, cy, Rin, Rin * k, 0, 0, TAU); ctx.clip();\n  ctx.beginPath(); ctx.ellipse(cx, G.cyB, Rb, Rb * k, 0, 0, TAU); ctx.clip();\n\n  // specular sheen of the lamp on the broth\n  const sp = sheenPos();\n  const [sx, sy] = P(sp.u, sp.v, 0);\n  radialEllipse(ctx, sx, sy, 0.64 * Rb, 0.3,\n    [[0, `rgba(255,226,180,${0.2 * f})`], [0.45, `rgba(255,200,140,${0.08 * f})`], [1, 'rgba(255,200,140,0)']], 'lighter');\n  radialEllipse(ctx, sx - 0.04 * Rb, sy, 0.2 * Rb, 0.36,\n    [[0, `rgba(255,242,220,${0.2 * f})`], [1, 'rgba(255,242,220,0)']], 'lighter');\n\n  // oil and chili oil\n  for (const d of drops) {\n    const [x, y] = P(d.u, d.v, 0);\n    const s = d.r * 2 * Rb;\n    if (d.chili) ctx.drawImage(SPR.chili[d.spr], x - s / 2, y - s * k / 2, s, s * k);\n    else ctx.drawImage(SPR.oil, x - s / 2, y - s * k / 2, s, s * k);\n  }\n  ctx.globalCompositeOperation = 'lighter';\n  for (const d of drops) {\n    if (d.chili) continue;\n    const w = sheenAt(d.u, d.v);\n    if (w < 0.05) continue;\n    const [x, y] = P(d.u, d.v, 0);\n    const s = (d.r * 1.4 + 0.012) * Rb;\n    ctx.globalAlpha = Math.min(1, w * 0.9 * f);\n    ctx.drawImage(SPR.white, x - s / 2 - d.r * 0.3 * Rb, y - s * 0.35 - d.r * 0.3 * Rb * k, s, s * 0.7);\n  }\n\n  // shimmering glints on the tiny waves inside the sheen\n  ctx.lineCap = 'round';\n  for (const s of shimmer) {\n    const u = sp.u + s.du, v = sp.v + s.dv;\n    const a = Math.pow(Math.max(0, Math.sin(S.time * s.sp + s.ph)), 3) * sheenAt(u, v) * 0.5 * f;\n    if (a < 0.02) continue;\n    const [x, y] = P(u, v, 0);\n    ctx.globalAlpha = a;\n    ctx.strokeStyle = 'rgb(255,240,214)';\n    ctx.lineWidth = s.w * G.unit;\n    ctx.beginPath(); ctx.ellipse(x, y + s.len * Rb * 0.4, s.len * Rb, s.len * Rb * 0.4, 0, Math.PI * 1.2, Math.PI * 1.8); ctx.stroke();\n  }\n  ctx.globalAlpha = 1;\n  ctx.globalCompositeOperation = 'source-over';\n\n  // ripples\n  for (const r of ripples) {\n    if (!r.fade || r.fade < 0.005) continue;\n    const [x, y] = P(r.u, r.v, 0);\n    for (let j = 0; j < 3; j++) {\n      const rj = r.rad - j * 0.05;\n      if (rj <= 0.006) continue;\n      const a = r.fade * (1 - j * 0.3);\n      ctx.lineWidth = Math.max(1, Rb * 0.006 * (1 + rj));\n      ctx.strokeStyle = `rgba(80,34,6,${0.3 * a})`;\n      ctx.beginPath(); ctx.ellipse(x, y + 1.2 * G.unit, rj * Rb, rj * Rb * k, 0, 0, TAU); ctx.stroke();\n      ctx.strokeStyle = `rgba(255,234,198,${0.45 * a})`;\n      ctx.beginPath(); ctx.ellipse(x, y - 0.6 * G.unit, rj * Rb, rj * Rb * k, 0, 0, TAU); ctx.stroke();\n    }\n  }\n  ctx.restore();\n}\n\nfunction drawBackRimHighlight() {\n  const { cx, cy, R, Rin, k } = G;\n  const Rm = (R + Rin) / 2;\n  const th0 = -Math.PI / 2 - 0.62 + S.cam.x * 0.55;\n  const s = (R - Rin) * 3.2;\n  ctx.globalCompositeOperation = 'lighter';\n  for (let i = -16; i <= 16; i++) {\n    const th = th0 + i * 0.03;\n    const w = Math.exp(-(i * i) / 60);\n    ctx.globalAlpha = w * 0.42 * S.flick;\n    const x = cx + Rm * Math.cos(th), y = cy + Rm * k * Math.sin(th) - 0.004 * R;\n    ctx.drawImage(SPR.warm, x - s / 2, y - s * 0.25, s, s * 0.5);\n  }\n  ctx.globalAlpha = 1;\n  ctx.globalCompositeOperation = 'source-over';\n}\nfunction drawFrontRimHighlight() {\n  const { cx, cy, R, Rin, k } = G;\n  const Rm = (R + Rin) / 2;\n  const s = (R - Rin) * 2.4;\n  ctx.globalCompositeOperation = 'lighter';\n  const th0 = Math.PI * 0.74 - S.cam.x * 0.2;\n  for (let i = -14; i <= 14; i++) {\n    const th = th0 + i * 0.025;\n    ctx.globalAlpha = Math.exp(-(i * i) / 50) * 0.3 * S.flick;\n    const x = cx + Rm * Math.cos(th), y = cy + Rm * k * Math.sin(th) - 0.003 * R;\n    ctx.drawImage(SPR.warm, x - s / 2, y - s * 0.22, s, s * 0.44);\n  }\n  const th1 = Math.PI * 0.3 - S.cam.x * 0.25;\n  for (let i = -10; i <= 10; i++) {\n    const th = th1 + i * 0.03;\n    ctx.globalAlpha = Math.exp(-(i * i) / 30) * 0.12 * S.flick;\n    const x = cx + Rm * Math.cos(th), y = cy + Rm * k * Math.sin(th) - 0.003 * R;\n    ctx.drawImage(SPR.warm, x - s / 2, y - s * 0.22, s, s * 0.44);\n  }\n  ctx.globalAlpha = 1;\n  ctx.globalCompositeOperation = 'source-over';\n}\n\nfunction drawToppings() {\n  for (const tp of T) {\n    let oy = 0, rot = 0;\n    if (tp.bob && !reduced) {\n      oy = Math.sin(S.time * tp.w + tp.ph) * tp.bob * G.R * 0.0035 + tp.kick;\n      rot = Math.sin(S.time * tp.w * 0.7 + tp.ph * 1.3) * tp.bob * 0.006;\n    }\n    tp.oy = oy;\n    if (rot) {\n      ctx.save();\n      ctx.translate(tp.ax, tp.ay + oy); ctx.rotate(rot);\n      ctx.drawImage(tp.L.c, tp.L.x0 - tp.ax, tp.L.y0 - tp.ay, tp.L.w, tp.L.h);\n      ctx.restore();\n    } else {\n      ctx.drawImage(tp.L.c, tp.L.x0, tp.L.y0 + oy, tp.L.w, tp.L.h);\n    }\n  }\n}\nfunction drawGlints() {\n  const la = S.cam.x * 1.1 + S.cam.y * 0.4;\n  ctx.globalCompositeOperation = 'lighter';\n  for (const gl of glints) {\n    const c = Math.cos((la - gl.pref) * 1.6);\n    const tw = reduced ? 1 : 0.75 + 0.25 * Math.sin(S.time * 1.7 + gl.ph);\n    const a = Math.pow(Math.max(0, c), 6) * tw * S.flick;\n    if (a < 0.02) continue;\n    const s = gl.size * (0.6 + 0.5 * a);\n    ctx.globalAlpha = Math.min(1, a * 0.85);\n    ctx.drawImage(SPR.sparkle, gl.x - s / 2, gl.y + (gl.tp.oy || 0) - s / 2, s, s);\n  }\n  ctx.globalAlpha = 1;\n  ctx.globalCompositeOperation = 'source-over';\n}\n\nfunction render() {\n  const cam = S.cam, u = G.unit, par = reduced ? 0 : 1;\n  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);\n  ctx.globalCompositeOperation = 'source-over';\n  ctx.globalAlpha = 1;\n\n  blit(L.bg, -cam.x * 14 * u * par, -cam.y * 8 * u * par);\n\n  // out-of-focus lights far behind\n  ctx.globalCompositeOperation = 'lighter';\n  for (const b of bokeh) {\n    const tw = 0.75 + 0.25 * Math.sin(S.time * b.sp + b.ph);\n    ctx.globalAlpha = b.a * tw * (0.85 + 0.15 * S.flick);\n    const x = b.x - cam.x * 26 * u * b.depth * par, y = b.y - cam.y * 12 * u * b.depth * par;\n    ctx.drawImage(SPR.bokeh[b.spr], x - b.r, y - b.r, 2 * b.r, 2 * b.r);\n  }\n  ctx.globalAlpha = clamp(0.4 + (S.flick - 0.9) * 5, 0, 1);\n  blit(L.glow, -cam.x * 10 * u * par, -cam.y * 6 * u * par);\n  ctx.globalAlpha = 1;\n  ctx.globalCompositeOperation = 'source-over';\n\n  const bx = cam.x * 4 * u * par, by = cam.y * 2.5 * u * par;\n  ctx.save();\n  ctx.translate(bx, by);\n  blit(L.bowl);\n  blit(L.broth);\n  drawBrothDynamic();\n  drawBackRimHighlight();\n  ctx.save(); drawToppingClip(); drawToppings(); ctx.restore();\n  blit(L.rim);\n  drawFrontRimHighlight();\n  drawGlints();\n  ctx.restore();\n\n  // dust motes\n  if (!reduced) {\n    ctx.globalCompositeOperation = 'lighter';\n    for (const m of motes) {\n      const env = Math.sin(Math.PI * clamp(m.life / m.max, 0, 1));\n      ctx.globalAlpha = m.a * env * (0.7 + 0.3 * Math.sin(S.time * 2 + m.ph));\n      const x = m.x + cam.x * 10 * u, y = m.y + cam.y * 5 * u;\n      ctx.drawImage(SPR.amber, x - m.s * 2, y - m.s * 2, m.s * 4, m.s * 4);\n    }\n    ctx.globalAlpha = 1;\n    ctx.globalCompositeOperation = 'source-over';\n  }\n\n  blit(L.vig);\n\n  steam.render(bx * 1.5, by * 1.5, reduced ? 14.0 : S.time + 20);\n}\n\n/* ------------------------------------------------------------------ *\n *  Loop, resize, input\n * ------------------------------------------------------------------ */\nlet raf = 0, pending = false;\nfunction loop(now) {\n  raf = 0;\n  const t = now / 1000;\n  let dt = S.last ? t - S.last : 1 / 60;\n  S.last = t;\n  dt = clamp(dt, 0, 0.05);\n  update(dt);\n  render();\n  adapt(dt);\n  if (!reduced) raf = requestAnimationFrame(loop);\n}\nfunction adapt(dt) {\n  if (dt > 0.034) { quality.slow++; quality.fast = 0; } else { quality.fast++; quality.slow = Math.max(0, quality.slow - 1); }\n  if (quality.slow > 90) {\n    quality.slow = 0;\n    if (quality.steamScale > 0.36) { quality.steamScale *= 0.75; steam.resize(); }\n    else if (quality.maxDpr > 1) { quality.maxDpr = 1; resize(); }\n  }\n}\nfunction start() {\n  if (raf) cancelAnimationFrame(raf);\n  raf = 0;\n  S.last = 0;\n  if (reduced) requestRender();\n  else raf = requestAnimationFrame(loop);\n}\nfunction requestRender() {\n  if (!reduced || pending) return;\n  pending = true;\n  requestAnimationFrame(() => {\n    pending = false;\n    S.dt = 0;\n    render();\n  });\n}\nfunction staticState() {\n  ripples = [];\n  S.boost = 0;\n  S.flick = 0.95;\n  resetFlow();\n  for (const tp of T) { tp.kick = 0; tp.oy = 0; }\n}\n\nfunction resize() {\n  W = Math.max(1, window.innerWidth);\n  H = Math.max(1, window.innerHeight);\n  DPR = Math.min(window.devicePixelRatio || 1, quality.maxDpr);\n  if (W * H * DPR * DPR > 9e6) DPR = Math.max(1, Math.sqrt(9e6 / (W * H)));\n  scene.width = Math.round(W * DPR);\n  scene.height = Math.round(H * DPR);\n  computeGeometry();\n  L.bg = buildBackground();\n  L.glow = buildGlow();\n  L.bowl = buildBowl();\n  L.broth = buildBroth();\n  buildToppings();\n  L.rim = buildRimFront();\n  L.vig = buildVignette();\n  buildDynamics();\n  resetFlow();\n  steam.resize();\n  if (reduced) { staticState(); requestRender(); }\n}\n\nlet resizeTimer = 0;\nwindow.addEventListener('resize', () => {\n  clearTimeout(resizeTimer);\n  resizeTimer = setTimeout(resize, 120);\n});\n\nfunction brothHit(x, y) {\n  const bx = S.cam.x * 4 * G.unit * (reduced ? 0 : 1), by = S.cam.y * 2.5 * G.unit * (reduced ? 0 : 1);\n  const u = (x - bx - G.cx) / G.Rb, v = (y - by - G.cyB) / (G.Rb * G.k);\n  const ex = (x - bx - G.cx) / G.Rin, ey = (y - by - G.cy) / (G.Rin * G.k);\n  if (u * u + v * v < 0.97 && ex * ex + ey * ey < 1) return [u, v];\n  return null;\n}\nfunction onMove(e) {\n  const x = e.clientX, y = e.clientY;\n  if (pointer.active) { pointer.fdx += x - pointer.x; pointer.fdy += y - pointer.y; }\n  const moved = pointer.active ? Math.hypot(x - pointer.x, y - pointer.y) : 0;\n  pointer.x = x; pointer.y = y;\n  pointer.active = true; pointer.type = e.pointerType || 'mouse';\n  pointer.last = S.time;\n  if (reduced) {\n    S.cam.x = S.camT.x = clamp((x - W / 2) / (W / 2), -1, 1) * 0.8;\n    S.cam.y = S.camT.y = clamp((y - H / 2) / (H / 2), -1, 1) * 0.8;\n    requestRender();\n    return;\n  }\n  const hit = brothHit(x, y);\n  if (hit) {\n    pointer.travel += moved;\n    if (pointer.travel > 0.07 * G.Rb) {\n      pointer.travel = 0;\n      addRipple(hit[0], hit[1], clamp(moved / (0.03 * G.Rb), 0.15, 0.45), 0.3);\n    }\n  }\n}\nfunction onDown(e) {\n  onMove(e);\n  if (reduced) return;\n  const hit = brothHit(e.clientX, e.clientY);\n  if (hit) {\n    addRipple(hit[0], hit[1], 1.0, 0.36);\n    setTimeout(() => addRipple(hit[0], hit[1], 0.45, 0.3), 140);\n  }\n  S.boost = Math.min(1.6, S.boost + 0.9);\n  flowInject(e.clientX, e.clientY, 1.6, 0.9, 0.38 * G.Rb, 'burst');\n}\nfunction onLeave() { pointer.active = false; }\n\nwindow.addEventListener('pointermove', onMove, { passive: true });\nwindow.addEventListener('pointerdown', onDown, { passive: true });\nwindow.addEventListener('pointerup', (e) => { if (e.pointerType !== 'mouse') pointer.last = S.time; }, { passive: true });\nwindow.addEventListener('pointercancel', onLeave, { passive: true });\ndocument.documentElement.addEventListener('pointerleave', onLeave, { passive: true });\nwindow.addEventListener('blur', onLeave);\n\nfunction onMotionPref() {\n  reduced = !!(reduceMQ && reduceMQ.matches);\n  if (reduced) staticState();\n  start();\n}\nif (reduceMQ) {\n  if (reduceMQ.addEventListener) reduceMQ.addEventListener('change', onMotionPref);\n  else if (reduceMQ.addListener) reduceMQ.addListener(onMotionPref);\n}\ndocument.addEventListener('visibilitychange', () => { if (!document.hidden) { S.last = 0; if (reduced) requestRender(); } });\n\n/* ------------------------------------------------------------------ *\n *  Boot\n * ------------------------------------------------------------------ */\nbuildSprites();\nmakeWood();\nsteam.init();\nresize();\nstart();\n})();\n</script>\n</body>\n</html>\n"
+      },
+      "timestamp": "2026-09-23T00:01:21.073Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Hhnrq8ZeTjTvPpFY5PDgwD",
+      "status": "success",
+      "output": "File created successfully at: <WORKSPACE>/anthropic/opus-5.5/xhigh/index.html (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-09-23T00:01:21.129Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now a headless harness to screenshot it.",
+      "timestamp": "2026-09-23T00:01:22.790Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_012X5zsiYVsqzYSrEq6t3MnP",
+      "tool": "Bash",
+      "input": {
+        "command": "mkdir -p <TMP>/ramen && cat > <TMP>/ramen/shot.mjs <<'EOF'\nimport { createRequire } from 'module';\nconst require = createRequire('<HOME>/.local/lib/node_modules/@playwright/mcp/node_modules/');\nconst { chromium } = require('playwright-core');\nconst [,, out = '<TMP>/ramen/shot.png', w = '1440', h = '900', opts = '{}'] = process.argv;\nconst o = JSON.parse(opts);\nconst browser = await chromium.launch({ executablePath: process.env.HOME + '/.cache/ms-playwright/chromium-1223/chrome-linux/chrome', args: ['--no-sandbox', '--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });\nconst page = await browser.newPage({ viewport: { width: +w, height: +h }, deviceScaleFactor: o.dpr || 1, reducedMotion: o.reduced ? 'reduce' : 'no-preference' });\nconst logs = [];\npage.on('console', m => logs.push(m.type() + ': ' + m.text()));\npage.on('pageerror', e => logs.push('PAGEERROR: ' + e.message));\nawait page.goto('file://<WORKSPACE>/anthropic/opus-5.5/xhigh/index.html');\nawait page.waitForTimeout(o.wait || 2500);\nfor (const m of (o.moves || [])) { await page.mouse.move(m[0], m[1], { steps: m[2] || 10 }); }\nif (o.click) await page.mouse.click(o.click[0], o.click[1]);\nif (o.after) await page.waitForTimeout(o.after);\nif (o.clip) await page.screenshot({ path: out, clip: o.clip }); else await page.screenshot({ path: out });\nif (o.fps) {\n  const f = await page.evaluate(() => new Promise(r => { let n = 0; const t0 = performance.now(); function s() { n++; if (performance.now() - t0 < 2000) requestAnimationFrame(s); else r(n / 2); } requestAnimationFrame(s); }));\n  logs.push('fps ' + f);\n}\nconsole.log(logs.join('\\n'));\nawait browser.close();\nEOF\ncd <TMP>/ramen && node shot.mjs <TMP>/ramen/a.png 1440 900 '{\"fps\":true}'",
+        "description": "Create playwright screenshot harness and take first shot",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:01:29.169Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_012X5zsiYVsqzYSrEq6t3MnP",
+      "status": "success",
+      "output": "warning: [.WebGL-0x3400160e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels\nwarning: [.WebGL-0x3400160e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels\nwarning: [.WebGL-0x3400160e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels\nwarning: [.WebGL-0x3400160e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)\nfps 58\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:01:34.757Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01MrM4kWa6GhPMn5fmvKtRiz",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/a.png"
+      },
+      "timestamp": "2026-09-23T00:01:35.937Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01MrM4kWa6GhPMn5fmvKtRiz",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"335256\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:01:35.996Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01WzxYH7krukhQSWwTPWbyF6",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen && node shot.mjs <TMP>/ramen/b.png 1440 900 '{\"dpr\":2,\"clip\":{\"x\":380,\"y\":280,\"width\":700,\"height\":520}}' 2>&1 | grep -v 'GL Driver'",
+        "description": "Take a 2x DPR close-up screenshot of the bowl",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:02:08.017Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01WzxYH7krukhQSWwTPWbyF6",
+      "status": "success",
+      "output": "warning: WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:02:12.089Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01VyxSYJHxQbNAvYrVjABN4B",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/b.png"
+      },
+      "timestamp": "2026-09-23T00:02:13.641Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01VyxSYJHxQbNAvYrVjABN4B",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"344768\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:02:13.704Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01BY5DUU56z4S8aqJhGChoxy",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\nimport re\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"const Z_BODY = 0.585, Z_FOOT0 = 0.56, Z_FOOT = 0.665;\nconst rBody = (z) => { const s = clamp(z / Z_BODY, 0, 1); return 0.43 + 0.57 * Math.pow(1 - Math.pow(s, 2.3), 0.62); };\nconst rFoot = (z) => 0.405 - (z - Z_FOOT0) * 0.22;\"\"\",\n\"\"\"const Z_BODY = 0.6, Z_FOOT0 = 0.585, Z_FOOT = 0.68;\nconst rBody = (z) => 1 - 0.56 * Math.pow(clamp(z / Z_BODY, 0, 1), 1.45) - 0.02 * Math.pow(clamp(z / Z_BODY, 0, 1), 6);\nconst rFoot = (z) => 0.4 - (z - Z_FOOT0) * 0.3;\"\"\")\nrep(\"\"\"  let R = portrait ? Math.min(W * 0.44, H * 0.30) : Math.min(W * 0.40, H * 0.36);\"\"\",\n\"\"\"  let R = portrait ? Math.min(W * 0.44, H * 0.30) : Math.min(W * 0.40, H * 0.375);\"\"\")\nrep(\"\"\"    Rin: 0.955 * R, Rb: 0.915 * R, cyB: cy + 0.13 * cosE * R,\"\"\",\n\"\"\"    Rin: 0.962 * R, Rb: 0.92 * R, cyB: cy + 0.13 * cosE * R,\"\"\")\n# rim colours\nrep(\"\"\"  gr.addColorStop(0, '#8e4f23'); gr.addColorStop(0.3, '#6e3a19'); gr.addColorStop(0.65, '#4b260f'); gr.addColorStop(1, '#5d3014');\n  g.fillStyle = gr;\n  g.fill('evenodd');\n  const Rm = (R + Rin) / 2;\n  g.lineWidth = (R - Rin) * 0.4;\n  g.strokeStyle = 'rgba(255,196,140,0.10)';\"\"\",\n\"\"\"  gr.addColorStop(0, '#5a3119'); gr.addColorStop(0.3, '#3f2213'); gr.addColorStop(0.65, '#26140b'); gr.addColorStop(1, '#3a1f10');\n  g.fillStyle = gr;\n  g.fill('evenodd');\n  const Rm = (R + Rin) / 2;\n  g.lineWidth = (R - Rin) * 0.45;\n  g.strokeStyle = 'rgba(255,190,130,0.13)';\"\"\")\nopen(p,'w').write(s)\nEOF",
+        "description": "Update bowl profile, size, and rim colours"
+      },
+      "timestamp": "2026-09-23T00:03:37.888Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01BY5DUU56z4S8aqJhGChoxy",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:03:37.980Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now the interior glow, the rust band, and the glaze edge in `buildBowl`:",
+      "timestamp": "2026-09-23T00:03:40.752Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01VpHHLHW8jGLsWSUYrmVPe5",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"    g.strokeStyle = `rgba(132,66,26,${0.5 * Math.pow(1 - z / 0.16, 2.4)})`;\"\"\",\n\"\"\"    g.strokeStyle = `rgba(120,60,24,${0.3 * Math.pow(1 - z / 0.16, 2.4)})`;\"\"\")\nrep(\"\"\"    let z = 0.475 + 0.016 * Math.sin(phi * 7 + 1.3) + 0.01 * Math.sin(phi * 17 + 0.2);\"\"\",\n\"\"\"    let z = 0.5 + 0.014 * Math.sin(phi * 7 + 1.3) + 0.008 * Math.sin(phi * 17 + 0.2);\"\"\")\nrep(\"\"\"  for (let i = 0; i < 7; i++) drips.push([rr(0.08, 0.92) * Math.PI, rr(0.015, 0.04), rr(0.02, 0.05)]);\"\"\",\n\"\"\"  for (let i = 0; i < 7; i++) drips.push([rr(0.08, 0.92) * Math.PI, rr(0.012, 0.03), rr(0.025, 0.06)]);\"\"\")\nrep(\"\"\"    const [x, y] = surf(rr(0.47, 0.585), rr(0.05, 0.95) * Math.PI);\"\"\",\n\"\"\"    const [x, y] = surf(rr(0.5, 0.6), rr(0.05, 0.95) * Math.PI);\"\"\")\n# interior\nrep(\"\"\"  g.fillStyle = '#0d0604'; g.fillRect(cx - R, cy - R, 2 * R, 2 * R);\n  radialEllipse(g, cx + 0.74 * Rin, cy + 0.02 * R, 0.72 * R, 0.85,\n    [[0, 'rgba(150,78,32,0.6)'], [1, 'rgba(150,78,32,0)']]);\n  radialEllipse(g, cx - 0.2 * R, cy - Rin * k, 0.9 * R, 0.25,\n    [[0, 'rgba(0,0,0,0.45)'], [1, 'rgba(0,0,0,0)']]);\n  radialEllipse(g, cx, cyB, 1.2 * Rb, k,\n    [[0, 'rgba(200,110,42,0.34)'], [0.83, 'rgba(200,110,42,0.3)'], [1, 'rgba(200,110,42,0)']]);\"\"\",\n\"\"\"  g.fillStyle = '#0b0604'; g.fillRect(cx - R, cy - R, 2 * R, 2 * R);\n  radialEllipse(g, cx + 0.8 * Rin, cy + 0.02 * R, 0.6 * R, 0.85,\n    [[0, 'rgba(120,62,26,0.42)'], [1, 'rgba(120,62,26,0)']]);\n  radialEllipse(g, cx - 0.2 * R, cy - Rin * k, 0.9 * R, 0.25,\n    [[0, 'rgba(0,0,0,0.5)'], [1, 'rgba(0,0,0,0)']]);\n  radialEllipse(g, cx, cyB, 1.12 * Rb, k,\n    [[0, 'rgba(170,90,34,0.2)'], [0.88, 'rgba(170,90,34,0.16)'], [1, 'rgba(170,90,34,0)']]);\"\"\")\nopen(p,'w').write(s)\nEOF",
+        "description": "Tone down interior glow and adjust glaze edge"
+      },
+      "timestamp": "2026-09-23T00:03:49.597Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01VpHHLHW8jGLsWSUYrmVPe5",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:03:49.679Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now I'll rework the noodles so individual strands read clearly, with gentler waves, a gold outline, and height-based shading:",
+      "timestamp": "2026-09-23T00:03:51.685Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01B32skLMYvx2LskkTmU8oqY",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nstart=s.index(\"const NOODLE_COLS\")\nend=s.index(\"function drawSubmergedNoodles\")\ns=s[:start]+r\"\"\"const NOODLE_COLS = [[250, 214, 120], [246, 206, 104], [252, 222, 138], [243, 200, 98]];\nconst NOODLE_EDGE = [186, 124, 38];\nconst BROTH = [206, 140, 70];\n\nfunction bez(c, s) {\n  const m = 1 - s, a = m * m * m, b = 3 * m * m * s, d = 3 * m * s * s, e = s * s * s;\n  return [a * c[0][0] + b * c[1][0] + d * c[2][0] + e * c[3][0], a * c[0][1] + b * c[1][1] + d * c[2][1] + e * c[3][1]];\n}\nfunction makeBundle(spec) {\n  const N = 120, out = [];\n  let len = 0, prev = bez(spec.c, 0);\n  for (let j = 1; j <= 40; j++) { const p = bez(spec.c, j / 40); len += Math.hypot(p[0] - prev[0], p[1] - prev[1]); prev = p; }\n  for (let i = 0; i < spec.n; i++) {\n    const f = spec.n > 1 ? i / (spec.n - 1) - 0.5 : 0;\n    const off0 = f * spec.width + gauss() * 0.005;\n    const waves = len / rr(0.075, 0.095);\n    const ph = rnd() * TAU, amp = rr(0.006, 0.0095), wd = rnd() * TAU;\n    const hb = spec.hmax * (1 - 0.5 * (2 * f) * (2 * f)) * rr(0.88, 1.08);\n    const s0 = rr(0, 0.05), s1 = 1 - rr(0, 0.05);\n    const pts = [];\n    for (let j = 0; j <= N; j++) {\n      const s = lerp(s0, s1, j / N);\n      const p = bez(spec.c, s), q1 = bez(spec.c, Math.min(1, s + 0.002)), q0 = bez(spec.c, Math.max(0, s - 0.002));\n      let tx = q1[0] - q0[0], ty = q1[1] - q0[1];\n      const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;\n      const ph2 = s * waves * TAU + ph;\n      const off = off0 + amp * Math.sin(ph2) + 0.012 * Math.sin(s * 4 + wd);\n      const h = hb * Math.pow(Math.sin(Math.PI * s), 0.65) - 0.016 + 0.004 * Math.cos(ph2);\n      pts.push([p[0] - ty * off, p[1] + tx * off, h, Math.cos(ph2)]);\n    }\n    pts.col = NOODLE_COLS[Math.floor(rnd() * NOODLE_COLS.length)];\n    pts.hmax = spec.hmax;\n    out.push(pts);\n  }\n  return out;\n}\nfunction strokeRuns(g, sp, vis, thr, dx, dy) {\n  let open = false;\n  g.beginPath();\n  for (let j = 0; j < sp.length; j++) {\n    if (vis[j] > thr) {\n      if (!open) { g.moveTo(sp[j][0] + dx, sp[j][1] + dy); open = true; } else g.lineTo(sp[j][0] + dx, sp[j][1] + dy);\n    } else open = false;\n  }\n  g.stroke();\n}\nfunction drawStrands(g, strands, nw) {\n  g.lineCap = 'round'; g.lineJoin = 'round';\n  for (const st of strands) {\n    const sp = st.map((p) => { const q = P(p[0], p[1], p[2]); return [q[0], q[1], p[2], p[3]]; });\n    const vis = sp.map((p) => smoothstep(-0.018, 0.018, p[2]));\n    g.strokeStyle = 'rgba(96,44,4,0.3)'; g.lineWidth = nw * 1.5;\n    strokeRuns(g, sp, vis, 0.5, nw * 0.2, nw * 0.6);\n    for (let pass = 0; pass < 2; pass++) {\n      g.lineWidth = pass ? nw * 0.66 : nw;\n      for (let j = 0; j < sp.length - 1; j++) {\n        const t = (vis[j] + vis[j + 1]) / 2;\n        if (t < 0.03) continue;\n        const occ = 0.8 + 0.2 * smoothstep(0, st.hmax, sp[j][2]);\n        const lum = (pass ? 0.93 + 0.09 * sp[j][3] : 1) * occ;\n        const base = pass ? st.col : NOODLE_EDGE;\n        const c = mixc(BROTH, [base[0] * lum, base[1] * lum, base[2] * lum], Math.pow(t, 0.8) * 0.97);\n        g.strokeStyle = rgb(c);\n        g.beginPath(); g.moveTo(sp[j][0], sp[j][1]); g.lineTo(sp[j + 1][0], sp[j + 1][1]); g.stroke();\n      }\n    }\n    g.strokeStyle = 'rgba(255,250,226,0.62)'; g.lineWidth = nw * 0.22;\n    strokeRuns(g, sp, vis, 0.8, -nw * 0.06, -nw * 0.2);\n  }\n}\nfunction drawNoodles(g) {\n  const nw = 0.03 * G.Rb;\n  const bundles = [\n    { c: [[-0.68, -0.44], [-0.3, -0.26], [0.06, 0.04], [0.42, 0.42]], n: 12, width: 0.26, hmax: 0.08 },\n    { c: [[-0.6, 0.42], [-0.22, 0.2], [0.14, -0.06], [0.46, -0.48]], n: 12, width: 0.24, hmax: 0.11 },\n    { c: [[-0.42, -0.02], [-0.16, -0.22], [0.16, 0.16], [0.36, -0.02]], n: 9, width: 0.17, hmax: 0.15 },\n  ];\n  const [mx, my] = P(-0.02, 0.03, 0);\n  softEll(g, mx + 0.02 * G.Rb, my + 0.03 * G.Rb, 0.52 * G.Rb, G.k * 0.95, '70,30,4', 0.34);\n  for (const b of bundles) drawStrands(g, makeBundle(b), nw);\n}\n\"\"\"+s[end:]\nopen(p,'w').write(s)\nEOF",
+        "description": "Rewrite noodle strand generation and drawing"
+      },
+      "timestamp": "2026-09-23T00:04:07.451Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01B32skLMYvx2LskkTmU8oqY",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:04:07.547Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Next: tofu, corn, scallions, and shiitake.",
+      "timestamp": "2026-09-23T00:04:08.991Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01V3TbYFr2LTi6m13UdsGAM2",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\n\n# ---- tofu faces\nrep(\"\"\"    const br = 0.5 + 0.35 * lam + 0.32 * fil;\n    const col = [206 * br, 134 * br, 56 * br];\n    const quad = [B[f.i], B[f.j], Tt[f.j], Tt[f.i]];\n    poly(g, quad);\n    const gy = g.createLinearGradient(0, Tt[f.i][1], 0, B[f.i][1]);\n    gy.addColorStop(0, rgb(mixc(col, [240, 180, 100], 0.2)));\n    gy.addColorStop(0.7, rgb(col));\n    gy.addColorStop(1, rgb(mixc(col, [150, 80, 30], 0.5)));\n    g.fillStyle = gy; g.fill();\n    g.save(); g.clip();\n    for (let k2 = 0; k2 < 50; k2++) {\n      const a = rnd(), b = rnd();\n      const x = lerp(lerp(B[f.i][0], B[f.j][0], a), lerp(Tt[f.i][0], Tt[f.j][0], a), b);\n      const y = lerp(lerp(B[f.i][1], B[f.j][1], a), lerp(Tt[f.i][1], Tt[f.j][1], a), b);\n      softEll(g, x, y, rr(1.5, 4.5) * fl, 1, rnd() < 0.6 ? '120,60,14' : '255,210,140', rr(0.2, 0.45));\n    }\"\"\",\n\"\"\"    const br = 0.55 + 0.3 * lam + 0.3 * fil;\n    const col = [214 * br, 140 * br, 58 * br];\n    const quad = [B[f.i], B[f.j], Tt[f.j], Tt[f.i]];\n    poly(g, quad);\n    const gy = g.createLinearGradient(0, Tt[f.i][1], 0, B[f.i][1]);\n    gy.addColorStop(0, rgb(mixc(col, [250, 196, 110], 0.35)));\n    gy.addColorStop(0.55, rgb(col));\n    gy.addColorStop(1, rgb(mixc(col, [120, 60, 20], 0.45)));\n    g.fillStyle = gy; g.fill();\n    g.save(); g.clip();\n    for (let k2 = 0; k2 < 34; k2++) {\n      const a = rnd(), b = rnd();\n      const x = lerp(lerp(B[f.i][0], B[f.j][0], a), lerp(Tt[f.i][0], Tt[f.j][0], a), b);\n      const y = lerp(lerp(B[f.i][1], B[f.j][1], a), lerp(Tt[f.i][1], Tt[f.j][1], a), b);\n      softEll(g, x, y, rr(3, 9) * fl, 0.8, rnd() < 0.6 ? '130,62,12' : '255,214,140', rr(0.08, 0.2));\n    }\n    for (let k2 = 0; k2 < 40; k2++) {\n      const a = rnd(), b = rnd();\n      const x = lerp(lerp(B[f.i][0], B[f.j][0], a), lerp(Tt[f.i][0], Tt[f.j][0], a), b);\n      const y = lerp(lerp(B[f.i][1], B[f.j][1], a), lerp(Tt[f.i][1], Tt[f.j][1], a), b);\n      g.fillStyle = rnd() < 0.5 ? 'rgba(110,50,10,0.25)' : 'rgba(255,226,170,0.25)';\n      g.fillRect(x, y, fl * rr(0.8, 1.8), fl * rr(0.8, 1.8));\n    }\"\"\")\nrep(\"\"\"  tg.addColorStop(0, '#f0b762'); tg.addColorStop(0.55, '#d89545'); tg.addColorStop(1, '#b8732e');\n  g.fillStyle = tg; g.fill();\n  g.save(); g.clip();\n  for (let k2 = 0; k2 < 70; k2++) {\n    const x = rr(lx, hx), y = rr(ly, hy);\n    softEll(g, x, y, rr(2, 6) * fl, 0.7, rnd() < 0.55 ? '140,70,16' : '255,220,150', rr(0.15, 0.4));\n  }\"\"\",\n\"\"\"  tg.addColorStop(0, '#f6c878'); tg.addColorStop(0.55, '#e0a150'); tg.addColorStop(1, '#bf7a32');\n  g.fillStyle = tg; g.fill();\n  g.save(); g.clip();\n  for (let k2 = 0; k2 < 26; k2++) {\n    const x = rr(lx, hx), y = rr(ly, hy);\n    softEll(g, x, y, rr(4, 10) * fl, 0.6, rnd() < 0.55 ? '150,72,14' : '255,226,160', rr(0.1, 0.25));\n  }\n  for (let k2 = 0; k2 < 40; k2++) {\n    g.fillStyle = rnd() < 0.5 ? 'rgba(120,56,10,0.22)' : 'rgba(255,236,190,0.3)';\n    g.fillRect(rr(lx, hx), rr(ly, hy), fl * rr(0.8, 1.8), fl * rr(0.8, 1.8));\n  }\"\"\")\nrep(\"\"\"  g.lineJoin = 'round';\n  g.strokeStyle = 'rgba(255,222,160,0.55)'; g.lineWidth = 1.6 * fl;\n  poly(g, Tt); g.stroke();\"\"\",\n\"\"\"  g.lineJoin = 'round';\n  g.strokeStyle = 'rgba(255,214,150,0.3)'; g.lineWidth = 3.2 * fl;\n  poly(g, Tt); g.stroke();\n  g.strokeStyle = 'rgba(255,236,190,0.55)'; g.lineWidth = 1.1 * fl;\n  poly(g, Tt); g.stroke();\"\"\")\n\n# ---- corn kernels bigger & brighter\nrep(\"\"\"    const w = 0.036 * Rb * kn.sz, h = w * 0.78;\n    g.save(); g.translate(x, y); g.rotate(kn.rot);\n    g.fillStyle = 'rgba(110,52,0,0.55)';\n    ellipsePath(g, 0, h * 0.25, w * 0.58, h * 0.55); g.fill();\n    const gr = g.createRadialGradient(-w * 0.18, -h * 0.2, 0, 0, 0, w * 0.6);\n    gr.addColorStop(0, '#fff2a8'); gr.addColorStop(0.45, '#f7c93a'); gr.addColorStop(1, '#d28c0e');\"\"\",\n\"\"\"    const w = 0.05 * Rb * kn.sz, h = w * 0.8;\n    g.save(); g.translate(x, y); g.rotate(kn.rot);\n    g.fillStyle = 'rgba(120,56,0,0.6)';\n    ellipsePath(g, w * 0.04, h * 0.28, w * 0.6, h * 0.58); g.fill();\n    const gr = g.createRadialGradient(-w * 0.18, -h * 0.22, 0, 0, 0, w * 0.62);\n    gr.addColorStop(0, '#fff7c0'); gr.addColorStop(0.4, '#ffd445'); gr.addColorStop(0.85, '#eca51a'); gr.addColorStop(1, '#c97d08');\"\"\")\nrep(\"\"\"  const corn = { u: 0.3, v: 0.64, rad: 0.17, n: 64 };\"\"\",\n\"\"\"  const corn = { u: 0.3, v: 0.64, rad: 0.17, n: 40 };\"\"\")\n\n# ---- scallions: hollow rings\nrep(\"\"\"  g.fillStyle = green ? 'rgba(200,232,150,0.95)' : 'rgba(236,243,208,0.95)';\n  ellipsePath(g, r * 0.04, r * 0.05, r * 0.58, r * 0.58); g.fill();\n  g.fillStyle = green ? 'rgba(90,150,50,0.7)' : 'rgba(180,200,140,0.6)';\n  ellipsePath(g, r * 0.1, r * 0.12, r * 0.3, r * 0.3); g.fill();\n  g.strokeStyle = 'rgba(255,255,240,0.55)'; g.lineWidth = r * 0.14;\n  g.beginPath(); g.arc(0, 0, r * 0.8, Math.PI * 1.05, Math.PI * 1.6); g.stroke();\"\"\",\n\"\"\"  // hollow centre: mostly see-through with a thin pale membrane\n  g.globalCompositeOperation = 'destination-out';\n  ellipsePath(g, r * 0.05, r * 0.06, r * 0.66, r * 0.66); g.fill();\n  g.globalCompositeOperation = 'source-over';\n  g.fillStyle = green ? 'rgba(214,240,170,0.3)' : 'rgba(245,250,225,0.35)';\n  ellipsePath(g, r * 0.05, r * 0.06, r * 0.66, r * 0.66); g.fill();\n  g.strokeStyle = green ? 'rgba(236,250,200,0.8)' : 'rgba(255,255,245,0.85)'; g.lineWidth = r * 0.09;\n  ellipsePath(g, r * 0.05, r * 0.06, r * 0.64, r * 0.64); g.stroke();\n  g.strokeStyle = 'rgba(255,255,240,0.6)'; g.lineWidth = r * 0.12;\n  g.beginPath(); g.arc(0, 0, r * 0.84, Math.PI * 1.05, Math.PI * 1.6); g.stroke();\"\"\")\nopen(p,'w').write(s)\nEOF",
+        "description": "Improve tofu, corn, and scallion rendering"
+      },
+      "timestamp": "2026-09-23T00:04:33.121Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01V3TbYFr2LTi6m13UdsGAM2",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:04:33.204Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now the garnish distribution, then the bok choy and nori reworks:",
+      "timestamp": "2026-09-23T00:04:37.576Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01NcWJk4VmxB8GnFEtCujvgH",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"  for (let i = 0; i < 34; i++) {\n    const u = -0.05 + gauss() * 0.16, v = 0.02 + gauss() * 0.16;\n    rings.push([u, v, moundH(u, v) + 0.03]);\n  }\n  for (let i = 0; i < 14; i++) {\n    const a = rnd() * TAU, d = rr(0.35, 0.8);\n    const u = Math.cos(a) * d, v = Math.sin(a) * d;\n    if (v < -0.55) continue;\n    rings.push([u, v, 0.005]);\n  }\n  rings.sort((a, b) => a[2] - b[2]);\n  for (const [u, v, h] of rings) {\n    const [x, y] = P(u, v, h);\n    scallion(g, x, y, rr(0.019, 0.026) * Rb, rnd() * TAU, rr(0.5, 0.95), rnd() < 0.72);\n  }\"\"\",\n\"\"\"  for (let i = 0; i < 30; i++) {\n    const u = -0.1 + gauss() * 0.085, v = 0.04 + gauss() * 0.1;\n    rings.push([u, v, moundH(u, v) + 0.03 + Math.max(0, 0.03 - Math.hypot(u + 0.1, v - 0.04) * 0.2)]);\n  }\n  for (let i = 0; i < 10; i++) {\n    const a = rnd() * TAU, d = rr(0.3, 0.8);\n    const u = Math.cos(a) * d, v = Math.sin(a) * d;\n    if (v < -0.5) continue;\n    rings.push([u, v, 0.005]);\n  }\n  rings.sort((a, b) => a[2] - b[2]);\n  for (const [u, v, h] of rings) {\n    const [x, y] = P(u, v, h);\n    scallion(g, x, y, rr(0.026, 0.034) * Rb, rnd() * TAU, rr(0.45, 0.9), rnd() < 0.7);\n  }\"\"\")\nrep(\"\"\"  for (let i = 0; i < 90; i++) {\n    const u = -0.02 + gauss() * 0.25, v = 0.04 + gauss() * 0.24;\"\"\",\n\"\"\"  for (let i = 0; i < 70; i++) {\n    const u = -0.02 + gauss() * 0.25, v = 0.04 + gauss() * 0.24;\"\"\")\nrep(\"\"\"  const [cx0, cy0] = P(-0.02, -0.02, moundH(-0.02, -0.02) + 0.05);\"\"\",\n\"\"\"  const [cx0, cy0] = P(0.1, -0.08, moundH(0.1, -0.08) + 0.06);\"\"\")\n\n# ---- shiitake bigger\nrep(\"\"\"    { u: -0.56, v: 0.2, r: 0.125, rot: 0.3 },\n    { u: -0.4, v: 0.48, r: 0.13, rot: 1.1 },\n    { u: -0.14, v: 0.58, r: 0.12, rot: 0.7 },\"\"\",\n\"\"\"    { u: -0.58, v: 0.22, r: 0.14, rot: 0.3 },\n    { u: -0.4, v: 0.5, r: 0.145, rot: 1.1 },\n    { u: -0.13, v: 0.6, r: 0.135, rot: 0.7 },\"\"\")\nrep(\"\"\"    { u: 0.64, v: 0.08, s: 0.18, rot: 0.25 },\n    { u: 0.7, v: 0.4, s: 0.17, rot: -0.2 },\n    { u: 0.43, v: 0.32, s: 0.165, rot: 0.62 },\"\"\",\n\"\"\"    { u: 0.64, v: 0.08, s: 0.2, rot: 0.25 },\n    { u: 0.71, v: 0.42, s: 0.19, rot: -0.2 },\n    { u: 0.44, v: 0.33, s: 0.185, rot: 0.62 },\"\"\")\n\n# ---- nori: shorter, darker\nrep(\"\"\"    { bu: 0.05, bv: -0.74, tu: 0.08, tv: -0.95, th: 0.44, w: 0.34, tilt: 0.18, s: 11 },\n    { bu: -0.26, bv: -0.69, tu: -0.29, tv: -0.92, th: 0.54, w: 0.4, tilt: -0.1, s: 23 },\"\"\",\n\"\"\"    { bu: 0.04, bv: -0.74, tu: 0.07, tv: -0.95, th: 0.33, w: 0.32, tilt: 0.2, s: 11 },\n    { bu: -0.25, bv: -0.7, tu: -0.29, tv: -0.93, th: 0.42, w: 0.38, tilt: -0.12, s: 23 },\"\"\")\nrep(\"\"\"  gr.addColorStop(0, '#202c1d'); gr.addColorStop(0.5, '#141d13'); gr.addColorStop(1, '#0a100a');\"\"\",\n\"\"\"  gr.addColorStop(0, '#151d14'); gr.addColorStop(0.5, '#0e150e'); gr.addColorStop(1, '#080c08');\"\"\")\nrep(\"\"\"    g.strokeStyle = rnd() < 0.55 ? `rgba(90,120,70,${rr(0.05, 0.14)})` : `rgba(0,0,0,${rr(0.15, 0.3)})`;\"\"\",\n\"\"\"    g.strokeStyle = rnd() < 0.55 ? `rgba(80,110,70,${rr(0.05, 0.13)})` : `rgba(0,0,0,${rr(0.2, 0.35)})`;\"\"\")\nrep(\"\"\"  tg.addColorStop(0, 'rgba(120,140,70,0.26)'); tg.addColorStop(0.3, 'rgba(90,110,50,0.06)'); tg.addColorStop(1, 'rgba(0,0,0,0)');\"\"\",\n\"\"\"  tg.addColorStop(0, 'rgba(110,130,60,0.22)'); tg.addColorStop(0.3, 'rgba(60,80,40,0.05)'); tg.addColorStop(1, 'rgba(0,0,0,0)');\"\"\")\nopen(p,'w').write(s)\nEOF",
+        "description": "Tune garnish, shiitake, tofu, and nori parameters"
+      },
+      "timestamp": "2026-09-23T00:04:52.511Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01NcWJk4VmxB8GnFEtCujvgH",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:04:52.600Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now the bok choy: broader spoon-shaped stalks, and darker, more ruffled leaves.",
+      "timestamp": "2026-09-23T00:04:54.210Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01CHWvHNAYg5ifbcvi365dpJ",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"  const wl = (a, side) => {\n    const x = clamp((a - 0.22) / 0.8, 0, 1);\n    return 0.29 * Math.pow(Math.sin(Math.PI * x), 0.7) *\n      (1 + 0.08 * Math.sin(a * 43 + s1 + side * 2.1) + 0.05 * Math.sin(a * 97 + s2 + side));\n  };\n  const leaf = [];\n  for (let i = 0; i <= 48; i++) { const a = 0.22 + 0.8 * i / 48; leaf.push(pt(a, -wl(a, -1))); }\n  for (let i = 48; i >= 0; i--) { const a = 0.22 + 0.8 * i / 48; leaf.push(pt(a, wl(a, 1))); }\"\"\",\n\"\"\"  const wl = (a, side) => {\n    const x = clamp((a - 0.36) / 0.66, 0, 1);\n    return 0.33 * Math.pow(Math.sin(Math.PI * Math.pow(x, 0.8)), 0.6) *\n      (1 + 0.07 * Math.sin(a * 60 + s1 + side * 2.1) + 0.05 * Math.sin(a * 131 + s2 + side) + 0.04 * Math.sin(a * 23 + side));\n  };\n  const leaf = [];\n  for (let i = 0; i <= 64; i++) { const a = 0.36 + 0.66 * i / 64; leaf.push(pt(a, -wl(a, -1))); }\n  for (let i = 64; i >= 0; i--) { const a = 0.36 + 0.66 * i / 64; leaf.push(pt(a, wl(a, 1))); }\"\"\")\nrep(\"\"\"  gr.addColorStop(0, '#2f6224'); gr.addColorStop(0.5, '#3d7e2c'); gr.addColorStop(1, '#2a5a1f');\n  g.fillStyle = gr; g.fill();\n  g.save(); g.clip();\n  for (let i = 0; i < 60; i++) {\n    const a = rr(0.3, 1), b = rr(-0.25, 0.25);\n    const [x, y] = pt(a, b);\n    softEll(g, x, y, rr(4, 11) * fl, 0.7, rnd() < 0.5 ? '120,170,70' : '10,30,6', rr(0.08, 0.2));\n  }\"\"\",\n\"\"\"  gr.addColorStop(0, '#2a5a1f'); gr.addColorStop(0.5, '#2f6823'); gr.addColorStop(1, '#1f4718');\n  g.fillStyle = gr; g.fill();\n  g.save(); g.clip();\n  for (let i = 0; i < 90; i++) {\n    const a = rr(0.36, 1), b = rr(-0.3, 0.3);\n    const [x, y] = pt(a, b);\n    softEll(g, x, y, rr(3, 9) * fl, 0.7, rnd() < 0.5 ? '110,160,70' : '6,22,4', rr(0.1, 0.24));\n  }\"\"\")\nrep(\"\"\"  for (let a = 0.34; a < 0.94; a += 0.075) {\"\"\", \"\"\"  for (let a = 0.42; a < 0.94; a += 0.07) {\"\"\")\nrep(\"\"\"  const ws = (a) => (0.1 + 0.06 * Math.sin(Math.PI * clamp(a / 0.5, 0, 1))) * (1 - 0.8 * smoothstep(0.4, 0.68, a));\n  const stalks = [\n    { w: 1.0, a1: 0.7, edge: '#95b862', mid: '#cfe2a0' },\n    { w: 0.74, a1: 0.62, edge: '#b5cf86', mid: '#e3eec4' },\n    { w: 0.48, a1: 0.54, edge: '#cfdda8', mid: '#f2f5de' },\n  ];\n  for (const st of stalks) {\n    const pts = [];\n    for (let i = 0; i <= 10; i++) { const th = -Math.PI / 2 + Math.PI * i / 10; pts.push(pt(-Math.cos(th) * 0.05 * st.w, Math.sin(th) * ws(0) * st.w)); }\n    for (let i = 1; i <= 24; i++) { const a = st.a1 * i / 24; pts.push(pt(a, ws(a) * st.w)); }\n    for (let i = 24; i >= 1; i--) { const a = st.a1 * i / 24; pts.push(pt(a, -ws(a) * st.w)); }\"\"\",\n\"\"\"  // spoon-shaped stalks: narrow at the root, widening to where the leaf begins\n  const ws = (a, a1) => {\n    const x = clamp(a / a1, 0, 1);\n    return (0.085 + 0.13 * Math.pow(x, 1.3)) * Math.sqrt(Math.max(0, 1 - Math.pow(Math.max(0, x - 0.82) / 0.18, 2)));\n  };\n  const stalks = [\n    { w: 1.0, a1: 0.62, edge: '#9dbd6c', mid: '#d6e6ab' },\n    { w: 0.72, a1: 0.56, edge: '#bfd592', mid: '#e8f0cc' },\n    { w: 0.45, a1: 0.48, edge: '#d6e2b0', mid: '#f4f6e2' },\n  ];\n  for (const st of stalks) {\n    const pts = [];\n    for (let i = 0; i <= 10; i++) { const th = -Math.PI / 2 + Math.PI * i / 10; pts.push(pt(-Math.cos(th) * 0.03 * st.w, Math.sin(th) * ws(0, st.a1) * st.w)); }\n    for (let i = 1; i <= 30; i++) { const a = st.a1 * i / 30; pts.push(pt(a, ws(a, st.a1) * st.w)); }\n    for (let i = 30; i >= 1; i--) { const a = st.a1 * i / 30; pts.push(pt(a, -ws(a, st.a1) * st.w)); }\"\"\")\nrep(\"\"\"    const e1 = pt(0.25, -ws(0.25) * st.w), e2 = pt(0.25, ws(0.25) * st.w);\"\"\",\n\"\"\"    const e1 = pt(0.3, -ws(0.3, st.a1) * st.w), e2 = pt(0.3, ws(0.3, st.a1) * st.w);\"\"\")\nrep(\"\"\"      for (let i = 0; i <= 12; i++) { const a = st.a1 * 0.9 * i / 12; const [x, y] = pt(a, f * ws(a) * st.w); if (i) g.lineTo(x, y); else g.moveTo(x, y); }\"\"\",\n\"\"\"      for (let i = 0; i <= 12; i++) { const a = st.a1 * 0.9 * i / 12; const [x, y] = pt(a, f * ws(a, st.a1) * st.w); if (i) g.lineTo(x, y); else g.moveTo(x, y); }\"\"\")\nrep(\"\"\"  g.beginPath(); for (let i = 0; i <= 10; i++) { const a = 0.06 + 0.4 * i / 10; const [x, y] = pt(a, -ws(a) * 0.45); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke();\n  const gp = pt(0.28, -ws(0.28) * 0.45);\"\"\",\n\"\"\"  g.beginPath(); for (let i = 0; i <= 10; i++) { const a = 0.06 + 0.4 * i / 10; const [x, y] = pt(a, -ws(a, 0.62) * 0.45); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke();\n  const gp = pt(0.28, -ws(0.28, 0.62) * 0.45);\"\"\")\nopen(p,'w').write(s)\nEOF",
+        "description": "Reshape bok choy stalks and leaves"
+      },
+      "timestamp": "2026-09-23T00:05:13.302Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01CHWvHNAYg5ifbcvi365dpJ",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:05:13.391Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now the steam: thin over the broth, full plume only above the back edge. Also push the table back into darkness.",
+      "timestamp": "2026-09-23T00:05:18.805Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01LmNZP5fYirVuNWbv1uA3ee",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"  float yFront = k * sqrt(max(0.0, 1.0 - ax * ax));\n  float s = h + yFront;\"\"\",\n\"\"\"  float inside = sqrt(max(0.0, 1.0 - ax * ax));\n  float s = h + k * inside;\n  float sBack = h - k * inside;\"\"\")\nrep(\"\"\"  float grow = smoothstep(0.02, 0.8, s) * step(ax, 1.25 + hh);\"\"\",\n\"\"\"  float grow = smoothstep(0.02, 0.8, s) * mix(0.28, 1.0, smoothstep(-0.2, 0.5, sBack)) * step(ax, 1.25 + hh);\"\"\")\nrep(\"\"\"  const yTop = cy - 1.25 * R, yBot = H + M;\"\"\", \"\"\"  const yTop = cy - 0.85 * R, yBot = H + M;\"\"\")\nrep(\"\"\"    g.globalAlpha = smoothstep(yTop, cy - 0.15 * R, y);\"\"\", \"\"\"    g.globalAlpha = Math.pow(smoothstep(yTop, cy + 0.15 * R, y), 1.4);\"\"\")\nrep(\"\"\"      d[i] = clamp(v * 70, 0, 255); d[i + 1] = clamp(v * 43, 0, 255); d[i + 2] = clamp(v * 27, 0, 255); d[i + 3] = 255;\"\"\",\n\"\"\"      d[i] = clamp(v * 60, 0, 255); d[i + 1] = clamp(v * 37, 0, 255); d[i + 2] = clamp(v * 23, 0, 255); d[i + 3] = 255;\"\"\")\nrep(\"\"\"  radialEllipse(ctx, sx, sy, 0.64 * Rb, 0.3,\n    [[0, `rgba(255,226,180,${0.2 * f})`], [0.45, `rgba(255,200,140,${0.08 * f})`], [1, 'rgba(255,200,140,0)']], 'lighter');\n  radialEllipse(ctx, sx - 0.04 * Rb, sy, 0.2 * Rb, 0.36,\n    [[0, `rgba(255,242,220,${0.2 * f})`], [1, 'rgba(255,242,220,0)']], 'lighter');\"\"\",\n\"\"\"  radialEllipse(ctx, sx, sy, 0.66 * Rb, 0.3,\n    [[0, `rgba(255,226,180,${0.26 * f})`], [0.45, `rgba(255,200,140,${0.1 * f})`], [1, 'rgba(255,200,140,0)']], 'lighter');\n  radialEllipse(ctx, sx - 0.04 * Rb, sy, 0.22 * Rb, 0.36,\n    [[0, `rgba(255,242,220,${0.26 * f})`], [1, 'rgba(255,242,220,0)']], 'lighter');\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen && node shot.mjs <TMP>/ramen/a.png 1440 900 '{}' 2>&1 | grep -v 'GL Driver'; node shot.mjs <TMP>/ramen/b.png 1440 900 '{\"dpr\":2,\"clip\":{\"x\":360,\"y\":250,\"width\":720,\"height\":600}}' 2>&1 | grep -v 'GL Driver'",
+        "description": "Apply steam/table tweaks and re-screenshot",
+        "timeout": 180000
+      },
+      "timestamp": "2026-09-23T00:05:27.107Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01LmNZP5fYirVuNWbv1uA3ee",
+      "status": "success",
+      "output": "warning: WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:05:34.777Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_013zGFKH33H4teFyWdc7rogr",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/a.png"
+      },
+      "timestamp": "2026-09-23T00:05:36.067Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_013zGFKH33H4teFyWdc7rogr",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"337516\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:05:36.125Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_019ucCxcXTK79EG1vZdnJZkM",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/b.png"
+      },
+      "timestamp": "2026-09-23T00:05:36.234Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_019ucCxcXTK79EG1vZdnJZkM",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"401392\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:05:36.299Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The bowl shape and scallions are much better. The whole bowl still looks veiled and grey, though. I'll check whether the steam layer is causing that by hiding it.",
+      "timestamp": "2026-09-23T00:05:51.932Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_018fULM2adqjt1aUB8GtvhPp",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen && python3 - <<'EOF'\ns=open('shot.mjs').read()\ns=s.replace(\"for (const m of (o.moves || []))\", \"if (o.hideSteam) await page.evaluate(() => document.getElementById('steam').style.display='none');\\nif (o.eval) await page.evaluate(o.eval);\\nfor (const m of (o.moves || []))\")\nopen('shot.mjs','w').write(s)\nEOF\nnode shot.mjs <TMP>/ramen/c.png 1440 900 '{\"dpr\":2,\"hideSteam\":true,\"clip\":{\"x\":360,\"y\":250,\"width\":720,\"height\":600}}' 2>&1 | grep -v 'GL Driver'",
+        "description": "Screenshot with steam layer hidden",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:05:54.019Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_018fULM2adqjt1aUB8GtvhPp",
+      "status": "success",
+      "output": "warning: WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:05:58.269Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01AchqpKbmPAYVcfKME72raY",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/c.png"
+      },
+      "timestamp": "2026-09-23T00:05:59.733Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01AchqpKbmPAYVcfKME72raY",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"404488\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:05:59.799Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_018Hpo1cUaYgYPr9EVdVthDa",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\n# remove clay band block\na=s.index(\"  // glaze stops above the foot: bare clay below a wavy, drippy edge\")\nb=s.index(\"  // groove between body and foot\")\ns=s[:a]+s[b:]\n# softer window reflection\nrep(\"\"\"  for (let z = 0.05; z < 0.36; z += 0.005) {\n    const [x, y] = surf(z, 0.355 * Math.PI);\n    softEll(g, x, y, 0.028 * R, 1, '255,222,190', 0.05 * Math.sin(Math.PI * (z - 0.05) / 0.31));\n  }\"\"\",\n\"\"\"  for (let z = 0.05; z < 0.4; z += 0.005) {\n    const [x, y] = surf(z, 0.36 * Math.PI);\n    softEll(g, x, y, 0.04 * R, 1, '255,222,190', 0.03 * Math.sin(Math.PI * (z - 0.05) / 0.35));\n  }\"\"\")\n# broth colours\nrep(\"\"\"    [[0, '#dea35c'], [0.42, '#d19146'], [0.78, '#b47133'], [1, '#86491b']]);\"\"\",\n\"\"\"    [[0, '#e6a54a'], [0.42, '#d68d36'], [0.78, '#b36a24'], [1, '#7c3d10']]);\"\"\")\nrep(\"\"\"    softEll(g, x, y, rr(0.02, 0.09) * Rb, k, light ? '255,214,150' : '120,56,16', rr(0.04, 0.1));\"\"\",\n\"\"\"    softEll(g, x, y, rr(0.02, 0.09) * Rb, k, light ? '255,206,120' : '130,56,10', rr(0.03, 0.08));\"\"\")\nrep(\"\"\"    g.strokeStyle = `rgba(246,214,150,${rr(0.1, 0.2)})`;\"\"\", \"\"\"    g.strokeStyle = `rgba(250,206,110,${rr(0.08, 0.16)})`;\"\"\")\nrep(\"\"\"  radialEllipse(g, cx, cyB, 1.1 * Rb, k, [[0, 'rgba(204,138,70,0.25)'], [1, 'rgba(204,138,70,0.35)']]);\"\"\",\n\"\"\"  radialEllipse(g, cx, cyB, 1.1 * Rb, k, [[0, 'rgba(214,138,54,0.2)'], [1, 'rgba(200,120,44,0.3)']]);\"\"\")\nrep(\"\"\"const BROTH = [206, 140, 70];\"\"\", \"\"\"const BROTH = [214, 140, 56];\"\"\")\nrep(\"\"\"const NOODLE_COLS = [[250, 214, 120], [246, 206, 104], [252, 222, 138], [243, 200, 98]];\nconst NOODLE_EDGE = [186, 124, 38];\"\"\",\n\"\"\"const NOODLE_COLS = [[252, 216, 108], [248, 208, 94], [253, 224, 128], [245, 202, 88]];\nconst NOODLE_EDGE = [178, 112, 26];\"\"\")\n# tofu more golden\nrep(\"\"\"    const col = [214 * br, 140 * br, 58 * br];\"\"\", \"\"\"    const col = [226 * br, 142 * br, 46 * br];\"\"\")\nrep(\"\"\"    gy.addColorStop(0, rgb(mixc(col, [250, 196, 110], 0.35)));\"\"\", \"\"\"    gy.addColorStop(0, rgb(mixc(col, [252, 196, 100], 0.25)));\"\"\")\nrep(\"\"\"  tg.addColorStop(0, '#f6c878'); tg.addColorStop(0.55, '#e0a150'); tg.addColorStop(1, '#bf7a32');\"\"\",\n\"\"\"  tg.addColorStop(0, '#f7c261'); tg.addColorStop(0.55, '#e29a3c'); tg.addColorStop(1, '#bb6f22');\"\"\")\n# nori darker + twist\nrep(\"\"\"  gr.addColorStop(0, '#151d14'); gr.addColorStop(0.5, '#0e150e'); gr.addColorStop(1, '#080c08');\"\"\",\n\"\"\"  gr.addColorStop(0, '#111a11'); gr.addColorStop(0.5, '#0b110b'); gr.addColorStop(1, '#060906');\"\"\")\nrep(\"\"\"  const ca = Math.cos(sp.tilt), sa = Math.sin(sp.tilt), hw = sp.w / 2;\n  const pt = (a, b) => {\n    const cu = lerp(sp.bu, sp.tu, b) + a * hw * ca;\n    const cv = lerp(sp.bv, sp.tv, b) + a * hw * sa + 0.03 * Math.sin(b * Math.PI) * (1 - a * a * 0.4);\"\"\",\n\"\"\"  const hw = sp.w / 2;\n  const pt = (a, b) => {\n    const tl = sp.tilt + sp.twist * b, ca = Math.cos(tl), sa = Math.sin(tl);\n    const cu = lerp(sp.bu, sp.tu, b) + a * hw * ca;\n    const cv = lerp(sp.bv, sp.tv, b) + a * hw * sa + 0.03 * Math.sin(b * Math.PI) * (1 - a * a * 0.4) + 0.025 * (1 - a * a);\"\"\")\nrep(\"\"\"    { bu: 0.04, bv: -0.74, tu: 0.07, tv: -0.95, th: 0.33, w: 0.32, tilt: 0.2, s: 11 },\n    { bu: -0.25, bv: -0.7, tu: -0.29, tv: -0.93, th: 0.42, w: 0.38, tilt: -0.12, s: 23 },\"\"\",\n\"\"\"    { bu: 0.03, bv: -0.74, tu: 0.08, tv: -0.95, th: 0.33, w: 0.32, tilt: 0.16, twist: 0.12, s: 11 },\n    { bu: -0.25, bv: -0.7, tu: -0.3, tv: -0.93, th: 0.42, w: 0.38, tilt: -0.14, twist: -0.1, s: 23 },\"\"\")\n# bok choy broader\nrep(\"\"\"    return (0.085 + 0.13 * Math.pow(x, 1.3)) * Math.sqrt(Math.max(0, 1 - Math.pow(Math.max(0, x - 0.82) / 0.18, 2)));\"\"\",\n\"\"\"    return (0.12 + 0.13 * Math.pow(x, 1.1)) * Math.sqrt(Math.max(0, 1 - Math.pow(Math.max(0, x - 0.8) / 0.2, 2)));\"\"\")\nrep(\"\"\"    const x = clamp((a - 0.36) / 0.66, 0, 1);\n    return 0.33 * Math.pow(\"\"\", \"\"\"    const x = clamp((a - 0.36) / 0.66, 0, 1);\n    return 0.37 * Math.pow(\"\"\")\nopen(p,'w').write(s)\nEOF",
+        "description": "Fix bowl body, broth colour, tofu, nori, bok choy"
+      },
+      "timestamp": "2026-09-23T00:06:57.110Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_018Hpo1cUaYgYPr9EVdVthDa",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:06:57.195Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now an inner-bowl depth shade layer, drawn over the toppings and under the front rim:",
+      "timestamp": "2026-09-23T00:07:02.815Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01ENMYpCJFPWwXTkKcDRtrc3",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"function buildRimFront() {\"\"\",\n\"\"\"function buildInnerShade() {\n  const { cx, cy, Rin, k, Rb, cyB } = G;\n  const Ly = makeLayer(cx - Rin, cy - Rin * k, 2 * Rin, 2 * Rin * k);\n  const g = Ly.g;\n  ellipsePath(g, cx, cy, Rin, Rin * k); g.clip();\n  radialEllipse(g, cx - 0.12 * Rb, cyB - 0.22 * Rb * k, 1.2 * Rb, k,\n    [[0, 'rgba(24,8,0,0)'], [0.55, 'rgba(24,8,0,0)'], [0.82, 'rgba(24,8,0,0.2)'], [1, 'rgba(18,6,0,0.46)']], null, true);\n  return Ly;\n}\n\nfunction buildRimFront() {\"\"\")\nrep(\"\"\"  ctx.save(); drawToppingClip(); drawToppings(); ctx.restore();\n  blit(L.rim);\"\"\", \"\"\"  ctx.save(); drawToppingClip(); drawToppings(); ctx.restore();\n  blit(L.shade);\n  blit(L.rim);\"\"\")\nrep(\"\"\"  L.rim = buildRimFront();\n  L.vig\"\"\", \"\"\"  L.shade = buildInnerShade();\n  L.rim = buildRimFront();\n  L.vig\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen && node shot.mjs <TMP>/ramen/c.png 1440 900 '{\"dpr\":2,\"clip\":{\"x\":360,\"y\":250,\"width\":720,\"height\":600}}' 2>&1 | grep -v 'GL Driver'",
+        "description": "Add inner shade layer and re-screenshot",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:07:08.099Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01ENMYpCJFPWwXTkKcDRtrc3",
+      "status": "success",
+      "output": "warning: WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:07:12.255Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01UNrj1u2U8upcNMqeSMTXZ1",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/c.png"
+      },
+      "timestamp": "2026-09-23T00:07:13.425Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01UNrj1u2U8upcNMqeSMTXZ1",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"396932\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:07:13.491Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_016ZX7senBdNaR2RcTzMkkwS",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"    [[0, '#e6a54a'], [0.42, '#d68d36'], [0.78, '#b36a24'], [1, '#7c3d10']]);\"\"\",\n\"\"\"    [[0, '#d99541'], [0.4, '#c97c2c'], [0.75, '#a65c1c'], [1, '#6c320b']]);\"\"\")\nrep(\"\"\"const BROTH = [214, 140, 56];\"\"\", \"\"\"const BROTH = [204, 128, 48];\"\"\")\n# more droplets\nrep(\"\"\"  for (let i = 0; i < 90; i++) {\n    const a = rnd() * TAU, d = Math.sqrt(rnd()) * 0.94;\n    drops.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, r: 0.006 + Math.pow(rnd(), 2.6) * 0.03, chili: false, s: rnd() * 50 });\n  }\n  for (let i = 0; i < 16; i++) {\n    const a = rr(1.9, 4.1), d = rr(0.45, 0.9);\n    drops.push({ u: Math.cos(a) * d, v: Math.sin(a) * d * 0.9, r: rr(0.028, 0.06), chili: true, spr: i % 4, s: rnd() * 50 });\n  }\"\"\",\n\"\"\"  for (let i = 0; i < 16; i++) {\n    const a = rr(1.9, 4.2), d = rr(0.4, 0.92);\n    drops.push({ u: Math.cos(a) * d, v: Math.sin(a) * d * 0.9, r: rr(0.035, 0.075), chili: true, spr: i % 4, s: rnd() * 50 });\n  }\n  for (let i = 0; i < 170; i++) {\n    const a = rnd() * TAU, d = Math.sqrt(rnd()) * 0.95;\n    drops.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, r: 0.005 + Math.pow(rnd(), 2.4) * 0.032, chili: false, s: rnd() * 50 });\n  }\"\"\")\nrep(\"\"\"    gr.addColorStop(0, 'rgba(255,214,130,0.30)');\n    gr.addColorStop(0.72, 'rgba(255,196,110,0.34)');\n    gr.addColorStop(0.9, 'rgba(120,58,10,0.40)');\n    gr.addColorStop(1, 'rgba(120,58,10,0)');\"\"\",\n\"\"\"    gr.addColorStop(0, 'rgba(255,208,110,0.34)');\n    gr.addColorStop(0.7, 'rgba(255,190,90,0.42)');\n    gr.addColorStop(0.88, 'rgba(110,48,6,0.5)');\n    gr.addColorStop(1, 'rgba(110,48,6,0)');\"\"\")\nrep(\"\"\"    gr.addColorStop(0, 'rgba(236,98,30,0.55)');\n    gr.addColorStop(0.75, 'rgba(206,58,18,0.62)');\n    gr.addColorStop(1, 'rgba(150,30,8,0.7)');\"\"\",\n\"\"\"    gr.addColorStop(0, 'rgba(246,112,34,0.5)');\n    gr.addColorStop(0.7, 'rgba(214,62,16,0.6)');\n    gr.addColorStop(1, 'rgba(140,26,6,0.75)');\"\"\")\n# sheen: wider sweep, hits open broth\nrep(\"\"\"function sheenPos() { return { u: -0.12 + 0.36 * S.cam.x, v: -0.44 + 0.16 * S.cam.y }; }\"\"\",\n\"\"\"function sheenPos() { return { u: -0.08 + 0.46 * S.cam.x, v: -0.36 + 0.2 * S.cam.y }; }\"\"\")\nrep(\"\"\"  radialEllipse(ctx, sx, sy, 0.66 * Rb, 0.3,\n    [[0, `rgba(255,226,180,${0.26 * f})`], [0.45, `rgba(255,200,140,${0.1 * f})`], [1, 'rgba(255,200,140,0)']], 'lighter');\n  radialEllipse(ctx, sx - 0.04 * Rb, sy, 0.22 * Rb, 0.36,\n    [[0, `rgba(255,242,220,${0.26 * f})`], [1, 'rgba(255,242,220,0)']], 'lighter');\"\"\",\n\"\"\"  radialEllipse(ctx, sx, sy, 0.8 * Rb, 0.34,\n    [[0, `rgba(255,220,160,${0.3 * f})`], [0.45, `rgba(255,190,120,${0.12 * f})`], [1, 'rgba(255,190,120,0)']], 'lighter');\n  radialEllipse(ctx, sx - 0.04 * Rb, sy, 0.3 * Rb, 0.36,\n    [[0, `rgba(255,240,214,${0.3 * f})`], [1, 'rgba(255,240,214,0)']], 'lighter');\"\"\")\nrep(\"\"\"  const du = (u - s.u) / 0.5, dv = (v - s.v) / 0.2;\"\"\", \"\"\"  const du = (u - s.u) / 0.6, dv = (v - s.v) / 0.26;\"\"\")\nrep(\"\"\"    shimmer.push({ du: gauss() * 0.22, dv: gauss() * 0.12, len: rr(0.02, 0.07), w: rr(0.6, 1.8), ph: rnd() * TAU, sp: rr(1.2, 3.2) });\"\"\",\n\"\"\"    shimmer.push({ du: gauss() * 0.28, dv: gauss() * 0.14, len: rr(0.02, 0.07), w: rr(0.6, 1.8), ph: rnd() * TAU, sp: rr(1.2, 3.2) });\"\"\")\n# darker nori, less glow\nrep(\"\"\"  tg.addColorStop(0, 'rgba(110,130,60,0.22)'); tg.addColorStop(0.3, 'rgba(60,80,40,0.05)'); tg.addColorStop(1, 'rgba(0,0,0,0)');\"\"\",\n\"\"\"  tg.addColorStop(0, 'rgba(90,120,55,0.16)'); tg.addColorStop(0.25, 'rgba(50,70,35,0.03)'); tg.addColorStop(1, 'rgba(0,0,0,0)');\"\"\")\nrep(\"\"\"  for (let i = 0; i < 26; i++) softEll(g, rr(minx, maxx), rr(miny, maxy), rr(3, 9) * fl, 1, '80,110,56', rr(0.08, 0.18));\"\"\",\n\"\"\"  for (let i = 0; i < 26; i++) softEll(g, rr(minx, maxx), rr(miny, maxy), rr(3, 9) * fl, 1, '70,100,50', rr(0.05, 0.12));\n  // faint diagonal sheen across the sheet\n  const d1 = pt(-1, 0.9), d2 = pt(1, 0.1);\n  const dg = g.createLinearGradient(d1[0], d1[1], d2[0], d2[1]);\n  dg.addColorStop(0, 'rgba(160,190,150,0)'); dg.addColorStop(0.45, 'rgba(160,190,150,0.07)'); dg.addColorStop(0.55, 'rgba(160,190,150,0.07)'); dg.addColorStop(1, 'rgba(160,190,150,0)');\n  g.fillStyle = dg; g.fillRect(minx, miny, maxx - minx, maxy - miny);\"\"\")\n# darker bok choy leaves\nrep(\"\"\"  gr.addColorStop(0, '#2a5a1f'); gr.addColorStop(0.5, '#2f6823'); gr.addColorStop(1, '#1f4718');\"\"\",\n\"\"\"  gr.addColorStop(0, '#24521b'); gr.addColorStop(0.5, '#285c1e'); gr.addColorStop(1, '#193d13');\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen && node shot.mjs <TMP>/ramen/a.png 1440 900 '{}' 2>&1 | grep -v 'GL Driver'",
+        "description": "Deepen broth, add droplets, tune sheen and greens",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:07:56.292Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_016ZX7senBdNaR2RcTzMkkwS",
+      "status": "success",
+      "output": "warning: WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:07:59.734Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01PYix7BZnSc5n1t9EHyJcdv",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/a.png"
+      },
+      "timestamp": "2026-09-23T00:08:02.895Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01PYix7BZnSc5n1t9EHyJcdv",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"337992\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:08:02.967Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "This is coming together: warm, moody, and the broth now looks appetizing. Next I'll test the interaction: a fast pointer sweep through the steam, then a click on the broth.",
+      "timestamp": "2026-09-23T00:08:11.478Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01UD8hbxRsUgbGLkg2ph3zHB",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen && node shot.mjs <TMP>/ramen/m1.png 1440 900 '{\"moves\":[[300,250,1],[1100,280,25]],\"after\":350}' 2>&1 | grep -v 'GL Driver\\|CONTEXT_LOST'; node shot.mjs <TMP>/ramen/m2.png 1440 900 '{\"moves\":[[700,600,5]],\"click\":[650,610],\"after\":450,\"clip\":{\"x\":380,\"y\":300,\"width\":700,\"height\":450}}' 2>&1 | grep -v 'GL Driver\\|CONTEXT_LOST'",
+        "description": "Screenshot after steam sweep and broth click",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:08:13.606Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01UD8hbxRsUgbGLkg2ph3zHB",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:08:21.666Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_015J7oKVVaSCD8cuws5SwU4z",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/m1.png"
+      },
+      "timestamp": "2026-09-23T00:08:23.267Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_015J7oKVVaSCD8cuws5SwU4z",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"340376\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:08:23.323Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01BD4aLLwgEXrpMtJoyEMEWi",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/m2.png"
+      },
+      "timestamp": "2026-09-23T00:08:23.369Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01BD4aLLwgEXrpMtJoyEMEWi",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"115372\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:08:23.414Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HUg2hxScHRLNNpZWhVQuSc",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"        Fvx[n] += (mvx - Fvx[n]) * w * 0.55;\n        Fvy[n] += (mvy - Fvy[n]) * w * 0.55;\"\"\",\n\"\"\"        Fvx[n] += (mvx - Fvx[n]) * w * 0.4;\n        Fvy[n] += (mvy - Fvy[n]) * w * 0.4;\"\"\")\nrep(\"\"\"    const mvx = clamp(pointer.fdx / G.Rb / sdt, -7, 7), mvy = clamp(-pointer.fdy / G.Rb / sdt, -7, 7);\"\"\",\n\"\"\"    const mvx = clamp(pointer.fdx / G.Rb / sdt, -5, 5), mvy = clamp(-pointer.fdy / G.Rb / sdt, -5, 5);\"\"\")\nrep(\"\"\"const FLOW_SCALE = 1.2;\"\"\", \"\"\"const FLOW_SCALE = 0.9;\"\"\")\nrep(\"\"\"    Fst[n] = Math.max(Fst[n] * ds, Math.min(1, Math.hypot(Fvx[n], Fvy[n]) * 0.3));\"\"\",\n\"\"\"    Fst[n] = Math.max(Fst[n] * ds, Math.min(1, Math.hypot(Fvx[n], Fvy[n]) * 0.45));\"\"\")\nrep(\"\"\"  d *= (1.0 - 0.45 * stir) * (0.9 + 0.9 * uBoost);\"\"\", \"\"\"  d *= (1.0 - 0.6 * stir) * (0.9 + 0.9 * uBoost);\"\"\")\nrep(\"\"\"  float turb = 0.32 + 0.5 * hh + 0.9 * stir;\"\"\", \"\"\"  float turb = 0.32 + 0.5 * hh + 1.3 * stir;\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen && node shot.mjs <TMP>/ramen/m1.png 1440 900 '{\"moves\":[[300,250,1],[1100,280,25]],\"after\":350}' 2>&1 | grep -v 'GL Driver\\|CONTEXT_LOST'; node shot.mjs <TMP>/ramen/m2.png 1440 900 '{\"moves\":[[700,660,5]],\"click\":[722,668],\"after\":500,\"clip\":{\"x\":380,\"y\":300,\"width\":700,\"height\":450}}' 2>&1 | grep -v 'GL Driver\\|CONTEXT_LOST'",
+        "description": "Tone down steam drag and retest interactions",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:08:39.528Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HUg2hxScHRLNNpZWhVQuSc",
+      "status": "success",
+      "output": "(Bash completed with no output)",
+      "timestamp": "2026-09-23T00:08:47.723Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01R3xME1SEtLp3J8EFsLK3nF",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/m1.png"
+      },
+      "timestamp": "2026-09-23T00:08:49.588Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01R3xME1SEtLp3J8EFsLK3nF",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"340316\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:08:49.647Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_014AETzCKWcB97P9pi4GnMxN",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen/m2.png"
+      },
+      "timestamp": "2026-09-23T00:08:49.670Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_014AETzCKWcB97P9pi4GnMxN",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"120616\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:08:49.729Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01H1g66aNPVRBHRDoPZcZfBQ",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"const FLOW_SCALE = 0.9;\"\"\", \"\"\"const FLOW_SCALE = 0.6;\"\"\")\nrep(\"\"\"  const dv = Math.exp(-dt * 2.0), dd = Math.exp(-dt * 0.3), ds = Math.exp(-dt * 1.1);\"\"\",\n\"\"\"  const dv = Math.exp(-dt * 2.4), dd = Math.exp(-dt * 0.9), ds = Math.exp(-dt * 0.9);\"\"\")\nrep(\"\"\"    flowInject(pointer.x, pointer.y, mvx, mvy, 0.3 * G.Rb, 'drag');\"\"\",\n\"\"\"    flowInject(pointer.x, pointer.y, mvx, mvy, 0.24 * G.Rb, 'drag');\"\"\")\nrep(\"\"\"        Fvx[n] += (mvx - Fvx[n]) * w * 0.4;\n        Fvy[n] += (mvy - Fvy[n]) * w * 0.4;\"\"\",\n\"\"\"        Fvx[n] += (mvx - Fvx[n]) * w * 0.35;\n        Fvy[n] += (mvy - Fvy[n]) * w * 0.35;\"\"\")\nrep(\"\"\"  d *= (1.0 - 0.6 * stir) * (0.9 + 0.9 * uBoost);\"\"\", \"\"\"  d *= (1.0 - 0.75 * stir) * (0.9 + 0.9 * uBoost);\"\"\")\nrep(\"\"\"  float grow = smoothstep(0.02, 0.8, s) * mix(0.28, 1.0, smoothstep(-0.2, 0.5, sBack)) * step(ax, 1.25 + hh);\"\"\",\n\"\"\"  float grow = smoothstep(0.02, 0.8, s) * mix(0.18, 1.0, smoothstep(0.0, 0.85, sBack)) * step(ax, 1.25 + hh);\"\"\")\nrep(\"\"\"      ctx.strokeStyle = `rgba(80,34,6,${0.3 * a})`;\n      ctx.beginPath(); ctx.ellipse(x, y + 1.2 * G.unit, rj * Rb, rj * Rb * k, 0, 0, TAU); ctx.stroke();\n      ctx.strokeStyle = `rgba(255,234,198,${0.45 * a})`;\"\"\",\n\"\"\"      ctx.strokeStyle = `rgba(80,34,6,${0.4 * a})`;\n      ctx.beginPath(); ctx.ellipse(x, y + 1.2 * G.unit, rj * Rb, rj * Rb * k, 0, 0, TAU); ctx.stroke();\n      ctx.strokeStyle = `rgba(255,234,198,${0.6 * a})`;\"\"\")\nrep(\"\"\"  let R = portrait ? Math.min(W * 0.44, H * 0.30) : Math.min(W * 0.40, H * 0.375);\"\"\",\n\"\"\"  let R = portrait ? Math.min(W * 0.44, H * 0.30) : Math.min(W * 0.40, H * 0.4);\"\"\")\n# nori fibres darker\nrep(\"\"\"    g.strokeStyle = rnd() < 0.55 ? `rgba(80,110,70,${rr(0.05, 0.13)})` : `rgba(0,0,0,${rr(0.2, 0.35)})`;\"\"\",\n\"\"\"    g.strokeStyle = rnd() < 0.55 ? `rgba(70,100,60,${rr(0.04, 0.1)})` : `rgba(0,0,0,${rr(0.2, 0.35)})`;\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen && node shot.mjs <TMP>/ramen/a.png 1440 900 '{}' 2>&1 | grep -v 'GL Driver\\|CONTEXT_LOST'; node shot.mjs <TMP>/ramen/m1.png 1440 900 '{\"moves\":[[300,250,1],[1100,280,25]],\"after\":350}' 2>&1 | grep -v 'GL Driver\\|CONTEXT_LOST'",
+        "description": "Tune steam response, bowl size, and nori",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:09:15.331Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01H1g66aNPVRBHRDoPZcZfBQ",
+      "status": "success",
+      "output": "{\"cw\":1050,\"ch\":656,\"cls\":\"ready\"} elapsed 4439\n\n{\"cw\":1050,\"ch\":656,\"cls\":\"ready\"} elapsed 4215\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:09:25.019Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "An unexpected line showed up in the output (`{\"cw\":1050,...} elapsed`). I'll check where it came from.",
+      "timestamp": "2026-09-23T00:09:27.829Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_014LwHLLpgx2PSpCeB1UKsLL",
+      "tool": "Bash",
+      "input": {
+        "command": "cat <TMP>/ramen/shot.mjs; ls -la <TMP>/ramen/; grep -n \"elapsed\\|console.log\" <WORKSPACE>/anthropic/opus-5.5/xhigh/index.html | head",
+        "description": "Inspect harness script and scratch dir"
+      },
+      "timestamp": "2026-09-23T00:09:28.867Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_014LwHLLpgx2PSpCeB1UKsLL",
+      "status": "success",
+      "output": "import { createRequire } from 'module';\nconst require = createRequire('<HOME>/.local/lib/node_modules/@playwright/mcp/node_modules/');\nconst { chromium } = require('playwright-core');\nconst args = Object.fromEntries(process.argv.slice(2).map(a => a.split('=')));\nconst file = args.file || '<WORKSPACE>/anthropic/opus-5.5/max/index.html';\nconst w = +(args.w || 1280), h = +(args.h || 800), dpr = +(args.dpr || 1);\nconst wait = +(args.wait || 2500);\nconst out = args.out || '<TMP>/ramen/shot.png';\nconst browser = await chromium.launch({\n  executablePath: process.env.HOME + '/.cache/ms-playwright/chromium-1223/chrome-linux/chrome',\n  args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],\n});\nconst ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, reducedMotion: args.reduced ? 'reduce' : 'no-preference' });\nconst page = await ctx.newPage();\nconst logs = [];\npage.on('console', m => logs.push(m.type() + ': ' + m.text()));\npage.on('pageerror', e => logs.push('pageerror: ' + e.message));\nconst t0 = Date.now();\nawait page.goto('file://' + file);\nif (args.moves) {\n  await page.waitForTimeout(+(args.pre || 1500));\n  const pts = args.moves.split(';').map(s => s.split(',').map(Number));\n  for (const [x, y] of pts) { await page.mouse.move(x * w, y * h, { steps: 6 }); await page.waitForTimeout(60); }\n}\nif (args.click) { const [x, y] = args.click.split(',').map(Number); await page.mouse.click(x * w, y * h); }\nawait page.waitForTimeout(wait);\nawait page.screenshot({ path: out });\nconst info = await page.evaluate(() => { const c = document.querySelector('canvas'); return { cw: c.width, ch: c.height, cls: c.className }; });\nconsole.log(JSON.stringify(info), 'elapsed', Date.now() - t0);\nconsole.log(logs.join('\\n'));\nawait browser.close();\ntotal 10100\ndrwxr-xr-x.   3 <USER> <USER>     260 Sep 22 20:09 .\ndrwxrwxrwt. 104 root     root        5300 Sep 22 20:09 ..\n-rw-r--r--.   1 <USER> <USER> 1720292 Sep 22 20:07 a.png\n-rw-r--r--.   1 <USER> <USER> 2035218 Sep 22 20:05 b.png\n-rwxr-xr-x.   1 <USER> <USER>     282 Sep 22 20:08 build.sh\n-rw-r--r--.   1 <USER> <USER> 2025001 Sep 22 20:07 c.png\n-rw-r--r--.   1 <USER> <USER>   81237 Sep 22 20:08 check.js\n-rw-r--r--.   1 <USER> <USER> 1761389 Sep 22 20:08 m1.png\n-rw-r--r--.   1 <USER> <USER>  545929 Sep 22 20:08 m2.png\n-rw-r--r--.   1 <USER> <USER> 1076499 Sep 22 20:09 s1.png\n-rw-r--r--.   1 <USER> <USER>    1883 Sep 22 20:09 shot.mjs\n-rw-r--r--.   1 <USER> <USER> 1076955 Sep 22 20:09 shot.png\ndrwxr-xr-x.   2 <USER> <USER>     220 Sep 22 20:08 src",
+      "timestamp": "2026-09-23T00:09:28.929Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Another session is using `<TMP>/ramen` for the `max` variant and overwrote the harness. I'll stop touching that directory and move to my own scratch dir.",
+      "timestamp": "2026-09-23T00:09:35.708Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_011CuFSgngL3sHQ2jZKtidtL",
+      "tool": "Bash",
+      "input": {
+        "command": "mkdir -p <TMP>/ramen-o55-xhigh && cat > <TMP>/ramen-o55-xhigh/shot.mjs <<'EOF'\nimport { createRequire } from 'module';\nconst require = createRequire('<HOME>/.local/lib/node_modules/@playwright/mcp/node_modules/');\nconst { chromium } = require('playwright-core');\nconst [,, out = '<TMP>/ramen-o55-xhigh/shot.png', w = '1440', h = '900', opts = '{}'] = process.argv;\nconst o = JSON.parse(opts);\nconst browser = await chromium.launch({ executablePath: process.env.HOME + '/.cache/ms-playwright/chromium-1223/chrome-linux/chrome', args: ['--no-sandbox', '--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });\nconst page = await browser.newPage({ viewport: { width: +w, height: +h }, deviceScaleFactor: o.dpr || 1, reducedMotion: o.reduced ? 'reduce' : 'no-preference', hasTouch: !!o.touch });\nconst logs = [];\npage.on('console', m => { if (!/GL Driver|CONTEXT_LOST/.test(m.text())) logs.push(m.type() + ': ' + m.text()); });\npage.on('pageerror', e => logs.push('PAGEERROR: ' + e.message));\nawait page.goto('file://<WORKSPACE>/anthropic/opus-5.5/xhigh/index.html');\nawait page.waitForTimeout(o.wait || 2500);\nif (o.hideSteam) await page.evaluate(() => document.getElementById('steam').style.display = 'none');\nfor (const m of (o.moves || [])) { await page.mouse.move(m[0], m[1], { steps: m[2] || 10 }); if (m[3]) await page.waitForTimeout(m[3]); }\nif (o.click) await page.mouse.click(o.click[0], o.click[1]);\nif (o.after) await page.waitForTimeout(o.after);\nif (o.clip) await page.screenshot({ path: out, clip: o.clip }); else await page.screenshot({ path: out });\nif (o.fps) {\n  const f = await page.evaluate(() => new Promise(r => { let n = 0; const t0 = performance.now(); function s() { n++; if (performance.now() - t0 < 2000) requestAnimationFrame(s); else r(n / 2); } requestAnimationFrame(s); }));\n  logs.push('fps ' + f);\n}\nif (logs.length) console.log(logs.join('\\n'));\nawait browser.close();\nEOF\ncd <TMP>/ramen-o55-xhigh && node shot.mjs a.png 1440 900 '{}' && node shot.mjs m1.png 1440 900 '{\"moves\":[[300,250,1],[1100,280,25]],\"after\":350}'",
+        "description": "Create private harness dir and take screenshots",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:09:42.523Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_011CuFSgngL3sHQ2jZKtidtL",
+      "status": "success",
+      "output": "Shell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:09:50.170Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01GJvcGLbEMGYCi5LaTAx7nN",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/a.png"
+      },
+      "timestamp": "2026-09-23T00:09:52.122Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01GJvcGLbEMGYCi5LaTAx7nN",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"341688\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:09:52.180Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01A3KTTeH5iHNhThxqPjNVoP",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/m1.png"
+      },
+      "timestamp": "2026-09-23T00:09:52.396Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01A3KTTeH5iHNhThxqPjNVoP",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"343340\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:09:52.457Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The idle frame looks good. A fast sweep still curls the plume a lot. That's acceptable for an extreme gesture, but I'll soften it a bit more and test a normal-speed pass.",
+      "timestamp": "2026-09-23T00:10:07.312Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_017TsykewhqbLUvAmqJvTRxc",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"        Fvx[n] += (mvx - Fvx[n]) * w * 0.35;\n        Fvy[n] += (mvy - Fvy[n]) * w * 0.35;\"\"\",\n\"\"\"        Fvx[n] += (mvx - Fvx[n]) * w * 0.25;\n        Fvy[n] += (mvy - Fvy[n]) * w * 0.25;\"\"\")\nrep(\"\"\"  float turb = 0.32 + 0.5 * hh + 1.3 * stir;\"\"\", \"\"\"  float turb = 0.32 + 0.5 * hh + 0.9 * stir;\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen-o55-xhigh && node shot.mjs m1.png 1440 900 '{\"moves\":[[450,200,1],[600,210,20,16],[750,230,20,16],[900,250,20,16]],\"after\":250}' && node shot.mjs p1.png 390 844 '{\"dpr\":2}' && node shot.mjs r1.png 1440 900 '{\"reduced\":true,\"moves\":[[1200,300,5]],\"after\":300}'",
+        "description": "Soften steam drag; test moderate move, mobile, reduced motion",
+        "timeout": 180000
+      },
+      "timestamp": "2026-09-23T00:10:11.157Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_017TsykewhqbLUvAmqJvTRxc",
+      "status": "success",
+      "output": "Shell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:10:23.373Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01GKV7SFJaQyoNUAgSA9QpVg",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/m1.png"
+      },
+      "timestamp": "2026-09-23T00:10:25.030Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01GKV7SFJaQyoNUAgSA9QpVg",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"346196\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:10:25.093Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01MDH7V53Dc6cAtBguGKPTkr",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/p1.png"
+      },
+      "timestamp": "2026-09-23T00:10:25.474Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01MDH7V53Dc6cAtBguGKPTkr",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"255672\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:10:25.537Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_014brGGUocKgFeiTK6CgDD4v",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/r1.png"
+      },
+      "timestamp": "2026-09-23T00:10:25.644Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_014brGGUocKgFeiTK6CgDD4v",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"354396\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:10:25.706Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Hj5GQF65vRNgmjcsPg3coA",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"  let R = portrait ? Math.min(W * 0.44, H * 0.30) : Math.min(W * 0.40, H * 0.4);\"\"\",\n\"\"\"  let R = portrait ? Math.min(W * 0.46, H * 0.3) : Math.min(W * 0.40, H * 0.4);\"\"\")\nrep(\"\"\"  let cy = H * (portrait ? 0.57 : 0.6);\"\"\", \"\"\"  let cy = H * (portrait ? 0.6 : 0.6);\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen-o55-xhigh && node shot.mjs c.png 1440 900 '{\"dpr\":2,\"clip\":{\"x\":350,\"y\":260,\"width\":740,\"height\":560}}'",
+        "description": "Adjust portrait layout; take 2x detail crop",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:10:35.586Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Hj5GQF65vRNgmjcsPg3coA",
+      "status": "success",
+      "output": "Shell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:10:39.862Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01YM9waLXxQXHQHZppvUWgm5",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/c.png"
+      },
+      "timestamp": "2026-09-23T00:10:41.553Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01YM9waLXxQXHQHZppvUWgm5",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"401964\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:10:41.621Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Gvixn9R5zQmhoMKwK42C7E",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"    gr.addColorStop(0, 'rgba(246,112,34,0.5)');\n    gr.addColorStop(0.7, 'rgba(214,62,16,0.6)');\n    gr.addColorStop(1, 'rgba(140,26,6,0.75)');\n    g.fillStyle = gr; g.fill();\n    g.save(); g.clip();\n    for (let i = 0; i < 9; i++) {\n      g.fillStyle = rnd() < 0.5 ? 'rgba(110,14,6,0.8)' : 'rgba(170,30,10,0.8)';\n      g.beginPath();\n      g.ellipse(c + gauss() * s * 0.12, c + gauss() * s * 0.12, s * rr(0.015, 0.035), s * rr(0.01, 0.025), rnd() * TAU, 0, TAU);\n      g.fill();\n    }\n    g.restore();\"\"\",\n\"\"\"    gr.addColorStop(0, 'rgba(250,126,40,0.34)');\n    gr.addColorStop(0.7, 'rgba(222,70,18,0.46)');\n    gr.addColorStop(1, 'rgba(160,32,6,0.62)');\n    g.fillStyle = gr; g.fill();\n    g.save(); g.clip();\n    for (let i = 0; i < 7; i++) {\n      g.fillStyle = rnd() < 0.5 ? 'rgba(110,14,6,0.7)' : 'rgba(170,30,10,0.6)';\n      g.beginPath();\n      g.ellipse(c + gauss() * s * 0.12, c + gauss() * s * 0.12, s * rr(0.012, 0.028), s * rr(0.008, 0.02), rnd() * TAU, 0, TAU);\n      g.fill();\n    }\n    g.restore();\n    // feather the edge so it reads as oil spreading on the surface\n    g.globalCompositeOperation = 'destination-in';\n    const fe = g.createRadialGradient(c, c, s * 0.18, c, c, s * 0.48);\n    fe.addColorStop(0, 'rgba(0,0,0,1)'); fe.addColorStop(0.7, 'rgba(0,0,0,0.85)'); fe.addColorStop(1, 'rgba(0,0,0,0)');\n    g.fillStyle = fe; g.fillRect(0, 0, s, s);\n    g.globalCompositeOperation = 'source-over';\"\"\")\n# stray noodles\nrep(\"\"\"  for (const b of bundles) drawStrands(g, makeBundle(b), nw);\n}\"\"\",\n\"\"\"  for (const b of bundles) drawStrands(g, makeBundle(b), nw);\n  // a few loose strands escaping the fold\n  const strays = [\n    { c: [[-0.3, 0.3], [-0.12, 0.36], [0.02, 0.2], [0.2, 0.3]], n: 1, width: 0, hmax: 0.06 },\n    { c: [[0.18, -0.3], [0.05, -0.12], [0.22, 0.02], [0.3, 0.18]], n: 1, width: 0, hmax: 0.07 },\n    { c: [[-0.45, -0.3], [-0.3, -0.05], [-0.36, 0.12], [-0.2, 0.2]], n: 1, width: 0, hmax: 0.05 },\n  ];\n  for (const b of strays) drawStrands(g, makeBundle(b), nw);\n}\"\"\")\nopen(p,'w').write(s)\nEOF\ncd <TMP>/ramen-o55-xhigh && node shot.mjs c.png 1440 900 '{\"clip\":{\"x\":380,\"y\":340,\"width\":680,\"height\":400}}'",
+        "description": "Feather chili oil, add stray noodles, screenshot",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:11:12.087Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Gvixn9R5zQmhoMKwK42C7E",
+      "status": "success",
+      "output": "Shell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:11:15.427Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01FiyBu29vWJz9G6QxRakYzC",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/c.png"
+      },
+      "timestamp": "2026-09-23T00:11:17.122Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01FiyBu29vWJz9G6QxRakYzC",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"633072\">",
+            "media_type": "image/png"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:11:17.167Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The bowl is in good shape and I'm polishing now. Still to do: edge-case checks (no-WebGL fallback, small and ultra-wide screens, errors, frame rate).",
+      "timestamp": "2026-09-23T00:11:19.505Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_013rzobVMTWejazka3Qyu8eY",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-o55-xhigh && cat > nogl.mjs <<'EOF'\nimport { createRequire } from 'module';\nconst require = createRequire('<HOME>/.local/lib/node_modules/@playwright/mcp/node_modules/');\nconst { chromium } = require('playwright-core');\nconst browser = await chromium.launch({ executablePath: process.env.HOME + '/.cache/ms-playwright/chromium-1223/chrome-linux/chrome', args: ['--no-sandbox', '--disable-webgl', '--disable-3d-apis'] });\nconst page = await browser.newPage({ viewport: { width: 1280, height: 800 } });\nconst logs = [];\npage.on('pageerror', e => logs.push('PAGEERROR: ' + e.message));\npage.on('console', m => logs.push(m.type() + ': ' + m.text()));\nawait page.goto('file://<WORKSPACE>/anthropic/opus-5.5/xhigh/index.html');\nawait page.waitForTimeout(4000);\nawait page.screenshot({ path: '<TMP>/ramen-o55-xhigh/nogl.png' });\nconsole.log(logs.join('\\n'));\nawait browser.close();\nEOF\nnode nogl.mjs; node shot.mjs small.png 320 568 '{\"dpr\":2,\"fps\":true}'; node shot.mjs wide.png 2560 1080 '{\"fps\":true}'",
+        "description": "Test no-WebGL fallback, small and ultrawide screens",
+        "timeout": 180000
+      },
+      "timestamp": "2026-09-23T00:11:23.183Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_013rzobVMTWejazka3Qyu8eY",
+      "status": "success",
+      "output": "fps 60.5\nfps 35.5\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:11:38.895Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01EVdhBtW518NhNTfYdWhPuB",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/nogl.png"
+      },
+      "timestamp": "2026-09-23T00:11:40.720Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01EVdhBtW518NhNTfYdWhPuB",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"270812\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:11:40.780Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_017FbZeuL2w247X3hixxsp1V",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/wide.png"
+      },
+      "timestamp": "2026-09-23T00:11:41.149Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_017FbZeuL2w247X3hixxsp1V",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"346480\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:11:41.398Z"
+    },
+    {
+      "type": "message",
+      "role": "user",
+      "content": "[Image: original 2560x1080, displayed at 2000x844. Multiply coordinates by 1.28 to map to original image.]",
+      "timestamp": "2026-09-23T00:11:41.359Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01MJXCuTbSub1hzCfQX6Ydv8",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/small.png"
+      },
+      "timestamp": "2026-09-23T00:11:41.446Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01MJXCuTbSub1hzCfQX6Ydv8",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"154612\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:11:41.507Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01U735pai87UBeNBTBqywvTN",
+      "tool": "Bash",
+      "input": {
+        "command": "python3 - <<'EOF'\np='index.html'; s=open(p).read()\ndef rep(a,b,cnt=1):\n    global s\n    n=s.count(a)\n    assert n==cnt, (n,a[:80])\n    s=s.replace(a,b)\nrep(\"\"\"      const rate = 26 * (1 + S.boost);\n      let n = Math.floor(rate * S.dt + Math.random());\n      while (n-- > 0 && parts.length < 170) {\"\"\",\n\"\"\"      const rate = 40 * (1 + S.boost);\n      let n = Math.floor(rate * S.dt + Math.random());\n      while (n-- > 0 && parts.length < 240) {\"\"\")\nrep(\"\"\"      for (let i = 0; i < 90; i++) {\"\"\", \"\"\"      for (let i = 0; i < 140; i++) {\"\"\")\nrep(\"\"\"      g.globalAlpha = 0.16 * Math.sin(Math.PI * p.life / p.max) * S.flick * (1 + S.boost * 0.5);\"\"\",\n\"\"\"      const hf = smoothstep(0.1, 0.9, p.life / 2);\n      g.globalAlpha = 0.3 * hf * Math.sin(Math.PI * p.life / p.max) * S.flick * (1 + S.boost * 0.5);\"\"\")\nrep(\"\"\"        gr.addColorStop(0, 'rgba(255,238,220,0.5)'); gr.addColorStop(0.5, 'rgba(255,230,205,0.18)'); gr.addColorStop(1, 'rgba(255,230,205,0)');\"\"\",\n\"\"\"        gr.addColorStop(0, 'rgba(255,236,214,0.55)'); gr.addColorStop(0.45, 'rgba(255,226,196,0.22)'); gr.addColorStop(1, 'rgba(255,226,196,0)');\"\"\")\nrep(\"\"\"  T.sort((a, b) => a.order - b.order);\n  void Rb;\n}\"\"\", \"\"\"  T.sort((a, b) => a.order - b.order);\n}\"\"\")\nrep(\"\"\"function buildToppings() {\n  T = []; glints = [];\n  const Rb = G.Rb;\n\"\"\", \"\"\"function buildToppings() {\n  T = []; glints = [];\n\"\"\")\nrep(\"\"\"const quality = { maxDpr: 2, steamScale: 0.6, slow: 0, fast: 0 };\"\"\", \"\"\"const quality = { maxDpr: 2, steamScale: 0.6, slow: 0 };\"\"\")\nrep(\"\"\"  if (dt > 0.034) { quality.slow++; quality.fast = 0; } else { quality.fast++; quality.slow = Math.max(0, quality.slow - 1); }\"\"\",\n\"\"\"  if (dt > 0.034) quality.slow++; else quality.slow = Math.max(0, quality.slow - 1);\"\"\")\nopen(p,'w').write(s)\nEOF\ngrep -n \"Rb\\b\" index.html | sed -n '1,0p'; cd <TMP>/ramen-o55-xhigh && node nogl.mjs && node shot.mjs t1.png 1440 900 '{\"touch\":true}'",
+        "description": "Strengthen 2D steam fallback, tidy code, retest",
+        "timeout": 180000
+      },
+      "timestamp": "2026-09-23T00:11:59.358Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01U735pai87UBeNBTBqywvTN",
+      "status": "success",
+      "output": "124:    Rin: 0.962 * R, Rb: 0.92 * R, cyB: cy + 0.13 * cosE * R,\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:12:07.603Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_015daxKvxzNe1Z1Q2CaBdScN",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-o55-xhigh/nogl.png"
+      },
+      "timestamp": "2026-09-23T00:12:10.710Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_015daxKvxzNe1Z1Q2CaBdScN",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"267236\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-09-23T00:12:10.765Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The fallback steam now reads clearly. Last check: switching reduced motion on and off live, plus clicks and resizes in both modes, watching for errors.",
+      "timestamp": "2026-09-23T00:12:13.995Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_012iwCi9vYCBqQKor6MjfSmH",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-o55-xhigh && cat > toggle.mjs <<'EOF'\nimport { createRequire } from 'module';\nconst require = createRequire('<HOME>/.local/lib/node_modules/@playwright/mcp/node_modules/');\nconst { chromium } = require('playwright-core');\nconst browser = await chromium.launch({ executablePath: process.env.HOME + '/.cache/ms-playwright/chromium-1223/chrome-linux/chrome', args: ['--no-sandbox', '--use-gl=swiftshader', '--ignore-gpu-blocklist'] });\nconst page = await browser.newPage({ viewport: { width: 1200, height: 800 } });\nconst logs = [];\npage.on('pageerror', e => logs.push('PAGEERROR: ' + e.message));\nawait page.goto('file://<WORKSPACE>/anthropic/opus-5.5/xhigh/index.html');\nawait page.waitForTimeout(1500);\nawait page.mouse.click(560, 560);\nawait page.emulateMedia({ reducedMotion: 'reduce' });\nawait page.waitForTimeout(500);\nawait page.mouse.move(900, 300, { steps: 8 }); await page.mouse.click(600, 560);\nawait page.setViewportSize({ width: 700, height: 1000 });\nawait page.waitForTimeout(600);\nconst a = await page.screenshot(); \nawait page.waitForTimeout(700);\nconst b = await page.screenshot();\nlogs.push('static while reduced: ' + a.equals(b));\nawait page.emulateMedia({ reducedMotion: 'no-preference' });\nawait page.waitForTimeout(800);\nconst c = await page.screenshot();\nlogs.push('animating after re-enable: ' + !b.equals(c));\nconsole.log(logs.join('\\n'));\nawait browser.close();\nEOF\nnode toggle.mjs",
+        "description": "Test live reduced-motion toggle and resize",
+        "timeout": 120000
+      },
+      "timestamp": "2026-09-23T00:12:19.225Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_012iwCi9vYCBqQKor6MjfSmH",
+      "status": "success",
+      "output": "static while reduced: true\nanimating after re-enable: true\nShell cwd was reset to <WORKSPACE>/anthropic/opus-5.5/xhigh",
+      "timestamp": "2026-09-23T00:12:24.461Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01C3oMs4sHmKbMyCDCXj6LhF",
+      "tool": "Bash",
+      "input": {
+        "command": "rm -rf <TMP>/ramen-o55-xhigh; cd <WORKSPACE> && git status --short -- anthropic/opus-5.5/xhigh && wc -c anthropic/opus-5.5/xhigh/index.html && grep -cE 'https?://|src=|href=' anthropic/opus-5.5/xhigh/index.html",
+        "description": "Clean scratch dir, confirm deliverable and no external refs"
+      },
+      "timestamp": "2026-09-23T00:12:29.684Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01C3oMs4sHmKbMyCDCXj6LhF",
+      "status": "success",
+      "output": "?? anthropic/opus-5.5/xhigh/\n86922 anthropic/opus-5.5/xhigh/index.html\n0",
+      "timestamp": "2026-09-23T00:12:29.757Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "I've written the page to `anthropic/opus-5.5/xhigh/index.html` (about 87 KB). All CSS and JavaScript are inline, it loads no external assets, and it shows no text or UI. I checked it with headless screenshots at desktop, phone, small-phone and ultrawide sizes, and with WebGL disabled. None of those runs threw page errors.\n\n**The scene:** a dark ceramic bowl with a glossy black-brown glaze and a warm iron-brown rim, on a dark wooden table that fades into shadow. Soft, warm out-of-focus lights sit in the background. The broth is a golden miso style with fat droplets and chili oil. On top are wavy noodles, seared tofu, shiitake caps with star cuts, halved bok choy, corn, edamame, bean sprouts, two nori sheets, scallion rings, sesame seeds and red chili threads.\n\n**Motion:** steam rises and curls off the bowl. The lamp light flickers gently, oil drifts slowly across the broth, and small ripples appear now and then as if the soup is simmering. Toppings bob slightly and glints of light twinkle on the glossy surfaces. When nobody is interacting, the view drifts slowly on its own.\n\n**Mouse and touch:**\n- Moving the pointer shifts the view slightly and moves the highlights on the broth, rim and toppings.\n- Moving through the steam bends it and thins it out. The disturbance rises with the steam, then the plume re-forms from below.\n- Moving over the broth makes small ripples. Clicking or tapping makes a bigger ripple, a puff of steam, and nearby toppings bob.\n\n**Screen sizes:** the bowl is sized and placed differently for landscape and portrait, and the page redraws itself when the window changes size.\n\n**Reduced motion:** with that setting on, the page shows one still frame, frozen steam included. The pointer only moves the highlights, and nothing moves or ripples. Turning the setting on or off while the page is open works: I checked that the frame stays still with it on and animation resumes after it's turned off.\n\n**Performance and fallbacks:**\n- If the frame rate stays low, the page lowers the steam resolution first, then the rendering sharpness. In headless testing this kicked in at 2x zoom, which is expected with software rendering.\n- Without WebGL, the steam switches to a simpler version made of soft puffs.\n\nI only created `index.html`, as `AGENTS.md` asks. `run.json`, the transcript and the `registry.json` entry still need to be generated with the importer, and nothing is committed.\n\nAnother session (the `opus-5.5/max` run) also uses `<TMP>/ramen` as scratch space. I wrote a test script there before I noticed, which may have overwritten its script of the same name, then moved to my own directory. If that run's screenshot tooling acts strangely, that's the likely cause.",
+      "timestamp": "2026-09-23T00:12:39.975Z"
+    }
+  ],
+  "metadata": {
+    "sourceRecord": "a4f3c8e1-2b7d-4c9a-8e56-1f0d3b9c72aa.jsonl",
+    "normalization": {
+      "excluded": [
+        "system and developer prompts",
+        "hidden thinking and reasoning",
+        "credentials and private agent-mail calls",
+        "large base64 and embedded image data (event retained with size marker)"
+      ],
+      "omittedPrivateToolCalls": 0
+    },
+    "eventCounts": {
+      "message": 19,
+      "tool_call": 50,
+      "tool_result": 50
+    }
+  }
+}
