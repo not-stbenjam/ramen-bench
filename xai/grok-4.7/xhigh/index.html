@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#070504">
+<title>Vegan Ramen</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='9' r='5.2' fill='%23e7d3bc'/%3E%3Ccircle cx='8' cy='8.2' r='3.4' fill='%23c46a30'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --gx: 50%;
+    --gy: 58%;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #070504;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 100%, rgba(48, 22, 10, 0.55), transparent 46%),
+      radial-gradient(ellipse 130% 90% at 50% 42%, #16100c 0%, #070504 70%);
+  }
+
+  #glow {
+    position: fixed;
+    inset: -8%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 36% 30% at var(--gx) var(--gy), rgba(255, 148, 62, 0.22), rgba(255, 120, 40, 0.06) 42%, transparent 68%);
+    animation: breathe 8s ease-in-out infinite;
+  }
+
+  .orb {
+    position: fixed;
+    z-index: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(46px);
+  }
+
+  .orb-a {
+    width: min(28vw, 240px);
+    height: min(28vw, 240px);
+    left: 8%;
+    top: 14%;
+    background: rgba(255, 132, 54, 0.14);
+    animation: drift 16s ease-in-out infinite;
+  }
+
+  .orb-b {
+    width: min(18vw, 160px);
+    height: min(18vw, 160px);
+    right: 12%;
+    top: 22%;
+    background: rgba(255, 206, 160, 0.08);
+    animation: drift 19s ease-in-out infinite reverse;
+  }
+
+  #rig {
+    position: relative;
+    z-index: 1;
+    width: min(960px, 92vw, 86vh);
+    margin-inline: auto;
+    perspective: 1400px;
+    perspective-origin: 50% 42%;
+  }
+
+  #tilt {
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  svg.scene {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  #steam {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(ellipse 68% 62% at 50% 56%, transparent 42%, rgba(0, 0, 0, 0.38) 78%, rgba(0, 0, 0, 0.72) 100%);
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+  }
+
+  #sheen {
+    mix-blend-mode: screen;
+  }
+
+  #oil {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: oilDrift 18s ease-in-out infinite;
+  }
+
+  .waft {
+    animation: waft 9.5s ease-in-out infinite;
+  }
+
+  .w2 { animation-duration: 11s; animation-delay: -3.2s; }
+  .w3 { animation-duration: 8.4s; animation-delay: -5.4s; }
+  .w4 { animation-duration: 12s; animation-delay: -7s; }
+  .w5 { animation-duration: 10s; animation-delay: -1.6s; }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.72; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes drift {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(14px, -18px, 0); }
+  }
+
+  @keyframes oilDrift {
+    0%, 100% { transform: rotate(-5deg) translate(0, 0); }
+    50% { transform: rotate(6deg) translate(4px, -2px); }
+  }
+
+  @keyframes waft {
+    0%, 100% { transform: translate3d(0, 8px, 0); opacity: 0.55; }
+    50% { transform: translate3d(7px, -28px, 0); opacity: 0.95; }
+  }
+
+  @media (max-width: 720px) {
+    #rig { width: min(560px, 94vw, 84vh); }
+    .orb-a { opacity: 0.7; }
+  }
+
+  @media (max-height: 520px) {
+    #rig { width: min(680px, 88vw, 76vh); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #glow, .orb, #oil, .waft {
+      animation: none !important;
+    }
+    #glow { opacity: 0.9; }
+    .waft { opacity: 0.7; transform: none; }
+    #oil { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div id="stage" role="img" aria-label="A steaming bowl of vegan ramen in warm low light, with noodles, fried tofu, shiitake, bok choy, nori, bamboo shoots, corn, scallions, and chili oil.">
+    <div id="glow" aria-hidden="true"></div>
+    <div class="orb orb-a" aria-hidden="true"></div>
+    <div class="orb orb-b" aria-hidden="true"></div>
+
+    <div id="rig">
+      <div id="tilt">
+        <svg class="scene" viewBox="0 0 800 820" aria-hidden="true">
+          <defs>
+            <radialGradient id="ambience" cx="50%" cy="46%" r="50%">
+              <stop offset="0%" stop-color="#ff9a48" stop-opacity="0.18"/>
+              <stop offset="48%" stop-color="#ff7a32" stop-opacity="0.05"/>
+              <stop offset="100%" stop-color="#ff7a32" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="bodyGrad" x1="12%" y1="8%" x2="92%" y2="100%">
+              <stop offset="0%" stop-color="#fff6ec"/>
+              <stop offset="22%" stop-color="#f0d8c0"/>
+              <stop offset="48%" stop-color="#e2c2a4"/>
+              <stop offset="70%" stop-color="#c49a78"/>
+              <stop offset="100%" stop-color="#6a4c3c"/>
+            </linearGradient>
+            <radialGradient id="ceramicTop" cx="34%" cy="30%" r="72%">
+              <stop offset="0%" stop-color="#fff8f1"/>
+              <stop offset="32%" stop-color="#f3e4d2"/>
+              <stop offset="58%" stop-color="#ddc3a8"/>
+              <stop offset="80%" stop-color="#b48b70"/>
+              <stop offset="100%" stop-color="#6e5142"/>
+            </radialGradient>
+            <radialGradient id="innerWall" cx="50%" cy="12%" r="80%">
+              <stop offset="0%" stop-color="#f0dcc8"/>
+              <stop offset="18%" stop-color="#c9a88c"/>
+              <stop offset="46%" stop-color="#6e5042"/>
+              <stop offset="100%" stop-color="#2a1c16"/>
+            </radialGradient>
+            <linearGradient id="rimEdge" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#fffaf5" stop-opacity="0.95"/>
+              <stop offset="38%" stop-color="#f2d8c0" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#4a3028" stop-opacity="0.55"/>
+            </linearGradient>
+            <radialGradient id="brothGrad" cx="42%" cy="38%" r="72%">
+              <stop offset="0%" stop-color="#ffd89a"/>
+              <stop offset="24%" stop-color="#f0a24e"/>
+              <stop offset="55%" stop-color="#d47832"/>
+              <stop offset="80%" stop-color="#a35220"/>
+              <stop offset="100%" stop-color="#6e3414"/>
+            </radialGradient>
+            <radialGradient id="brothShade" cx="50%" cy="48%" r="52%">
+              <stop offset="62%" stop-color="#3a1408" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#2a0e08" stop-opacity="0.55"/>
+            </radialGradient>
+            <radialGradient id="sheenGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff8ee" stop-opacity="0.9"/>
+              <stop offset="42%" stop-color="#ffd7a4" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#ffd7a4" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="chili" cx="32%" cy="32%" r="68%">
+              <stop offset="0%" stop-color="#ffc2a0" stop-opacity="0.95"/>
+              <stop offset="28%" stop-color="#ff4c1c" stop-opacity="0.92"/>
+              <stop offset="68%" stop-color="#c4180c" stop-opacity="0.72"/>
+              <stop offset="100%" stop-color="#6e0c08" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="kernel" cx="35%" cy="32%" r="70%">
+              <stop offset="0%" stop-color="#fff3b0"/>
+              <stop offset="45%" stop-color="#f0c232"/>
+              <stop offset="100%" stop-color="#d49216"/>
+            </radialGradient>
+            <radialGradient id="cap1" cx="32%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#d49268"/>
+              <stop offset="38%" stop-color="#8d5340"/>
+              <stop offset="78%" stop-color="#4a2a1e"/>
+              <stop offset="100%" stop-color="#2a1610"/>
+            </radialGradient>
+            <radialGradient id="cap2" cx="30%" cy="28%" r="75%">
+              <stop offset="0%" stop-color="#c48460"/>
+              <stop offset="46%" stop-color="#6a3c2c"/>
+              <stop offset="100%" stop-color="#241410"/>
+            </radialGradient>
+            <linearGradient id="stem" x1="0" y1="1" x2="0.2" y2="0">
+              <stop offset="0%" stop-color="#f4f8e4"/>
+              <stop offset="42%" stop-color="#d7e8a4"/>
+              <stop offset="100%" stop-color="#8fbe62"/>
+            </linearGradient>
+            <linearGradient id="leaf" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0%" stop-color="#1c5a2a"/>
+              <stop offset="48%" stop-color="#3f9b48"/>
+              <stop offset="100%" stop-color="#245e30"/>
+            </linearGradient>
+            <linearGradient id="leaf2" x1="1" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#174e26"/>
+              <stop offset="55%" stop-color="#2f8640"/>
+              <stop offset="100%" stop-color="#4eae58"/>
+            </linearGradient>
+            <linearGradient id="tofuTop" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#fff4e0"/>
+              <stop offset="45%" stop-color="#f0d0a2"/>
+              <stop offset="100%" stop-color="#e0b278"/>
+            </linearGradient>
+            <linearGradient id="menma" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#fff7e2"/>
+              <stop offset="55%" stop-color="#f0d6a6"/>
+              <stop offset="100%" stop-color="#d2b07a"/>
+            </linearGradient>
+            <linearGradient id="noriGrad" x1="0" y1="0" x2="0.15" y2="1">
+              <stop offset="0%" stop-color="#243e38"/>
+              <stop offset="28%" stop-color="#142420"/>
+              <stop offset="100%" stop-color="#0c1412"/>
+            </linearGradient>
+            <linearGradient id="lipGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
+              <stop offset="16%" stop-color="#fff8f0" stop-opacity="0.95"/>
+              <stop offset="40%" stop-color="#ffe4c8" stop-opacity="0.55"/>
+              <stop offset="68%" stop-color="#c8a48c" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="steamFade" gradientUnits="userSpaceOnUse" x1="0" y1="500" x2="0" y2="30">
+              <stop offset="0%" stop-color="#fff6ee" stop-opacity="0"/>
+              <stop offset="14%" stop-color="#fff4ea" stop-opacity="0.72"/>
+              <stop offset="48%" stop-color="#fff8f4" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#fff8f4" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="footGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#a4846c"/>
+              <stop offset="100%" stop-color="#4a342c"/>
+            </linearGradient>
+            <radialGradient id="pool" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffb068" stop-opacity="0.16"/>
+              <stop offset="55%" stop-color="#c47840" stop-opacity="0.05"/>
+              <stop offset="100%" stop-color="#c47840" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="shadowBlur" x="-50%" y="-120%" width="200%" height="340%">
+              <feGaussianBlur stdDeviation="8"/>
+            </filter>
+            <filter id="soft" x="-70%" y="-70%" width="240%" height="240%">
+              <feGaussianBlur stdDeviation="2.4"/>
+            </filter>
+            <filter id="steamBlur" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="8"/>
+            </filter>
+            <filter id="heat" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="16"/>
+            </filter>
+            <filter id="contact" x="-90%" y="-90%" width="280%" height="280%">
+              <feGaussianBlur stdDeviation="2.2"/>
+            </filter>
+            <clipPath id="soupClip" clipPathUnits="userSpaceOnUse">
+              <circle cx="0" cy="0" r="202"/>
+            </clipPath>
+          </defs>
+
+          <ellipse cx="400" cy="500" rx="300" ry="210" fill="url(#ambience)"/>
+          <ellipse cx="400" cy="790" rx="300" ry="36" fill="url(#pool)"/>
+          <ellipse cx="424" cy="718" rx="188" ry="18" fill="#120804" opacity="0.55" filter="url(#shadowBlur)"/>
+
+          <g id="shell">
+            <path fill="url(#bodyGrad)" d="M114,430 C118,530 196,650 318,696 C382,718 468,720 528,694 C646,656 688,540 686,430 Z"/>
+            <ellipse cx="286" cy="620" rx="150" ry="58" fill="#fff1e0" opacity="0.28" filter="url(#soft)"/>
+            <ellipse cx="560" cy="630" rx="110" ry="52" fill="#3a241c" opacity="0.22" filter="url(#soft)"/>
+            <path d="M200,560 C260,640 540,648 620,548" fill="none" stroke="#3a241c" stroke-width="16" stroke-linecap="round" opacity="0.18" filter="url(#soft)"/>
+            <path d="M176,530 C210,610 268,670 348,692" fill="none" stroke="#fff8f2" stroke-width="18" stroke-linecap="round" opacity="0.28" filter="url(#soft)"/>
+            <path d="M600,490 C640,560 628,640 552,688" fill="none" stroke="#d5e4f4" stroke-width="2.5" stroke-linecap="round" opacity="0.22"/>
+            <g fill="#7a5c4c" opacity="0.22">
+              <circle cx="190" cy="540" r="1.4"/>
+              <circle cx="230" cy="600" r="1.1"/>
+              <circle cx="280" cy="660" r="1.3"/>
+              <circle cx="360" cy="692" r="1"/>
+              <circle cx="470" cy="688" r="1.2"/>
+              <circle cx="548" cy="656" r="1.3"/>
+              <circle cx="610" cy="590" r="1.1"/>
+              <circle cx="648" cy="510" r="1.2"/>
+              <circle cx="168" cy="480" r="1"/>
+            </g>
+            <ellipse cx="408" cy="704" rx="74" ry="13" fill="#3a2a24"/>
+            <ellipse cx="400" cy="696" rx="70" ry="11" fill="url(#footGrad)"/>
+            <ellipse cx="374" cy="692" rx="24" ry="3.2" fill="#fff6ee" opacity="0.28"/>
+          </g>
+
+          <g id="opening" transform="translate(400,430) scale(1,0.54)">
+            <circle r="286" fill="url(#ceramicTop)"/>
+            <circle r="286" fill="none" stroke="url(#rimEdge)" stroke-width="7" vector-effect="non-scaling-stroke"/>
+            <circle r="250" fill="url(#innerWall)"/>
+            <circle r="250" fill="none" stroke="#140c0a" stroke-width="10" opacity="0.28" vector-effect="non-scaling-stroke"/>
+            <path d="M-168,-176 A230,230 0 0 1 168,-176" fill="none" stroke="#edd8c4" stroke-width="16" opacity="0.28" stroke-linecap="round"/>
+
+            <g id="soup" transform="translate(0,32)">
+              <circle id="broth-disk" r="204" fill="url(#brothGrad)"/>
+              <circle r="204" fill="url(#brothShade)"/>
+              <circle r="198" fill="none" stroke="#ffd7a8" stroke-width="2.5" opacity="0.28" vector-effect="non-scaling-stroke"/>
+              <ellipse cx="0" cy="16" rx="132" ry="86" fill="#4a1e0c" opacity="0.2"/>
+
+              <g clip-path="url(#soupClip)">
+                <g class="noodles" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <g stroke="#5a2c10" stroke-width="12" opacity="0.32" transform="translate(1.4,3)">
+                    <path d="M-158,24 C-116,-36 -64,62 -6,4 S78,-46 132,12"/>
+                    <path d="M-148,74 C-96,12 -58,96 4,42 S86,4 146,52"/>
+                    <path d="M-126,-28 C-78,-78 -16,-16 24,28 S96,78 142,18"/>
+                    <path d="M-168,42 C-104,86 -86,-8 -24,18 S48,92 112,36 S162,8 176,42"/>
+                    <path d="M-86,104 C-36,52 6,124 54,70 S124,36 162,92"/>
+                    <path d="M-58,-52 C-16,-92 44,-36 52,12 S74,74 28,104"/>
+                    <path d="M-24,22 C-36,-24 22,-42 44,2 C66,46 18,58 -2,30 C-18,8 12,12 32,26"/>
+                    <path d="M24,-18 C66,-62 104,2 82,42 S124,96 154,48"/>
+                    <path d="M-112,12 C-66,44 -46,-32 4,-8 S64,34 96,-18"/>
+                    <path d="M-38,64 C4,18 42,84 94,40"/>
+                    <path d="M-136,-6 C-92,34 -36,-42 22,-28 S104,22 68,74"/>
+                    <path d="M-78,84 C-26,40 12,96 64,54 S132,86 156,38"/>
+                    <path d="M-46,-8 C-6,-42 34,12 8,44 S46,86 84,48"/>
+                    <path d="M104,-36 C136,-70 164,-16 140,24"/>
+                    <path d="M-116,52 C-70,112 -12,58 32,102"/>
+                    <path d="M-12,78 C28,48 48,92 86,62 S130,40 154,70"/>
+                    <path d="M36,6 C8,28 -18,8 -8,-18 C2,-40 36,-24 28,2 C22,20 48,16 40,0"/>
+                    <path d="M-90,36 C-60,8 -30,48 8,20 S40,8 62,36"/>
+                  </g>
+                  <g stroke="#e8c27a" stroke-width="9">
+                    <path d="M-158,24 C-116,-36 -64,62 -6,4 S78,-46 132,12"/>
+                    <path d="M-148,74 C-96,12 -58,96 4,42 S86,4 146,52"/>
+                    <path d="M-126,-28 C-78,-78 -16,-16 24,28 S96,78 142,18"/>
+                    <path d="M-168,42 C-104,86 -86,-8 -24,18 S48,92 112,36 S162,8 176,42"/>
+                    <path d="M-86,104 C-36,52 6,124 54,70 S124,36 162,92"/>
+                    <path d="M-12,78 C28,48 48,92 86,62 S130,40 154,70"/>
+                    <path d="M-116,52 C-70,112 -12,58 32,102"/>
+                    <path d="M-90,36 C-60,8 -30,48 8,20 S40,8 62,36"/>
+                  </g>
+                  <g stroke="#f4d7a0" stroke-width="8">
+                    <path d="M-58,-52 C-16,-92 44,-36 52,12 S74,74 28,104"/>
+                    <path d="M-24,22 C-36,-24 22,-42 44,2 C66,46 18,58 -2,30 C-18,8 12,12 32,26"/>
+                    <path d="M24,-18 C66,-62 104,2 82,42 S124,96 154,48"/>
+                    <path d="M-112,12 C-66,44 -46,-32 4,-8 S64,34 96,-18"/>
+                    <path d="M-38,64 C4,18 42,84 94,40"/>
+                    <path d="M-136,-6 C-92,34 -36,-42 22,-28 S104,22 68,74"/>
+                    <path d="M-78,84 C-26,40 12,96 64,54 S132,86 156,38"/>
+                    <path d="M-46,-8 C-6,-42 34,12 8,44 S46,86 84,48"/>
+                    <path d="M104,-36 C136,-70 164,-16 140,24"/>
+                    <path d="M36,6 C8,28 -18,8 -8,-18 C2,-40 36,-24 28,2 C22,20 48,16 40,0"/>
+                  </g>
+                  <g stroke="#fff3d4" stroke-width="2.4" opacity="0.72" transform="translate(-0.8,-1.4)">
+                    <path d="M-158,24 C-116,-36 -64,62 -6,4 S78,-46 132,12"/>
+                    <path d="M-148,74 C-96,12 -58,96 4,42 S86,4 146,52"/>
+                    <path d="M-126,-28 C-78,-78 -16,-16 24,28 S96,78 142,18"/>
+                    <path d="M-58,-52 C-16,-92 44,-36 52,12 S74,74 28,104"/>
+                    <path d="M-24,22 C-36,-24 22,-42 44,2 C66,46 18,58 -2,30"/>
+                    <path d="M24,-18 C66,-62 104,2 82,42"/>
+                    <path d="M-112,12 C-66,44 -46,-32 4,-8"/>
+                    <path d="M36,6 C8,28 -18,8 -8,-18 C2,-40 36,-24 28,2"/>
+                    <path d="M-90,36 C-60,8 -30,48 8,20"/>
+                  </g>
+                </g>
+
+                <g id="oil">
+                  <ellipse cx="-78" cy="96" rx="40" ry="20" fill="url(#chili)"/>
+                  <ellipse cx="-96" cy="78" rx="16" ry="9" fill="#ff5a28" opacity="0.8"/>
+                  <ellipse cx="-58" cy="112" rx="12" ry="6" fill="#ff7340" opacity="0.7"/>
+                  <ellipse cx="-86" cy="90" rx="10" ry="4" fill="#fff1e4" opacity="0.35" transform="rotate(-16 -86 90)"/>
+                  <g fill="#7a180e">
+                    <ellipse cx="-88" cy="92" rx="2.6" ry="1.5" transform="rotate(20 -88 92)"/>
+                    <ellipse cx="-70" cy="104" rx="2.2" ry="1.3" transform="rotate(-24 -70 104)"/>
+                    <ellipse cx="-100" cy="80" rx="1.8" ry="1.1" transform="rotate(12 -100 80)"/>
+                    <ellipse cx="-60" cy="84" rx="1.7" ry="1" transform="rotate(40 -60 84)"/>
+                  </g>
+                </g>
+
+                <g id="sheen">
+                  <ellipse cx="-28" cy="-18" rx="96" ry="44" fill="url(#sheenGrad)" transform="rotate(-18 -28 -18)"/>
+                  <ellipse cx="-52" cy="-28" rx="26" ry="9" fill="#fffaf4" opacity="0.7" transform="rotate(-18 -52 -28)"/>
+                </g>
+
+                <g id="fat" fill="#f8e2b8">
+                  <ellipse cx="78" cy="-24" rx="13" ry="7" opacity="0.5"/>
+                  <ellipse cx="74" cy="-26" rx="5" ry="2.4" fill="#fff" opacity="0.75"/>
+                  <ellipse cx="24" cy="-78" rx="9" ry="5" opacity="0.42"/>
+                  <ellipse cx="21" cy="-80" rx="3.2" ry="1.6" fill="#fff" opacity="0.7"/>
+                  <ellipse cx="-120" cy="8" rx="8" ry="4.5" opacity="0.4"/>
+                  <ellipse cx="-123" cy="7" rx="2.8" ry="1.4" fill="#fff" opacity="0.65"/>
+                  <ellipse cx="132" cy="36" rx="7" ry="4" opacity="0.38"/>
+                  <ellipse cx="130" cy="35" rx="2.4" ry="1.2" fill="#fff" opacity="0.6"/>
+                  <ellipse cx="-20" cy="150" rx="10" ry="5" opacity="0.36"/>
+                  <ellipse cx="-24" cy="148" rx="3.4" ry="1.6" fill="#fff" opacity="0.65"/>
+                  <ellipse cx="150" cy="-8" rx="6" ry="3.4" opacity="0.34"/>
+                </g>
+              </g>
+
+              <g id="bubbles" fill="none" stroke="#fff8f0" stroke-linecap="round" vector-effect="non-scaling-stroke">
+                <circle cx="30" cy="-20" r="3" stroke-width="1.3" opacity="0.45"/>
+                <circle cx="-90" cy="48" r="2.2" stroke-width="1.1" opacity="0.35"/>
+                <circle cx="64" cy="24" r="2.6" stroke-width="1.2" opacity="0.4"/>
+              </g>
+            </g>
+          </g>
+
+          <g id="nori" transform="rotate(-7 468 300)">
+            <ellipse cx="470" cy="368" rx="52" ry="13" fill="#140a08" opacity="0.45" filter="url(#soft)"/>
+            <path fill="url(#noriGrad)" d="M424,372 C416,292 412,214 422,176 L452,168 C468,160 486,176 494,196 L518,366 C490,356 452,370 424,372 Z"/>
+            <path fill="#1c3832" d="M422,176 C436,162 448,178 462,166 C474,156 488,172 498,184 C486,192 460,184 444,194 C432,186 426,180 422,176 Z"/>
+            <path d="M432,360 C426,280 428,210 436,178" fill="none" stroke="#5ea088" stroke-width="3.2" stroke-linecap="round" opacity="0.8"/>
+            <path d="M458,172 C456,230 460,300 452,364" fill="none" stroke="#000" stroke-width="1.1" opacity="0.28"/>
+            <path d="M484,188 C488,250 482,320 490,360" fill="none" stroke="#000" stroke-width="0.8" opacity="0.22"/>
+            <path d="M446,200 C444,236 450,228 442,258" fill="none" stroke="#2f5c4e" stroke-width="1.6" opacity="0.45"/>
+          </g>
+
+          <g id="toppings" transform="translate(400,430) scale(1,0.54)">
+            <g transform="translate(0,32)">
+              <g transform="translate(-18,-132)">
+                <ellipse cx="2" cy="10" rx="34" ry="12" fill="#1a0c08" opacity="0.35" filter="url(#contact)"/>
+                <g transform="scale(1,1.52) rotate(-8)">
+                  <path d="M-34,6 C-22,-22 8,-30 22,-12 C36,-26 54,-2 34,16 C14,8 -8,20 -34,6 Z" fill="#2c1816"/>
+                  <path d="M-16,-4 C-4,-16 12,-8 10,4" fill="none" stroke="#7a4c44" stroke-width="2.4" stroke-linecap="round"/>
+                  <path d="M-6,2 C6,-6 18,2 16,10" fill="none" stroke="#4a2824" stroke-width="1.6" opacity="0.7"/>
+                  <ellipse cx="-8" cy="-6" rx="7" ry="3" fill="#fff" opacity="0.12" transform="rotate(-20)"/>
+                </g>
+              </g>
+
+              <g transform="translate(28,-96)">
+                <ellipse cx="4" cy="14" rx="48" ry="16" fill="#2a120c" opacity="0.42" filter="url(#contact)"/>
+                <g transform="scale(1.15,1.85) rotate(8)">
+                  <ellipse cx="0" cy="0" rx="50" ry="32" fill="url(#cap1)"/>
+                  <ellipse cx="-16" cy="-10" rx="16" ry="9" fill="#fff" opacity="0.2"/>
+                  <path d="M-32,10 Q2,36 34,8 Q16,26 -32,10 Z" fill="#f6dcc0"/>
+                  <g stroke="#6a4034" stroke-width="1.05" fill="none" opacity="0.9">
+                    <path d="M-24,14 Q0,30 26,12"/>
+                    <path d="M-20,17 Q0,31 22,15"/>
+                    <path d="M-14,20 Q0,31 16,18"/>
+                    <path d="M-8,22 Q0,30 10,20"/>
+                  </g>
+                  <ellipse cx="6" cy="18" rx="9" ry="5.5" fill="#f3e0c8"/>
+                </g>
+              </g>
+
+              <g transform="translate(124,-28)">
+                <ellipse cx="3" cy="8" rx="30" ry="11" fill="#2a120c" opacity="0.38" filter="url(#contact)"/>
+                <g transform="scale(1,1.55) rotate(-16)">
+                  <ellipse rx="32" ry="23" fill="url(#cap2)"/>
+                  <ellipse cx="-9" cy="-7" rx="11" ry="6.5" fill="#fff" opacity="0.1"/>
+                  <ellipse cx="8" cy="3" rx="5" ry="3" fill="#1a0c0a" opacity="0.35"/>
+                  <path d="M-18,8 Q0,18 20,6" fill="none" stroke="#1a0c0a" stroke-width="1.2" opacity="0.35"/>
+                </g>
+              </g>
+
+              <g transform="translate(-78,-78)">
+                <ellipse cx="0" cy="8" rx="36" ry="12" fill="#102008" opacity="0.3" filter="url(#contact)"/>
+                <g transform="scale(1,1.5) rotate(-12)">
+                  <path d="M0,22 C-30,-6 -24,-52 2,-64 C22,-50 26,-8 0,22 Z" fill="#2d7a3a"/>
+                  <path d="M0,16 C0,-8 0,-40 2,-56" stroke="#c6e8a4" stroke-width="1.4" fill="none" opacity="0.8"/>
+                  <path d="M8,12 C34,-8 36,-46 12,-42 C18,-22 16,0 8,12 Z" fill="#3e9450"/>
+                  <path d="M16,0 C26,-16 28,-32 18,-38" stroke="#e4f6c8" stroke-width="1" fill="none" opacity="0.7"/>
+                </g>
+              </g>
+
+              <g transform="translate(-132,6)">
+                <ellipse cx="8" cy="16" rx="46" ry="16" fill="#14240c" opacity="0.38" filter="url(#contact)"/>
+                <g transform="scale(1.2,2.05) rotate(-26)">
+                  <path d="M-6,34 C-16,10 -12,-20 0,-40 C14,-16 16,12 8,36 C4,20 -2,18 -6,34 Z" fill="url(#stem)"/>
+                  <path d="M-2,-6 C-40,-16 -64,-54 -36,-78 C-8,-50 -4,-20 -2,-6 Z" fill="url(#leaf)"/>
+                  <path d="M-10,-22 C-28,-40 -34,-58 -26,-66" stroke="#dff6b8" stroke-width="1.5" fill="none" opacity="0.75"/>
+                  <path d="M4,-4 C32,-28 50,-62 20,-80 C6,-50 2,-22 4,-4 Z" fill="url(#leaf2)"/>
+                  <path d="M12,-24 C26,-44 30,-60 22,-68" stroke="#f2ffe0" stroke-width="1.3" fill="none" opacity="0.7"/>
+                  <path d="M0,-18 C-8,-44 8,-68 16,-52 C12,-34 6,-20 0,-18 Z" fill="#46a452"/>
+                  <ellipse cx="-20" cy="-46" rx="6" ry="2.6" fill="#fff" opacity="0.35" transform="rotate(-28 -20 -46)"/>
+                  <ellipse cx="16" cy="-40" rx="4" ry="2" fill="#fff" opacity="0.28" transform="rotate(20 16 -40)"/>
+                </g>
+              </g>
+
+              <g transform="translate(156,36)">
+                <ellipse cx="0" cy="8" rx="34" ry="12" fill="#3a2010" opacity="0.32" filter="url(#contact)"/>
+                <g transform="scale(1,1.48) rotate(16)">
+                  <path d="M-10,26 C-20,-8 -8,-40 4,-30 C10,-8 8,16 4,28 Z" fill="url(#menma)"/>
+                  <path d="M4,24 C0,-6 16,-36 26,-22 C28,-2 18,16 12,26 Z" fill="#f7e4bc"/>
+                  <path d="M16,20 C22,-4 36,-28 44,-14 C42,4 32,16 26,22 Z" fill="#edd49a"/>
+                  <path d="M-4,2 C-8,-16 -2,-26 2,-24" stroke="#fff" stroke-width="1.6" opacity="0.5" fill="none" stroke-linecap="round"/>
+                  <path d="M14,4 C16,-10 24,-20 28,-16" stroke="#fff" stroke-width="1.2" opacity="0.35" fill="none" stroke-linecap="round"/>
+                </g>
+              </g>
+
+              <g transform="translate(-118,96)">
+                <ellipse cx="6" cy="8" rx="36" ry="12" fill="#3a2408" opacity="0.28" filter="url(#contact)"/>
+                <g transform="scale(1,1.5)">
+                  <g transform="translate(0,0)"><ellipse rx="8" ry="5.6" fill="url(#kernel)"/><ellipse cx="-2.2" cy="-1.6" rx="3" ry="1.7" fill="#fff6c8" opacity="0.8"/></g>
+                  <g transform="translate(15,-2)"><ellipse rx="7.4" ry="5.2" fill="url(#kernel)"/><ellipse cx="-2" cy="-1.4" rx="2.6" ry="1.5" fill="#fff6c8" opacity="0.75"/></g>
+                  <g transform="translate(-14,3)"><ellipse rx="7" ry="5" fill="url(#kernel)"/><ellipse cx="-1.8" cy="-1.3" rx="2.4" ry="1.4" fill="#fff6c8" opacity="0.7"/></g>
+                  <g transform="translate(7,10)"><ellipse rx="7.6" ry="5.3" fill="url(#kernel)"/><ellipse cx="-2" cy="-1.5" rx="2.7" ry="1.5" fill="#fff6c8" opacity="0.75"/></g>
+                  <g transform="translate(-8,12)"><ellipse rx="6.6" ry="4.8" fill="url(#kernel)"/><ellipse cx="-1.6" cy="-1.2" rx="2.2" ry="1.3" fill="#fff6c8" opacity="0.7"/></g>
+                  <g transform="translate(20,9)"><ellipse rx="6.4" ry="4.6" fill="url(#kernel)"/><ellipse cx="-1.6" cy="-1.2" rx="2.1" ry="1.2" fill="#fff6c8" opacity="0.65"/></g>
+                  <g transform="translate(4,-12)"><ellipse rx="6.8" ry="4.8" fill="url(#kernel)"/><ellipse cx="-1.8" cy="-1.3" rx="2.3" ry="1.3" fill="#fff6c8" opacity="0.72"/></g>
+                  <g transform="translate(-16,-8)"><ellipse rx="6.2" ry="4.5" fill="url(#kernel)"/><ellipse cx="-1.5" cy="-1.1" rx="2" ry="1.2" fill="#fff6c8" opacity="0.65"/></g>
+                </g>
+              </g>
+
+              <g transform="translate(108,128)">
+                <ellipse cx="6" cy="16" rx="32" ry="11" fill="#3a1a08" opacity="0.35" filter="url(#contact)"/>
+                <g transform="scale(1.4,2.05) rotate(8)">
+                  <path d="M2,-16 L30,-4 L12,8 L-18,-4 Z" fill="url(#tofuTop)"/>
+                  <path d="M-18,-4 L12,8 L12,24 L-18,12 Z" fill="#e2bc8a"/>
+                  <path d="M12,8 L30,-4 L30,12 L12,24 Z" fill="#c48a48"/>
+                  <path d="M2,-16 L30,-4" stroke="#a86c32" stroke-width="1.3" fill="none" opacity="0.55"/>
+                  <g fill="#b88858" opacity="0.55">
+                    <circle cx="6" cy="-6" r="1.3"/>
+                    <circle cx="16" cy="-2" r="1.1"/>
+                    <circle cx="10" cy="2" r="1.35"/>
+                    <circle cx="18" cy="3" r="0.9"/>
+                  </g>
+                  <path d="M6,-12 L18,-7" stroke="#fff" stroke-width="1.6" opacity="0.45" stroke-linecap="round"/>
+                </g>
+              </g>
+
+              <g transform="translate(48,124)">
+                <ellipse cx="4" cy="18" rx="36" ry="12" fill="#3a1a08" opacity="0.4" filter="url(#contact)"/>
+                <g transform="scale(1.35,2) rotate(-6)">
+                  <path d="M0,-20 L36,-4 L16,12 L-22,-4 Z" fill="url(#tofuTop)"/>
+                  <path d="M-22,-4 L16,12 L16,30 L-22,14 Z" fill="#deb07e"/>
+                  <path d="M16,12 L36,-4 L36,14 L16,30 Z" fill="#c08640"/>
+                  <path d="M0,-20 L36,-4" stroke="#8f5a28" stroke-width="1.5" fill="none" opacity="0.4"/>
+                  <g fill="#a87848" opacity="0.5">
+                    <circle cx="4" cy="-8" r="1.4"/>
+                    <circle cx="16" cy="-4" r="1.2"/>
+                    <circle cx="10" cy="2" r="1.5"/>
+                    <circle cx="22" cy="4" r="1.1"/>
+                    <circle cx="8" cy="6" r="1"/>
+                  </g>
+                  <path d="M4,-14 L20,-8" stroke="#fffaf2" stroke-width="1.8" opacity="0.5" stroke-linecap="round"/>
+                </g>
+              </g>
+
+              <g transform="translate(-16,148)">
+                <g transform="scale(1.55,2.15)" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke">
+                  <path d="M-24,8 C-12,-16 6,-12 16,4" stroke="#f7f4ec" stroke-width="2.3"/>
+                  <path d="M-8,14 C2,-10 18,-20 30,-2" stroke="#f3efe4" stroke-width="2"/>
+                  <path d="M-18,16 C-4,-4 10,-2 8,12" stroke="#fffaf4" stroke-width="1.7"/>
+                  <path d="M4,12 C14,-6 26,-8 34,6" stroke="#f6f1e6" stroke-width="1.8"/>
+                  <path d="M-30,4 C-16,-8 -6,2 -12,14" stroke="#efe8da" stroke-width="1.6"/>
+                  <circle cx="16" cy="4" r="1.7" fill="#f2d48a" stroke="none"/>
+                  <circle cx="30" cy="-2" r="1.5" fill="#f0c878" stroke="none"/>
+                  <circle cx="-12" cy="14" r="1.4" fill="#f6e2b0" stroke="none"/>
+                </g>
+              </g>
+
+              <g class="noodles" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke">
+                <path d="M-20,8 C8,-16 28,18 52,-2" stroke="#c9964a" stroke-width="9"/>
+                <path d="M-20,8 C8,-16 28,18 52,-2" stroke="#f0d7a4" stroke-width="5.5"/>
+                <path d="M-20,8 C8,-16 28,18 52,-2" stroke="#fff4d4" stroke-width="2" transform="translate(-0.6,-1)"/>
+                <path d="M24,46 C48,28 40,64 70,48" stroke="#ddb46a" stroke-width="8"/>
+                <path d="M24,46 C48,28 40,64 70,48" stroke="#f3d7a0" stroke-width="4.5"/>
+                <path d="M-70,20 C-48,4 -30,28 -8,14" stroke="#e6c484" stroke-width="7"/>
+                <path d="M-70,20 C-48,4 -30,28 -8,14" stroke="#fff1cc" stroke-width="2.2"/>
+              </g>
+
+              <g id="scallions">
+                <g transform="translate(-18,-6) rotate(-24)"><g transform="scale(1.55,2.15)"><ellipse rx="10" ry="3.3" fill="#3eae4c"/><ellipse cx="-2.2" cy="-0.4" rx="4.2" ry="1.5" fill="#e7f6d4"/></g></g>
+                <g transform="translate(14,18) rotate(18)"><g transform="scale(1.55,2.15)"><ellipse rx="8" ry="3" fill="#e8f3d8"/><ellipse cx="3" cy="0" rx="3.4" ry="2" fill="#49b856"/></g></g>
+                <g transform="translate(32,-16) rotate(42)"><g transform="scale(1.55,2.15)"><ellipse rx="9" ry="3.1" fill="#2f9840"/><ellipse cx="-1.5" cy="-0.3" rx="3.6" ry="1.4" fill="#dff3c4"/></g></g>
+                <g transform="translate(-42,28) rotate(-50)"><g transform="scale(1.55,2.15)"><ellipse rx="11" ry="3.4" fill="#46b255"/><ellipse cx="-3" cy="-0.5" rx="4" ry="1.5" fill="#f2fbe4"/></g></g>
+                <g transform="translate(52,36) rotate(12)"><g transform="scale(1.55,2.15)"><ellipse rx="7.5" ry="2.8" fill="#218038"/><ellipse cx="2.4" cy="0.2" rx="3" ry="1.6" fill="#d5efc0"/></g></g>
+                <g transform="translate(-8,48) rotate(66)"><g transform="scale(1.55,2.15)"><ellipse rx="8.5" ry="3" fill="#dff0cc"/><ellipse cx="-2.6" cy="-0.2" rx="3.2" ry="1.7" fill="#3ea64c"/></g></g>
+                <g transform="translate(18,58) rotate(-16)"><g transform="scale(1.55,2.15)"><ellipse rx="9" ry="3.1" fill="#37a448"/><ellipse cx="-2" cy="-0.4" rx="3.8" ry="1.4" fill="#e5f6d0"/></g></g>
+                <g transform="translate(-36,-24) rotate(30)"><g transform="scale(1.55,2.15)"><ellipse rx="7" ry="2.7" fill="#1f7434"/><ellipse cx="1.8" cy="0" rx="2.8" ry="1.4" fill="#c8e8b0"/></g></g>
+                <g transform="translate(70,8) rotate(-36)"><g transform="scale(1.55,2.15)"><ellipse rx="8" ry="2.9" fill="#4cbc5e"/><ellipse cx="-1.6" cy="-0.3" rx="3.2" ry="1.3" fill="#f4fbe8"/></g></g>
+                <g transform="translate(-24,70) rotate(8)"><g transform="scale(1.55,2.15)"><ellipse rx="10" ry="3.2" fill="#2e943c"/><ellipse cx="-2.4" cy="-0.4" rx="4" ry="1.5" fill="#e3f4cc"/></g></g>
+                <g transform="translate(6,-36) rotate(52)"><g transform="scale(1.55,2.15)"><ellipse rx="6.5" ry="2.5" fill="#8fd48a"/><ellipse cx="2" cy="0.1" rx="2.6" ry="1.4" fill="#f7fff2"/></g></g>
+                <g transform="translate(44,-48) rotate(-22)"><g transform="scale(1.55,2.15)"><ellipse rx="7.2" ry="2.6" fill="#3aaa4a"/><ellipse cx="-1.4" cy="-0.2" rx="2.8" ry="1.2" fill="#e8f7d6"/></g></g>
+                <g transform="translate(86,52) rotate(24)"><g transform="scale(1.55,2.15)"><ellipse rx="6.4" ry="2.4" fill="#e7f4d6"/><ellipse cx="2.2" cy="0" rx="2.4" ry="1.3" fill="#46b454"/></g></g>
+                <g transform="translate(-58,52) rotate(-40)"><g transform="scale(1.55,2.15)"><ellipse rx="8.2" ry="2.9" fill="#278438"/><ellipse cx="-2" cy="-0.3" rx="3" ry="1.3" fill="#d9f0c2"/></g></g>
+                <g transform="translate(36,78) rotate(70)"><g transform="scale(1.55,2.15)"><ellipse rx="7.6" ry="2.7" fill="#55c066"/><ellipse cx="-1.8" cy="-0.3" rx="3" ry="1.2" fill="#f3fbe6"/></g></g>
+                <g transform="translate(-6,96) rotate(-8)"><g transform="scale(1.55,2.15)"><ellipse rx="8.8" ry="3" fill="#f0f8e4"/><ellipse cx="3" cy="0.2" rx="3.3" ry="1.7" fill="#3eae4e"/></g></g>
+              </g>
+
+              <g id="sesame">
+                <g transform="translate(58,112) rotate(32)"><g transform="scale(1,1.5)"><ellipse rx="2.5" ry="1.35" fill="#f6f1e6"/></g></g>
+                <g transform="translate(78,126) rotate(-20)"><g transform="scale(1,1.5)"><ellipse rx="2.3" ry="1.25" fill="#17120e"/></g></g>
+                <g transform="translate(96,118) rotate(50)"><g transform="scale(1,1.5)"><ellipse rx="2.4" ry="1.3" fill="#f4efe4"/></g></g>
+                <g transform="translate(70,136) rotate(10)"><g transform="scale(1,1.5)"><ellipse rx="2.2" ry="1.2" fill="#f7f3e8"/></g></g>
+                <g transform="translate(40,108) rotate(-48)"><g transform="scale(1,1.5)"><ellipse rx="2.3" ry="1.25" fill="#1a140f"/></g></g>
+                <g transform="translate(-8,24) rotate(16)"><g transform="scale(1,1.5)"><ellipse rx="2.2" ry="1.2" fill="#f6f2e8"/></g></g>
+                <g transform="translate(22,8) rotate(-28)"><g transform="scale(1,1.5)"><ellipse rx="2.1" ry="1.15" fill="#14100c"/></g></g>
+                <g transform="translate(-30,42) rotate(40)"><g transform="scale(1,1.5)"><ellipse rx="2.3" ry="1.25" fill="#f3eee4"/></g></g>
+                <g transform="translate(8,40) rotate(-12)"><g transform="scale(1,1.5)"><ellipse rx="2" ry="1.1" fill="#f7f4ea"/></g></g>
+                <g transform="translate(120,108) rotate(22)"><g transform="scale(1,1.5)"><ellipse rx="2.2" ry="1.2" fill="#f4efe2"/></g></g>
+                <g transform="translate(132,122) rotate(-36)"><g transform="scale(1,1.5)"><ellipse rx="2.1" ry="1.15" fill="#1c1612"/></g></g>
+              </g>
+            </g>
+          </g>
+
+          <path id="lip" d="M168,522 A286 154.4 0 0 0 632,522" fill="none" stroke="#4a342c" stroke-width="14" stroke-linecap="round" opacity="0.22"/>
+          <path d="M168,516 A286 154.4 0 0 0 632,516" fill="none" stroke="url(#lipGrad)" stroke-width="9" stroke-linecap="round"/>
+          <path d="M240,544 A240 112 0 0 0 455,558" fill="none" stroke="#fff6ec" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+
+          <g class="steam" filter="url(#steamBlur)">
+            <path class="waft w1" d="M392,400 C378,330 430,286 396,214 C372,156 418,112 384,62" fill="none" stroke="url(#steamFade)" stroke-width="34" stroke-linecap="round"/>
+            <path class="waft w2" d="M438,412 C458,340 408,292 444,220 C476,156 434,118 462,70" fill="none" stroke="url(#steamFade)" stroke-width="24" stroke-linecap="round"/>
+            <path class="waft w3" d="M348,390 C326,324 372,280 342,214 C318,160 358,126 334,78" fill="none" stroke="url(#steamFade)" stroke-width="18" stroke-linecap="round"/>
+            <path class="waft w4" d="M470,380 C506,318 468,270 498,214 C524,168 490,136 508,96" fill="none" stroke="url(#steamFade)" stroke-width="14" stroke-linecap="round"/>
+            <path class="waft w5" d="M410,360 C400,300 436,250 414,190" fill="none" stroke="url(#steamFade)" stroke-width="12" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <canvas id="steam" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <svg class="grain" aria-hidden="true">
+      <filter id="grainFx">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/>
+      </filter>
+      <rect width="100%" height="100%" filter="url(#grainFx)"/>
+    </svg>
+  </div>
+
+<script>
+(() => {
+  const reduceMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const stage = document.getElementById("stage");
+  const tilt = document.getElementById("tilt");
+  const glow = document.getElementById("glow");
+  const orbs = document.querySelector(".orb-a");
+  const sheen = document.getElementById("sheen");
+  const broth = document.getElementById("broth-disk");
+  const bubbles = Array.from(document.querySelectorAll("#bubbles circle"));
+  const canvas = document.getElementById("steam");
+  const ctx = canvas.getContext("2d", { alpha: true });
+
+  let reduce = reduceMQ.matches;
+  let cssW = 1;
+  let cssH = 1;
+  let tx = 0;
+  let ty = 0;
+  let cx = 0;
+  let cy = 0;
+  let pointerX = window.innerWidth * 0.5;
+  let pointerY = window.innerHeight * 0.42;
+  let lastMove = -10000;
+  let last = 0;
+  let running = false;
+  let sprite;
+
+  const bubbleState = bubbles.map((el) => ({
+    el,
+    life: Math.random(),
+    dur: 2.6 + Math.random() * 2.4,
+    x: +el.getAttribute("cx"),
+    y: +el.getAttribute("cy")
+  }));
+
+  const wisps = Array.from({ length: 46 }, () => makeWisp(true));
+  const motes = Array.from({ length: 18 }, () => makeMote());
+
+  function makeSprite() {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const g = c.getContext("2d");
+    const rg = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    rg.addColorStop(0, "rgba(255,250,244,0.95)");
+    rg.addColorStop(0.28, "rgba(255,236,214,0.45)");
+    rg.addColorStop(0.62, "rgba(255,226,196,0.12)");
+    rg.addColorStop(1, "rgba(255,226,196,0)");
+    g.fillStyle = rg;
+    g.fillRect(0, 0, 128, 128);
+    return c;
+  }
+
+  function brothPoint() {
+    const rect = broth.getBoundingClientRect();
+    const a = Math.random() * Math.PI * 2;
+    const rad = Math.sqrt(Math.random()) * 0.78;
+    return {
+      x: rect.left + rect.width * (0.5 + Math.cos(a) * rad * 0.5),
+      y: rect.top + rect.height * (0.5 + Math.sin(a) * rad * 0.5),
+      rect
+    };
+  }
+
+  function makeWisp(primed) {
+    const origin = brothPoint();
+    const w = {
+      x0: origin.x,
+      y0: origin.y,
+      age: primed ? Math.random() : 0,
+      max: 3.6 + Math.random() * 3.2,
+      rise: 150 + Math.random() * 210,
+      size0: 14 + Math.random() * 28,
+      grow: 36 + Math.random() * 70,
+      amp: 10 + Math.random() * 26,
+      freq: 0.7 + Math.random() * 1.1,
+      phase: Math.random() * Math.PI * 2,
+      peak: 0.12 + Math.random() * 0.16,
+      drift: (Math.random() - 0.5) * 16
+    };
+    if (!origin.rect.width) w.age = primed ? Math.random() * w.max : 0;
+    return w;
+  }
+
+  function respawn(w) {
+    const next = makeWisp(false);
+    w.x0 = next.x0;
+    w.y0 = next.y0;
+    w.age = 0;
+    w.max = next.max;
+    w.rise = next.rise;
+    w.size0 = next.size0;
+    w.grow = next.grow;
+    w.amp = next.amp;
+    w.freq = next.freq;
+    w.phase = next.phase;
+    w.peak = next.peak;
+    w.drift = next.drift;
+  }
+
+  function sampleWisp(w, time) {
+    const u = Math.min(1, w.age / w.max);
+    const fadeIn = Math.min(1, u / 0.14);
+    const fadeOut = Math.pow(Math.max(0, 1 - u), 1.2);
+    return {
+      x: w.x0 + Math.sin(time * w.freq + w.phase) * w.amp * u + w.drift * u,
+      y: w.y0 - w.rise * Math.pow(u, 0.85),
+      size: w.size0 + w.grow * u,
+      a: fadeIn * fadeOut * w.peak,
+      rot: Math.sin(time * 0.6 + w.phase) * 0.4,
+      sy: 1.35 + u * 1.15
+    };
+  }
+
+  function makeMote() {
+    return {
+      x: Math.random(),
+      y: Math.random(),
+      r: 0.6 + Math.random() * 1.6,
+      s: 0.015 + Math.random() * 0.03,
+      p: Math.random() * Math.PI * 2,
+      a: 0.15 + Math.random() * 0.45
+    };
+  }
+
+  function placeBubble(b) {
+    const a = Math.random() * Math.PI * 2;
+    const r = Math.sqrt(Math.random()) * 150;
+    b.x = Math.cos(a) * r;
+    b.y = Math.sin(a) * r * 0.92;
+    b.life = 0;
+    b.dur = 2.4 + Math.random() * 2.6;
+  }
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cssW = window.innerWidth;
+    cssH = window.innerHeight;
+    canvas.width = Math.max(1, Math.floor(cssW * dpr));
+    canvas.height = Math.max(1, Math.floor(cssH * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (reduce) drawFrame(performance.now(), 0, true);
+  }
+
+  function onPointer(e) {
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    lastMove = performance.now();
+    const nx = (e.clientX / cssW - 0.5) * 2;
+    const ny = (e.clientY / cssH - 0.5) * 2;
+    if (reduce) {
+      applyPose(nx * 0.35, ny * 0.35, true);
+      return;
+    }
+    tx = Math.max(-1, Math.min(1, nx));
+    ty = Math.max(-1, Math.min(1, ny));
+  }
+
+  function applyPose(px, py, instant) {
+    const heatX = 50 + px * 7;
+    const heatY = 58 + py * 5;
+    stage.style.setProperty("--gx", heatX.toFixed(2) + "%");
+    stage.style.setProperty("--gy", heatY.toFixed(2) + "%");
+    if (!reduce) {
+      tilt.style.transform = "rotateX(" + (-py * 5.5).toFixed(2) + "deg) rotateY(" + (px * 7).toFixed(2) + "deg)";
+      orbs.style.translate = (-px * 16).toFixed(1) + "px " + (-py * 10).toFixed(1) + "px";
+    } else if (instant) {
+      tilt.style.transform = "none";
+    }
+    const simmerX = reduce ? 0 : Math.sin(performance.now() / 1000 * 0.7) * 5;
+    const simmerY = reduce ? 0 : Math.cos(performance.now() / 1000 * 0.53) * 4;
+    sheen.setAttribute("transform", "translate(" + ((-px * 34) + simmerX).toFixed(1) + " " + ((-py * 26) + simmerY).toFixed(1) + ")");
+    const bowl = tilt.getBoundingClientRect();
+    const bcx = bowl.left + bowl.width * 0.5;
+    const bcy = bowl.top + bowl.height * 0.48;
+    const dist = Math.hypot(pointerX - bcx, pointerY - bcy);
+    const warmth = Math.max(0, 1 - dist / (bowl.width * 0.9));
+    if (reduce) glow.style.opacity = (0.85 + warmth * 0.15).toFixed(3);
+    glow.style.filter = "saturate(" + (1 + warmth * 0.35).toFixed(3) + ")";
+  }
+
+  function drawFrame(now, dt, frozen) {
+    ctx.clearRect(0, 0, cssW, cssH);
+    ctx.globalCompositeOperation = "lighter";
+    const time = now / 1000;
+    for (const w of wisps) {
+      if (!frozen) {
+        w.age += dt;
+        if (w.age >= w.max) respawn(w);
+        const dx = w.x0 - pointerX;
+        const dy = w.y0 - pointerY;
+        const dist = Math.hypot(dx, dy) || 1;
+        if (dist < 240) {
+          const push = (1 - dist / 240) * 90 * dt;
+          w.x0 += (dx / dist) * push;
+          w.y0 += (dy / dist) * push * 0.25;
+        }
+        w.x0 += cx * 14 * dt;
+      }
+      const s = sampleWisp(w, frozen ? w.phase : time);
+      if (s.a < 0.008) continue;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.rot);
+      ctx.scale(1, s.sy);
+      ctx.globalAlpha = s.a;
+      ctx.drawImage(sprite, -s.size / 2, -s.size / 2, s.size, s.size);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+    for (const m of motes) {
+      if (!frozen) {
+        m.y -= m.s * dt;
+        m.x += Math.sin(time + m.p) * 0.012 * dt;
+        if (m.y < -0.02) m.y = 1.02;
+      }
+      const tw = frozen ? 0.7 : 0.55 + Math.sin(time * 1.4 + m.p) * 0.45;
+      ctx.globalAlpha = m.a * tw;
+      ctx.fillStyle = "#ffd2a4";
+      ctx.beginPath();
+      ctx.arc(m.x * cssW, m.y * cssH, m.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function stepBubbles(dt, frozen) {
+    for (const b of bubbleState) {
+      if (!frozen) {
+        b.life += dt / b.dur;
+        if (b.life >= 1) placeBubble(b);
+      }
+      const u = frozen ? 0.45 : b.life;
+      const flicker = Math.sin(u * Math.PI);
+      b.el.setAttribute("cx", b.x.toFixed(1));
+      b.el.setAttribute("cy", (b.y - u * 8).toFixed(1));
+      b.el.setAttribute("r", (1.4 + u * 2.4).toFixed(2));
+      b.el.setAttribute("opacity", (flicker * 0.55).toFixed(3));
+    }
+  }
+
+  function frame(now) {
+    if (!running) return;
+    const dt = Math.min(0.034, last ? (now - last) / 1000 : 0.016);
+    last = now;
+    if (now - lastMove > 2200) {
+      const t = now / 1000;
+      tx = Math.sin(t * 0.27) * 0.24;
+      ty = Math.cos(t * 0.21) * 0.16;
+    }
+    const k = 1 - Math.pow(0.0015, dt);
+    cx += (tx - cx) * k;
+    cy += (ty - cy) * k;
+    applyPose(cx, cy, false);
+    stepBubbles(dt, false);
+    drawFrame(now, dt, false);
+    requestAnimationFrame(frame);
+  }
+
+  function start() {
+    sprite = makeSprite();
+    resize();
+    if (reduce) {
+      applyPose(0, 0, true);
+      stepBubbles(0, true);
+      drawFrame(performance.now(), 0, true);
+      return;
+    }
+    running = true;
+    requestAnimationFrame(frame);
+  }
+
+  function setReduced(next) {
+    reduce = next;
+    if (reduce) {
+      running = false;
+      tilt.style.transform = "none";
+      orbs.style.translate = "0px 0px";
+      applyPose(0, 0, true);
+      stepBubbles(0, true);
+      drawFrame(performance.now(), 0, true);
+      return;
+    }
+    if (!running) {
+      running = true;
+      last = 0;
+      requestAnimationFrame(frame);
+    }
+  }
+
+  window.addEventListener("pointermove", onPointer, { passive: true });
+  window.addEventListener("pointerdown", onPointer, { passive: true });
+  window.addEventListener("resize", resize);
+  document.addEventListener("visibilitychange", () => {
+    if (reduce) return;
+    if (document.hidden) {
+      running = false;
+      return;
+    }
+    if (!running) {
+      running = true;
+      last = 0;
+      requestAnimationFrame(frame);
+    }
+  });
+  reduceMQ.addEventListener("change", () => setReduced(reduceMQ.matches));
+  start();
+})();
+</script>
+</body>
+</html>

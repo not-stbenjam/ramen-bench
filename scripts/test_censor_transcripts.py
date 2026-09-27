@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Regression tests for the shared transcript censor."""
 
 from __future__ import annotations
@@ -10,6 +9,26 @@ from scripts.censor_transcripts import censor_text, censor_value
 
 
 class TranscriptCensorTests(unittest.TestCase):
+    def test_decodes_tool_bytes_before_redacting(self) -> None:
+        text = "npx is /usr/bin/npx\n/home/private-user/ramen/ラーメン\n"
+        for tool, field in [("Bash", "output"), ("GrepSearch", "stdout")]:
+            with self.subTest(tool=tool):
+                value = {"type": tool, field: list(text.encode("utf-8"))}
+                censored = censor_value(value, home="/home/private-user")
+                self.assertEqual(
+                    censored[field], "npx is /usr/bin/npx\n<HOME>/ramen/ラーメン\n"
+                )
+                self.assertEqual(censor_value(censored), censored)
+
+    def test_marks_binary_tool_bytes_and_keeps_numeric_data(self) -> None:
+        for data in ([255, 254, 128], [65, 0, 66]):
+            self.assertEqual(
+                censor_value({"type": "Bash", "output": data})["output"],
+                '<OMITTED_BINARY_PAYLOAD encoding="uint8-array" original-bytes="3">',
+            )
+        self.assertEqual(censor_value({"rgb": [110, 112, 120]}), {"rgb": [110, 112, 120]})
+        self.assertEqual(censor_value({"type": "Bash", "output": []})["output"], "")
+
     def test_elides_fernet_payload_but_keeps_tool_call(self) -> None:
         token = "gAAAAA" + "Ab_9" * 80 + "=="
         event = {
@@ -77,13 +96,11 @@ class TranscriptCensorTests(unittest.TestCase):
 
     def test_redacts_both_claude_roots_and_encoded_variants(self) -> None:
         home = Path("/home/private-user")
-        value = " ".join(
-            (
-                "/home/private-user/.claude/projects/session.jsonl",
-                "/home/private-user/.claude-personal/projects/session.jsonl",
-                "%2Fhome%2Fprivate-user%2F.claude%2Fprojects",
-                "-home-private-user-.claude-projects-session",
-            )
+        value = (
+            "/home/private-user/.claude/projects/session.jsonl "
+            "/home/private-user/.claude-personal/projects/session.jsonl "
+            "%2Fhome%2Fprivate-user%2F.claude%2Fprojects "
+            "-home-private-user-.claude-projects-session"
         )
 
         censored = censor_text(value, home=home)

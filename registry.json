@@ -65,6 +65,17 @@
     "meta/muse-spark-1.3/high/run.json",
     "meta/muse-spark-1.3/medium/run.json",
     "meta/muse-spark-1.3/low/run.json",
+    "xai/grok-4.7/xhigh/run.json",
+    "xai/grok-4.7/high/run.json",
+    "xai/grok-4.7/medium/run.json",
+    "xai/grok-4.7/low/run.json",
+    "xai/grok-4.6/xhigh/run.json",
+    "xai/grok-4.6/high/run.json",
+    "xai/grok-4.6/medium/run.json",
+    "xai/grok-4.6/low/run.json",
+    "xai/grok-4.5/high/run.json",
+    "xai/grok-4.5/medium/run.json",
+    "xai/grok-4.5/low/run.json",
     "z.ai/glm-5.3/max/run.json",
     "z.ai/glm-5.3/high/run.json"
   ]

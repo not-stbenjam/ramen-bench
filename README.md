@@ -50,7 +50,14 @@ python3 scripts/import_claude_code.py
 python3 scripts/import_codex.py
 python3 scripts/import_antigravity.py
 python3 scripts/import_muse.py <redacted-export-directory>
+python3 scripts/import_grok.py --session <session-directory> --artifact <index.html> --harness-version <version>
 ```
+
+Grok Build sessions live under `~/.grok/sessions/`. Its importer checks the HTML
+against successful recorded writes, reads persisted accounting with `grok usage`,
+and excludes structured hidden reasoning. Add `--check-sources` to verify that
+the artifact and regenerated public JSON match an existing import. An exported
+`grok usage <session-id>` JSON file can be supplied with `--usage-file`.
 
 The importers recover recorded transcripts, timing, and token usage from the corresponding local harness stores. Provider-recorded costs take precedence. When Codex records exact token categories, the scripts apply the pinned LiteLLM catalog directly. For terminal captures that contain only an exact total, the cost is marked estimated and uses the same-effort GPT 6 Astra run's recorded input, cache, and output proportions with that model's own pinned rates; existing recorded costs are never replaced.
 

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>Vegan Ramen</title>
+  <style>
+    :root {
+      --mx: 0.5;
+      --my: 0.5;
+      --tilt-x: 10deg;
+      --tilt-y: 0deg;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: #060403;
+      overflow: hidden;
+    }
+
+    body {
+      min-height: 100dvh;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      perspective: 1600px;
+      perspective-origin: 50% 40%;
+      background:
+        radial-gradient(ellipse 80% 62% at calc(48% + var(--mx) * 4%) calc(46% + var(--my) * 4%),
+          #2a160c 0%,
+          #120a08 38%,
+          #070504 68%,
+          #030201 100%);
+    }
+
+    .table {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          91deg,
+          rgba(255, 200, 140, 0.018) 0 1px,
+          transparent 1px 8px
+        ),
+        repeating-linear-gradient(
+          88deg,
+          rgba(0, 0, 0, 0.16) 0 2px,
+          transparent 2px 13px
+        );
+      mask-image: radial-gradient(ellipse 70% 55% at 50% 50%, #000 20%, transparent 75%);
+    }
+
+    .glow {
+      position: absolute;
+      width: 95vmin;
+      height: 75vmin;
+      left: 50%;
+      top: 48%;
+      translate: -50% -50%;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 46% 40% at calc(40% + var(--mx) * 20%) calc(34% + var(--my) * 18%),
+        rgba(255, 150, 70, 0.32) 0%,
+        rgba(255, 100, 40, 0.1) 36%,
+        transparent 68%
+      );
+      filter: blur(6px);
+      z-index: 1;
+    }
+
+    .shadow {
+      position: absolute;
+      width: min(72vmin, 680px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(ellipse 50% 22% at 50% 60%,
+        rgba(0, 0, 0, 0.8) 0%,
+        rgba(40, 10, 0, 0.3) 40%,
+        transparent 72%);
+      filter: blur(16px);
+      transform: translateY(10%) scale(1.08, 0.4);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .stage {
+      position: relative;
+      width: min(72vmin, 680px);
+      aspect-ratio: 1;
+      transform-style: preserve-3d;
+      transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+      z-index: 3;
+      will-change: transform;
+    }
+
+    .bowl { position: absolute; inset: 0; }
+
+    .bowl-outer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at calc(30% + var(--mx) * 16%) calc(20% + var(--my) * 10%),
+          #6a5c50 0%, transparent 26%),
+        radial-gradient(circle at 78% 80%, #050302 0%, transparent 40%),
+        conic-gradient(from 210deg,
+          #14100e, #2a2420, #1a1512, #3a322c, #120e0c, #26201c, #14100e);
+      box-shadow:
+        0 40px 70px rgba(0, 0, 0, 0.62),
+        0 10px 22px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 230, 200, 0.18),
+        inset 0 -22px 36px rgba(0, 0, 0, 0.5);
+    }
+
+    .bowl-outer::after {
+      content: "";
+      position: absolute;
+      inset: 2.6%;
+      border-radius: 50%;
+      background:
+        repeating-radial-gradient(circle at 38% 32%,
+          rgba(255, 220, 180, 0.04) 0 1px,
+          transparent 1px 6px);
+      pointer-events: none;
+    }
+
+    .bowl-lip {
+      position: absolute;
+      inset: 5.4%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at calc(32% + var(--mx) * 10%) calc(24% + var(--my) * 8%),
+          #e8d5b4 0%, #c4a47c 38%, #9a7550 70%, #6a4a30 100%);
+      box-shadow:
+        inset 0 2px 2px rgba(255, 255, 245, 0.38),
+        inset 0 -2px 5px rgba(40, 20, 8, 0.4);
+    }
+
+    .bowl-well {
+      position: absolute;
+      inset: 7.6%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #c4ae8a;
+      box-shadow: inset 0 16px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .inner-wall {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at calc(40% + var(--mx) * 8%) calc(32% + var(--my) * 8%),
+          #f0e2c8 0%, #d4c09a 42%, #b39470 100%);
+      -webkit-mask: radial-gradient(circle closest-side at 50% 50%, transparent 93.5%, #000 95%);
+      mask: radial-gradient(circle closest-side at 50% 50%, transparent 93.5%, #000 95%);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .broth {
+      position: absolute;
+      inset: 3.2%;
+      border-radius: 50%;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 65% 50% at calc(32% + var(--mx) * 16%) calc(26% + var(--my) * 12%),
+          rgba(255, 190, 110, 0.5) 0%,
+          transparent 46%),
+        radial-gradient(ellipse 42% 36% at 74% 72%,
+          rgba(50, 10, 4, 0.55) 0%,
+          transparent 58%),
+        radial-gradient(circle at 50% 52%,
+          #c56a28 0%,
+          #a04a16 26%,
+          #7a3010 52%,
+          #541c08 78%,
+          #301008 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(40, 12, 4, 0.45),
+        inset 0 12px 20px rgba(255, 200, 120, 0.1),
+        inset 0 0 48px rgba(40, 8, 0, 0.28);
+      z-index: 1;
+    }
+
+    .oil {
+      position: absolute;
+      inset: -12%;
+      background:
+        radial-gradient(ellipse 30% 18% at 64% 42%, rgba(150, 24, 8, 0.62), transparent 68%),
+        radial-gradient(ellipse 24% 16% at 40% 60%, rgba(180, 48, 16, 0.42), transparent 70%),
+        radial-gradient(ellipse 16% 12% at 56% 74%, rgba(90, 12, 6, 0.5), transparent 70%);
+      filter: blur(7px);
+      mix-blend-mode: multiply;
+      animation: oil-drift 16s ease-in-out infinite alternate;
+    }
+
+    .caustic {
+      position: absolute;
+      inset: -18%;
+      background:
+        radial-gradient(ellipse 26% 10% at 38% 44%, rgba(255, 220, 160, 0.2), transparent 70%),
+        radial-gradient(ellipse 20% 8% at 62% 58%, rgba(255, 170, 90, 0.14), transparent 70%);
+      mix-blend-mode: overlay;
+      animation: caustic 8s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    .food {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+    }
+
+    .sheen {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(
+        ellipse 36% 22% at calc(28% + var(--mx) * 30%) calc(22% + var(--my) * 22%),
+        rgba(255, 248, 230, 0.28) 0%,
+        rgba(255, 210, 150, 0.1) 30%,
+        transparent 64%
+      );
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 5;
+      animation: sheen-breathe 6s ease-in-out infinite;
+    }
+
+    .bubbles span {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%,
+        rgba(255, 240, 210, 0.6),
+        rgba(255, 180, 100, 0.08) 55%,
+        transparent 70%);
+      animation: bubble var(--dur, 5s) ease-in infinite;
+      animation-delay: var(--delay, 0s);
+      width: var(--s, 6px);
+      height: var(--s, 6px);
+      left: var(--x, 50%);
+      top: var(--y, 60%);
+      opacity: 0;
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    .plumes {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+      overflow: visible;
+    }
+
+    .plumes span {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18%;
+      height: 42%;
+      translate: -50% -108%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 50% 80%,
+        rgba(255, 236, 214, 0.28) 0%,
+        rgba(255, 210, 170, 0.1) 40%,
+        transparent 72%);
+      filter: blur(12px);
+      transform-origin: 50% 100%;
+      animation: plume 5.2s ease-in-out infinite;
+      opacity: 0.7;
+    }
+
+    .plumes span:nth-child(1) { margin-left: -8%; animation-delay: 0s; width: 20%; }
+    .plumes span:nth-child(2) { margin-left: 2%; animation-delay: -1.6s; width: 16%; height: 48%; }
+    .plumes span:nth-child(3) { margin-left: 10%; animation-delay: -3.1s; width: 14%; }
+    .plumes span:nth-child(4) { margin-left: -14%; animation-delay: -2.2s; width: 15%; height: 38%; }
+    .plumes span:nth-child(5) { margin-left: 6%; animation-delay: -4.4s; width: 12%; height: 36%; }
+
+    canvas.steam {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 7;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.05;
+      z-index: 9;
+      mix-blend-mode: overlay;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse 56% 50% at 50% 48%,
+        transparent 28%, rgba(0, 0, 0, 0.32) 72%, #000 100%);
+      z-index: 8;
+    }
+
+    @keyframes oil-drift {
+      from { transform: rotate(-8deg) scale(1); }
+      to { transform: rotate(12deg) scale(1.07); }
+    }
+
+    @keyframes sheen-breathe {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes caustic {
+      from { transform: translate(-2%, 1%) rotate(-5deg); opacity: 0.65; }
+      to { transform: translate(3%, -2%) rotate(6deg); opacity: 1; }
+    }
+
+    @keyframes bubble {
+      0% { opacity: 0; transform: translateY(0) scale(0.6); }
+      15% { opacity: 0.75; }
+      100% { opacity: 0; transform: translateY(-42px) scale(1.2); }
+    }
+
+    @keyframes plume {
+      0%, 100% { transform: translate3d(0, 8%, 0) scale(0.92, 1); opacity: 0.45; }
+      50% { transform: translate3d(4%, -10%, 0) scale(1.08, 1.15); opacity: 0.85; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .oil, .sheen, .caustic, .bubbles span, .plumes span {
+        animation: none !important;
+      }
+      .plumes span {
+        opacity: 0.8;
+        transform: translate3d(0, -8%, 0) scale(1.04, 1.1);
+      }
+      .stage { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <div class="table" aria-hidden="true"></div>
+    <div class="glow" aria-hidden="true"></div>
+    <div class="shadow" id="shadow" aria-hidden="true"></div>
+    <div class="stage" id="stage">
+      <div class="bowl">
+        <div class="bowl-outer"></div>
+        <div class="bowl-lip"></div>
+        <div class="bowl-well">
+          <div class="broth">
+            <div class="oil"></div>
+            <div class="caustic"></div>
+            <svg class="food" id="food" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <clipPath id="clip">
+                  <circle cx="250" cy="250" r="249" />
+                </clipPath>
+                <filter id="blur2">
+                  <feGaussianBlur stdDeviation="2.2" />
+                </filter>
+                <filter id="blur5">
+                  <feGaussianBlur stdDeviation="4.5" />
+                </filter>
+                <linearGradient id="ndDeep" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#a06a32" />
+                  <stop offset="100%" stop-color="#6a3e16" />
+                </linearGradient>
+                <linearGradient id="ndMid" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#f0cc8a" />
+                  <stop offset="45%" stop-color="#d4a056" />
+                  <stop offset="100%" stop-color="#9a6428" />
+                </linearGradient>
+                <linearGradient id="ndHi" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#fff1c8" />
+                  <stop offset="100%" stop-color="#e0b46a" />
+                </linearGradient>
+                <radialGradient id="oilG" cx="40%" cy="35%" r="70%">
+                  <stop offset="0%" stop-color="#d44418" stop-opacity="0.75" />
+                  <stop offset="100%" stop-color="#5a0c08" stop-opacity="0.05" />
+                </radialGradient>
+                <linearGradient id="noriG" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#1c2c20" />
+                  <stop offset="35%" stop-color="#0c1610" />
+                  <stop offset="70%" stop-color="#152018" />
+                  <stop offset="100%" stop-color="#0a100c" />
+                </linearGradient>
+                <linearGradient id="chashuG" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f0b080" />
+                  <stop offset="35%" stop-color="#c46230" />
+                  <stop offset="100%" stop-color="#7a2e12" />
+                </linearGradient>
+                <linearGradient id="tofuTop" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#fffdf6" />
+                  <stop offset="60%" stop-color="#f2e6ce" />
+                  <stop offset="100%" stop-color="#d8c4a0" />
+                </linearGradient>
+                <radialGradient id="mushG" cx="36%" cy="30%" r="70%">
+                  <stop offset="0%" stop-color="#7a5238" />
+                  <stop offset="50%" stop-color="#3a2418" />
+                  <stop offset="100%" stop-color="#160e0a" />
+                </radialGradient>
+                <radialGradient id="cornG" cx="34%" cy="30%" r="70%">
+                  <stop offset="0%" stop-color="#fff6b0" />
+                  <stop offset="50%" stop-color="#f0c430" />
+                  <stop offset="100%" stop-color="#c07810" />
+                </radialGradient>
+                <linearGradient id="leafG" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#c6e86a" />
+                  <stop offset="40%" stop-color="#5a9c34" />
+                  <stop offset="100%" stop-color="#2a5a18" />
+                </linearGradient>
+                <linearGradient id="stemG" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#f7f4e4" />
+                  <stop offset="100%" stop-color="#c5d49a" />
+                </linearGradient>
+                <linearGradient id="bamG" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f3e8c0" />
+                  <stop offset="100%" stop-color="#c4a85e" />
+                </linearGradient>
+              </defs>
+              <g clip-path="url(#clip)">
+                <g filter="url(#blur5)" opacity="0.9">
+                  <path d="M255 215 C330 190 385 250 350 315 C318 365 240 350 220 300 C205 260 215 230 255 215Z" fill="url(#oilG)" />
+                  <ellipse cx="190" cy="310" rx="52" ry="30" fill="#8a180c" opacity="0.4" />
+                  <ellipse cx="320" cy="345" rx="40" ry="22" fill="#b83010" opacity="0.32" />
+                </g>
+                <g id="noodles" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="toppings"></g>
+                <g id="garnish"></g>
+              </g>
+            </svg>
+            <div class="sheen"></div>
+            <div class="bubbles" id="bubbles"></div>
+          </div>
+          <div class="inner-wall"></div>
+        </div>
+      </div>
+    </div>
+    <div class="plumes" id="plumes" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <canvas class="steam" id="steam"></canvas>
+    <svg class="grain" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <filter id="noiseFilter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+    </svg>
+    <div class="vignette"></div>
+  </div>
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const shadow = document.getElementById("shadow");
+      const canvas = document.getElementById("steam");
+      const ctx = canvas.getContext("2d");
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const NS = "http://www.w3.org/2000/svg";
+
+      const pointer = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, active: false };
+      let steam = [];
+      let last = performance.now();
+
+      function rng(seed) {
+        let s = seed % 2147483647;
+        if (s <= 0) s += 2147483646;
+        return function () {
+          s = (s * 16807) % 2147483647;
+          return (s - 1) / 2147483646;
+        };
+      }
+
+      function el(name, attrs, parent) {
+        const node = document.createElementNS(NS, name);
+        for (const k in attrs) node.setAttribute(k, attrs[k]);
+        if (parent) parent.appendChild(node);
+        return node;
+      }
+
+      function offsetPts(pts, off) {
+        const out = [];
+        for (let i = 0; i < pts.length; i++) {
+          const a = pts[Math.max(0, i - 1)];
+          const b = pts[Math.min(pts.length - 1, i + 1)];
+          const dx = b[0] - a[0];
+          const dy = b[1] - a[1];
+          const len = Math.hypot(dx, dy) || 1;
+          out.push([pts[i][0] - (dy / len) * off, pts[i][1] + (dx / len) * off]);
+        }
+        return out;
+      }
+
+      function smoothPath(pts) {
+        if (pts.length < 2) return "";
+        let d = "M" + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p0 = pts[Math.max(0, i - 1)];
+          const p1 = pts[i];
+          const p2 = pts[i + 1];
+          const p3 = pts[Math.min(pts.length - 1, i + 2)];
+          const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+          const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+          const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+          const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+          d += " C" + c1x.toFixed(1) + " " + c1y.toFixed(1) + " " + c2x.toFixed(1) + " " + c2y.toFixed(1) + " " + p2[0].toFixed(1) + " " + p2[1].toFixed(1);
+        }
+        return d;
+      }
+
+      function wave(x0, y0, x1, y1, amp, freq, samples, phase) {
+        const pts = [];
+        for (let i = 0; i <= samples; i++) {
+          const t = i / samples;
+          const x = x0 + (x1 - x0) * t;
+          const y = y0 + (y1 - y0) * t;
+          const nx = -(y1 - y0);
+          const ny = x1 - x0;
+          const nl = Math.hypot(nx, ny) || 1;
+          const w = Math.sin(t * Math.PI * freq + phase) * amp * Math.sin(t * Math.PI);
+          pts.push([x + (nx / nl) * w, y + (ny / nl) * w]);
+        }
+        return pts;
+      }
+
+      function strokeNoodle(g, pts, width, stroke, opacity) {
+        el("path", {
+          d: smoothPath(pts),
+          stroke: stroke,
+          "stroke-width": String(width),
+          opacity: String(opacity)
+        }, g);
+      }
+
+      function drawNoodles() {
+        const g = document.getElementById("noodles");
+        const bands = [
+          [150, 300, 360, 210, 22, 2.4, 0.2],
+          [140, 250, 370, 280, 18, 2.1, 1.1],
+          [170, 340, 355, 250, 20, 2.6, 0.6],
+          [165, 220, 340, 345, 16, 1.8, 2.2],
+          [200, 190, 330, 330, 19, 2.3, 0.4],
+          [130, 280, 380, 320, 14, 2.0, 1.7],
+          [190, 360, 350, 200, 17, 2.5, 0.9],
+          [175, 205, 300, 355, 15, 1.9, 2.8]
+        ];
+        bands.forEach((b) => {
+          const base = wave(b[0], b[1], b[2], b[3], b[4], b[5], 18, b[6]);
+          for (let k = -2; k <= 2; k++) {
+            const pts = offsetPts(base, k * 7.2);
+            strokeNoodle(g, pts, 8.6, "url(#ndDeep)", 0.4);
+            strokeNoodle(g, pts, 6.6, "url(#ndMid)", 0.95);
+            if (k === -1 || k === 1) strokeNoodle(g, offsetPts(pts, 1.4), 1.8, "url(#ndHi)", 0.42);
+          }
+        });
+      }
+
+      function drawToppings() {
+        const g = document.getElementById("toppings");
+
+        const nori = el("g", {}, g);
+        el("path", {
+          d: "M64 145 C58 210 62 300 72 365 C78 380 108 376 114 358 C108 280 104 210 112 142 C104 130 70 132 64 145Z",
+          fill: "url(#noriG)"
+        }, nori);
+        el("path", {
+          d: "M80 155 C76 240 80 320 88 358",
+          fill: "none",
+          stroke: "rgba(200,230,190,0.2)",
+          "stroke-width": "3.5"
+        }, nori);
+        el("path", {
+          d: "M96 138 C90 215 96 310 106 360 C112 374 138 370 144 352 C136 265 132 200 142 140 C134 128 102 126 96 138Z",
+          fill: "#121c14"
+        }, nori);
+        el("path", {
+          d: "M114 152 C110 240 116 318 124 350",
+          fill: "none",
+          stroke: "rgba(220,255,210,0.16)",
+          "stroke-width": "2.4"
+        }, nori);
+
+        function chashu(x, y, rot, w, h) {
+          const wrap = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + rot + ")" }, g);
+          el("ellipse", { cx: "4", cy: "14", rx: String(w * 0.5), ry: String(h * 0.38), fill: "rgba(40,10,4,0.38)" }, wrap);
+          el("rect", {
+            x: String(-w / 2), y: String(-h / 2), width: String(w), height: String(h),
+            rx: "18", ry: "15", fill: "url(#chashuG)", stroke: "#5a2410", "stroke-width": "1.4"
+          }, wrap);
+          el("ellipse", {
+            cx: "0", cy: "0", rx: String(w * 0.32), ry: String(h * 0.28),
+            fill: "none", stroke: "rgba(80,24,8,0.35)", "stroke-width": "2"
+          }, wrap);
+          el("ellipse", {
+            cx: String(-w * 0.16), cy: String(-h * 0.16), rx: String(w * 0.28), ry: String(h * 0.18),
+            fill: "rgba(255,220,180,0.28)"
+          }, wrap);
+          for (let i = 0; i < 3; i++) {
+            el("line", {
+              x1: String(-w * 0.34), y1: String(-h * 0.18 + i * 9),
+              x2: String(w * 0.36), y2: String(-h * 0.02 + i * 9),
+              stroke: "rgba(60,20,8,0.4)", "stroke-width": "1.5", "stroke-linecap": "round"
+            }, wrap);
+          }
+        }
+        chashu(250, 108, -16, 132, 54);
+        chashu(228, 142, 14, 124, 50);
+        chashu(268, 168, -8, 108, 46);
+
+        function mush(cx, cy, rx, ry, rot) {
+          const wrap = el("g", { transform: "translate(" + cx + " " + cy + ") rotate(" + rot + ")" }, g);
+          el("ellipse", { cx: "4", cy: String(ry * 0.55), rx: String(rx * 0.9), ry: String(ry * 0.4), fill: "rgba(20,8,4,0.4)" }, wrap);
+          el("path", {
+            d: "M" + (-rx) + " " + (ry * 0.2) +
+              " C" + (-rx * 0.85) + " " + (-ry * 0.55) + " " + (-rx * 0.35) + " " + (-ry) + " 0 " + (-ry * 1.02) +
+              " C" + (rx * 0.4) + " " + (-ry) + " " + (rx * 0.95) + " " + (-ry * 0.5) + " " + rx + " " + (ry * 0.18) +
+              " C" + (rx * 0.5) + " " + (ry * 0.5) + " " + (-rx * 0.45) + " " + (ry * 0.52) + " " + (-rx) + " " + (ry * 0.2) + "Z",
+            fill: "url(#mushG)", stroke: "#1a100a", "stroke-width": "1.1"
+          }, wrap);
+          el("ellipse", {
+            cx: String(-rx * 0.22), cy: String(-ry * 0.32), rx: String(rx * 0.3), ry: String(ry * 0.16),
+            fill: "rgba(210,170,130,0.2)"
+          }, wrap);
+          el("path", {
+            d: "M" + (-rx * 0.4) + " " + (-ry * 0.05) + " Q0 " + (ry * 0.12) + " " + (rx * 0.42) + " " + (-ry * 0.1),
+            fill: "none", stroke: "rgba(0,0,0,0.3)", "stroke-width": "1.5"
+          }, wrap);
+        }
+        mush(148, 205, 48, 34, -22);
+        mush(186, 232, 40, 28, 18);
+        mush(128, 242, 32, 22, -6);
+
+        const enoki = el("g", {}, g);
+        const er = rng(77);
+        for (let i = 0; i < 14; i++) {
+          const ox = 160 + er() * 32;
+          const oy = 188 + er() * 18;
+          const ex = ox + (er() - 0.35) * 16;
+          const ey = oy - 20 - er() * 24;
+          el("line", {
+            x1: ox.toFixed(1), y1: oy.toFixed(1), x2: ex.toFixed(1), y2: ey.toFixed(1),
+            stroke: "#f4ecd8", "stroke-width": (1.3 + er() * 0.9).toFixed(2), "stroke-linecap": "round"
+          }, enoki);
+          el("circle", { cx: ex.toFixed(1), cy: ey.toFixed(1), r: (2 + er()).toFixed(2), fill: "#fff8ea" }, enoki);
+        }
+
+        function tofu(x, y, s, rot) {
+          const wrap = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + rot + ")" }, g);
+          el("rect", {
+            x: String(-s * 0.08), y: String(s * 0.08), width: String(s), height: String(s * 0.92),
+            rx: "8", fill: "rgba(50,20,6,0.35)"
+          }, wrap);
+          el("rect", {
+            x: "0", y: "0", width: String(s), height: String(s * 0.92),
+            rx: "8", fill: "url(#tofuTop)", stroke: "#c8b494", "stroke-width": "1.2"
+          }, wrap);
+          el("rect", {
+            x: "0", y: String(s * 0.62), width: String(s), height: String(s * 0.3),
+            rx: "6", fill: "rgba(180,150,110,0.35)"
+          }, wrap);
+          el("ellipse", {
+            cx: String(s * 0.32), cy: String(s * 0.28), rx: String(s * 0.28), ry: String(s * 0.16),
+            fill: "rgba(255,255,245,0.55)"
+          }, wrap);
+        }
+        tofu(338, 128, 58, 16);
+        tofu(378, 158, 52, -10);
+        tofu(348, 178, 48, 22);
+
+        const bok = el("g", {}, g);
+        [[340, 268, 28], [354, 276, 40], [368, 284, 54]].forEach((s) => {
+          const st = el("g", { transform: "translate(" + s[0] + " " + s[1] + ") rotate(" + s[2] + ")" }, bok);
+          el("rect", {
+            x: "-6.5", y: "-4", width: "13", height: "58", rx: "6.5",
+            fill: "url(#stemG)", stroke: "#c5d0a0", "stroke-width": "0.8"
+          }, st);
+          el("ellipse", {
+            cx: "-2", cy: "8", rx: "4", ry: "14", fill: "rgba(255,255,245,0.35)"
+          }, st);
+        });
+        function leaf(x, y, rot, sc, fill) {
+          const w = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + rot + ") scale(" + sc + ")" }, bok);
+          el("path", {
+            d: "M0 38 C-18 16 -20 -6 0 -54 C4 -58 12 -40 18 -10 C20 16 12 36 0 38Z",
+            fill: fill
+          }, w);
+          el("path", {
+            d: "M0 24 C1 4 2 -24 1 -46",
+            fill: "none", stroke: "rgba(20,50,10,0.32)", "stroke-width": "1.5"
+          }, w);
+          el("path", {
+            d: "M2 4 C10 -2 14 -10 12 -18",
+            fill: "none", stroke: "rgba(20,50,10,0.18)", "stroke-width": "1.1"
+          }, w);
+          el("ellipse", {
+            cx: "-3", cy: "-18", rx: "6", ry: "10", fill: "rgba(230,255,190,0.18)"
+          }, w);
+        }
+        leaf(412, 228, -38, 1.15, "#3f7a22");
+        leaf(430, 236, 8, 1.05, "#6aaa3c");
+        leaf(400, 242, -72, 0.92, "#4e8c2c");
+        leaf(422, 218, -12, 0.78, "#7ab844");
+
+        const crd = rng(5);
+        for (let i = 0; i < 7; i++) {
+          const x = 230 + crd() * 90;
+          const y = 210 + crd() * 80;
+          const rot = -50 + crd() * 100;
+          el("path", {
+            d: "M0 0 C6 -12 14 -14 22 -4 C26 2 24 8 18 10",
+            fill: "none",
+            stroke: "#c42810",
+            "stroke-width": (1.5 + crd()).toFixed(2),
+            "stroke-linecap": "round",
+            opacity: "0.8",
+            transform: "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ") rotate(" + rot.toFixed(1) + ")"
+          }, g);
+        }
+
+        const bam = el("g", {}, g);
+        [[310, 368, -42, 92, 17], [338, 386, -24, 80, 15], [292, 388, -54, 76, 14]].forEach((b) => {
+          const w = el("g", { transform: "translate(" + b[0] + " " + b[1] + ") rotate(" + b[2] + ")" }, bam);
+          el("rect", {
+            x: String(-b[3] / 2), y: String(-b[4] / 2), width: String(b[3]), height: String(b[4]),
+            rx: "7", fill: "url(#bamG)", stroke: "#b39450", "stroke-width": "0.9"
+          }, w);
+          el("line", {
+            x1: "-6", y1: String(-b[4] / 2), x2: "-6", y2: String(b[4] / 2),
+            stroke: "rgba(130,100,36,0.4)", "stroke-width": "1.1"
+          }, w);
+          el("ellipse", {
+            cx: String(-b[3] * 0.2), cy: String(-b[4] * 0.15), rx: String(b[3] * 0.18), ry: String(b[4] * 0.22),
+            fill: "rgba(255,255,230,0.28)"
+          }, w);
+        });
+
+        const corn = el("g", {}, g);
+        const cr = rng(123);
+        for (let row = 0; row < 5; row++) {
+          for (let col = 0; col < 6; col++) {
+            if (row === 0 && (col === 0 || col === 5)) continue;
+            if (row === 4 && (col === 0 || col === 5)) continue;
+            const x = 108 + col * 14 + row * 5 + cr() * 3;
+            const y = 328 + row * 12 + cr() * 2.5;
+            const rx = 6.4 + cr() * 1.5;
+            const ry = 5.4 + cr() * 1.1;
+            el("ellipse", { cx: (x + 1.6).toFixed(1), cy: (y + 2.2).toFixed(1), rx: rx.toFixed(1), ry: ry.toFixed(1), fill: "rgba(70,35,4,0.3)" }, corn);
+            el("ellipse", { cx: x.toFixed(1), cy: y.toFixed(1), rx: rx.toFixed(1), ry: ry.toFixed(1), fill: "url(#cornG)" }, corn);
+            el("ellipse", { cx: (x - 1.7).toFixed(1), cy: (y - 1.5).toFixed(1), rx: (rx * 0.28).toFixed(1), ry: (ry * 0.22).toFixed(1), fill: "rgba(255,255,230,0.6)" }, corn);
+          }
+        }
+      }
+
+      function drawGarnish() {
+        const g = document.getElementById("garnish");
+        const r = rng(2026);
+        const spots = [
+          [200, 188], [248, 210], [300, 198], [226, 268], [278, 252],
+          [196, 318], [258, 300], [318, 278], [170, 268], [290, 330]
+        ];
+        spots.forEach((s, i) => {
+          const rx = 8 + r() * 4;
+          const ry = 5 + r() * 2.5;
+          const rot = r() * 360;
+          const ring = el("g", { transform: "translate(" + s[0] + " " + s[1] + ") rotate(" + rot.toFixed(1) + ")" }, g);
+          el("ellipse", {
+            cx: "0", cy: "0", rx: rx.toFixed(1), ry: ry.toFixed(1),
+            fill: "none", stroke: i % 2 ? "#2f6a28" : "#4a8c34", "stroke-width": (2.3 + r()).toFixed(2)
+          }, ring);
+          el("ellipse", {
+            cx: "0", cy: "0", rx: (rx * 0.58).toFixed(1), ry: (ry * 0.5).toFixed(1),
+            fill: "none", stroke: "#eef0d8", "stroke-width": (1.3 + r() * 0.5).toFixed(2)
+          }, ring);
+        });
+
+        for (let i = 0; i < 16; i++) {
+          const x = 170 + r() * 180;
+          const y = 190 + r() * 160;
+          const rot = r() * 360;
+          const len = 10 + r() * 11;
+          el("rect", {
+            x: (-len / 2).toFixed(1), y: "-2.2", width: len.toFixed(1), height: "4.4", rx: "1.8",
+            fill: r() > 0.3 ? "#3f7e2c" : "#dce8b8",
+            transform: "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ") rotate(" + rot.toFixed(1) + ")"
+          }, g);
+        }
+
+        for (let i = 0; i < 90; i++) {
+          const x = 115 + r() * 275;
+          const y = 115 + r() * 255;
+          const black = r() > 0.6;
+          el("ellipse", {
+            cx: x.toFixed(1), cy: y.toFixed(1),
+            rx: (1.15 + r() * 1.35).toFixed(2),
+            ry: (0.8 + r() * 0.95).toFixed(2),
+            fill: black ? "#241c14" : "#f6eee0",
+            opacity: black ? "0.82" : "0.95",
+            transform: "rotate(" + (r() * 50).toFixed(1) + " " + x.toFixed(1) + " " + y.toFixed(1) + ")"
+          }, g);
+        }
+      }
+
+      function drawBubbles() {
+        const host = document.getElementById("bubbles");
+        [[30, 64], [46, 72], [62, 58], [54, 46], [38, 54], [70, 66], [24, 50]].forEach((s, i) => {
+          const span = document.createElement("span");
+          span.style.setProperty("--x", s[0] + "%");
+          span.style.setProperty("--y", s[1] + "%");
+          span.style.setProperty("--s", (5 + (i % 4) * 2) + "px");
+          span.style.setProperty("--dur", (4.6 + i * 0.45) + "s");
+          span.style.setProperty("--delay", (i * 0.65) + "s");
+          host.appendChild(span);
+        });
+      }
+
+      function bowlBox() {
+        const r = Math.min(Math.min(window.innerWidth, window.innerHeight) * 0.36, 340);
+        return { cx: window.innerWidth * 0.5, cy: window.innerHeight * 0.5, r: r };
+      }
+
+      function spawnSteam(b, initial) {
+        const ang = Math.random() * Math.PI * 2;
+        const rad = Math.random() * b.r * 0.4;
+        return {
+          x: b.cx + Math.cos(ang) * rad,
+          y: b.cy + Math.sin(ang) * rad * 0.5,
+          vy: -0.42 - Math.random() * 0.55,
+          size: 14 + Math.random() * 38,
+          amp: 10 + Math.random() * 28,
+          freq: 0.5 + Math.random() * 1.15,
+          phase: Math.random() * Math.PI * 2,
+          life: 2.6 + Math.random() * 2.8,
+          age: initial ? Math.random() * 2.8 : 0,
+          heat: 0.8 + Math.random() * 0.2
+        };
+      }
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(window.innerWidth * dpr);
+        canvas.height = Math.floor(window.innerHeight * dpr);
+        canvas.style.width = window.innerWidth + "px";
+        canvas.style.height = window.innerHeight + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const b = bowlBox();
+        steam = [];
+        if (!reduce.matches) {
+          for (let i = 0; i < 110; i++) steam.push(spawnSteam(b, true));
+        }
+      }
+
+      function applyLight(x, y) {
+        root.style.setProperty("--mx", x.toFixed(4));
+        root.style.setProperty("--my", y.toFixed(4));
+        if (reduce.matches) {
+          root.style.setProperty("--tilt-x", "10deg");
+          root.style.setProperty("--tilt-y", "0deg");
+          return;
+        }
+        const tx = 10 + (y - 0.5) * 11;
+        const ty = (x - 0.5) * -18;
+        root.style.setProperty("--tilt-x", tx.toFixed(3) + "deg");
+        root.style.setProperty("--tilt-y", ty.toFixed(3) + "deg");
+        shadow.style.transform =
+          "translate(" + ((x - 0.5) * 30).toFixed(2) + "px," + (10 + (y - 0.5) * 12).toFixed(2) + "%) scale(1.08, 0.4)";
+        const plumes = document.getElementById("plumes");
+        plumes.style.transform = "translate(" + ((x - 0.5) * 36).toFixed(1) + "px," + ((y - 0.5) * 10).toFixed(1) + "px)";
+      }
+
+      function frame(now) {
+        const dt = Math.min(0.033, (now - last) / 1000);
+        last = now;
+        if (!pointer.active && !reduce.matches) {
+          const t = now * 0.00022;
+          pointer.tx = 0.5 + Math.sin(t) * 0.1;
+          pointer.ty = 0.5 + Math.cos(t * 0.8) * 0.06;
+        }
+        const ease = reduce.matches ? 1 : 0.085;
+        pointer.x += (pointer.tx - pointer.x) * ease;
+        pointer.y += (pointer.ty - pointer.y) * ease;
+        applyLight(pointer.x, pointer.y);
+
+        if (!reduce.matches) {
+          const b = bowlBox();
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+          ctx.globalCompositeOperation = "lighter";
+          const windX = (pointer.x - 0.5) * 80;
+          const windY = (pointer.y - 0.5) * 14;
+          for (let i = 0; i < steam.length; i++) {
+            const p = steam[i];
+            p.age += dt;
+            if (p.age > p.life) {
+              steam[i] = spawnSteam(b, false);
+              continue;
+            }
+            const t = p.age / p.life;
+            const fade = t < 0.1 ? t / 0.1 : Math.max(0, 1 - (t - 0.1) / 0.9);
+            const sway = Math.sin(p.age * p.freq + p.phase) * p.amp * (0.35 + t);
+            const x = p.x + sway + windX * t;
+            const y = p.y + p.vy * p.age * 78 + windY * t * 0.35;
+            const s = p.size * (0.5 + t * 1.85);
+            const a = 0.16 * fade * p.heat;
+            const grad = ctx.createRadialGradient(x, y - s * 0.2, 0, x, y, s);
+            grad.addColorStop(0, "rgba(255,240,220," + (a * 1.2).toFixed(3) + ")");
+            grad.addColorStop(0.4, "rgba(255,208,168," + (a * 0.55).toFixed(3) + ")");
+            grad.addColorStop(1, "rgba(255,170,120,0)");
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.ellipse(x, y, s * 0.6, s * 1.22, sway * 0.02, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalCompositeOperation = "source-over";
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function onMove(x, y) {
+        pointer.active = true;
+        pointer.tx = x / window.innerWidth;
+        pointer.ty = y / window.innerHeight;
+      }
+
+      window.addEventListener("pointermove", (e) => onMove(e.clientX, e.clientY), { passive: true });
+      window.addEventListener("pointerdown", (e) => onMove(e.clientX, e.clientY), { passive: true });
+      window.addEventListener("pointerleave", () => { pointer.active = false; });
+      window.addEventListener("blur", () => { pointer.active = false; });
+      window.addEventListener("resize", resize);
+      reduce.addEventListener("change", resize);
+
+      drawNoodles();
+      drawToppings();
+      drawGarnish();
+      drawBubbles();
+      resize();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

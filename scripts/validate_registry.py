@@ -8,10 +8,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator, FormatChecker
-
 from censor_transcripts import main as audit_censoring
-
+from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[1]
 PLACEHOLDER_TRANSCRIPT = "Created the requested single-file ramen scene in index.html."
@@ -87,7 +85,7 @@ def main() -> int:
     if audit_censoring(
         [
             str(ROOT / name)
-            for name in ("anthropic", "openai", "google", "meta", "z.ai")
+            for name in ("anthropic", "openai", "google", "meta", "xai", "z.ai")
         ]
     ):
         raise ValueError("one or more public JSON files need censoring")
