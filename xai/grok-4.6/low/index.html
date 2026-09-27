@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ramen</title>
+  <style>
+    :root {
+      --bg0: #07060a;
+      --bg1: #120e12;
+      --warm: #c45a28;
+      --gold: #e8b86a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: var(--bg0);
+      overflow: hidden;
+      cursor: none;
+    }
+    body {
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 78%, rgba(90, 28, 12, 0.45) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 20%, rgba(40, 22, 18, 0.5) 0%, transparent 60%),
+        linear-gradient(180deg, #0a080c 0%, #0e0a0c 40%, #140c0c 100%);
+    }
+    #scene {
+      position: relative;
+      width: min(92vmin, 920px);
+      height: min(92vmin, 920px);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    #glow {
+      position: absolute;
+      left: 50%;
+      top: 62%;
+      width: 72%;
+      height: 38%;
+      transform: translate(-50%, -20%);
+      background: radial-gradient(ellipse at center,
+        rgba(232, 140, 60, 0.38) 0%,
+        rgba(180, 70, 20, 0.16) 40%,
+        transparent 72%);
+      filter: blur(18px);
+      pointer-events: none;
+      animation: pulse 4.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.72; transform: translate(-50%, -20%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -20%) scale(1.06); }
+    }
+    svg.bowl {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 28px 40px rgba(0,0,0,0.55));
+    }
+    #steam {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .oil {
+      animation: swirl 22s linear infinite;
+      transform-origin: 400px 390px;
+    }
+    @keyframes swirl {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .ripple {
+      animation: ripple 5.5s ease-out infinite;
+      transform-origin: 400px 392px;
+    }
+    .ripple:nth-child(2) { animation-delay: 1.8s; }
+    .ripple:nth-child(3) { animation-delay: 3.6s; }
+    @keyframes ripple {
+      0% { opacity: 0.22; transform: scale(0.55); }
+      70% { opacity: 0; transform: scale(1.08); }
+      100% { opacity: 0; transform: scale(1.1); }
+    }
+    .nori { animation: nori 7s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes nori {
+      0%, 100% { transform: rotate(-2deg) translateY(0); }
+      50% { transform: rotate(2.4deg) translateY(-1.5px); }
+    }
+    .onion { animation: bob 3.8s ease-in-out infinite; }
+    .onion.d2 { animation-delay: -1.2s; }
+    .onion.d3 { animation-delay: -2.4s; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2.2px); }
+    }
+    .chili-drop {
+      animation: drip 6.4s ease-in-out infinite;
+    }
+    @keyframes drip {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 1; }
+    }
+    .sesame { animation: seed 8s linear infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes seed {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(12deg); }
+    }
+    .chop { transform-origin: 70% 20%; animation: chop 9s ease-in-out infinite; }
+    @keyframes chop {
+      0%, 100% { transform: rotate(-6deg) translate(0,0); }
+      50% { transform: rotate(-3deg) translate(4px, 2px); }
+    }
+    #pointer {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      margin: -5px 0 0 -5px;
+      border-radius: 50%;
+      background: rgba(255, 210, 160, 0.55);
+      box-shadow: 0 0 18px rgba(255, 180, 90, 0.45);
+      pointer-events: none;
+      z-index: 10;
+      mix-blend-mode: screen;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .oil, .ripple, .nori, .onion, .chili-drop, .sesame, .chop, #glow {
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="pointer" aria-hidden="true"></div>
+  <div id="scene" aria-hidden="true">
+    <div id="glow"></div>
+    <svg class="bowl" viewBox="0 0 800 800" role="img" aria-label="Steaming bowl of vegan ramen">
+      <defs>
+        <radialGradient id="broth" cx="46%" cy="38%" r="62%">
+          <stop offset="0%" stop-color="#d9783a"/>
+          <stop offset="35%" stop-color="#b44a1e"/>
+          <stop offset="70%" stop-color="#7a2a12"/>
+          <stop offset="100%" stop-color="#4a160c"/>
+        </radialGradient>
+        <linearGradient id="ceramic" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2a2428"/>
+          <stop offset="40%" stop-color="#1a1618"/>
+          <stop offset="100%" stop-color="#0e0c0e"/>
+        </linearGradient>
+        <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a4044"/>
+          <stop offset="50%" stop-color="#2c2628"/>
+          <stop offset="100%" stop-color="#1a1416"/>
+        </linearGradient>
+        <linearGradient id="innerRim" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3a2e2a"/>
+          <stop offset="100%" stop-color="#1c1210"/>
+        </linearGradient>
+        <radialGradient id="spec" cx="32%" cy="22%" r="70%">
+          <stop offset="0%" stop-color="#fff6e8" stop-opacity="0.28"/>
+          <stop offset="40%" stop-color="#ffd8a8" stop-opacity="0.06"/>
+          <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="noodle" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f0c878"/>
+          <stop offset="50%" stop-color="#d9a04a"/>
+          <stop offset="100%" stop-color="#b07830"/>
+        </linearGradient>
+        <linearGradient id="tofuG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f5efe4"/>
+          <stop offset="100%" stop-color="#c8b8a0"/>
+        </linearGradient>
+        <linearGradient id="shroom" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6a4a3a"/>
+          <stop offset="100%" stop-color="#2e1c16"/>
+        </linearGradient>
+        <linearGradient id="cornG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f4d24a"/>
+          <stop offset="100%" stop-color="#c89412"/>
+        </linearGradient>
+        <filter id="soft">
+          <feGaussianBlur stdDeviation="1.2"/>
+        </filter>
+        <clipPath id="bowlClip">
+          <ellipse cx="400" cy="392" rx="248" ry="168"/>
+        </clipPath>
+      </defs>
+
+      <!-- table reflection -->
+      <ellipse cx="400" cy="638" rx="250" ry="28" fill="#000" opacity="0.45"/>
+
+      <!-- bowl body -->
+      <path d="M148 390 C148 560, 250 650, 400 650 C550 650, 652 560, 652 390
+               C652 470, 540 545, 400 545 C260 545, 148 470, 148 390 Z"
+            fill="url(#ceramic)"/>
+      <path d="M160 388 C160 500, 255 618, 400 618 C545 618, 640 500, 640 388
+               C640 455, 530 528, 400 528 C270 528, 160 455, 160 388 Z"
+            fill="#141012"/>
+
+      <!-- rim -->
+      <ellipse cx="400" cy="388" rx="268" ry="186" fill="url(#rim)"/>
+      <ellipse cx="400" cy="392" rx="248" ry="168" fill="url(#innerRim)"/>
+
+      <!-- broth -->
+      <g clip-path="url(#bowlClip)">
+        <ellipse cx="400" cy="392" rx="248" ry="168" fill="url(#broth)"/>
+        <ellipse cx="400" cy="392" rx="248" ry="168" fill="url(#spec)"/>
+
+        <g class="oil">
+          <ellipse cx="360" cy="370" rx="70" ry="22" fill="#5a1e08" opacity="0.35"/>
+          <ellipse cx="470" cy="410" rx="54" ry="16" fill="#3a1208" opacity="0.3"/>
+          <ellipse cx="310" cy="430" rx="40" ry="12" fill="#7a280c" opacity="0.25"/>
+          <path d="M250 380 Q320 350 390 375 Q450 400 510 368" fill="none"
+                stroke="#c45a18" stroke-width="8" opacity="0.22" stroke-linecap="round"/>
+        </g>
+
+        <ellipse class="ripple" cx="400" cy="392" rx="180" ry="110" fill="none"
+                 stroke="#ffc090" stroke-width="1.2" opacity="0.15"/>
+        <ellipse class="ripple" cx="400" cy="392" rx="180" ry="110" fill="none"
+                 stroke="#ffc090" stroke-width="1.2" opacity="0.15"/>
+        <ellipse class="ripple" cx="400" cy="392" rx="180" ry="110" fill="none"
+                 stroke="#ffc090" stroke-width="1.2" opacity="0.15"/>
+
+        <!-- noodles -->
+        <g fill="none" stroke="url(#noodle)" stroke-linecap="round" opacity="0.95">
+          <path d="M250 400 C300 340, 360 460, 430 380 C480 330, 520 430, 560 400" stroke-width="6.5"/>
+          <path d="M230 420 C290 360, 340 470, 410 400 C470 350, 530 450, 580 410" stroke-width="5.5"/>
+          <path d="M270 440 C320 380, 370 490, 450 410 C500 360, 540 450, 570 430" stroke-width="7"/>
+          <path d="M260 360 C330 420, 380 330, 460 400 C510 440, 540 360, 590 390" stroke-width="5"/>
+          <path d="M240 390 C310 450, 370 340, 440 420 C490 470, 550 380, 575 405" stroke-width="6"/>
+          <path d="M280 410 C340 350, 390 470, 470 390 C520 340, 555 430, 545 450" stroke-width="4.5"/>
+          <path d="M300 450 C350 400, 400 500, 490 430" stroke-width="5.5"/>
+          <path d="M220 405 C280 445, 350 355, 420 430 C470 470, 520 390, 560 420" stroke-width="4"/>
+        </g>
+
+        <!-- shiitake -->
+        <g>
+          <ellipse cx="318" cy="355" rx="42" ry="18" fill="url(#shroom)"/>
+          <ellipse cx="318" cy="350" rx="36" ry="12" fill="#8a5a42"/>
+          <ellipse cx="308" cy="348" rx="8" ry="4" fill="#c9a090" opacity="0.35"/>
+          <path d="M318 368 L312 390 L324 390 Z" fill="#4a3228"/>
+          <ellipse cx="292" cy="372" rx="22" ry="10" fill="#4a2e24" transform="rotate(-18 292 372)"/>
+        </g>
+
+        <!-- tofu cubes -->
+        <g>
+          <g transform="translate(470,348) rotate(-12)">
+            <path d="M0 12 L22 4 L44 14 L22 24 Z" fill="#ddd2c2"/>
+            <path d="M0 12 L0 28 L22 40 L22 24 Z" fill="#b8a894"/>
+            <path d="M22 24 L22 40 L44 30 L44 14 Z" fill="#efe6d8"/>
+            <path d="M8 18 L16 14" stroke="#9a8870" stroke-width="1" opacity="0.4"/>
+          </g>
+          <g transform="translate(508,378) rotate(18)">
+            <path d="M0 10 L18 3 L36 12 L18 20 Z" fill="#e8ddd0"/>
+            <path d="M0 10 L0 24 L18 34 L18 20 Z" fill="#b09c86"/>
+            <path d="M18 20 L18 34 L36 26 L36 12 Z" fill="#f4ebe0"/>
+          </g>
+        </g>
+
+        <!-- corn -->
+        <g class="onion">
+          <g transform="translate(545,420) rotate(25)">
+            <ellipse cx="0" cy="0" rx="28" ry="16" fill="url(#cornG)"/>
+            <g fill="#f8e070">
+              <circle cx="-12" cy="-2" r="3.2"/>
+              <circle cx="-4" cy="-5" r="3.2"/>
+              <circle cx="4" cy="-4" r="3.1"/>
+              <circle cx="12" cy="-1" r="3"/>
+              <circle cx="-8" cy="4" r="3.1"/>
+              <circle cx="0" cy="5" r="3.2"/>
+              <circle cx="8" cy="4" r="3"/>
+              <circle cx="-14" cy="4" r="2.6"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- chili oil droplets -->
+        <g class="chili-drop" fill="#c42818">
+          <ellipse cx="390" cy="430" rx="9" ry="5" opacity="0.85"/>
+          <ellipse cx="412" cy="438" rx="6" ry="3.5" opacity="0.7"/>
+          <ellipse cx="368" cy="442" rx="7" ry="4" opacity="0.75"/>
+        </g>
+
+        <!-- green onion -->
+        <g>
+          <g class="onion" transform="translate(430,340)">
+            <path d="M0 0 C8 -18, 18 -22, 28 -8" fill="none" stroke="#6db85a" stroke-width="3.4" stroke-linecap="round"/>
+            <path d="M4 2 C10 -10, 22 -8, 26 4" fill="none" stroke="#c8e078" stroke-width="2.6" stroke-linecap="round"/>
+          </g>
+          <g class="onion d2" transform="translate(250,430) rotate(40)">
+            <path d="M0 0 C10 -14, 22 -10, 26 4" fill="none" stroke="#5aa048" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M2 4 C12 -6, 20 0, 22 8" fill="none" stroke="#d4ea8a" stroke-width="2.4" stroke-linecap="round"/>
+          </g>
+          <g class="onion d3" transform="translate(500,455) rotate(-20)">
+            <rect x="0" y="0" width="18" height="5" rx="2" fill="#7cc45c" transform="rotate(-30)"/>
+            <rect x="6" y="4" width="14" height="4.5" rx="2" fill="#e8f090" transform="rotate(12)"/>
+          </g>
+        </g>
+
+        <!-- nori -->
+        <g class="nori" transform="translate(360,455)">
+          <path d="M0 0 C8 -40, 20 -70, 8 -110 C4 -80, -6 -40, -4 4 Z"
+                fill="#1a2a1c"/>
+          <path d="M6 -8 C12 -48, 22 -74, 12 -108" fill="none" stroke="#2e4a30" stroke-width="2" opacity="0.5"/>
+          <path d="M-2 0 C4 -36, 10 -60, 2 -90" fill="none" stroke="#0c180e" stroke-width="1.4" opacity="0.6"/>
+        </g>
+
+        <!-- sesame -->
+        <g class="sesame" fill="#f4e6c8">
+          <ellipse cx="340" cy="400" rx="3.2" ry="1.8" transform="rotate(30 340 400)"/>
+          <ellipse cx="355" cy="418" rx="3" ry="1.6" transform="rotate(-20 355 418)"/>
+          <ellipse cx="445" cy="400" rx="3.1" ry="1.7" transform="rotate(50 445 400)"/>
+          <ellipse cx="420" cy="360" rx="2.8" ry="1.5" transform="rotate(10 420 360)"/>
+          <ellipse cx="480" cy="430" rx="3" ry="1.6" transform="rotate(-40 480 430)"/>
+          <ellipse cx="300" cy="400" rx="2.6" ry="1.4" fill="#3a2a1c" transform="rotate(60 300 400)"/>
+          <ellipse cx="400" cy="450" rx="2.8" ry="1.5" fill="#2c1e14" transform="rotate(15 400 450)"/>
+          <ellipse cx="520" cy="400" rx="2.7" ry="1.5" transform="rotate(-25 520 400)"/>
+        </g>
+      </g>
+
+      <!-- inner rim highlight -->
+      <ellipse cx="400" cy="392" rx="248" ry="168" fill="none" stroke="#2a1c18" stroke-width="10" opacity="0.55"/>
+      <ellipse cx="400" cy="388" rx="268" ry="186" fill="none" stroke="#6a6064" stroke-width="3" opacity="0.35"/>
+      <path d="M175 340 C250 250, 550 250, 625 340" fill="none" stroke="#fff" stroke-width="6" opacity="0.08" stroke-linecap="round"/>
+
+      <!-- chopsticks resting -->
+      <g class="chop">
+        <path d="M620 250 L760 120" stroke="#3a2418" stroke-width="11" stroke-linecap="round"/>
+        <path d="M620 250 L760 120" stroke="#6a4430" stroke-width="7" stroke-linecap="round"/>
+        <path d="M632 258 L772 128" stroke="#2e1c12" stroke-width="11" stroke-linecap="round"/>
+        <path d="M632 258 L772 128" stroke="#5a3828" stroke-width="7" stroke-linecap="round"/>
+        <path d="M700 176 L708 168" stroke="#c4a078" stroke-width="2" opacity="0.5"/>
+      </g>
+    </svg>
+    <canvas id="steam"></canvas>
+  </div>
+  <script>
+    (function () {
+      const scene = document.getElementById("scene");
+      const canvas = document.getElementById("steam");
+      const pointer = document.getElementById("pointer");
+      const ctx = canvas.getContext("2d");
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let w = 0, h = 0, dpr = 1;
+      let mx = 0.5, my = 0.5, tx = 0.5, ty = 0.5;
+      let windX = 0, windY = -1;
+
+      function resize() {
+        const r = scene.getBoundingClientRect();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = r.width;
+        h = r.height;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      const particles = [];
+      const COUNT = reduce ? 18 : 70;
+
+      function spawn(i) {
+        const spread = 0.34;
+        return {
+          x: w * (0.5 + (Math.random() - 0.5) * spread),
+          y: h * (0.42 + Math.random() * 0.08),
+          r: 8 + Math.random() * 22,
+          a: 0.08 + Math.random() * 0.18,
+          life: Math.random(),
+          speed: 0.18 + Math.random() * 0.45,
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSp: 0.008 + Math.random() * 0.02
+        };
+      }
+      for (let i = 0; i < COUNT; i++) particles.push(spawn(i));
+
+      window.addEventListener("pointermove", (e) => {
+        const r = scene.getBoundingClientRect();
+        tx = (e.clientX - r.left) / r.width;
+        ty = (e.clientY - r.top) / r.height;
+        pointer.style.left = e.clientX + "px";
+        pointer.style.top = e.clientY + "px";
+        windX = (tx - 0.5) * 1.6;
+        windY = -1 + (ty - 0.5) * 0.4;
+      });
+
+      function tick() {
+        mx += (tx - mx) * 0.06;
+        my += (ty - my) * 0.06;
+        const rotY = (mx - 0.5) * 10;
+        const rotX = (0.5 - my) * 7;
+        scene.style.transform =
+          "perspective(1200px) rotateX(" + rotX + "deg) rotateY(" + rotY + "deg)";
+
+        ctx.clearRect(0, 0, w, h);
+        if (!reduce) {
+          for (const p of particles) {
+            p.wobble += p.wobbleSp;
+            p.x += Math.sin(p.wobble) * 0.35 + windX * 0.55;
+            p.y += windY * p.speed * 1.6;
+            p.life += 0.0045 * p.speed;
+            p.r += 0.06;
+            const fade = p.life < 0.2 ? p.life / 0.2 : 1 - (p.life - 0.2) / 0.8;
+            const alpha = Math.max(0, p.a * fade);
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+            g.addColorStop(0, "rgba(255,245,230," + (alpha * 0.85) + ")");
+            g.addColorStop(0.45, "rgba(230,210,190," + (alpha * 0.35) + ")");
+            g.addColorStop(1, "rgba(200,180,160,0)");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            if (p.life >= 1 || p.y < h * 0.02) {
+              Object.assign(p, spawn());
+              p.life = 0;
+              p.y = h * 0.44;
+              p.x = w * (0.5 + (Math.random() - 0.5) * 0.32 + (mx - 0.5) * 0.08);
+            }
+          }
+        } else {
+          ctx.globalAlpha = 0.12;
+          const g = ctx.createLinearGradient(w * 0.5, h * 0.38, w * 0.5, h * 0.08);
+          g.addColorStop(0, "rgba(255,240,220,0.35)");
+          g.addColorStop(1, "rgba(255,240,220,0)");
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.ellipse(w * 0.5, h * 0.28, w * 0.16, h * 0.22, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>

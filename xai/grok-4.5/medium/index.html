@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vegan Ramen</title>
+  <style>
+    :root {
+      --bg-deep: #07060a;
+      --bg-mid: #120e14;
+      --warm: #ff8a3d;
+      --warm-soft: #e8a060;
+      --broth: #c4783a;
+      --broth-deep: #8a4a22;
+      --steam: rgba(255, 236, 210, 0.55);
+      --mx: 0;
+      --my: 0;
+      --glow: 0.55;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-deep);
+      cursor: none;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      touch-action: none;
+    }
+
+    .stage {
+      position: relative;
+      width: min(100vw, 100vh);
+      height: min(100vw, 100vh);
+      max-width: 920px;
+      max-height: 920px;
+      display: grid;
+      place-items: center;
+      transform: translate3d(
+        calc(var(--mx) * 10px),
+        calc(var(--my) * 8px),
+        0
+      );
+      transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+      will-change: transform;
+    }
+
+    .ambient {
+      position: absolute;
+      inset: -20%;
+      pointer-events: none;
+      background:
+        radial-gradient(
+          ellipse 55% 45% at calc(50% + var(--mx) * 4%) calc(58% + var(--my) * 3%),
+          rgba(255, 120, 40, calc(0.22 * var(--glow))) 0%,
+          rgba(180, 60, 20, calc(0.1 * var(--glow))) 35%,
+          transparent 70%
+        ),
+        radial-gradient(
+          ellipse 80% 70% at 50% 70%,
+          rgba(40, 20, 12, 0.9) 0%,
+          transparent 65%
+        );
+      filter: blur(2px);
+      z-index: 0;
+      animation: ambient-breathe 7s ease-in-out infinite;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(
+          ellipse 70% 65% at 50% 48%,
+          transparent 30%,
+          rgba(0, 0, 0, 0.35) 70%,
+          rgba(0, 0, 0, 0.75) 100%
+        );
+      z-index: 10;
+    }
+
+    .bowl-wrap {
+      position: relative;
+      width: 72%;
+      height: 72%;
+      z-index: 2;
+      transform: translate3d(
+        calc(var(--mx) * -6px),
+        calc(var(--my) * -5px),
+        0
+      ) rotateX(calc(var(--my) * -3deg)) rotateY(calc(var(--mx) * 4deg));
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+      will-change: transform;
+    }
+
+    .bowl-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 28px 40px rgba(0, 0, 0, 0.65))
+        drop-shadow(0 0 60px rgba(255, 110, 40, calc(0.18 * var(--glow))));
+      overflow: visible;
+    }
+
+    /* Steam wisps */
+    .steam-layer {
+      position: absolute;
+      left: 18%;
+      right: 18%;
+      top: 8%;
+      height: 42%;
+      pointer-events: none;
+      z-index: 3;
+      transform: translate3d(
+        calc(var(--mx) * 14px),
+        calc(var(--my) * 6px),
+        0
+      );
+      transition: transform 0.5s ease-out;
+    }
+
+    .wisp {
+      position: absolute;
+      bottom: 0;
+      width: 28%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(
+        ellipse at 50% 100%,
+        var(--steam) 0%,
+        rgba(255, 230, 200, 0.25) 30%,
+        transparent 70%
+      );
+      filter: blur(14px);
+      opacity: 0;
+      transform-origin: 50% 100%;
+      animation: rise 4.8s ease-out infinite;
+      will-change: transform, opacity;
+    }
+
+    .wisp:nth-child(1) {
+      left: 8%;
+      width: 32%;
+      animation-delay: 0s;
+      animation-duration: 5.2s;
+    }
+    .wisp:nth-child(2) {
+      left: 34%;
+      width: 36%;
+      animation-delay: 1.1s;
+      animation-duration: 4.6s;
+    }
+    .wisp:nth-child(3) {
+      left: 58%;
+      width: 30%;
+      animation-delay: 2.2s;
+      animation-duration: 5.5s;
+    }
+    .wisp:nth-child(4) {
+      left: 22%;
+      width: 24%;
+      animation-delay: 0.6s;
+      animation-duration: 4.2s;
+      filter: blur(18px);
+    }
+    .wisp:nth-child(5) {
+      left: 48%;
+      width: 26%;
+      animation-delay: 3s;
+      animation-duration: 4.9s;
+      filter: blur(16px);
+    }
+
+    /* Soft table reflection */
+    .reflection {
+      position: absolute;
+      left: 20%;
+      right: 20%;
+      bottom: 6%;
+      height: 12%;
+      border-radius: 50%;
+      background: radial-gradient(
+        ellipse at 50% 30%,
+        rgba(255, 140, 60, 0.12) 0%,
+        transparent 70%
+      );
+      filter: blur(8px);
+      z-index: 1;
+      transform: translate3d(calc(var(--mx) * 4px), 0, 0);
+      animation: reflect-pulse 5s ease-in-out infinite;
+    }
+
+    /* Custom warmth cursor */
+    .cursor {
+      position: fixed;
+      width: 18px;
+      height: 18px;
+      margin: -9px 0 0 -9px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 100;
+      background: radial-gradient(
+        circle,
+        rgba(255, 200, 140, 0.85) 0%,
+        rgba(255, 120, 40, 0.35) 40%,
+        transparent 70%
+      );
+      mix-blend-mode: screen;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      will-change: transform;
+    }
+
+    body.is-pointer .cursor {
+      opacity: 1;
+    }
+
+    @keyframes rise {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 8%, 0) scaleX(0.7) scaleY(0.4);
+      }
+      15% {
+        opacity: 0.7;
+      }
+      45% {
+        opacity: 0.45;
+        transform: translate3d(4%, -35%, 0) scaleX(1) scaleY(1);
+      }
+      75% {
+        opacity: 0.2;
+        transform: translate3d(-6%, -70%, 0) scaleX(1.15) scaleY(1.3);
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(3%, -100%, 0) scaleX(1.3) scaleY(1.5);
+      }
+    }
+
+    @keyframes ambient-breathe {
+      0%,
+      100% {
+        opacity: 0.85;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.03);
+      }
+    }
+
+    @keyframes reflect-pulse {
+      0%,
+      100% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes broth-shimmer {
+      0%,
+      100% {
+        opacity: 0.35;
+      }
+      50% {
+        opacity: 0.55;
+      }
+    }
+
+    @keyframes noodle-sway {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(1.2px);
+      }
+    }
+
+    @keyframes oil-drift {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.55;
+      }
+      50% {
+        transform: translate(1.5px, -0.8px) scale(1.05);
+        opacity: 0.75;
+      }
+      100% {
+        transform: translate(-1px, 0.5px) scale(0.98);
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes chili-bob {
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-1.5px) rotate(2deg);
+      }
+    }
+
+    @keyframes scallion-float {
+      0%,
+      100% {
+        transform: translateY(0) rotate(-2deg);
+      }
+      50% {
+        transform: translateY(-2px) rotate(1deg);
+      }
+    }
+
+    .shimmer {
+      animation: broth-shimmer 3.5s ease-in-out infinite;
+    }
+
+    .noodles {
+      animation: noodle-sway 6s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .oil {
+      animation: oil-drift 7s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .oil:nth-of-type(2) {
+      animation-delay: -2s;
+      animation-duration: 8.5s;
+    }
+    .oil:nth-of-type(3) {
+      animation-delay: -4s;
+      animation-duration: 6.2s;
+    }
+
+    .chili {
+      animation: chili-bob 4.5s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .chili:nth-of-type(2) {
+      animation-delay: -1.5s;
+    }
+
+    .scallion {
+      animation: scallion-float 5.5s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center bottom;
+    }
+    .scallion:nth-of-type(2) {
+      animation-delay: -2.2s;
+      animation-duration: 6.5s;
+    }
+
+    @media (max-width: 600px) {
+      .bowl-wrap {
+        width: 88%;
+        height: 88%;
+      }
+      .steam-layer {
+        left: 14%;
+        right: 14%;
+        top: 6%;
+      }
+      .wisp {
+        filter: blur(12px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage,
+      .bowl-wrap,
+      .steam-layer,
+      .reflection {
+        transition: none !important;
+      }
+
+      .ambient,
+      .reflection,
+      .wisp,
+      .shimmer,
+      .noodles,
+      .oil,
+      .chili,
+      .scallion {
+        animation: none !important;
+      }
+
+      .wisp {
+        opacity: 0.28;
+        transform: translate3d(0, -30%, 0) scaleY(1.1);
+        filter: blur(16px);
+      }
+
+      .wisp:nth-child(1) {
+        opacity: 0.22;
+      }
+      .wisp:nth-child(3),
+      .wisp:nth-child(5) {
+        opacity: 0.18;
+      }
+
+      .shimmer {
+        opacity: 0.4;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div class="stage" id="stage" role="img" aria-label="A steaming bowl of vegan ramen">
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="reflection" aria-hidden="true"></div>
+
+    <div class="steam-layer" aria-hidden="true">
+      <div class="wisp"></div>
+      <div class="wisp"></div>
+      <div class="wisp"></div>
+      <div class="wisp"></div>
+      <div class="wisp"></div>
+    </div>
+
+    <div class="bowl-wrap">
+      <svg class="bowl-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="brothGrad" cx="45%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#e8a050" />
+            <stop offset="35%" stop-color="#c4783a" />
+            <stop offset="75%" stop-color="#8a4a22" />
+            <stop offset="100%" stop-color="#5c3014" />
+          </radialGradient>
+
+          <linearGradient id="bowlOuter" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#2a2420" />
+            <stop offset="40%" stop-color="#1a1614" />
+            <stop offset="100%" stop-color="#0c0a09" />
+          </linearGradient>
+
+          <linearGradient id="bowlRim" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4a4038" />
+            <stop offset="50%" stop-color="#2e2822" />
+            <stop offset="100%" stop-color="#1a1612" />
+          </linearGradient>
+
+          <linearGradient id="bowlInner" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3d342c" />
+            <stop offset="100%" stop-color="#1e1a16" />
+          </linearGradient>
+
+          <radialGradient id="highlight" cx="35%" cy="30%" r="50%">
+            <stop offset="0%" stop-color="#fff5e0" stop-opacity="0.45" />
+            <stop offset="40%" stop-color="#ffcc88" stop-opacity="0.15" />
+            <stop offset="100%" stop-color="#ffaa44" stop-opacity="0" />
+          </radialGradient>
+
+          <radialGradient id="tofuGrad" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#f5f0e4" />
+            <stop offset="70%" stop-color="#d8d0c0" />
+            <stop offset="100%" stop-color="#b8a890" />
+          </radialGradient>
+
+          <linearGradient id="noriGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1a3a28" />
+            <stop offset="50%" stop-color="#0e2418" />
+            <stop offset="100%" stop-color="#061410" />
+          </linearGradient>
+
+          <linearGradient id="mushroomGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#8b6040" />
+            <stop offset="100%" stop-color="#4a3020" />
+          </linearGradient>
+
+          <linearGradient id="cornGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#f5d060" />
+            <stop offset="100%" stop-color="#d4a020" />
+          </linearGradient>
+
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+
+          <clipPath id="brothClip">
+            <ellipse cx="200" cy="198" rx="118" ry="52" />
+          </clipPath>
+        </defs>
+
+        <!-- Soft ground shadow -->
+        <ellipse cx="200" cy="340" rx="130" ry="18" fill="#000" opacity="0.45" />
+
+        <!-- Bowl body -->
+        <path
+          d="M70 195
+             C70 195, 75 310, 200 318
+             C325 310, 330 195, 330 195
+             L318 195
+             C318 195, 312 295, 200 302
+             C88 295, 82 195, 82 195 Z"
+          fill="url(#bowlOuter)"
+        />
+
+        <!-- Bowl side highlight -->
+        <path
+          d="M82 195
+             C82 195, 88 280, 140 295
+             C100 270, 90 220, 88 198 Z"
+          fill="#fff"
+          opacity="0.04"
+        />
+        <path
+          d="M318 195
+             C318 195, 312 280, 260 295
+             C300 270, 310 220, 312 198 Z"
+          fill="#000"
+          opacity="0.2"
+        />
+
+        <!-- Inner wall -->
+        <ellipse cx="200" cy="195" rx="128" ry="58" fill="url(#bowlInner)" />
+
+        <!-- Rim -->
+        <ellipse cx="200" cy="192" rx="132" ry="60" fill="none" stroke="url(#bowlRim)" stroke-width="10" />
+        <ellipse cx="200" cy="188" rx="128" ry="56" fill="none" stroke="#5a5048" stroke-width="1.5" opacity="0.5" />
+        <ellipse cx="200" cy="196" rx="126" ry="54" fill="none" stroke="#0a0806" stroke-width="2" opacity="0.4" />
+
+        <!-- Broth surface -->
+        <g clip-path="url(#brothClip)">
+          <ellipse cx="200" cy="198" rx="118" ry="52" fill="url(#brothGrad)" />
+
+          <!-- Surface shimmer -->
+          <ellipse class="shimmer" cx="175" cy="185" rx="55" ry="22" fill="url(#highlight)" />
+
+          <!-- Oil droplets -->
+          <ellipse class="oil" cx="155" cy="200" rx="14" ry="5" fill="#d49040" opacity="0.55" />
+          <ellipse class="oil" cx="240" cy="192" rx="10" ry="3.5" fill="#e8a850" opacity="0.45" />
+          <ellipse class="oil" cx="210" cy="210" rx="8" ry="3" fill="#c87830" opacity="0.5" />
+          <ellipse class="oil" cx="175" cy="215" rx="6" ry="2.2" fill="#e0a040" opacity="0.4" />
+
+          <!-- Noodles -->
+          <g class="noodles" fill="none" stroke="#e8c878" stroke-width="3.2" stroke-linecap="round" opacity="0.85">
+            <path d="M120 195 Q150 175, 180 198 Q210 220, 240 190 Q265 170, 285 200" />
+            <path d="M125 210 Q155 188, 185 212 Q215 232, 250 205" stroke="#d4b060" stroke-width="2.8" />
+            <path d="M135 185 Q165 205, 195 182 Q225 160, 255 188" stroke="#f0d890" stroke-width="2.6" />
+            <path d="M145 220 Q175 200, 205 218 Q235 235, 270 210" stroke="#c8a850" stroke-width="2.4" opacity="0.7" />
+            <path d="M130 200 Q160 220, 190 195 Q220 175, 260 205" stroke="#e0c070" stroke-width="2.2" />
+          </g>
+        </g>
+
+        <!-- Soft broth edge blend -->
+        <ellipse cx="200" cy="198" rx="118" ry="52" fill="none" stroke="#6a3818" stroke-width="3" opacity="0.35" />
+
+        <!-- Nori sheet -->
+        <g transform="translate(255, 155)">
+          <rect x="0" y="0" width="38" height="55" rx="2" fill="url(#noriGrad)" transform="rotate(12)" />
+          <rect x="4" y="4" width="30" height="8" rx="1" fill="#2a5a40" opacity="0.35" transform="rotate(12)" />
+          <rect x="4" y="18" width="30" height="4" rx="1" fill="#0a1a10" opacity="0.4" transform="rotate(12)" />
+          <rect x="4" y="28" width="30" height="4" rx="1" fill="#0a1a10" opacity="0.3" transform="rotate(12)" />
+        </g>
+
+        <!-- Tofu cubes -->
+        <g filter="url(#softGlow)">
+          <g transform="translate(145, 175)">
+            <rect x="0" y="0" width="28" height="22" rx="2" fill="url(#tofuGrad)" transform="rotate(-8)" />
+            <rect x="2" y="2" width="18" height="6" rx="1" fill="#fff" opacity="0.35" transform="rotate(-8)" />
+          </g>
+          <g transform="translate(168, 192)">
+            <rect x="0" y="0" width="22" height="18" rx="2" fill="url(#tofuGrad)" transform="rotate(15)" />
+            <rect x="2" y="2" width="12" height="4" rx="1" fill="#fff" opacity="0.3" transform="rotate(15)" />
+          </g>
+        </g>
+
+        <!-- Shiitake mushrooms -->
+        <g transform="translate(220, 175)">
+          <ellipse cx="0" cy="0" rx="18" ry="10" fill="url(#mushroomGrad)" />
+          <ellipse cx="0" cy="-2" rx="12" ry="5" fill="#a07050" opacity="0.5" />
+          <ellipse cx="-2" cy="-3" rx="5" ry="2.5" fill="#c09070" opacity="0.35" />
+          <rect x="-3" y="6" width="6" height="10" rx="2" fill="#6a4830" />
+        </g>
+        <g transform="translate(248, 195)">
+          <ellipse cx="0" cy="0" rx="14" ry="8" fill="url(#mushroomGrad)" />
+          <ellipse cx="0" cy="-1.5" rx="9" ry="4" fill="#a07050" opacity="0.45" />
+          <rect x="-2.5" y="5" width="5" height="8" rx="1.5" fill="#5a3820" />
+        </g>
+
+        <!-- Corn kernels -->
+        <g>
+          <ellipse cx="185" cy="205" rx="4" ry="3.2" fill="url(#cornGrad)" />
+          <ellipse cx="193" cy="200" rx="3.5" ry="2.8" fill="#f0c850" />
+          <ellipse cx="178" cy="198" rx="3.8" ry="3" fill="#e8b830" />
+          <ellipse cx="190" cy="210" rx="3.2" ry="2.5" fill="#f5d060" />
+          <ellipse cx="200" cy="203" rx="3.5" ry="2.8" fill="#d4a020" />
+        </g>
+
+        <!-- Chili oil flakes / chili slices -->
+        <g class="chili">
+          <ellipse cx="130" cy="188" rx="9" ry="3.5" fill="#c03020" transform="rotate(-25 130 188)" />
+          <ellipse cx="130" cy="188" rx="5" ry="1.5" fill="#e05030" opacity="0.5" transform="rotate(-25 130 188)" />
+        </g>
+        <g class="chili">
+          <ellipse cx="270" cy="208" rx="8" ry="3" fill="#a82818" transform="rotate(40 270 208)" />
+        </g>
+
+        <!-- Scallions -->
+        <g class="scallion">
+          <path
+            d="M160 170 Q170 155, 185 165"
+            fill="none"
+            stroke="#5a9a40"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+          <path
+            d="M160 170 Q170 155, 185 165"
+            fill="none"
+            stroke="#8bc868"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            opacity="0.6"
+          />
+        </g>
+        <g class="scallion">
+          <path
+            d="M200 168 Q215 152, 228 170"
+            fill="none"
+            stroke="#4a8a35"
+            stroke-width="2.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M205 172 Q218 160, 232 175"
+            fill="none"
+            stroke="#6ab050"
+            stroke-width="2.4"
+            stroke-linecap="round"
+          />
+        </g>
+        <g class="scallion">
+          <path
+            d="M175 160 Q182 148, 195 158"
+            fill="none"
+            stroke="#70b050"
+            stroke-width="2.2"
+            stroke-linecap="round"
+          />
+        </g>
+
+        <!-- Sesame seeds -->
+        <g fill="#f5ecd8" opacity="0.75">
+          <ellipse cx="150" cy="195" rx="1.8" ry="1.1" transform="rotate(30 150 195)" />
+          <ellipse cx="210" cy="185" rx="1.6" ry="1" transform="rotate(-20 210 185)" />
+          <ellipse cx="230" cy="205" rx="1.7" ry="1.1" transform="rotate(50 230 205)" />
+          <ellipse cx="165" cy="210" rx="1.5" ry="0.9" transform="rotate(10 165 210)" />
+          <ellipse cx="195" cy="192" rx="1.6" ry="1" transform="rotate(-40 195 192)" />
+          <ellipse cx="250" cy="185" rx="1.4" ry="0.9" transform="rotate(15 250 185)" />
+          <ellipse cx="140" cy="205" rx="1.5" ry="1" transform="rotate(-15 140 205)" />
+        </g>
+
+        <!-- Broth surface gloss -->
+        <ellipse cx="170" cy="180" rx="40" ry="12" fill="#fff8e8" opacity="0.08" />
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const body = document.body;
+      const cursor = document.getElementById("cursor");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+      let glow = 0.55;
+      let targetGlow = 0.55;
+      let pointerActive = false;
+      let rafId = null;
+
+      function setVars() {
+        root.style.setProperty("--mx", currentX.toFixed(4));
+        root.style.setProperty("--my", currentY.toFixed(4));
+        root.style.setProperty("--glow", glow.toFixed(4));
+      }
+
+      function animate() {
+        const ease = reduceMotion.matches ? 1 : 0.08;
+        currentX += (targetX - currentX) * ease;
+        currentY += (targetY - currentY) * ease;
+        glow += (targetGlow - glow) * (reduceMotion.matches ? 1 : 0.06);
+        setVars();
+
+        if (!reduceMotion.matches) {
+          rafId = requestAnimationFrame(animate);
+        }
+      }
+
+      function startLoop() {
+        if (rafId != null) cancelAnimationFrame(rafId);
+        if (!reduceMotion.matches) {
+          rafId = requestAnimationFrame(animate);
+        } else {
+          currentX = targetX;
+          currentY = targetY;
+          glow = targetGlow;
+          setVars();
+        }
+      }
+
+      function onPointerMove(e) {
+        const w = window.innerWidth || 1;
+        const h = window.innerHeight || 1;
+        const x = (e.clientX / w) * 2 - 1;
+        const y = (e.clientY / h) * 2 - 1;
+        targetX = Math.max(-1, Math.min(1, x));
+        targetY = Math.max(-1, Math.min(1, y));
+
+        const dist = Math.hypot(targetX, targetY);
+        targetGlow = 0.45 + (1 - Math.min(dist, 1)) * 0.45;
+
+        if (cursor) {
+          cursor.style.transform = "translate(" + e.clientX + "px," + e.clientY + "px)";
+        }
+
+        if (!pointerActive) {
+          pointerActive = true;
+          body.classList.add("is-pointer");
+        }
+
+        if (reduceMotion.matches) {
+          currentX = targetX;
+          currentY = targetY;
+          glow = targetGlow;
+          setVars();
+        }
+      }
+
+      function onPointerLeave() {
+        targetX = 0;
+        targetY = 0;
+        targetGlow = 0.55;
+        pointerActive = false;
+        body.classList.remove("is-pointer");
+        if (reduceMotion.matches) {
+          currentX = 0;
+          currentY = 0;
+          glow = 0.55;
+          setVars();
+        }
+      }
+
+      window.addEventListener("pointermove", onPointerMove, { passive: true });
+      window.addEventListener("pointerleave", onPointerLeave);
+      document.addEventListener("mouseleave", onPointerLeave);
+
+      reduceMotion.addEventListener("change", startLoop);
+      startLoop();
+      setVars();
+    })();
+  </script>
+</body>
+</html>

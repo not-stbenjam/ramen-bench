@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vegan Ramen</title>
+  <style>
+    :root {
+      --lx: 50%;
+      --ly: 48%;
+      --heat: 1;
+      --tilt-x: 6deg;
+      --tilt-y: 0deg;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #070504;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    body {
+      background:
+        radial-gradient(ellipse 42% 28% at 50% 62%, rgba(190, 72, 22, calc(0.28 * var(--heat))), transparent 70%),
+        radial-gradient(ellipse 22% 14% at 50% 58%, rgba(255, 170, 70, calc(0.18 * var(--heat))), transparent 60%),
+        radial-gradient(ellipse 80% 50% at 50% 100%, #140a08, transparent 55%),
+        #070504;
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      perspective: 1400px;
+    }
+
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        52vw 40vh at var(--lx) var(--ly),
+        rgba(255, 150, 70, 0.08),
+        transparent 58%
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .hearth {
+      position: absolute;
+      width: min(78vmin, 760px);
+      height: min(46vmin, 420px);
+      left: 50%;
+      top: 58%;
+      transform: translate(-50%, -40%);
+      background: radial-gradient(ellipse at center,
+        rgba(255, 132, 42, calc(0.5 * var(--heat))) 0%,
+        rgba(210, 70, 18, calc(0.22 * var(--heat))) 36%,
+        transparent 70%);
+      filter: blur(28px);
+      animation: hearth 5.5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .stage {
+      position: relative;
+      width: min(92vmin, 980px);
+      height: min(92vmin, 980px);
+      transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+      transform-style: preserve-3d;
+      will-change: transform;
+      z-index: 1;
+    }
+
+    .stage svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      display: block;
+    }
+
+    #oil {
+      transform-origin: 500px 440px;
+      animation: swirl 48s linear infinite;
+    }
+
+    #noodles {
+      transform-origin: 490px 445px;
+      animation: simmer 6.5s ease-in-out infinite;
+    }
+
+    #garnish-float {
+      transform-origin: 500px 440px;
+      animation: garnish 8s ease-in-out infinite;
+    }
+
+    #bubbles circle {
+      animation: bubble 4.8s ease-in-out infinite;
+    }
+    #bubbles circle:nth-child(2) { animation-delay: -1.1s; animation-duration: 5.4s; }
+    #bubbles circle:nth-child(3) { animation-delay: -2.4s; animation-duration: 4.2s; }
+    #bubbles circle:nth-child(4) { animation-delay: -0.6s; animation-duration: 6s; }
+    #bubbles circle:nth-child(5) { animation-delay: -3.3s; animation-duration: 5s; }
+    #bubbles circle:nth-child(6) { animation-delay: -1.8s; animation-duration: 4.6s; }
+
+    .static-steam { display: none; }
+
+    .steam-live {
+      pointer-events: none;
+    }
+    .steam-live path {
+      fill: none;
+      stroke: #f6ead8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+    }
+    .steam-live .w1 { animation: steamRise 4.8s ease-in infinite; }
+    .steam-live .w2 { animation: steamRise 5.6s ease-in infinite 0.7s; }
+    .steam-live .w3 { animation: steamRise 5.1s ease-in infinite 1.4s; }
+    .steam-live .w4 { animation: steamRise 6.2s ease-in infinite 0.3s; }
+    .steam-live .w5 { animation: steamRise 4.4s ease-in infinite 2.1s; }
+    .steam-live .w6 { animation: steamRise 5.8s ease-in infinite 1.8s; }
+    .steam-live .w7 { animation: steamRise 6.6s ease-in infinite 2.6s; }
+    .steam-live .w8 { animation: steamRise 5.2s ease-in infinite 3.2s; }
+
+    @keyframes steamRise {
+      0%   { transform: translate(0, 24px) scale(0.7, 0.45); opacity: 0; }
+      12%  { opacity: 0.42; }
+      55%  { opacity: 0.22; }
+      100% { transform: translate(12px, -240px) scale(1.35, 1.9); opacity: 0; }
+    }
+
+    canvas#fx {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      background: radial-gradient(ellipse 68% 62% at 50% 46%, transparent 38%, rgba(0, 0, 0, 0.55) 100%);
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0.045;
+      mix-blend-mode: overlay;
+    }
+
+    @keyframes hearth {
+      0%, 100% { opacity: 0.82; transform: translate(-50%, -40%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -40%) scale(1.07); }
+    }
+
+    @keyframes swirl {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes simmer {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(0, 1.4px) scale(1.008, 1.012); }
+    }
+
+    @keyframes garnish {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(1.2px, -1px); }
+    }
+
+    @keyframes bubble {
+      0%, 100% { opacity: 0.05; r: 2.2; }
+      40% { opacity: 0.45; }
+      70% { opacity: 0.15; r: 4.4; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hearth,
+      #oil,
+      #noodles,
+      #garnish-float,
+      #bubbles circle,
+      .steam-live .w1,
+      .steam-live .w2,
+      .steam-live .w3,
+      .steam-live .w4,
+      .steam-live .w5,
+      .steam-live .w6,
+      .steam-live .w7,
+      .steam-live .w8 {
+        animation: none !important;
+      }
+      .steam-live { display: none; }
+      .static-steam { display: block; }
+      canvas#fx { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" role="img" aria-label="A steaming bowl of vegan ramen">
+    <div class="hearth"></div>
+    <div class="stage">
+      <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="shadowG" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#000" stop-opacity="0.7" />
+            <stop offset="70%" stop-color="#000" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#000" stop-opacity="0" />
+          </radialGradient>
+
+          <linearGradient id="bodyG" x1="0.15" y1="0" x2="0.9" y2="1">
+            <stop offset="0%" stop-color="#4a3228" />
+            <stop offset="18%" stop-color="#2a1b16" />
+            <stop offset="45%" stop-color="#16100e" />
+            <stop offset="78%" stop-color="#0c0908" />
+            <stop offset="100%" stop-color="#1a100c" />
+          </linearGradient>
+
+          <radialGradient id="bodySheen" cx="28%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#6a4534" stop-opacity="0.55" />
+            <stop offset="40%" stop-color="#3a241c" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="#000" stop-opacity="0" />
+          </radialGradient>
+
+          <linearGradient id="rimG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#7a5644" />
+            <stop offset="22%" stop-color="#3a261e" />
+            <stop offset="50%" stop-color="#c4a07a" />
+            <stop offset="72%" stop-color="#2a1c16" />
+            <stop offset="100%" stop-color="#8a6250" />
+          </linearGradient>
+
+          <linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e8d2b4" stop-opacity="0.55" />
+            <stop offset="40%" stop-color="#8a6a52" stop-opacity="0.15" />
+            <stop offset="100%" stop-color="#1a100c" stop-opacity="0.4" />
+          </linearGradient>
+
+          <radialGradient id="innerG" cx="50%" cy="82%" r="78%">
+            <stop offset="0%" stop-color="#6a4634" />
+            <stop offset="38%" stop-color="#3e2a20" />
+            <stop offset="100%" stop-color="#140c0a" />
+          </radialGradient>
+
+          <radialGradient id="brothG" cx="46%" cy="42%" r="62%">
+            <stop offset="0%" stop-color="#e09048" />
+            <stop offset="18%" stop-color="#c45a24" />
+            <stop offset="48%" stop-color="#a03e16" />
+            <stop offset="78%" stop-color="#6e2410" />
+            <stop offset="100%" stop-color="#4a160c" />
+          </radialGradient>
+
+          <radialGradient id="brothEdge" cx="50%" cy="50%" r="50%">
+            <stop offset="70%" stop-color="#000" stop-opacity="0" />
+            <stop offset="100%" stop-color="#2a0c06" stop-opacity="0.45" />
+          </radialGradient>
+
+          <radialGradient id="oilBlob" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#f0a030" stop-opacity="0.55" />
+            <stop offset="40%" stop-color="#c43010" stop-opacity="0.5" />
+            <stop offset="100%" stop-color="#6a1008" stop-opacity="0.15" />
+          </radialGradient>
+
+          <radialGradient id="chiliG" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#ff6a2a" stop-opacity="0.7" />
+            <stop offset="55%" stop-color="#a01808" stop-opacity="0.65" />
+            <stop offset="100%" stop-color="#4a0804" stop-opacity="0.2" />
+          </radialGradient>
+
+          <linearGradient id="noriG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1c3324" />
+            <stop offset="35%" stop-color="#0b160e" />
+            <stop offset="70%" stop-color="#15241a" />
+            <stop offset="100%" stop-color="#08110a" />
+          </linearGradient>
+
+          <linearGradient id="noriSheen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="40%" stop-color="#d8f0c8" stop-opacity="0.22" />
+            <stop offset="55%" stop-color="#fff" stop-opacity="0.05" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+
+          <linearGradient id="leafG" x1="0.2" y1="0" x2="0.8" y2="1">
+            <stop offset="0%" stop-color="#c6e070" />
+            <stop offset="40%" stop-color="#5a9a38" />
+            <stop offset="100%" stop-color="#2e5c22" />
+          </linearGradient>
+
+          <linearGradient id="leafG2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#8ec44a" />
+            <stop offset="100%" stop-color="#3a6e28" />
+          </linearGradient>
+
+          <linearGradient id="stemG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#e8efd4" />
+            <stop offset="50%" stop-color="#c5d49a" />
+            <stop offset="100%" stop-color="#9aaa70" />
+          </linearGradient>
+
+          <linearGradient id="menmaG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f0e0b0" />
+            <stop offset="100%" stop-color="#c4a060" />
+          </linearGradient>
+
+          <radialGradient id="mushG" cx="38%" cy="32%" r="70%">
+            <stop offset="0%" stop-color="#a06a48" />
+            <stop offset="40%" stop-color="#6e422c" />
+            <stop offset="100%" stop-color="#3a2418" />
+          </radialGradient>
+
+          <radialGradient id="mushG2" cx="40%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#b07a54" />
+            <stop offset="50%" stop-color="#7a4c32" />
+            <stop offset="100%" stop-color="#422818" />
+          </radialGradient>
+
+          <linearGradient id="tofuTop" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f8ecc8" />
+            <stop offset="50%" stop-color="#e4c888" />
+            <stop offset="100%" stop-color="#c9a05a" />
+          </linearGradient>
+          <linearGradient id="tofuL" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d4b06a" />
+            <stop offset="100%" stop-color="#8a6028" />
+          </linearGradient>
+          <linearGradient id="tofuR" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#c49240" />
+            <stop offset="100%" stop-color="#6e4418" />
+          </linearGradient>
+
+          <radialGradient id="cornG" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#fff3a0" />
+            <stop offset="45%" stop-color="#f0c848" />
+            <stop offset="100%" stop-color="#c49018" />
+          </radialGradient>
+
+          <radialGradient id="kikuG" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#4a3028" />
+            <stop offset="60%" stop-color="#1c1010" />
+            <stop offset="100%" stop-color="#0a0606" />
+          </radialGradient>
+
+          <radialGradient id="specG" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff8e8" stop-opacity="0.72" />
+            <stop offset="35%" stop-color="#ffe0a8" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </radialGradient>
+
+          <radialGradient id="glowSoft" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffb060" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#ff7010" stop-opacity="0" />
+          </radialGradient>
+
+          <filter id="blur12" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="12" />
+          </filter>
+          <filter id="blur8" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="8" />
+          </filter>
+          <filter id="blur3" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.4" />
+          </filter>
+          <filter id="blurSteam" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="7" />
+          </filter>
+          <clipPath id="brothClip">
+            <ellipse cx="500" cy="440" rx="322" ry="124" />
+          </clipPath>
+          <clipPath id="innerClip">
+            <ellipse cx="500" cy="422" rx="352" ry="148" />
+          </clipPath>
+        </defs>
+
+        <!-- Grounding shadow -->
+        <ellipse cx="500" cy="818" rx="340" ry="36" fill="url(#shadowG)" />
+
+        <!-- Warm pool on the table -->
+        <ellipse cx="500" cy="800" rx="280" ry="26" fill="url(#glowSoft)" filter="url(#blur12)" />
+
+        <!-- Bowl exterior -->
+        <g>
+          <path
+            d="M128,435
+               C138,620 255,772 500,792
+               C745,772 862,620 872,435
+               A375,158 0 0 1 128,435 Z"
+            fill="url(#bodyG)" />
+          <path
+            d="M128,435
+               C138,620 255,772 500,792
+               C745,772 862,620 872,435
+               A375,158 0 0 1 128,435 Z"
+            fill="url(#bodySheen)" />
+          <path
+            d="M210,520 C260,640 400,730 500,742 C400,700 280,600 210,520 Z"
+            fill="#c4a080"
+            opacity="0.08" />
+        </g>
+
+        <!-- Interior cavity -->
+        <ellipse cx="500" cy="422" rx="352" ry="148" fill="url(#innerG)" />
+        <ellipse cx="500" cy="390" rx="300" ry="70" fill="#0c0806" opacity="0.28" />
+
+        <!-- Broth -->
+        <g clip-path="url(#innerClip)">
+          <ellipse cx="500" cy="440" rx="322" ry="124" fill="url(#brothG)" />
+          <ellipse cx="500" cy="440" rx="322" ry="124" fill="url(#brothEdge)" />
+        </g>
+
+        <!-- Oil sheen & chili -->
+        <g id="oil" clip-path="url(#brothClip)">
+          <ellipse cx="470" cy="430" rx="210" ry="48" fill="#f0b050" opacity="0.07" />
+          <path
+            d="M390,430
+               C430,400 520,400 560,430
+               C600,460 560,490 510,478
+               C460,466 430,470 410,450
+               C390,430 360,450 390,430 Z"
+            fill="url(#oilBlob)"
+            opacity="0.35" />
+          <ellipse cx="360" cy="455" rx="52" ry="18" fill="url(#chiliG)" opacity="0.55" />
+          <ellipse cx="410" cy="418" rx="34" ry="12" fill="url(#chiliG)" opacity="0.4" />
+          <ellipse cx="330" cy="430" rx="22" ry="8" fill="url(#chiliG)" opacity="0.5" />
+          <ellipse cx="580" cy="470" rx="40" ry="14" fill="url(#oilBlob)" opacity="0.25" />
+          <path
+            d="M340,448 C380,430 430,455 470,438 C510,422 550,450 590,436"
+            fill="none"
+            stroke="#f07828"
+            stroke-width="6"
+            stroke-linecap="round"
+            opacity="0.28" />
+          <path
+            d="M355,460 C400,448 445,470 500,452"
+            fill="none"
+            stroke="#6a1808"
+            stroke-width="3.5"
+            stroke-linecap="round"
+            opacity="0.35" />
+        </g>
+
+        <!-- Surface bubbles -->
+        <g id="bubbles" clip-path="url(#brothClip)" fill="#f8dcb0">
+          <circle cx="392" cy="452" r="2.4" />
+          <circle cx="448" cy="418" r="1.8" />
+          <circle cx="610" cy="458" r="2.2" />
+          <circle cx="540" cy="428" r="1.6" />
+          <circle cx="318" cy="442" r="2" />
+          <circle cx="670" cy="438" r="1.7" />
+        </g>
+
+        <!-- Noodles -->
+        <g id="noodles" clip-path="url(#brothClip)"></g>
+
+        <!-- Chili oil sitting on open broth -->
+        <g clip-path="url(#brothClip)" opacity="0.85">
+          <ellipse cx="348" cy="452" rx="58" ry="20" fill="url(#chiliG)" />
+          <ellipse cx="392" cy="422" rx="28" ry="10" fill="url(#chiliG)" opacity="0.7" />
+          <ellipse cx="318" cy="428" rx="18" ry="7" fill="#f07828" opacity="0.35" />
+          <ellipse cx="360" cy="448" rx="16" ry="6" fill="#fff0c8" opacity="0.18" />
+        </g>
+
+        <!-- Toppings -->
+        <g id="toppings">
+          <!-- Wood ear (kikurage), back-left -->
+          <path
+            d="M318,402
+               C292,382 278,402 296,424
+               C280,438 312,458 338,440
+               C360,456 378,422 358,400
+               C350,386 332,386 318,402 Z"
+            fill="url(#kikuG)" />
+          <path
+            d="M326,408 C312,400 308,416 322,422 C334,428 346,412 336,404 Z"
+            fill="#8a6a58"
+            opacity="0.4" />
+          <path
+            d="M334,396 C348,404 356,418 346,428"
+            fill="none"
+            stroke="#e8c8b0"
+            stroke-width="1.4"
+            opacity="0.22" />
+
+          <!-- Menma, left-front -->
+          <g>
+            <path d="M300,478 C330,462 370,470 398,458 C392,474 350,486 318,492 C304,488 294,484 300,478 Z" fill="url(#menmaG)" />
+            <path d="M312,468 C342,456 378,464 404,452 C400,464 360,476 328,480 Z" fill="url(#menmaG)" opacity="0.95" />
+            <path d="M322,458 C348,448 380,456 408,446" fill="none" stroke="#a07838" stroke-width="0.8" opacity="0.5" />
+            <path d="M308,484 C340,472 376,482 402,470" fill="none" stroke="#efe0b8" stroke-width="1.1" opacity="0.35" />
+          </g>
+
+          <!-- Enoki bundle, front-left -->
+          <g stroke-linecap="round" fill="none">
+            <path d="M356,512 C360,490 352,470 364,452" stroke="#f2e8c8" stroke-width="1.6" />
+            <path d="M362,514 C368,492 366,468 378,448" stroke="#efe0b0" stroke-width="1.8" />
+            <path d="M368,516 C376,494 372,472 386,454" stroke="#e8d49c" stroke-width="1.5" />
+            <path d="M374,515 C380,496 384,474 394,458" stroke="#f4e8c4" stroke-width="1.7" />
+            <path d="M350,510 C348,488 340,470 348,454" stroke="#e6d8b0" stroke-width="1.4" />
+            <path d="M380,516 C390,498 392,478 404,464" stroke="#f0e0b8" stroke-width="1.5" />
+            <circle cx="364" cy="450" r="2.1" fill="#f8f0d8" stroke="none" />
+            <circle cx="378" cy="446" r="2.3" fill="#f4e8c4" stroke="none" />
+            <circle cx="386" cy="452" r="1.8" fill="#efe0b0" stroke="none" />
+            <circle cx="394" cy="456" r="2" fill="#f6ecd0" stroke="none" />
+            <circle cx="348" cy="452" r="1.7" fill="#eee4c4" stroke="none" />
+            <circle cx="404" cy="462" r="1.9" fill="#f2e6bc" stroke="none" />
+          </g>
+
+          <!-- Bean sprouts, front -->
+          <g fill="none" stroke="#f0ead0" stroke-width="1.35" stroke-linecap="round" opacity="0.9">
+            <path d="M430,522 C442,508 438,492 452,484" />
+            <path d="M440,524 C456,510 450,496 466,488" />
+            <path d="M422,518 C428,504 420,492 434,482" />
+            <path d="M454,526 C470,514 478,500 486,494" />
+          </g>
+          <g fill="#f6f0d8">
+            <circle cx="452" cy="484" r="2.2" />
+            <circle cx="466" cy="488" r="2" />
+            <circle cx="434" cy="482" r="1.8" />
+            <circle cx="486" cy="494" r="2.1" />
+          </g>
+
+          <!-- Nori sheet, thin and leaning -->
+          <g>
+            <path
+              d="M268,448
+                 C276,382 290,322 306,272
+                 C322,264 354,268 372,282
+                 C362,348 348,408 336,462
+                 C312,470 280,462 268,448 Z"
+              fill="url(#noriG)" />
+            <path
+              d="M372,282 C362,348 348,408 336,462"
+              fill="none"
+              stroke="#2a4a32"
+              stroke-width="3.2"
+              stroke-linecap="round" />
+            <path
+              d="M318,270
+                 C328,338 340,400 348,454
+                 L356,452
+                 C348,398 336,336 326,268 Z"
+              fill="url(#noriSheen)" />
+            <path
+              d="M348,268 L372,282 L352,300 C346,286 348,274 348,268 Z"
+              fill="#24382a" />
+            <path
+              d="M348,268 L360,276 L352,298"
+              fill="none"
+              stroke="#8aaa80"
+              stroke-width="0.8"
+              opacity="0.35" />
+            <g stroke="#c8e0b8" stroke-opacity="0.12" stroke-width="1" fill="none">
+              <path d="M280,310 L360,300" />
+              <path d="M276,350 L354,342" />
+              <path d="M274,390 L348,384" />
+              <path d="M272,424 L342,420" />
+            </g>
+            <ellipse cx="308" cy="456" rx="36" ry="9" fill="#3a180c" opacity="0.4" />
+          </g>
+
+          <!-- Bok choy, back-right -->
+          <g>
+            <path
+              d="M556,428
+                 C560,448 586,458 612,446
+                 C604,468 574,478 548,462
+                 C540,448 548,432 556,428 Z"
+              fill="url(#stemG)" />
+            <path
+              d="M572,424
+                 C578,368 606,326 636,288
+                 C652,332 640,386 610,428
+                 C594,420 578,424 572,424 Z"
+              fill="url(#leafG)" />
+            <path
+              d="M598,430
+                 C618,378 652,342 686,312
+                 C688,360 666,408 632,440
+                 C616,430 602,432 598,430 Z"
+              fill="url(#leafG2)" />
+            <path
+              d="M618,436
+                 C638,396 672,372 704,350
+                 C698,396 670,432 638,454
+                 C626,444 618,442 618,436 Z"
+              fill="url(#leafG)" />
+            <path d="M608,304 C598,356 590,400 584,428" fill="none" stroke="#2a4a1c" stroke-width="1.2" opacity="0.32" />
+            <path d="M646,324 C632,372 624,412 618,438" fill="none" stroke="#1e3a14" stroke-width="1.1" opacity="0.28" />
+            <path d="M624,296 C642,304 656,296 670,304" fill="none" stroke="#e8f8b0" stroke-width="1.6" opacity="0.4" />
+            <ellipse cx="590" cy="434" rx="10" ry="5" fill="#f4f8e4" opacity="0.35" />
+          </g>
+
+          <!-- Shiitake cluster, right -->
+          <g>
+            <ellipse cx="690" cy="430" rx="10" ry="7" fill="#e6d4b0" />
+            <ellipse cx="686" cy="418" rx="48" ry="22" fill="#5a3824" transform="rotate(-16 686 418)" />
+            <ellipse cx="686" cy="414" rx="44" ry="19" fill="url(#mushG)" transform="rotate(-16 686 414)" />
+            <ellipse cx="686" cy="416" rx="44" ry="19" fill="none" stroke="#c49a72" stroke-width="2" opacity="0.45" transform="rotate(-16 686 416)" />
+            <path d="M668,408 C676,418 690,418 702,408" fill="none" stroke="#3a2418" stroke-width="1.3" opacity="0.45" transform="rotate(-16 686 414)" />
+            <ellipse cx="672" cy="402" rx="12" ry="6" fill="#f2ddc0" opacity="0.28" transform="rotate(-16 672 402)" />
+
+            <ellipse cx="728" cy="456" rx="8" ry="6" fill="#e8d6b2" />
+            <ellipse cx="726" cy="446" rx="36" ry="17" fill="#624028" transform="rotate(12 726 446)" />
+            <ellipse cx="726" cy="442" rx="33" ry="15" fill="url(#mushG2)" transform="rotate(12 726 442)" />
+            <ellipse cx="726" cy="444" rx="33" ry="15" fill="none" stroke="#d0a880" stroke-width="1.7" opacity="0.4" transform="rotate(12 726 444)" />
+            <ellipse cx="716" cy="434" rx="9" ry="4.5" fill="#f2ddc0" opacity="0.24" transform="rotate(12 716 434)" />
+
+            <ellipse cx="648" cy="448" rx="7" ry="5" fill="#ead8b4" />
+            <ellipse cx="646" cy="438" rx="32" ry="15" fill="#5a3824" transform="rotate(-8 646 438)" />
+            <ellipse cx="646" cy="434" rx="29" ry="13" fill="url(#mushG)" transform="rotate(-8 646 434)" />
+            <ellipse cx="646" cy="436" rx="29" ry="13" fill="none" stroke="#c49a72" stroke-width="1.6" opacity="0.4" transform="rotate(-8 646 436)" />
+            <ellipse cx="636" cy="426" rx="8" ry="3.8" fill="#f2ddc0" opacity="0.26" />
+          </g>
+
+          <!-- Tofu cubes, front-right -->
+          <g>
+            <!-- cube A -->
+            <polygon points="602,486 648,468 694,486 648,504" fill="url(#tofuTop)" />
+            <polygon points="602,486 648,504 648,542 602,524" fill="url(#tofuL)" />
+            <polygon points="648,504 694,486 694,524 648,542" fill="url(#tofuR)" />
+            <polyline points="618,478 632,492" fill="none" stroke="#8a6028" stroke-width="1.3" opacity="0.45" />
+            <polyline points="658,476 670,488" fill="none" stroke="#8a6028" stroke-width="1.1" opacity="0.35" />
+            <polygon points="610,492 630,500 618,508" fill="#f8ecd0" opacity="0.25" />
+
+            <!-- cube B, slightly back -->
+            <polygon points="568,458 606,444 644,458 606,472" fill="url(#tofuTop)" />
+            <polygon points="568,458 606,472 606,502 568,488" fill="url(#tofuL)" />
+            <polygon points="606,472 644,458 644,488 606,502" fill="url(#tofuR)" />
+            <polyline points="580,452 592,462" fill="none" stroke="#8a6028" stroke-width="1.1" opacity="0.4" />
+
+            <!-- cube C, small -->
+            <polygon points="640,456 670,444 700,456 670,468" fill="url(#tofuTop)" />
+            <polygon points="640,456 670,468 670,492 640,480" fill="url(#tofuL)" />
+            <polygon points="670,468 700,456 700,480 670,492" fill="url(#tofuR)" />
+          </g>
+
+          <!-- Corn cluster -->
+          <g>
+            <ellipse cx="548" cy="508" rx="36" ry="18" fill="#c48a18" opacity="0.35" />
+            <g id="corn"></g>
+          </g>
+        </g>
+
+        <!-- Scallions, sesame, chili threads -->
+        <g id="garnish-float" clip-path="url(#brothClip)"></g>
+
+        <!-- Specular on broth (mouse-driven) -->
+        <ellipse id="spec" cx="456" cy="412" rx="108" ry="34" fill="url(#specG)" />
+
+        <!-- Rim lip -->
+        <ellipse cx="500" cy="420" rx="364" ry="154" fill="none" stroke="url(#rimG)" stroke-width="18" />
+        <ellipse cx="500" cy="416" rx="354" ry="148" fill="none" stroke="url(#lipG)" stroke-width="5" />
+        <!-- Inner contact line -->
+        <ellipse cx="500" cy="424" rx="346" ry="144" fill="none" stroke="#1a0c08" stroke-width="2.2" opacity="0.55" />
+
+        <!-- Ceramic rim highlight -->
+        <ellipse id="ceramic-spec" cx="390" cy="330" rx="70" ry="18" fill="#fff" opacity="0.14" filter="url(#blur8)" />
+
+        <!-- Front rim thickness hint -->
+        <path
+          d="M140,448 C250,575 750,575 860,448"
+          fill="none"
+          stroke="#000"
+          stroke-width="6"
+          opacity="0.18" />
+
+        <!-- Animated steam wisps -->
+        <g class="steam-live" filter="url(#blurSteam)" transform-origin="500px 400px">
+          <path class="w1" d="M430,400 C418,330 452,280 438,200" stroke-width="16" opacity="0.42" />
+          <path class="w2" d="M498,388 C522,310 468,255 490,165" stroke-width="20" opacity="0.38" />
+          <path class="w3" d="M562,402 C580,328 538,272 556,198" stroke-width="14" opacity="0.36" />
+          <path class="w4" d="M468,370 C452,300 492,255 476,190" stroke-width="11" opacity="0.32" />
+          <path class="w5" d="M530,396 C548,320 510,270 528,188" stroke-width="13" opacity="0.34" />
+          <path class="w6" d="M404,410 C388,340 424,290 410,214" stroke-width="12" opacity="0.3" />
+          <path class="w7" d="M590,408 C610,338 568,286 586,210" stroke-width="13" opacity="0.28" />
+          <path class="w8" d="M452,392 C470,318 430,268 448,196" stroke-width="10" opacity="0.26" />
+        </g>
+
+        <!-- Static steam for reduced motion -->
+        <g class="static-steam" fill="none" stroke="#f8efe4" stroke-linecap="round" filter="url(#blurSteam)">
+          <path d="M430,390 C418,320 455,270 442,200" stroke-width="18" opacity="0.28" />
+          <path d="M500,380 C520,300 470,250 492,170" stroke-width="22" opacity="0.24" />
+          <path d="M560,395 C575,325 540,270 558,205" stroke-width="16" opacity="0.26" />
+          <path d="M470,360 C455,300 490,260 478,210" stroke-width="12" opacity="0.2" />
+          <path d="M410,400 C396,330 430,280 416,220" stroke-width="14" opacity="0.18" />
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <canvas id="fx"></canvas>
+  <div class="vignette"></div>
+  <svg class="grain" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <filter id="pageGrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#pageGrain)" />
+  </svg>
+  <script>
+    (function () {
+      const svgNS = "http://www.w3.org/2000/svg";
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let reduced = reduce.matches;
+      reduce.addEventListener("change", () => {
+        reduced = reduce.matches;
+        if (!reduced) startLoop();
+      });
+
+      const root = document.documentElement;
+      const stage = document.querySelector(".stage");
+      const spec = document.getElementById("spec");
+      const ceramicSpec = document.getElementById("ceramic-spec");
+      const canvas = document.getElementById("fx");
+      const ctx = canvas.getContext("2d");
+
+      function mulberry32(a) {
+        return function () {
+          let t = (a += 0x6d2b79f5);
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function catmull(pts) {
+        if (pts.length < 2) return "";
+        let d = "M " + pts[0][0] + " " + pts[0][1];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p0 = pts[i - 1] || pts[i];
+          const p1 = pts[i];
+          const p2 = pts[i + 1];
+          const p3 = pts[i + 2] || p2;
+          const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+          const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+          const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+          const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+          d += " C " + c1x + " " + c1y + " " + c2x + " " + c2y + " " + p2[0] + " " + p2[1];
+        }
+        return d;
+      }
+
+      function addPath(parent, d, attrs) {
+        const p = document.createElementNS(svgNS, "path");
+        p.setAttribute("d", d);
+        for (const k in attrs) p.setAttribute(k, attrs[k]);
+        parent.appendChild(p);
+        return p;
+      }
+
+      function addEl(parent, name, attrs) {
+        const el = document.createElementNS(svgNS, name);
+        for (const k in attrs) el.setAttribute(k, attrs[k]);
+        parent.appendChild(el);
+        return el;
+      }
+
+      function inBroth(x, y, pad) {
+        const rx = 322 - (pad || 0);
+        const ry = 124 - (pad || 0);
+        const dx = (x - 500) / rx;
+        const dy = (y - 440) / ry;
+        return dx * dx + dy * dy < 1;
+      }
+
+      /* ---- Noodles ---- */
+      (function buildNoodles() {
+        const g = document.getElementById("noodles");
+        const rng = mulberry32(20260927);
+        const cx = 488, cy = 444, rx = 200, ry = 82;
+        const layers = [
+          [10.5, "#6e4218", 0.95],
+          [6.4, "#c48a38", 1],
+          [2.6, "#f3d27a", 0.88]
+        ];
+
+        const strands = [];
+
+        for (let n = 0; n < 28; n++) {
+          const pts = [];
+          let a = rng() * Math.PI * 2;
+          let rad = 0.18 + rng() * 0.55;
+          const len = 6 + Math.floor(rng() * 6);
+          for (let i = 0; i < len; i++) {
+            a += (rng() - 0.4) * 0.95;
+            rad += (rng() - 0.5) * 0.2;
+            rad = Math.max(0.1, Math.min(0.96, rad));
+            pts.push([cx + Math.cos(a) * rx * rad, cy + Math.sin(a) * ry * rad]);
+          }
+          strands.push(catmull(pts));
+        }
+
+        const draped = [
+          "M 360 430 C 400 458 445 418 490 446 C 535 474 580 428 640 452",
+          "M 340 448 C 390 420 450 470 510 438 C 560 412 610 460 670 442",
+          "M 380 410 C 430 438 480 400 530 428 C 570 448 610 418 650 430",
+          "M 355 462 C 410 448 460 488 520 466 C 575 446 620 480 668 462",
+          "M 400 400 C 440 428 500 392 548 422 C 590 446 630 410 675 424",
+          "M 372 440 C 420 470 475 430 528 458 C 572 480 618 444 655 460",
+          "M 410 470 C 455 448 500 492 555 470 C 600 452 638 478 690 458",
+          "M 390 418 C 445 400 490 450 545 418 C 590 392 640 430 685 414"
+        ];
+        draped.forEach((d) => strands.push(d));
+
+        strands.forEach((d, i) => {
+          layers.forEach(([w, color, op], li) => {
+            addPath(g, d, {
+              fill: "none",
+              stroke: color,
+              "stroke-width": String(w * (i % 5 === 0 ? 1.12 : 1)),
+              "stroke-linecap": "round",
+              "stroke-linejoin": "round",
+              opacity: String(op)
+            });
+          });
+        });
+      })();
+
+      /* ---- Corn kernels ---- */
+      (function buildCorn() {
+        const g = document.getElementById("corn");
+        const rng = mulberry32(77);
+        const cells = [
+          [536, 500], [548, 496], [560, 500], [572, 498],
+          [542, 508], [554, 506], [566, 510], [578, 506],
+          [530, 508], [548, 516], [560, 518], [572, 514],
+          [538, 518], [584, 500], [526, 498]
+        ];
+        cells.forEach(([x, y]) => {
+          const rx = 5.2 + rng() * 1.6;
+          const ry = 4.2 + rng() * 1.2;
+          const rot = (rng() - 0.5) * 50;
+          addEl(g, "ellipse", {
+            cx: x, cy: y, rx: rx, ry: ry,
+            fill: "url(#cornG)",
+            transform: "rotate(" + rot.toFixed(1) + " " + x + " " + y + ")"
+          });
+        });
+      })();
+
+      /* ---- Garnish: scallions, sesame, chili threads ---- */
+      (function buildGarnish() {
+        const g = document.getElementById("garnish-float");
+        const rng = mulberry32(99);
+
+        for (let i = 0; i < 28; i++) {
+          let x, y, guard = 0;
+          do {
+            x = 500 + (rng() - 0.5) * 520;
+            y = 440 + (rng() - 0.5) * 200;
+            guard++;
+          } while (!inBroth(x, y, 28) && guard < 40);
+
+          const rx = 6 + rng() * 5;
+          const ry = 3.2 + rng() * 2.4;
+          const rot = rng() * 180;
+          const isWhite = rng() > 0.62;
+          if (isWhite) {
+            addEl(g, "ellipse", {
+              cx: x, cy: y, rx: rx * 0.7, ry: ry * 0.7,
+              fill: "#f4f0e0",
+              opacity: "0.92",
+              transform: "rotate(" + rot.toFixed(1) + " " + x + " " + y + ")"
+            });
+            addEl(g, "ellipse", {
+              cx: x, cy: y, rx: rx * 0.7, ry: ry * 0.7,
+              fill: "none",
+              stroke: "#7aaa4a",
+              "stroke-width": "1.4",
+              opacity: "0.85",
+              transform: "rotate(" + rot.toFixed(1) + " " + x + " " + y + ")"
+            });
+          } else {
+            addEl(g, "ellipse", {
+              cx: x, cy: y, rx: rx, ry: ry,
+              fill: "none",
+              stroke: rng() > 0.5 ? "#6aaa3c" : "#4e8a2c",
+              "stroke-width": String(1.6 + rng()),
+              opacity: String(0.75 + rng() * 0.2),
+              transform: "rotate(" + rot.toFixed(1) + " " + x + " " + y + ")"
+            });
+          }
+        }
+
+        for (let i = 0; i < 90; i++) {
+          let x, y, guard = 0;
+          do {
+            x = 500 + (rng() - 0.5) * 560;
+            y = 440 + (rng() - 0.5) * 220;
+            guard++;
+          } while (!inBroth(x, y, 18) && guard < 40);
+          const white = rng() > 0.38;
+          const rx = white ? 1.7 + rng() * 0.7 : 1.4 + rng() * 0.6;
+          const ry = rx * (0.55 + rng() * 0.25);
+          addEl(g, "ellipse", {
+            cx: x.toFixed(1),
+            cy: y.toFixed(1),
+            rx: rx.toFixed(2),
+            ry: ry.toFixed(2),
+            fill: white ? "#f6f0de" : "#1a120c",
+            opacity: white ? "0.9" : "0.8",
+            transform: "rotate(" + (rng() * 180).toFixed(1) + " " + x + " " + y + ")"
+          });
+        }
+
+        for (let i = 0; i < 14; i++) {
+          let x, y, guard = 0;
+          do {
+            x = 500 + (rng() - 0.5) * 500;
+            y = 440 + (rng() - 0.5) * 180;
+            guard++;
+          } while (!inBroth(x, y, 36) && guard < 40);
+          const a = rng() * Math.PI * 2;
+          const len = 6 + rng() * 10;
+          addPath(g, "M " + x + " " + y + " l " + Math.cos(a) * len + " " + Math.sin(a) * len * 0.45, {
+            fill: "none",
+            stroke: rng() > 0.5 ? "#c42810" : "#8a1808",
+            "stroke-width": String(0.9 + rng() * 0.7),
+            "stroke-linecap": "round",
+            opacity: "0.8"
+          });
+        }
+      })();
+
+      /* ---- Pointer / lighting ---- */
+      let tx = 0.5, ty = 0.5, mx = 0.5, my = 0.5;
+      let pmx = 0.5, pmy = 0.5;
+      let windX = 0, windY = 0;
+      let mousePx = window.innerWidth * 0.5;
+      let mousePy = window.innerHeight * 0.48;
+
+      function onMove(clientX, clientY) {
+        tx = clientX / window.innerWidth;
+        ty = clientY / window.innerHeight;
+        mousePx = clientX;
+        mousePy = clientY;
+      }
+
+      window.addEventListener("pointermove", (e) => onMove(e.clientX, e.clientY), { passive: true });
+      window.addEventListener("touchmove", (e) => {
+        const t = e.touches[0];
+        if (t) onMove(t.clientX, t.clientY);
+      }, { passive: true });
+
+      /* ---- Steam particles ---- */
+      const particles = [];
+      const MAX = 200;
+
+      function bowlOrigin() {
+        const r = stage.getBoundingClientRect();
+        return {
+          x: r.left + r.width * 0.5,
+          y: r.top + r.height * 0.44,
+          rx: r.width * 0.28,
+          ry: r.height * 0.1
+        };
+      }
+
+      function spawn(kind) {
+        const b = bowlOrigin();
+        const t = Math.random() * Math.PI * 2;
+        const rad = Math.sqrt(Math.random());
+        const x = b.x + Math.cos(t) * b.rx * rad;
+        const y = b.y + Math.sin(t) * b.ry * rad;
+        if (kind === "dust") {
+          return {
+            kind: "dust",
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            vx: (Math.random() - 0.5) * 0.15,
+            vy: -0.05 - Math.random() * 0.08,
+            life: 0,
+            max: 400 + Math.random() * 400,
+            size: 0.6 + Math.random() * 1.4,
+            heat: 0.15 + Math.random() * 0.2
+          };
+        }
+        if (kind === "spark") {
+          return {
+            kind: "spark",
+            x, y,
+            vx: (Math.random() - 0.5) * 0.25,
+            vy: -0.55 - Math.random() * 0.5,
+            life: 0,
+            max: 50 + Math.random() * 40,
+            size: 1.2 + Math.random() * 2,
+            heat: 0.8
+          };
+        }
+        return {
+          kind: "steam",
+          x, y,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -0.55 - Math.random() * 0.7,
+          life: 0,
+          max: 130 + Math.random() * 110,
+          size: 18 + Math.random() * 26,
+          heat: 0.32 + Math.random() * 0.28,
+          wob: Math.random() * Math.PI * 2,
+          wobS: 0.02 + Math.random() * 0.03
+        };
+      }
+
+      for (let i = 0; i < 55; i++) {
+        const p = spawn("steam");
+        p.life = Math.random() * p.max * 0.85;
+        p.x += p.vx * p.life * 1.2;
+        p.y += p.vy * p.life * 1.2;
+        p.wob += p.wobS * p.life;
+        particles.push(p);
+      }
+      for (let i = 0; i < 16; i++) particles.push(spawn("dust"));
+      for (let i = 0; i < 8; i++) {
+        const p = spawn("spark");
+        p.life = Math.random() * p.max * 0.6;
+        p.y += p.vy * p.life;
+        particles.push(p);
+      }
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(window.innerWidth * dpr);
+        canvas.height = Math.floor(window.innerHeight * dpr);
+        canvas.style.width = window.innerWidth + "px";
+        canvas.style.height = window.innerHeight + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      let running = false;
+      let last = performance.now();
+      let burstT = 0;
+
+      function frame(now) {
+        if (reduced) {
+          running = false;
+          return;
+        }
+        const dt = Math.min(32, now - last) / 16.67;
+        last = now;
+
+        mx += (tx - mx) * 0.08;
+        my += (ty - my) * 0.08;
+        windX += ((tx - pmx) * 18 - windX) * 0.12;
+        windY += ((ty - pmy) * 18 - windY) * 0.12;
+        pmx = tx;
+        pmy = ty;
+
+        const tiltY = (mx - 0.5) * 14;
+        const tiltX = 6 + (0.5 - my) * 8;
+        root.style.setProperty("--tilt-x", tiltX.toFixed(3) + "deg");
+        root.style.setProperty("--tilt-y", tiltY.toFixed(3) + "deg");
+        root.style.setProperty("--lx", (mx * 100).toFixed(2) + "%");
+        root.style.setProperty("--ly", (my * 100).toFixed(2) + "%");
+
+        const b = bowlOrigin();
+        const dx = mousePx - b.x;
+        const dy = mousePy - b.y;
+        const near = Math.hypot(dx / (b.rx * 1.35), dy / (b.ry * 2.2));
+        const heat = near < 1 ? 1.18 : 1;
+        root.style.setProperty("--heat", heat.toFixed(3));
+
+        spec.setAttribute("cx", (456 + (mx - 0.5) * 90).toFixed(1));
+        spec.setAttribute("cy", (412 + (my - 0.5) * 36).toFixed(1));
+        ceramicSpec.setAttribute("cx", (390 + (mx - 0.5) * 70).toFixed(1));
+        ceramicSpec.setAttribute("cy", (330 + (my - 0.5) * 24).toFixed(1));
+
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        ctx.globalCompositeOperation = "source-over";
+        const pScale = Math.min(window.innerWidth, window.innerHeight) / 980;
+
+        burstT += dt;
+        if (burstT > 180) {
+          burstT = 0;
+          for (let i = 0; i < 10; i++) {
+            if (particles.length < MAX) particles.push(spawn("steam"));
+          }
+        }
+
+        if (Math.random() < 0.7 * dt && particles.length < MAX) particles.push(spawn("steam"));
+        if (Math.random() < 0.12 * dt && particles.length < MAX) particles.push(spawn("spark"));
+        if (Math.random() < 0.04 * dt && particles.length < MAX) particles.push(spawn("dust"));
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.life += dt;
+
+          const pdx = p.x - mousePx;
+          const pdy = p.y - mousePy;
+          const pd = Math.hypot(pdx, pdy) || 1;
+          if (pd < 220 && p.kind !== "dust") {
+            const f = (1 - pd / 220) * 0.45;
+            p.vx += windX * f * 0.35;
+            p.vy += windY * f * 0.35;
+            p.vx += (pdx / pd) * f * 0.08;
+          }
+
+          if (p.kind === "steam") {
+            p.wob += p.wobS * dt;
+            p.vx += Math.sin(p.wob) * 0.04;
+            p.vy -= 0.012 * dt;
+            p.vx *= 0.99;
+          }
+
+          p.x += p.vx * dt * 1.4;
+          p.y += p.vy * dt * 1.4;
+
+          const tLife = p.life / p.max;
+          if (tLife >= 1) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          const fade = tLife < 0.12 ? tLife / 0.12 : 1 - (tLife - 0.12) / 0.88;
+          const alpha = fade * p.heat;
+
+          if (p.kind === "steam") {
+            const s = p.size * pScale * (0.75 + tLife * 1.35);
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, s);
+            g.addColorStop(0, "rgba(255, 246, 236, " + (alpha * 0.2) + ")");
+            g.addColorStop(0.35, "rgba(255, 228, 206, " + (alpha * 0.08) + ")");
+            g.addColorStop(1, "rgba(255, 210, 180, 0)");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.ellipse(p.x, p.y, s * 0.72, s, 0, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (p.kind === "spark") {
+            ctx.fillStyle = "rgba(255, 196, 120, " + (alpha * 0.35) + ")";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * pScale * (1 - tLife * 0.5), 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.fillStyle = "rgba(255, 230, 200, " + (alpha * 0.22) + ")";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * pScale, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      function startLoop() {
+        if (running || reduced) return;
+        running = true;
+        last = performance.now();
+        requestAnimationFrame(frame);
+      }
+
+      if (!reduced) startLoop();
+      else {
+        root.style.setProperty("--tilt-x", "6deg");
+        root.style.setProperty("--tilt-y", "0deg");
+      }
+    })();
+  </script>
+</body>
+</html>

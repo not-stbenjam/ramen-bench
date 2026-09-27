@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "xai/grok-4.6/low",
+  "vendor": {
+    "slug": "xai",
+    "displayName": "xAI"
+  },
+  "model": {
+    "slug": "grok-4.6",
+    "displayName": "Grok 4.6",
+    "providerModelId": "grok-4.6-build"
+  },
+  "variation": {
+    "slug": "low",
+    "displayName": "Low",
+    "reasoningEffort": "low"
+  },
+  "harness": {
+    "name": "Grok Build",
+    "version": "1.0.41"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-27T18:22:19.918Z",
+    "completedAt": "2026-09-27T18:24:01.739Z",
+    "wallDurationMs": 101821
+  },
+  "usage": {
+    "tokens": {
+      "input": 129756,
+      "output": 7403,
+      "total": 137159,
+      "cachedInput": 100480,
+      "cacheCreationInput": 0,
+      "reasoning": 343
+    },
+    "cost": {
+      "currency": "USD",
+      "total": 0.0520914,
+      "estimated": false
+    },
+    "providerReported": true,
+    "requests": 5,
+    "turns": 1,
+    "toolCalls": 5
+  },
+  "notes": "Usage and cost are from Grok Build's persisted session ledger. Input tokens include cached input; reasoning tokens are a subset of output tokens. Timing spans the first turn start through the last turn end. Structured hidden reasoning is excluded.",
+  "resultStats": {
+    "bytes": 18445,
+    "lines": 445
+  }
+}

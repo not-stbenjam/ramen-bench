@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070504">
+<title>Vegan ramen</title>
+<style>
+  :root {
+    --void: #070504;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--void);
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  body {
+    min-height: 100%;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(ellipse 46% 34% at 50% 60%, rgba(214, 112, 42, 0.2), transparent 66%),
+      radial-gradient(ellipse 100% 78% at 50% 46%, #16110e 0%, #070504 68%);
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .glow {
+    position: fixed;
+    left: 50%;
+    top: 56%;
+    width: min(78vw, 880px);
+    height: min(52vw, 560px);
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center,
+      rgba(236, 150, 72, 0.28) 0%,
+      rgba(170, 72, 28, 0.12) 36%,
+      transparent 70%);
+    filter: blur(10px);
+    pointer-events: none;
+    z-index: 0;
+    animation: ember 7.5s ease-in-out infinite;
+  }
+
+  @keyframes ember {
+    0%, 100% { opacity: 0.72; }
+    40% { opacity: 1; }
+    68% { opacity: 0.82; }
+  }
+
+  .stage {
+    height: min(100vh, 980px, calc(100vw * 780 / 900));
+    height: min(100dvh, 980px, calc(100vw * 780 / 900));
+    aspect-ratio: 900 / 780;
+    width: auto;
+    max-width: 100vw;
+    position: relative;
+    z-index: 1;
+    perspective: 1500px;
+  }
+
+  .tilt {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  svg.bowl {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  canvas.steam {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  html.live canvas.steam { opacity: 1; }
+
+  .steam-static {
+    animation: waft 8s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @keyframes waft {
+    0%, 100% { transform: translate(0, 8px); }
+    50% { transform: translate(10px, -16px); }
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    background: radial-gradient(ellipse at 50% 52%, transparent 36%, rgba(0, 0, 0, 0.58) 100%);
+  }
+
+  svg.grain {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.11;
+    mix-blend-mode: overlay;
+  }
+
+  .oil {
+    transform-box: view-box;
+    transform-origin: 450px 505px;
+    animation: convection 38s linear infinite;
+  }
+
+  @keyframes convection {
+    to { transform: rotate(360deg); }
+  }
+
+  .bubble {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rise-bubble 4.2s ease-in infinite;
+  }
+
+  .bubble:nth-child(2) { animation-duration: 5.1s; animation-delay: -1.6s; }
+  .bubble:nth-child(3) { animation-duration: 3.7s; animation-delay: -2.4s; }
+  .bubble:nth-child(4) { animation-duration: 4.8s; animation-delay: -0.8s; }
+  .bubble:nth-child(5) { animation-duration: 5.6s; animation-delay: -3.1s; }
+  .bubble:nth-child(6) { animation-duration: 3.9s; animation-delay: -2s; }
+
+  @keyframes rise-bubble {
+    0% { transform: translateY(3px) scale(0.35); opacity: 0; }
+    28% { opacity: 0.7; }
+    100% { transform: translateY(-12px) scale(1.55); opacity: 0; }
+  }
+
+  .sheen {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sheen 6.5s ease-in-out infinite;
+  }
+
+  @keyframes sheen {
+    0%, 100% { opacity: 0.28; transform: translate(0, 0); }
+    50% { opacity: 0.5; transform: translate(10px, 4px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    .steam-static { opacity: 1 !important; }
+    canvas.steam { display: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="glow" id="glow" aria-hidden="true"></div>
+
+  <main class="stage" id="stage" aria-label="A steaming bowl of vegan ramen">
+    <div class="tilt" id="tilt">
+      <svg class="bowl" viewBox="0 50 900 780" role="presentation">
+        <defs>
+          <path id="bowlShape" d="M168,485 C160,545 240,620 345,655 C400,675 500,675 555,655 C660,620 740,545 732,485 C722,415 635,358 450,350 C265,358 178,415 168,485 Z"/>
+
+          <clipPath id="bowlClip"><use href="#bowlShape"/></clipPath>
+
+          <clipPath id="openingClip">
+            <ellipse cx="450" cy="470" rx="226" ry="94"/>
+          </clipPath>
+
+          <radialGradient id="noodleFade" cx="50%" cy="46%" r="52%">
+            <stop offset="62%" stop-color="#fff"/>
+            <stop offset="100%" stop-color="#000"/>
+          </radialGradient>
+          <mask id="noodleMask" maskUnits="userSpaceOnUse" x="220" y="420" width="460" height="180">
+            <ellipse cx="450" cy="505" rx="196" ry="58" fill="url(#noodleFade)"/>
+          </mask>
+
+          <linearGradient id="ceramic" x1="0" y1="0" x2="1" y2="0.55">
+            <stop offset="0%" stop-color="#b89280"/>
+            <stop offset="22%" stop-color="#7a5c4e"/>
+            <stop offset="52%" stop-color="#4e3a32"/>
+            <stop offset="100%" stop-color="#322420"/>
+          </linearGradient>
+          <linearGradient id="ceramicDepth" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+            <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#000" stop-opacity="0.42"/>
+          </linearGradient>
+          <linearGradient id="rimEdge" x1="0" y1="0" x2="0.2" y2="1">
+            <stop offset="0%" stop-color="#fff4ea" stop-opacity="0.95"/>
+            <stop offset="16%" stop-color="#f0d0b8" stop-opacity="0.45"/>
+            <stop offset="34%" stop-color="#f0d0b8" stop-opacity="0"/>
+            <stop offset="68%" stop-color="#e7c2a8" stop-opacity="0"/>
+            <stop offset="86%" stop-color="#f2d2bc" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#8a6858" stop-opacity="0.15"/>
+          </linearGradient>
+          <radialGradient id="wall" cx="36%" cy="30%" r="78%">
+            <stop offset="0%" stop-color="#6a5148"/>
+            <stop offset="42%" stop-color="#3a2a24"/>
+            <stop offset="74%" stop-color="#4a3026"/>
+            <stop offset="100%" stop-color="#d16830"/>
+          </radialGradient>
+
+          <radialGradient id="aura" cx="50%" cy="42%" r="52%">
+            <stop offset="0%" stop-color="#ff9a4a" stop-opacity="0.34"/>
+            <stop offset="48%" stop-color="#d06028" stop-opacity="0.1"/>
+            <stop offset="100%" stop-color="#d06028" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="surface" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#4a2c1c" stop-opacity="0.45"/>
+            <stop offset="62%" stop-color="#2a1610" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#2a1610" stop-opacity="0"/>
+          </radialGradient>
+
+          <radialGradient id="broth" cx="36%" cy="38%" r="72%">
+            <stop offset="0%" stop-color="#ffd09a"/>
+            <stop offset="22%" stop-color="#f4a04c"/>
+            <stop offset="52%" stop-color="#e07a30"/>
+            <stop offset="78%" stop-color="#c45a1c"/>
+            <stop offset="100%" stop-color="#7a2e10"/>
+          </radialGradient>
+          <radialGradient id="specGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff8ee" stop-opacity="0.95"/>
+            <stop offset="32%" stop-color="#ffd7a6" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#ffd7a6" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="bead" cx="32%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#fffaf2"/>
+            <stop offset="42%" stop-color="#ffc56e" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#e08830" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="cap" cx="38%" cy="34%" r="68%">
+            <stop offset="0%" stop-color="#8a5a46"/>
+            <stop offset="42%" stop-color="#5c382c"/>
+            <stop offset="82%" stop-color="#3a2018"/>
+            <stop offset="100%" stop-color="#24120e"/>
+          </radialGradient>
+          <linearGradient id="noriGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#35584e"/>
+            <stop offset="38%" stop-color="#1c3530"/>
+            <stop offset="100%" stop-color="#101e1c"/>
+          </linearGradient>
+          <linearGradient id="tofuTop" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fffaf3"/>
+            <stop offset="42%" stop-color="#f4e7d4"/>
+            <stop offset="100%" stop-color="#e6cba8"/>
+          </linearGradient>
+          <radialGradient id="kernel" cx="32%" cy="32%" r="72%">
+            <stop offset="0%" stop-color="#fff3b8"/>
+            <stop offset="46%" stop-color="#f2c43c"/>
+            <stop offset="100%" stop-color="#cf8e18"/>
+          </radialGradient>
+          <radialGradient id="chili" cx="40%" cy="40%" r="65%">
+            <stop offset="0%" stop-color="#ff7848"/>
+            <stop offset="45%" stop-color="#e03018"/>
+            <stop offset="100%" stop-color="#8a140c"/>
+          </radialGradient>
+
+          <filter id="auraBlur" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="22"/>
+          </filter>
+          <filter id="shadowBlur" x="-70%" y="-90%" width="240%" height="280%">
+            <feGaussianBlur stdDeviation="16"/>
+          </filter>
+          <filter id="soft10" x="-70%" y="-70%" width="240%" height="240%">
+            <feGaussianBlur stdDeviation="10"/>
+          </filter>
+          <filter id="soft18" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="18"/>
+          </filter>
+          <filter id="steamBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="18"/>
+          </filter>
+          <filter id="oilBlur" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="7"/>
+          </filter>
+          <filter id="seat" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="0" dy="2.4" stdDeviation="2" flood-color="#2a1008" flood-opacity="0.55"/>
+          </filter>
+        </defs>
+
+        <ellipse cx="450" cy="760" rx="320" ry="34" fill="url(#surface)"/>
+        <ellipse cx="450" cy="530" rx="270" ry="160" fill="url(#aura)" filter="url(#auraBlur)"/>
+        <ellipse cx="468" cy="735" rx="200" ry="22" fill="#000" opacity="0.58" filter="url(#shadowBlur)"/>
+        <ellipse cx="430" cy="712" rx="130" ry="14" fill="#e08038" opacity="0.16" filter="url(#shadowBlur)"/>
+
+        <use href="#bowlShape" fill="url(#ceramic)"/>
+        <use href="#bowlShape" fill="url(#ceramicDepth)"/>
+        <g clip-path="url(#bowlClip)">
+          <ellipse cx="330" cy="430" rx="120" ry="46" fill="#fff1e4" opacity="0.13" filter="url(#soft18)"/>
+          <ellipse cx="390" cy="640" rx="150" ry="40" fill="#e07830" opacity="0.2" filter="url(#soft18)"/>
+        </g>
+        <use href="#bowlShape" fill="none" stroke="#140c0a" stroke-width="5"/>
+        <use href="#bowlShape" fill="none" stroke="rgba(255,220,196,0.28)" stroke-width="1.6"/>
+
+        <ellipse cx="450" cy="470" rx="230" ry="98" fill="url(#wall)"/>
+        <g clip-path="url(#openingClip)">
+          <ellipse cx="340" cy="430" rx="90" ry="28" fill="#7a5c50" opacity="0.4" filter="url(#soft10)"/>
+          <ellipse cx="450" cy="448" rx="170" ry="18" fill="#e87830" opacity="0.5" filter="url(#soft10)"/>
+          <ellipse cx="590" cy="445" rx="40" ry="26" fill="#140c0a" opacity="0.25" filter="url(#soft10)"/>
+
+          <g fill="#e09040">
+            <ellipse cx="378" cy="418" rx="3.2" ry="5.6" opacity="0.8"/>
+            <ellipse cx="404" cy="408" rx="2.1" ry="4" opacity="0.65"/>
+            <ellipse cx="500" cy="404" rx="2.4" ry="4.6" opacity="0.7"/>
+            <ellipse cx="536" cy="416" rx="2.8" ry="5" opacity="0.6"/>
+          </g>
+          <g fill="#fff" opacity="0.35">
+            <ellipse cx="376" cy="416" rx="1.1" ry="1.8"/>
+            <ellipse cx="498" cy="402" rx="0.9" ry="1.5"/>
+          </g>
+
+          <ellipse cx="450" cy="505" rx="198" ry="58" fill="url(#broth)"/>
+          <ellipse cx="450" cy="505" rx="190" ry="52" fill="none" stroke="#5a240e" stroke-width="6" opacity="0.28"/>
+          <ellipse cx="450" cy="512" rx="188" ry="50" fill="none" stroke="#4a160c" stroke-width="16" opacity="0.28" stroke-dasharray="90 420" stroke-dashoffset="-40"/>
+
+          <g class="oil" filter="url(#oilBlur)">
+            <ellipse cx="380" cy="488" rx="78" ry="18" fill="#ffb15e" opacity="0.28"/>
+            <ellipse cx="520" cy="522" rx="64" ry="14" fill="#ffe0b0" opacity="0.18"/>
+            <ellipse cx="455" cy="478" rx="40" ry="12" fill="#a61e10" opacity="0.16"/>
+            <ellipse cx="410" cy="530" rx="84" ry="12" fill="#ffd8a4" opacity="0.14"/>
+          </g>
+
+          <g id="noodles" mask="url(#noodleMask)"></g>
+
+          <g id="crests" fill="none" stroke-linecap="round" transform="translate(0 -16)">
+            <path d="M392,492 C410,468 446,470 458,496" stroke="#c4925a" stroke-width="11"/>
+            <path d="M394,490 C412,470 444,472 454,494" stroke="#f4e0c2" stroke-width="8"/>
+            <path d="M396,488 C412,472 440,474 450,492" stroke="#fff8ee" stroke-width="2.2" opacity="0.7"/>
+            <path d="M468,500 C490,478 528,486 534,512" stroke="#b8884e" stroke-width="10"/>
+            <path d="M470,498 C490,480 524,488 530,510" stroke="#efd4ae" stroke-width="7"/>
+            <path d="M472,496 C488,482 520,488 526,506" stroke="#fff6ea" stroke-width="2" opacity="0.65"/>
+            <path d="M424,530 C400,510 388,528 406,546" stroke="#e4c89a" stroke-width="8"/>
+            <path d="M426,528 C404,512 392,526 408,542" stroke="#fff3e2" stroke-width="2" opacity="0.55"/>
+          </g>
+
+          <g id="toppings" filter="url(#seat)" transform="translate(0 -34)">
+            <g transform="translate(352 478)" fill="#214e30">
+              <ellipse cx="-6" cy="8" rx="26" ry="11" transform="rotate(-18 -6 8)"/>
+              <ellipse cx="14" cy="0" rx="20" ry="9" transform="rotate(16 14 0)"/>
+              <ellipse cx="2" cy="14" rx="16" ry="7" transform="rotate(-6 2 14)"/>
+            </g>
+
+            <g transform="translate(308 452) rotate(-26) scale(1.28)">
+              <path d="M-6,16 C-9,2 -3,-12 0,-20 C3,-12 9,2 6,16 C3,21 -3,21 -6,16Z" fill="#e9f3d6"/>
+              <path d="M0,-16 V14" stroke="#c9dcb0" stroke-width="1.1" fill="none"/>
+              <path d="M1,-8 C24,-30 46,-8 30,14 C16,8 6,-2 1,-8Z" fill="#3eaf52"/>
+              <path d="M0,-6 C-22,-32 -46,-8 -28,14 C-14,6 -4,-2 0,-6Z" fill="#2c7e3e"/>
+              <path d="M3,-2 C18,-18 34,-12 26,4 C14,-2 6,-6 3,-2Z" fill="#8ed46a"/>
+              <path d="M1,-8 C14,-2 24,4 28,12" fill="none" stroke="#e4f8c8" stroke-width="0.8" opacity="0.7"/>
+              <path d="M0,-6 C-12,-2 -22,2 -26,10" fill="none" stroke="#d4f0b4" stroke-width="0.7" opacity="0.55"/>
+            </g>
+
+            <g transform="translate(292 528) rotate(-14)">
+              <path d="M-46,-8 C-20,-30 34,-26 48,-2 C54,18 28,34 -6,30 C-40,26 -54,8 -46,-8Z" fill="url(#noriGrad)"/>
+              <path d="M-34,8 C-8,-6 22,-2 40,12 C18,4 -10,2 -34,8Z" fill="#0e1c1a" opacity="0.35"/>
+              <g fill="none" stroke="#0c1a18" stroke-width="1.15" opacity="0.45">
+                <path d="M-28,-6 C-18,8 -16,18 -20,26"/>
+                <path d="M-6,-14 C2,2 4,16 0,28"/>
+                <path d="M16,-12 C22,2 24,14 20,26"/>
+                <path d="M34,-4 C36,6 34,16 32,22"/>
+              </g>
+              <path d="M-24,-8 C2,-2 24,6 36,16" fill="none" stroke="#8aada2" stroke-width="2.6" stroke-linecap="round" opacity="0.35"/>
+            </g>
+
+            <g transform="translate(575 508) rotate(-16)">
+              <path d="M-40,2 C-42,-16 -18,-26 4,-24 C28,-28 46,-10 40,6 C32,20 10,24 -12,20 C-30,18 -38,12 -40,2Z" fill="url(#cap)"/>
+              <path d="M-28,6 C-8,18 22,16 36,4 C16,12 -6,12 -28,6Z" fill="#f3e0cc"/>
+              <g stroke="#d8b89a" stroke-width="0.75" fill="none">
+                <path d="M-4,8 L-22,6"/>
+                <path d="M-2,10 L-14,14"/>
+                <path d="M2,10 L2,16"/>
+                <path d="M6,9 L20,14"/>
+                <path d="M8,7 L28,6"/>
+                <path d="M-10,8 L-26,10"/>
+              </g>
+              <path d="M-24,4 C-6,12 16,12 30,4" fill="none" stroke="#4a2820" stroke-width="1.4" opacity="0.7"/>
+              <ellipse cx="-12" cy="-10" rx="14" ry="5.5" fill="#fff" opacity="0.18" transform="rotate(-24 -12 -10)"/>
+            </g>
+
+            <g transform="translate(528 492) rotate(28)">
+              <path d="M-18,1 C-20,-14 -4,-18 8,-12 C16,-18 28,-8 20,3 C24,12 10,16 -4,12 C-14,18 -22,8 -18,1Z" fill="#3a2224"/>
+              <path d="M-12,-2 C-2,-10 12,-8 16,0" fill="none" stroke="#7a4844" stroke-width="1.4" opacity="0.65" stroke-linecap="round"/>
+              <path d="M-8,4 C2,8 12,6 16,2" fill="none" stroke="#1a0c0e" stroke-width="1" opacity="0.4"/>
+            </g>
+
+            <g transform="translate(468 516)">
+              <g transform="translate(18 -14) rotate(-8)">
+                <path d="M-16,8 L18,10 L18,17 L-16,15Z" fill="#c9b296"/>
+                <rect x="-17" y="-10" width="34" height="19" rx="3.5" fill="url(#tofuTop)" transform="rotate(-3)"/>
+                <path d="M-8,-2 H11" stroke="#d09248" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
+              </g>
+              <g transform="translate(-10 10) rotate(7)">
+                <path d="M-19,9 L21,12 L21,20 L-19,17Z" fill="#b89a74"/>
+                <rect x="-20" y="-11" width="40" height="22" rx="4" fill="url(#tofuTop)"/>
+                <path d="M-11,-3 H13" stroke="#c88840" stroke-width="1.45" stroke-linecap="round" opacity="0.8"/>
+                <path d="M-6,4 H9" stroke="#a56a38" stroke-width="1.05" stroke-linecap="round" opacity="0.55"/>
+                <ellipse cx="-5" cy="-4" rx="1.7" ry="1.05" fill="#f8f0e2" transform="rotate(18 -5 -4)"/>
+                <ellipse cx="7" cy="2" rx="1.5" ry="0.95" fill="#2a221c" transform="rotate(-20 7 2)"/>
+                <ellipse cx="-12" cy="-8" rx="8" ry="3" fill="#fff" opacity="0.2" transform="rotate(-16 -12 -8)"/>
+              </g>
+            </g>
+
+            <g transform="translate(348 566) rotate(-16)">
+              <path d="M-8,-22 C12,-26 24,-6 16,14 C8,18 -14,10 -18,-4 C-20,-16 -16,-20 -8,-22Z" fill="#f6e6c2" stroke="#dcc492" stroke-width="0.6"/>
+              <path d="M8,-16 C24,-18 32,-2 24,14 C16,18 6,6 6,-6 C6,-12 6,-14 8,-16Z" fill="#fbf0d4" stroke="#e2cc9e" stroke-width="0.5"/>
+              <path d="M-20,-6 C-6,-16 8,-8 6,10 C2,14 -18,8 -24,0 C-26,-6 -24,-8 -20,-6Z" fill="#f0ddb0" stroke="#d8c090" stroke-width="0.5"/>
+              <g fill="none" stroke="#e6d2a4" stroke-width="0.8" opacity="0.9">
+                <path d="M-4,-16 C0,-4 -2,6 0,12"/>
+                <path d="M12,-10 C14,0 12,8 14,14"/>
+                <path d="M-14,-2 C-10,4 -12,8 -10,12"/>
+              </g>
+            </g>
+
+            <g transform="translate(412 562) rotate(18)">
+              <path d="M-30,-2 C-20,-18 22,-18 32,-2 C14,-8 -12,-8 -30,-2Z" fill="#4a2c22"/>
+              <path d="M-28,0 C-8,16 18,16 30,0 C14,8 -10,8 -28,0Z" fill="#f4e2ce"/>
+              <g stroke="#e4c6a6" stroke-width="0.85" fill="none">
+                <path d="M-6,2 L-24,0"/>
+                <path d="M-4,4 L-18,8"/>
+                <path d="M0,4 L-2,12"/>
+                <path d="M3,4 L16,9"/>
+                <path d="M6,2 L24,1"/>
+                <path d="M-8,2 L-26,5"/>
+                <path d="M8,3 L22,-1"/>
+              </g>
+              <path d="M-18,-6 C-4,-12 14,-10 24,-3" fill="none" stroke="#fff" stroke-width="1.1" opacity="0.28" stroke-linecap="round"/>
+            </g>
+
+            <g transform="translate(596 552)">
+              <ellipse cx="0" cy="0" rx="7.2" ry="4.3" fill="url(#kernel)" transform="rotate(-18 0 0)"/>
+              <ellipse cx="13" cy="3" rx="6.6" ry="4" fill="url(#kernel)" transform="rotate(16 13 3)"/>
+              <ellipse cx="-12" cy="4" rx="6.4" ry="3.8" fill="url(#kernel)" transform="rotate(-38 -12 4)"/>
+              <ellipse cx="6" cy="-9" rx="6.2" ry="3.7" fill="url(#kernel)" transform="rotate(8 6 -9)"/>
+              <ellipse cx="-3" cy="11" rx="6.5" ry="3.8" fill="url(#kernel)" transform="rotate(24 -3 11)"/>
+              <ellipse cx="18" cy="-6" rx="5.6" ry="3.4" fill="url(#kernel)" transform="rotate(-12 18 -6)"/>
+              <ellipse cx="-18" cy="-3" rx="5.8" ry="3.5" fill="url(#kernel)" transform="rotate(28 -18 -3)"/>
+              <ellipse cx="9" cy="12" rx="5.5" ry="3.3" fill="url(#kernel)" transform="rotate(-16 9 12)"/>
+              <ellipse cx="-7" cy="-11" rx="5.3" ry="3.2" fill="url(#kernel)" transform="rotate(14 -7 -11)"/>
+              <ellipse cx="22" cy="7" rx="5" ry="3.1" fill="url(#kernel)" transform="rotate(18 22 7)"/>
+              <g fill="#fff" opacity="0.55">
+                <ellipse cx="-2" cy="-2" rx="2.1" ry="1" transform="rotate(-18 -2 -2)"/>
+                <ellipse cx="4" cy="-11" rx="1.8" ry="0.8" transform="rotate(8 4 -11)"/>
+                <ellipse cx="12" cy="1" rx="1.7" ry="0.8" transform="rotate(16 12 1)"/>
+              </g>
+            </g>
+
+            <g transform="translate(524 578)">
+              <ellipse cx="0" cy="0" rx="40" ry="15" fill="url(#chili)" opacity="0.92"/>
+              <ellipse cx="-6" cy="-3" rx="18" ry="6" fill="#ff8a58" opacity="0.55"/>
+              <ellipse cx="14" cy="2" rx="6" ry="3" fill="#ffd0a8" opacity="0.35"/>
+              <ellipse cx="-22" cy="-8" rx="4.5" ry="2.4" fill="#d42818"/>
+              <ellipse cx="24" cy="-6" rx="3.2" ry="2" fill="#ff5a32"/>
+              <ellipse cx="8" cy="10" rx="2.6" ry="1.6" fill="#c42012"/>
+              <circle cx="-30" cy="4" r="1.5" fill="#ff7840"/>
+              <circle cx="30" cy="1" r="1.3" fill="#e03018"/>
+            </g>
+
+            <g transform="translate(562 528) rotate(22)">
+              <ellipse rx="11" ry="6.4" fill="none" stroke="#e43422" stroke-width="3.3"/>
+              <ellipse rx="4.6" ry="2.6" fill="#f3d7a6"/>
+            </g>
+
+            <path d="M478,534 C508,552 536,544 562,566" fill="none" stroke="#e22e16" stroke-width="5" stroke-linecap="round" opacity="0.82"/>
+            <path d="M482,532 C510,548 534,540 556,560" fill="none" stroke="#ff7844" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+
+            <g id="onions"></g>
+
+            <g id="seeds" fill="#f6edd4">
+              <ellipse cx="446" cy="486" rx="2.2" ry="1.25" transform="rotate(24 446 486)"/>
+              <ellipse cx="458" cy="498" rx="2" ry="1.15" transform="rotate(-18 458 498)"/>
+              <ellipse cx="432" cy="508" rx="1.8" ry="1.05" transform="rotate(40 432 508)"/>
+              <ellipse cx="504" cy="486" rx="2.1" ry="1.2" transform="rotate(12 504 486)"/>
+              <ellipse cx="390" cy="500" rx="1.7" ry="1" transform="rotate(-30 390 500)"/>
+              <ellipse cx="548" cy="540" rx="1.8" ry="1.05" transform="rotate(20 548 540)"/>
+              <ellipse cx="360" cy="530" rx="1.6" ry="0.95" transform="rotate(-10 360 530)"/>
+              <ellipse cx="490" cy="548" rx="2" ry="1.1" transform="rotate(36 490 548)"/>
+              <ellipse cx="418" cy="478" rx="1.5" ry="0.9" transform="rotate(8 418 478)"/>
+              <ellipse cx="536" cy="500" rx="1.7" ry="1" transform="rotate(-24 536 500)"/>
+            </g>
+            <g fill="#241c16">
+              <ellipse cx="474" cy="506" rx="1.9" ry="1.1" transform="rotate(-12 474 506)"/>
+              <ellipse cx="512" cy="522" rx="1.7" ry="1" transform="rotate(28 512 522)"/>
+              <ellipse cx="440" cy="524" rx="1.6" ry="0.95" transform="rotate(16 440 524)"/>
+              <ellipse cx="566" cy="518" rx="1.5" ry="0.9" transform="rotate(-20 566 518)"/>
+            </g>
+          </g>
+
+          <g class="beads">
+            <ellipse cx="390" cy="490" rx="5.5" ry="2.6" fill="url(#bead)"/>
+            <ellipse cx="560" cy="500" rx="4.2" ry="2.1" fill="url(#bead)"/>
+            <ellipse cx="430" cy="548" rx="3.6" ry="1.8" fill="url(#bead)"/>
+            <ellipse cx="500" cy="468" rx="4.8" ry="2.2" fill="url(#bead)"/>
+            <ellipse cx="610" cy="540" rx="3.2" ry="1.6" fill="url(#bead)"/>
+          </g>
+
+          <g class="bubbles" fill="none" stroke="rgba(255,236,214,0.6)" stroke-width="1.05">
+            <circle class="bubble" cx="408" cy="508" r="2.3"/>
+            <circle class="bubble" cx="462" cy="536" r="1.6"/>
+            <circle class="bubble" cx="528" cy="496" r="2.5"/>
+            <circle class="bubble" cx="372" cy="532" r="1.5"/>
+            <circle class="bubble" cx="494" cy="470" r="1.9"/>
+            <circle class="bubble" cx="580" cy="524" r="1.4"/>
+          </g>
+
+          <ellipse id="spec" class="sheen" cx="392" cy="488" rx="70" ry="18" fill="url(#specGrad)"/>
+        </g>
+
+        <g id="glints">
+          <ellipse cx="450" cy="470" rx="228" ry="96" fill="none" stroke="url(#rimEdge)" stroke-width="7"/>
+        </g>
+
+        <g class="steam-static" filter="url(#steamBlur)">
+          <ellipse cx="448" cy="290" rx="55" ry="120" fill="rgba(255,248,242,0.2)"/>
+          <ellipse cx="410" cy="220" rx="32" ry="72" fill="rgba(255,246,236,0.16)"/>
+          <ellipse cx="505" cy="240" rx="28" ry="86" fill="rgba(255,244,230,0.14)"/>
+          <ellipse cx="462" cy="145" rx="20" ry="46" fill="rgba(255,250,246,0.13)"/>
+          <path d="M425,430 C395,350 465,300 438,220 C418,160 455,115 442,62" fill="none" stroke="rgba(255,248,242,0.28)" stroke-width="34" stroke-linecap="round"/>
+          <path d="M495,415 C530,330 455,270 500,185 C525,130 485,95 500,58" fill="none" stroke="rgba(255,242,228,0.18)" stroke-width="22" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <canvas id="steam" class="steam" width="900" height="780"></canvas>
+    </div>
+  </main>
+
+  <div class="vignette" aria-hidden="true"></div>
+  <svg class="grain" aria-hidden="true">
+    <filter id="filmGrain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#filmGrain)"/>
+  </svg>
+
+  <script>
+    (function () {
+      const NS = "http://www.w3.org/2000/svg";
+      const tilt = document.getElementById("tilt");
+      const glow = document.getElementById("glow");
+      const spec = document.getElementById("spec");
+      const glints = document.getElementById("glints");
+      const noodles = document.getElementById("noodles");
+      const onions = document.getElementById("onions");
+      const canvas = document.getElementById("steam");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      const motionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+      let reduce = motionMQ.matches;
+
+      function el(name, attrs) {
+        const node = document.createElementNS(NS, name);
+        for (const key in attrs) node.setAttribute(key, attrs[key]);
+        return node;
+      }
+
+      function mulberry32(seed) {
+        let a = seed >>> 0;
+        return function () {
+          a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function buildNoodles() {
+        const rand = mulberry32(0x51a7e);
+        const cx = 450, cy = 505, rx = 178, ry = 48;
+        const tones = ["#f4e0c4", "#e8c99a", "#f8ead4", "#efc278", "#ead3ae", "#f0d4a8", "#f7e7d2"];
+
+        function inside(x, y, pad) {
+          const nx = (x - cx) / (rx * pad);
+          const ny = (y - cy) / (ry * pad);
+          return nx * nx + ny * ny <= 1;
+        }
+
+        function paint(pts, sw, color, extra) {
+          if (pts.length < 4) return;
+          let d = "M " + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+          for (let i = 1; i < pts.length - 1; i++) {
+            const mx = (pts[i][0] + pts[i + 1][0]) / 2;
+            const my = (pts[i][1] + pts[i + 1][1]) / 2;
+            d += " Q " + pts[i][0].toFixed(1) + " " + pts[i][1].toFixed(1) + " " + mx.toFixed(1) + " " + my.toFixed(1);
+          }
+          const attrs = {
+            d: d,
+            fill: "none",
+            stroke: color,
+            "stroke-width": sw.toFixed(2),
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          };
+          if (extra) {
+            for (const key in extra) attrs[key] = extra[key];
+          }
+          noodles.appendChild(el("path", attrs));
+        }
+
+        function commit(pts) {
+          const kept = pts.filter(function (p) { return inside(p[0], p[1], 1.02); });
+          if (kept.length < 4) return;
+          const sw = 8.4 + rand() * 2.6;
+          const tone = tones[(rand() * tones.length) | 0];
+          paint(kept, sw, "#a87440", { opacity: "0.38", transform: "translate(1 1.8)" });
+          paint(kept, sw, tone);
+          paint(kept, Math.max(1.4, sw * 0.18), "rgba(255,244,224,0.38)", { transform: "translate(-1.1 -1.5)" });
+        }
+
+        const waves = 9;
+        for (let i = 0; i < waves; i++) {
+          const pts = [];
+          const phase = rand() * Math.PI * 2;
+          const amp = 2.4 + rand() * 3.2;
+          const freq = 0.055 + rand() * 0.035;
+          let y = cy - 40 + (i + 0.35) * (80 / waves) + (rand() - 0.5) * 4;
+          const x0 = cx - rx + rand() * 36;
+          const x1 = cx + rx - rand() * 28;
+          for (let x = x0; x <= x1; x += 7.4) {
+            const py = y + Math.sin(x * freq + phase) * amp + Math.sin(x * 0.018 + i) * 1.6;
+            y += Math.sin(i + x * 0.01) * 0.18;
+            pts.push([x, py]);
+          }
+          commit(pts);
+        }
+
+        for (let n = 0; n < 4; n++) {
+          let x = cx + (rand() - 0.5) * rx * 0.9;
+          let y = cy + (rand() - 0.5) * ry * 0.75;
+          let ang = rand() * Math.PI * 2;
+          const pts = [];
+          const steps = 12 + ((rand() * 8) | 0);
+          for (let i = 0; i < steps; i++) {
+            if (!inside(x, y, 0.94)) ang = Math.atan2(cy - y, cx - x) + (rand() - 0.5) * 0.9;
+            pts.push([x, y]);
+            ang += (rand() - 0.5) * 1.15;
+            const step = 11 + rand() * 9;
+            x += Math.cos(ang) * step;
+            y += Math.sin(ang) * step * 0.5;
+          }
+          commit(pts);
+        }
+      }
+
+      function buildOnions() {
+        const pieces = [
+          [430, 524, -28, 1.02, 1],
+          [462, 516, 14, 0.9, 0],
+          [494, 528, -16, 1.0, 1],
+          [520, 512, 30, 0.72, 0],
+          [446, 546, 8, 0.84, 1],
+          [478, 552, -36, 0.92, 0],
+          [512, 548, 12, 0.66, 1],
+          [408, 538, -14, 0.62, 0],
+          [454, 568, 24, 0.56, 0],
+          [498, 566, -10, 0.54, 1],
+          [536, 536, 38, 0.48, 0],
+          [422, 558, 16, 0.52, 0],
+          [548, 552, -22, 0.44, 0],
+          [470, 500, -6, 0.5, 1]
+        ];
+        for (let i = 0; i < pieces.length; i++) {
+          const x = pieces[i][0], y = pieces[i][1], rot = pieces[i][2], s = pieces[i][3], cut = pieces[i][4];
+          const g = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + rot + ") scale(" + s + ")" });
+          if (cut) {
+            g.appendChild(el("ellipse", { cx: 0, cy: 0, rx: 13.5, ry: 4.8, fill: "#62c256", transform: "rotate(-34)" }));
+            g.appendChild(el("ellipse", { cx: 0, cy: -0.7, rx: 13.2, ry: 2.35, fill: "#dff8bc", transform: "rotate(-34)" }));
+            g.appendChild(el("ellipse", { cx: -2.2, cy: -1.3, rx: 3.6, ry: 0.9, fill: "#fff", opacity: "0.4", transform: "rotate(-34)" }));
+          } else {
+            g.appendChild(el("ellipse", { cx: 0, cy: 0, rx: 8.6, ry: 4.9, fill: "#3ea24c", stroke: "#2c7a38", "stroke-width": "0.6" }));
+            g.appendChild(el("ellipse", { cx: 0, cy: 0, rx: 3.5, ry: 2.0, fill: "#e9fad4" }));
+            g.appendChild(el("ellipse", { cx: -1.1, cy: -0.8, rx: 1.5, ry: 0.7, fill: "#fff", opacity: "0.45" }));
+          }
+          onions.appendChild(g);
+        }
+      }
+
+      buildNoodles();
+      buildOnions();
+
+      const sprite = document.createElement("canvas");
+      sprite.width = sprite.height = 128;
+      const sctx = sprite.getContext("2d");
+      const blob = sctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      blob.addColorStop(0, "rgba(255,246,236,0.7)");
+      blob.addColorStop(0.38, "rgba(255,232,208,0.22)");
+      blob.addColorStop(1, "rgba(255,232,208,0)");
+      sctx.fillStyle = blob;
+      sctx.beginPath();
+      sctx.arc(64, 64, 64, 0, Math.PI * 2);
+      sctx.fill();
+
+      const SPAWN = { x: 450 / 900, y: (500 - 50) / 780, rx: 130 / 900, ry: 26 / 780 };
+      const particles = [];
+
+      function spawn(randomLife) {
+        const a = Math.random() * Math.PI * 2;
+        const rad = Math.sqrt(Math.random());
+        const max = 240 + Math.random() * 170;
+        const life = randomLife ? Math.random() * max : 0;
+        const vy = -(0.00105 + Math.random() * 0.00085);
+        const y0 = SPAWN.y + Math.sin(a) * SPAWN.ry * rad * 0.45;
+        return {
+          x: SPAWN.x + Math.cos(a) * SPAWN.rx * rad,
+          y: Math.max(0.06, y0 + vy * life),
+          vy: vy,
+          r: 18 + Math.random() * 34,
+          life: life,
+          max: max,
+          ph: Math.random() * Math.PI * 2,
+          ps: 0.02 + Math.random() * 0.028,
+          cloud: Math.random() > 0.35
+        };
+      }
+
+      for (let i = 0; i < 34; i++) particles.push(spawn(true));
+
+      let cssW = 0;
+      let cssH = 0;
+      let dpr = 1;
+
+      function resize() {
+        cssW = tilt.offsetWidth;
+        cssH = tilt.offsetHeight;
+        if (!cssW || !cssH) return;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.max(1, Math.round(cssW * dpr));
+        canvas.height = Math.max(1, Math.round(cssH * dpr));
+      }
+
+      let tx = 0, ty = 0, x = 0, y = 0, wind = 0;
+      let running = false;
+
+      function resetPose() {
+        x = 0;
+        y = 0;
+        tx = 0;
+        ty = 0;
+        wind = 0;
+        tilt.style.transform = "none";
+        glow.style.transform = "translate(-50%, -50%)";
+        if (spec) {
+          spec.setAttribute("cx", "392");
+          spec.setAttribute("cy", "488");
+        }
+        if (glints) glints.removeAttribute("transform");
+      }
+
+      function applyPreference() {
+        reduce = motionMQ.matches;
+        document.documentElement.classList.toggle("live", !reduce);
+        if (reduce) {
+          resetPose();
+          running = false;
+        } else {
+          resize();
+          start();
+        }
+      }
+
+      function setTarget(clientX, clientY) {
+        tx = Math.max(-1, Math.min(1, (clientX / window.innerWidth - 0.5) * 2));
+        ty = Math.max(-1, Math.min(1, (clientY / window.innerHeight - 0.5) * 2));
+      }
+
+      function frame() {
+        if (reduce) {
+          running = false;
+          return;
+        }
+        x += (tx - x) * 0.065;
+        y += (ty - y) * 0.065;
+        wind += (tx * 1.15 - wind) * 0.04;
+
+        tilt.style.transform = "rotateX(" + (-y * 4.6).toFixed(3) + "deg) rotateY(" + (x * 6.2).toFixed(3) + "deg)";
+        glow.style.transform = "translate(-50%, -50%) translate(" + (x * 32).toFixed(2) + "px, " + (y * 18).toFixed(2) + "px)";
+
+        if (spec) {
+          let sx = 392 + x * 80;
+          let sy = 488 + y * 22;
+          const nx = (sx - 450) / 150;
+          const ny = (sy - 505) / 40;
+          const dist = Math.hypot(nx, ny);
+          if (dist > 1) {
+            sx = 450 + (nx / dist) * 150;
+            sy = 505 + (ny / dist) * 40;
+          }
+          spec.setAttribute("cx", sx.toFixed(1));
+          spec.setAttribute("cy", sy.toFixed(1));
+        }
+        if (glints) {
+          glints.setAttribute("transform", "translate(" + (x * 12).toFixed(1) + " " + (y * 7).toFixed(1) + ")");
+        }
+
+        if (cssW && cssH) {
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.clearRect(0, 0, cssW, cssH);
+          for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.life += 1;
+            p.ph += p.ps;
+            p.y += p.vy;
+            p.x += Math.sin(p.ph) * 0.00042 + wind * 0.00062;
+            if (p.life > p.max || p.y < 0.05 || p.x < -0.05 || p.x > 1.05) {
+              particles[i] = spawn(false);
+              continue;
+            }
+            const t = p.life / p.max;
+            const bell = Math.sin(Math.PI * t);
+            let mask = 1;
+            if (p.y > 0.6) mask = Math.max(0, 1 - (p.y - 0.6) / 0.08);
+            const alpha = bell * mask * (p.cloud ? 0.5 : 0.62);
+            if (alpha < 0.01) continue;
+            const grow = (p.cloud ? 0.7 : 0.45) + t * (p.cloud ? 1.7 : 1.15);
+            const rad = p.r * grow * (cssW / 900);
+            const px = p.x * cssW;
+            const py = p.y * cssH;
+            ctx.globalAlpha = alpha;
+            ctx.drawImage(sprite, px - rad, py - rad, rad * 2, rad * 2);
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      function start() {
+        if (running || reduce) return;
+        running = true;
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener("pointermove", function (e) {
+        if (reduce) return;
+        setTarget(e.clientX, e.clientY);
+      }, { passive: true });
+
+      function release() {
+        if (!finePointer.matches) {
+          tx = 0;
+          ty = 0;
+        }
+      }
+      window.addEventListener("pointerup", release);
+      window.addEventListener("pointercancel", release);
+      window.addEventListener("pointerleave", function () {
+        tx = 0;
+        ty = 0;
+      });
+      window.addEventListener("blur", function () {
+        tx = 0;
+        ty = 0;
+      });
+
+      motionMQ.addEventListener("change", applyPreference);
+      window.addEventListener("resize", resize);
+      if (window.ResizeObserver) new ResizeObserver(resize).observe(tilt);
+
+      applyPreference();
+    })();
+  </script>
+</body>
+</html>

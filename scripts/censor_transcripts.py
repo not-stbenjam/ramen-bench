@@ -16,11 +16,10 @@ import re
 import sys
 import tempfile
 from collections import Counter
-from collections.abc import MutableMapping
+from collections.abc import Iterable, Mapping, MutableMapping
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 from urllib.parse import parse_qsl, quote, urlsplit
-
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HOME_ROOT = Path.home()
@@ -364,6 +363,30 @@ def censor_value(
     if isinstance(value, dict):
         cleaned: dict[Any, Any] = {}
         for item_key, item in value.items():
+            # Grok serializes terminal/search text as Vec<u8>. Decode known
+            # byte fields before redaction; ordinary numeric lists stay lists.
+            byte_fields = {
+                "Bash": {"output"},
+                "GrepSearch": {"stdout", "stderr"},
+            }
+            if (
+                item_key in byte_fields.get(str(value.get("type")), set())
+                and isinstance(item, list)
+                and all(type(byte) is int and 0 <= byte <= 255 for byte in item)
+            ):
+                size = len(item)
+                try:
+                    decoded = bytes(item).decode("utf-8")
+                    if "\x00" in decoded:
+                        raise ValueError("Binary NUL in output")
+                    item = decoded
+                    _bump(stats, "decoded_byte_arrays")
+                except (UnicodeDecodeError, ValueError):
+                    item = (
+                        '<OMITTED_BINARY_PAYLOAD encoding="uint8-array" '
+                        f'original-bytes="{size}">'
+                    )
+                    _bump(stats, "binary_byte_arrays")
             normalized_key = str(item_key).lower().replace("-", "_")
             if normalized_key in HIDDEN_REASONING_KEYS:
                 _bump(stats, "hidden_reasoning_fields")
@@ -411,7 +434,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     paths = args.paths or [
         REPO_ROOT / name
-        for name in ("anthropic", "openai", "google", "meta", "z.ai")
+        for name in ("anthropic", "openai", "google", "meta", "xai", "z.ai")
     ]
     paths = [path if path.is_absolute() else REPO_ROOT / path for path in paths]
 
