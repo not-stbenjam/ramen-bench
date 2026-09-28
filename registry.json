@@ -2,6 +2,11 @@
   "$schema": "./schemas/registry.schema.json",
   "schemaVersion": 1,
   "runs": [
+    "anthropic/sonnet-5.5/max/run.json",
+    "anthropic/sonnet-5.5/xhigh/run.json",
+    "anthropic/sonnet-5.5/high/run.json",
+    "anthropic/sonnet-5.5/medium/run.json",
+    "anthropic/sonnet-5.5/low/run.json",
     "anthropic/opus-5.5/max/run.json",
     "anthropic/opus-5.5/xhigh/run.json",
     "anthropic/opus-5.5/high/run.json",

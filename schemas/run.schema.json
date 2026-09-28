@@ -178,7 +178,7 @@
         "cacheCreationInput": { "type": "number", "minimum": 0, "default": 0 },
         "output": { "type": "number", "minimum": 0, "default": 0 },
         "other": { "type": "number", "minimum": 0, "default": 0 },
-        "total": { "type": "number", "minimum": 0 },
+        "total": { "type": ["number", "null"], "minimum": 0, "description": "Null when reliable pricing is unavailable." },
         "estimated": { "type": "boolean", "default": false }
       }
     }
