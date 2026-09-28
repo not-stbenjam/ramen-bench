@@ -41,6 +41,8 @@ PROMPT = (
     "response to the mouse. Keep the scene pure (no UI, text, or menus), responsive "
     "on all screens, and respectful of prefers-reduced-motion."
 )
+CURRENT_PROMPT = (ROOT / "PROMPT.md").read_text().strip()
+BENCHMARK_PROMPTS = (CURRENT_PROMPT, PROMPT)
 
 DISPLAY_NAMES = {
     "gpt-6-sol": "GPT 6 Sol",
@@ -52,6 +54,7 @@ DISPLAY_NAMES = {
     "gpt-5.5": "GPT 5.5",
     "fable-5.1": "Fable 5.1",
     "opus-5.5": "Opus 5.5",
+    "sonnet-5.5": "Sonnet 5.5",
     "opus-5": "Opus 5",
     "glm-5.3": "GLM-5.3",
 }
@@ -70,6 +73,11 @@ EFFORT_NAMES = {
 }
 
 CLAUDE_SOURCES = {
+    "anthropic/sonnet-5.5/low": "1347a561-9089-4ef0-98d3-caf8fdeda00d.jsonl",
+    "anthropic/sonnet-5.5/medium": "e15cc8a3-4b0a-4287-a9a3-c7d84b446373.jsonl",
+    "anthropic/sonnet-5.5/high": "7d0a7ef6-9146-4dd5-bcb8-83accd08e365.jsonl",
+    "anthropic/sonnet-5.5/xhigh": "d7ec1eb8-3a16-40ac-8cf6-eb9ee385abb5.jsonl",
+    "anthropic/sonnet-5.5/max": "bbbf3a05-2d3b-4d17-a683-d4f61caf5c44.jsonl",
     "anthropic/opus-5.5/low": "ee5d151b-3aa4-4665-9edb-c8221098d7dd.jsonl",
     "anthropic/opus-5.5/medium": "f5588de3-8761-48e5-814c-0406b5a454d2.jsonl",
     "anthropic/opus-5.5/high": "e8585317-8097-4061-8f28-bab99dbf2011.jsonl",
@@ -91,10 +99,16 @@ CLAUDE_SOURCES = {
     # truthfully serve as a GLM-5.3 source mapping.
 }
 CLAUDE_SOURCE_ROOTS = {
+    **{
+        run_id: ".claude"
+        for run_id in CLAUDE_SOURCES
+        if run_id.startswith("anthropic/sonnet-5.5/")
+    },
     "z.ai/glm-5.3/max": ".claude",
     "z.ai/glm-5.3/high": ".claude",
 }
 CLAUDE_REPLAY_VERIFICATION = {
+    *(run_id for run_id in CLAUDE_SOURCES if run_id.startswith("anthropic/sonnet-5.5/")),
     "anthropic/opus-5.5/low",
     "anthropic/opus-5.5/medium",
     "anthropic/opus-5.5/high",
@@ -117,6 +131,11 @@ CLAUDE_COMPONENT_BUILDS = {
     )
 }
 CLAUDE_EXPECTED_PROVIDER_MODELS = {
+    **{
+        run_id: "claude-sonnet-5-5"
+        for run_id in CLAUDE_SOURCES
+        if run_id.startswith("anthropic/sonnet-5.5/")
+    },
     "anthropic/opus-5.5/low": "claude-opus-5-5",
     "anthropic/opus-5.5/medium": "claude-opus-5-5",
     "anthropic/opus-5.5/high": "claude-opus-5-5",
@@ -127,7 +146,9 @@ CLAUDE_EXPECTED_PROVIDER_MODELS = {
     "z.ai/glm-5.3/high": "glm-5.3",
 }
 CLAUDE_REQUIRE_FINAL_COST_STATE = {
-    run_id for run_id in CLAUDE_SOURCES if run_id.startswith("anthropic/opus-5.5/")
+    run_id
+    for run_id in CLAUDE_SOURCES
+    if run_id.startswith(("anthropic/opus-5.5/", "anthropic/sonnet-5.5/"))
 }
 
 CODEX_SESSION_SOURCES = {
@@ -356,8 +377,9 @@ def public_user_text(value: str) -> str | None:
     )
     if value.startswith(private_prefixes):
         return None
-    if PROMPT in value:
-        return PROMPT
+    for prompt in BENCHMARK_PROMPTS:
+        if prompt in value:
+            return prompt
     return scrub_text(value)
 
 
@@ -590,7 +612,11 @@ def benchmark_claude_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if row.get("type") != "user":
             continue
         content = row.get("message", {}).get("content", "")
-        if any(PROMPT in value for value in iter_strings(content)):
+        if any(
+            prompt in value
+            for value in iter_strings(content)
+            for prompt in BENCHMARK_PROMPTS
+        ):
             return rows[index:]
     raise ValueError("Claude Code session does not contain the benchmark prompt")
 
@@ -756,6 +782,7 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
 
     if cost_states:
         state = cost_states[-1]
+        cost_known = not state.get("hasUnknownModelCost", False)
         model_usage = state.get("modelUsage", {})
         token_values = {
             "input": sum(item.get("inputTokens", 0) for item in model_usage.values()),
@@ -780,7 +807,7 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
             "tokens": token_values,
             "cost": {
                 "currency": "USD",
-                "total": state["totalCostUSD"],
+                "total": state["totalCostUSD"] if cost_known else None,
                 "estimated": False,
             },
             "requests": len(latest_messages),
@@ -800,7 +827,7 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
                 },
             },
         }
-        return usage, provider_model_id, "provider"
+        return usage, provider_model_id, "provider" if cost_known else "unknown"
 
     totals = {
         "input": 0,
@@ -891,7 +918,21 @@ def build_claude(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
         ),
         "invocation": f"Claude Code session using {provider_model_id}; effort {run_id.rsplit('/', 1)[1]}",
     }
-    if cost_kind == "provider":
+    if run_id.startswith("anthropic/sonnet-5.5/"):
+        harness["invocation"] += (
+            "; --safe-mode --print --permission-mode acceptEdits "
+            "--tools Read,Write,Edit --strict-mcp-config --output-format stream-json --verbose"
+        )
+    if cost_kind == "unknown":
+        pricing_source = f"Claude Code {cli_version} final cost-state: unknown model pricing"
+        notes = (
+            "Token totals are the exact final Claude Code cost-state totals, including "
+            "harness auxiliary requests. Cost is unknown because Claude Code flagged "
+            "hasUnknownModelCost; its raw dollar figures are not verified prices. "
+            "The public transcript omits hidden thinking, private agent-mail activity, "
+            "credentials, and private local path prefixes."
+        )
+    elif cost_kind == "provider":
         pricing_source = f"Claude Code {cli_version} final cost-state"
         notes = (
             "Token and cost totals are the exact final Claude Code cost-state totals. "
@@ -2015,6 +2056,7 @@ def main(argv: list[str] | None = None) -> None:
     coverage = {
         "claudeProviderCost": 0,
         "claudeLiteLLMCost": 0,
+        "claudeUnknownCost": 0,
         "openaiLiteLLMCost": 0,
         "openaiTotalOnlyEstimatedCost": 0,
         "events": 0,
@@ -2025,11 +2067,12 @@ def main(argv: list[str] | None = None) -> None:
     for run_id in run_ids:
         if run_id in CLAUDE_SOURCES:
             run, transcript, cost_kind = build_claude(run_id)
-            coverage[
-                "claudeProviderCost"
-                if cost_kind == "provider"
-                else "claudeLiteLLMCost"
-            ] += 1
+            coverage_key = {
+                "provider": "claudeProviderCost",
+                "litellm": "claudeLiteLLMCost",
+                "unknown": "claudeUnknownCost",
+            }[cost_kind]
+            coverage[coverage_key] += 1
         elif run_id in CODEX_SESSION_SOURCES:
             run, transcript, _ = build_codex_session(run_id)
             coverage["openaiLiteLLMCost"] += 1
@@ -2054,6 +2097,7 @@ def main(argv: list[str] | None = None) -> None:
         "Coverage: "
         f"Claude Code provider cost={coverage['claudeProviderCost']}, "
         f"Claude Code LiteLLM cost={coverage['claudeLiteLLMCost']}, "
+        f"Claude Code unknown cost={coverage['claudeUnknownCost']}, "
         f"OpenAI LiteLLM cost={coverage['openaiLiteLLMCost']}, "
         "OpenAI total-only estimated cost="
         f"{coverage['openaiTotalOnlyEstimatedCost']}."

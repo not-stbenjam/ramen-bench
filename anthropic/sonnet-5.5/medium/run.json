@@ -1,0 +1,94 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "anthropic/sonnet-5.5/medium",
+  "vendor": {
+    "slug": "anthropic",
+    "displayName": "Anthropic"
+  },
+  "model": {
+    "slug": "sonnet-5.5",
+    "displayName": "Sonnet 5.5",
+    "providerModelId": "claude-sonnet-5-5"
+  },
+  "variation": {
+    "slug": "medium",
+    "displayName": "Medium",
+    "reasoningEffort": "medium",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Claude Code",
+    "version": "2.1.283",
+    "runtime": "Anthropic Claude Code CLI",
+    "invocation": "Claude Code session using claude-sonnet-5-5; effort medium; --safe-mode --print --permission-mode acceptEdits --tools Read,Write,Edit --strict-mcp-config --output-format stream-json --verbose"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-09-28T19:05:06.944Z",
+    "completedAt": "2026-09-28T19:08:02.498Z",
+    "wallDurationMs": 175554,
+    "apiDurationMs": 176067
+  },
+  "usage": {
+    "tokens": {
+      "input": 1403,
+      "cachedInput": 15026,
+      "cacheCreationInput": 25737,
+      "reasoning": 11288,
+      "output": 24440,
+      "total": 66606
+    },
+    "cost": {
+      "currency": "USD",
+      "total": null,
+      "estimated": false
+    },
+    "requests": 2,
+    "turns": 1,
+    "toolCalls": 1,
+    "providerReported": true,
+    "raw": {
+      "source": "Claude Code final cost-state",
+      "requestCountBasis": "unique recorded assistant message ids",
+      "costState": {
+        "totalCostUSD": 0.6988912,
+        "totalAPIDurationMs": 176067,
+        "totalDurationMs": 176657,
+        "startTimeEpochMs": 1790622305873,
+        "hasUnknownModelCost": true,
+        "modelUsage": {
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 1399,
+            "outputTokens": 15,
+            "thinkingTokens": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 0.001474
+          },
+          "claude-sonnet-5-5": {
+            "inputTokens": 4,
+            "outputTokens": 24425,
+            "thinkingTokens": 11288,
+            "cacheReadInputTokens": 15026,
+            "cacheCreationInputTokens": 25737,
+            "webSearchRequests": 0,
+            "costUSD": 0.6974172000000001
+          }
+        }
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 19242,
+    "lines": 405
+  },
+  "provenance": {
+    "pricingSource": "Claude Code 2.1.283 final cost-state: unknown model pricing"
+  },
+  "notes": "Token totals are the exact final Claude Code cost-state totals, including harness auxiliary requests. Cost is unknown because Claude Code flagged hasUnknownModelCost; its raw dollar figures are not verified prices. The public transcript omits hidden thinking, private agent-mail activity, credentials, and private local path prefixes. The result matches its recorded file-operation replay (1 operations)."
+}
