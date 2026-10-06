@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#120e0b">
+    <title>Scores · Ramen Bench</title>
+    <link rel="stylesheet" href="scores.css">
+    <script type="module" src="scores.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="back" href="index.html">← Browse the bowls</a>
+        <h1>A taste for tradeoffs.</h1>
+        <p class="intro">How much soup does another dollar buy?</p>
+      </header>
+      <section class="chart-panel" aria-labelledby="chart-heading">
+        <div class="panel-heading">
+          <div><h2 id="chart-heading">Quality & efficiency</h2><p id="coverage" class="sr-only" aria-live="polite">Loading evaluations…</p></div>
+          <a class="download" href="scores.json" download>Download raw scores ↓</a>
+        </div>
+        <div class="controls">
+          <label>Vendor<select id="vendor"><option value="">All vendors</option></select></label>
+          <div class="model-filter">
+            <span id="model-filter-label">Models</span>
+            <details id="model-menu">
+              <summary id="model-summary" aria-describedby="model-filter-label">All models</summary>
+              <div class="model-popover">
+                <div class="model-actions"><button id="models-all" type="button">Select all</button><button id="models-none" type="button">Clear all</button></div>
+                <fieldset id="model-options"><legend class="sr-only">Models to compare</legend></fieldset>
+              </div>
+            </details>
+          </div>
+          <label>Compare against<select id="axis"><option value="cost">Generation cost (USD)</option><option value="time">Generation time (minutes)</option></select></label>
+          <label class="check"><input type="checkbox" id="log" checked> Log scale</label>
+          <label class="check"><input type="checkbox" id="recorded"> Exclude estimated costs</label>
+        </div>
+        <div id="empty" class="empty" hidden><span aria-hidden="true">◌</span><h3>The tasting hasn’t started yet.</h3><p>Existing bowls are waiting for their first visual evaluation.</p></div>
+        <div id="plot" class="plot"></div>
+        <div id="plot-tooltip" class="plot-tooltip" role="tooltip" hidden></div>
+        <p class="plot-note" id="plot-note"></p>
+        <div class="legend" id="legend"></div>
+        <p class="method">Up and to the right is better: higher quality, lower cost or time.</p>
+      </section>
+      <section class="results-panel" aria-labelledby="results-heading">
+        <div class="panel-heading"><div><h2 id="results-heading">The tasting notes</h2><p id="judge-note">Scores range from 0 to 1. Click a row to expand its judge notes.</p></div></div>
+        <p class="method" id="scoring-method">Standalone HTML is a hard gate: external dependencies make the composite zero. Otherwise, the six visual criteria and the three judges have equal weight. Each judge’s samples are averaged first. Vegan scores describe visible ingredients; they cannot establish a recipe. Browser frame timings are diagnostics and do not affect reward.</p>
+        <div class="table-scroll"><table><caption class="sr-only">Composite rewards and individual visual criteria for each model and effort.</caption><thead id="criteria-heading"><tr><th scope="col">Model / effort</th><th scope="col">Reward</th><th scope="col">Cost</th><th scope="col">Minutes</th><th scope="col">Standalone</th><th scope="col">Vegan</th><th scope="col">Appetizing</th><th scope="col">Steam</th><th scope="col">Aesthetics</th><th scope="col">Interaction</th><th scope="col">Reduced motion</th></tr></thead><tbody id="results"></tbody></table></div>
+      </section>
+      <footer>A very serious benchmark about a very small bowl of soup. <a href="index.html">Back to the kitchen ↗</a></footer>
+    </main>
+  </body>
+</html>

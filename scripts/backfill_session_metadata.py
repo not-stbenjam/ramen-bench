@@ -15,16 +15,18 @@ import os
 import re
 import shlex
 import subprocess
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from importlib.metadata import version as package_version
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import litellm
-from jsonschema import Draft202012Validator, FormatChecker
-
 from censor_transcripts import censor_text, censor_value
-
+from claude_list_prices import AS_OF as SONNET_PRICE_DATE
+from claude_list_prices import SOURCE as SONNET_PRICE_SOURCE
+from claude_list_prices import sonnet_list_cost
+from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[1]
 HOME = Path.home()
@@ -45,6 +47,7 @@ CURRENT_PROMPT = (ROOT / "PROMPT.md").read_text().strip()
 BENCHMARK_PROMPTS = (CURRENT_PROMPT, PROMPT)
 
 DISPLAY_NAMES = {
+    "gpt-6.1-sol": "GPT 6.1 Sol",
     "gpt-6-sol": "GPT 6 Sol",
     "gpt-6-luna": "GPT 6 Luna",
     "gpt-6-astra": "GPT 6 Astra",
@@ -281,10 +284,12 @@ TERRA_LOW_PARENT = (
 TERRA_LOW_STARTED = "2026-09-04T22:09:59.409Z"
 TERRA_LOW_COMPLETED = "2026-09-04T22:11:35.604Z"
 
-PRIVATE_TOOL_RE = re.compile(r"(?:agent[_-]?mail|dawnmark)", re.I)
+PRIVATE_TOOL_RE = re.compile(r"(?:agent[_-]?mail|dawnmark)", re.IGNORECASE)
 BASE64_MARKER_RE = re.compile(
     r'OMITTED_BINARY_PAYLOAD[^>]+original-characters=\\?"(\d+)\\?"'
 )
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -363,7 +368,7 @@ def content_text(content: Any) -> str:
     return scrub_text(str(content))
 
 
-def public_user_text(value: str) -> str | None:
+def public_user_text(value: str, *, preserve_task: bool = False) -> str | None:
     """Return recorded user text after excluding harness-injected context blocks."""
     value = value.strip()
     if not value:
@@ -377,7 +382,7 @@ def public_user_text(value: str) -> str | None:
     )
     if value.startswith(private_prefixes):
         return None
-    for prompt in BENCHMARK_PROMPTS:
+    for prompt in () if preserve_task else BENCHMARK_PROMPTS:
         if prompt in value:
             return prompt
     return scrub_text(value)
@@ -504,8 +509,8 @@ def estimated_total_only_cost(
     return cost, method
 
 
-def result_stats(run_id: str) -> dict[str, int]:
-    data = (ROOT / run_id / "index.html").read_bytes()
+def result_stats(run_id: str, artifact: Path | None = None) -> dict[str, int]:
+    data = (artifact or ROOT / run_id / "index.html").read_bytes()
     return {"bytes": len(data), "lines": data.count(b"\n")}
 
 
@@ -517,6 +522,7 @@ def run_base(
     usage: dict[str, Any],
     notes: str,
     pricing_source: str,
+    artifact: Path | None = None,
 ) -> dict[str, Any]:
     vendor, model_slug, effort = run_id.split("/")
     parameters: dict[str, Any] = {}
@@ -543,7 +549,7 @@ def run_base(
         "artifacts": {"result": "index.html", "transcript": "transcript.json"},
         "timing": timing,
         "usage": usage,
-        "resultStats": result_stats(run_id),
+        "resultStats": result_stats(run_id, artifact),
         "provenance": {"pricingSource": pricing_source},
         "notes": notes,
     }
@@ -827,6 +833,11 @@ def claude_usage(rows: list[dict[str, Any]]) -> tuple[dict[str, Any], str, str]:
                 },
             },
         }
+        if not cost_known and provider_model_id == "claude-sonnet-5-5":
+            priced = sonnet_list_cost(latest_messages, state)
+            if priced is not None:
+                usage["cost"], usage["raw"]["listPriceCalculation"] = priced
+                return usage, provider_model_id, "list"
         return usage, provider_model_id, "provider" if cost_known else "unknown"
 
     totals = {
@@ -881,6 +892,11 @@ def build_claude(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
     project_directory = str(ROOT / run_id).replace(os.sep, "-").replace(".", "-")
     source_root = CLAUDE_SOURCE_ROOTS.get(run_id, ".claude-personal")
     source = HOME / source_root / "projects" / project_directory / filename
+    if not source.is_file():
+        matches = list((HOME / source_root / "projects").glob(f"*/{filename}"))
+        if len(matches) != 1:
+            raise ValueError(f"{run_id}: expected one recorded source session, found {len(matches)}")
+        source = matches[0]
     rows = read_jsonl(source)
     if run_id in CLAUDE_REQUIRE_FINAL_COST_STATE and not any(
         row.get("type") == "cost-state" for row in rows
@@ -923,7 +939,18 @@ def build_claude(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
             "; --safe-mode --print --permission-mode acceptEdits "
             "--tools Read,Write,Edit --strict-mcp-config --output-format stream-json --verbose"
         )
-    if cost_kind == "unknown":
+    if cost_kind == "list":
+        pricing_source = f"Anthropic official list prices as of {SONNET_PRICE_DATE}: {SONNET_PRICE_SOURCE}"
+        notes = (
+            "Token totals are the exact final Claude Code cost-state totals, including "
+            "harness auxiliary requests. Cost is estimated at published Sonnet 5.5 list "
+            "prices, with recorded cache durations and recorded auxiliary Haiku cost. "
+            "Unclassified cache writes use the upper tariff bound; the exact range is "
+            "retained in listPriceCalculation. Thinking is already included in output. "
+            "The public transcript omits hidden thinking, private agent-mail activity, "
+            "credentials, and private local path prefixes."
+        )
+    elif cost_kind == "unknown":
         pricing_source = f"Claude Code {cli_version} final cost-state: unknown model pricing"
         notes = (
             "Token totals are the exact final Claude Code cost-state totals, including "
@@ -1005,7 +1032,7 @@ def recorded_codex_patch(source: str) -> str | None:
 
 
 def recorded_codex_command(source: str) -> str | None:
-    return javascript_string_after(source, r"\bcmd\s*:\s*")
+    return javascript_string_after(source, r'(?:"cmd"|\bcmd)\s*:\s*')
 
 
 def find_unique_line_region(
@@ -1123,7 +1150,7 @@ def replay_safe_python_write(content: str, script: str, run_id: str) -> str:
     allowed_methods = {"read", "write", "replace", "count", "index"}
     for node in ast.walk(tree):
         if not isinstance(node, allowed_nodes):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004 -- malformed recorded repairs are value errors
                 f"{run_id}: unsupported {type(node).__name__} in recorded repair"
             )
         if isinstance(node, ast.Import):
@@ -1153,7 +1180,7 @@ def replay_safe_python_write(content: str, script: str, run_id: str) -> str:
         def write(self, value: str) -> int:
             nonlocal file_content, write_count
             if not isinstance(value, str):
-                raise ValueError(f"{run_id}: recorded write is not text")
+                raise ValueError(f"{run_id}: recorded write is not text")  # noqa: TRY004
             file_content = value
             write_count += 1
             return len(value)
@@ -1170,6 +1197,86 @@ def replay_safe_python_write(content: str, script: str, run_id: str) -> str:
     return file_content
 
 
+def replay_path_python_write(content: str, script: str, run_id: str) -> tuple[str, int]:
+    """Interpret literal Path/read_text/replace/write_text edits without execution."""
+    tree = ast.parse(script)
+    variables: dict[str, Any] = {}
+    path_marker = object()
+    writes = [
+        i
+        for i, node in enumerate(tree.body)
+        if isinstance(node, ast.Expr)
+        and isinstance(node.value, ast.Call)
+        and isinstance(node.value.func, ast.Attribute)
+        and node.value.func.attr == "write_text"
+    ]
+    if not writes:
+        return content, 0
+
+    def evaluate(node: ast.AST) -> Any:
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        if isinstance(node, ast.Name) and node.id in variables:
+            return variables[node.id]
+        if isinstance(node, ast.Call) and not node.keywords:
+            if (
+                isinstance(node.func, ast.Name)
+                and node.func.id == "Path"
+                and len(node.args) == 1
+                and evaluate(node.args[0]) in {"index.html", "/app/index.html"}
+            ):
+                return path_marker
+            if isinstance(node.func, ast.Attribute):
+                receiver = evaluate(node.func.value)
+                if (
+                    node.func.attr == "read_text"
+                    and receiver is path_marker
+                    and not node.args
+                ):
+                    return content
+                if (
+                    node.func.attr == "replace"
+                    and isinstance(receiver, str)
+                    and len(node.args) == 2
+                ):
+                    old, new = (evaluate(arg) for arg in node.args)
+                    if isinstance(old, str) and isinstance(new, str):
+                        return receiver.replace(old, new)
+        raise ValueError(f"{run_id}: unsupported expression in recorded Path repair")
+
+    count = 0
+    for statement in tree.body[: writes[-1] + 1]:
+        if isinstance(statement, (ast.Import, ast.ImportFrom)):
+            continue
+        if (
+            isinstance(statement, ast.Assign)
+            and len(statement.targets) == 1
+            and isinstance(statement.targets[0], ast.Name)
+        ):
+            variables[statement.targets[0].id] = evaluate(statement.value)
+        elif (
+            isinstance(statement, ast.Expr)
+            and isinstance(statement.value, ast.Call)
+            and isinstance(statement.value.func, ast.Attribute)
+            and statement.value.func.attr == "write_text"
+        ):
+            call = statement.value
+            if (
+                evaluate(call.func.value) is not path_marker
+                or len(call.args) != 1
+                or call.keywords
+            ):
+                raise ValueError(f"{run_id}: unsupported recorded Path write")
+            value = evaluate(call.args[0])
+            if not isinstance(value, str):
+                raise ValueError(f"{run_id}: recorded Path write is not text")
+            content = value
+            count += 1
+        else:
+            raise ValueError(f"{run_id}: unsupported statement in recorded Path repair")
+    return content, count
+
+
 def replay_recorded_shell_mutation(
     content: str, command: str, run_id: str
 ) -> tuple[str, int]:
@@ -1177,17 +1284,20 @@ def replay_recorded_shell_mutation(
     for marker, terminator in (
         ("python3 - <<'PY'\n", "PY"),
         ("python3 - <<'EOF'\n", "EOF"),
+        ("python - <<'PY'\n", "PY"),
     ):
         start = command.find(marker)
         if start >= 0:
             script_start = start + len(marker)
-            match = re.search(
-                rf"(?m)^{re.escape(terminator)}$", command[script_start:]
-            )
+            match = re.search(rf"(?m)^{re.escape(terminator)}$", command[script_start:])
             end = script_start + match.start() if match else -1
             if end >= 0 and "open(p,'w').write" in command[:end]:
                 script = command[script_start:end]
                 return replay_safe_python_write(content, script, run_id), 1
+            if end >= 0 and ".write_text(" in command[script_start:end]:
+                return replay_path_python_write(
+                    content, command[script_start:end], run_id
+                )
 
     first_command = command.split(" && ", 1)[0]
     if not first_command.startswith("sed -i "):
@@ -1277,7 +1387,7 @@ def replay_safe_component_python(
     }
     for node in ast.walk(tree):
         if not isinstance(node, allowed_nodes):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004 -- preserve transcript validation error semantics
                 f"{run_id}: unsupported {type(node).__name__} in component repair"
             )
         if isinstance(node, ast.Import):
@@ -1306,7 +1416,7 @@ def replay_safe_component_python(
         def write(self, value: str) -> int:
             nonlocal write_count
             if not isinstance(value, str):
-                raise ValueError(f"{run_id}: recorded component write is not text")
+                raise ValueError(f"{run_id}: recorded component write is not text")  # noqa: TRY004
             files[self.key] = value
             write_count += 1
             return len(value)
@@ -1493,31 +1603,43 @@ def replay_codex_command(
     content: str | None, command: str, run_id: str
 ) -> tuple[str | None, int]:
     """Replay supported direct index.html writes from recorded shell commands."""
-    heredoc_start = "cat > index.html <<'EOF'\n"
-    if command.startswith(heredoc_start):
-        delimiter = "\nEOF\n"
-        end = command.find(delimiter, len(heredoc_start))
+    heredoc = re.match(
+        r"cat\s*>\s*(?:/app/)?index\.html\s*<<\s*['\"]?(\w+)['\"]?\n", command
+    )
+    if heredoc:
+        delimiter = "\n" + heredoc[1]
+        end = command.find(delimiter + "\n", heredoc.end())
+        if end < 0 and command.endswith(delimiter):
+            end = len(command) - len(delimiter)
         if end < 0:
             raise ValueError(f"{run_id}: malformed recorded index.html heredoc")
-        return command[len(heredoc_start) : end] + "\n", 1
+        return command[heredoc.end() : end] + "\n", 1
 
     if content is not None:
         return replay_recorded_shell_mutation(content, command, run_id)
     return content, 0
 
 
-def verify_codex_result(rows: list[dict[str, Any]], run_id: str) -> str:
+def verify_codex_result(
+    rows: list[dict[str, Any]], run_id: str, artifact: Path | None = None
+) -> str:
     """Replay recorded Codex file mutations and require an exact artifact match."""
     content: str | None = None
     operation_count = 0
     for row in rows:
         payload = row.get("payload", {})
-        if row.get("type") != "response_item" or payload.get(
-            "type"
-        ) not in {"custom_tool_call", "function_call"}:
+        if row.get("type") != "response_item" or payload.get("type") not in {
+            "custom_tool_call",
+            "function_call",
+        }:
             continue
         source = str(payload.get("input", payload.get("arguments", "")))
-        patch = recorded_codex_patch(source)
+        patch = (
+            source
+            if payload.get("name") == "apply_patch"
+            and source.startswith("*** Begin Patch")
+            else recorded_codex_patch(source)
+        )
         if patch is not None:
             line_content = content.splitlines() if content is not None else None
             line_content, count = replay_codex_patch(line_content, patch, run_id)
@@ -1532,14 +1654,16 @@ def verify_codex_result(rows: list[dict[str, Any]], run_id: str) -> str:
             operation_count += count
     if content is None:
         raise ValueError(f"{run_id}: no recorded index.html creation found")
-    artifact = (ROOT / run_id / "index.html").read_text()
-    if content != artifact:
+    artifact_text = (artifact or ROOT / run_id / "index.html").read_text()
+    if content != artifact_text:
         raise ValueError(f"{run_id}: index.html differs from recorded file operations")
     return f"recorded file-operation replay ({operation_count} operations)"
 
 
 def normalize_codex_events(
     rows: list[dict[str, Any]],
+    *,
+    preserve_task: bool = False,
 ) -> tuple[list[dict[str, Any]], int]:
     events: list[dict[str, Any]] = []
     published_calls: set[str] = set()
@@ -1558,7 +1682,7 @@ def normalize_codex_events(
                 continue
             text = content_text(payload.get("content", []))
             if role == "user":
-                text = public_user_text(text)
+                text = public_user_text(text, preserve_task=preserve_task)
                 if not text:
                     continue
                 user_message_emitted = True
@@ -1594,7 +1718,9 @@ def normalize_codex_events(
             event = {
                 "type": "tool_result",
                 "callId": call_id,
-                "status": "error" if re.search(r"\b(?:failed|error)\b", output_text, re.I) else "success",
+                "status": "error"
+                if re.search(r"\b(?:failed|error)\b", output_text, re.IGNORECASE)
+                else "success",
                 "output": output,
             }
             if timestamp:
@@ -1801,7 +1927,7 @@ def normalize_log_events(
                     "type": "tool_result",
                     "callId": call_id,
                     "status": "error"
-                    if re.search(r"\b(?:exited [1-9]|failed|error)\b", output, re.I)
+                    if re.search(r"\b(?:exited [1-9]|failed|error)\b", output, re.IGNORECASE)
                     else "success",
                     "output": output,
                 }
@@ -2036,6 +2162,14 @@ def main(argv: list[str] | None = None) -> None:
         TERRA_LOW_ID
     }
     all_run_ids = tracked_run_ids()
+    native_runs = set()
+    for run_id in set(all_run_ids) | set(args.run_ids or []):
+        manifest = ROOT / run_id / "run.json"
+        if manifest.is_file():
+            run = json.loads(manifest.read_text())
+            if run.get("harness", {}).get("runtime") == "Harbor" and run.get("harness", {}).get("name") == "Codex":
+                native_runs.add(run_id)
+    expected.update(native_runs)
     if not args.run_ids and set(all_run_ids) != expected:
         missing_sources = sorted(set(all_run_ids) - expected)
         missing_runs = sorted(expected - set(all_run_ids))
@@ -2056,9 +2190,11 @@ def main(argv: list[str] | None = None) -> None:
     coverage = {
         "claudeProviderCost": 0,
         "claudeLiteLLMCost": 0,
+        "claudeListPriceCost": 0,
         "claudeUnknownCost": 0,
         "openaiLiteLLMCost": 0,
         "openaiTotalOnlyEstimatedCost": 0,
+        "openaiHarborNative": 0,
         "events": 0,
         "base64Omissions": 0,
         "base64CharactersOmitted": 0,
@@ -2070,9 +2206,15 @@ def main(argv: list[str] | None = None) -> None:
             coverage_key = {
                 "provider": "claudeProviderCost",
                 "litellm": "claudeLiteLLMCost",
+                "list": "claudeListPriceCost",
                 "unknown": "claudeUnknownCost",
             }[cost_kind]
             coverage[coverage_key] += 1
+        elif run_id in native_runs:
+            from import_harbor_codex import build_registered_trial
+
+            run, transcript, _ = build_registered_trial(run_id)
+            coverage["openaiHarborNative"] += 1
         elif run_id in CODEX_SESSION_SOURCES:
             run, transcript, _ = build_codex_session(run_id)
             coverage["openaiLiteLLMCost"] += 1
@@ -2097,6 +2239,7 @@ def main(argv: list[str] | None = None) -> None:
         "Coverage: "
         f"Claude Code provider cost={coverage['claudeProviderCost']}, "
         f"Claude Code LiteLLM cost={coverage['claudeLiteLLMCost']}, "
+        f"Claude Code official list-price cost={coverage['claudeListPriceCost']}, "
         f"Claude Code unknown cost={coverage['claudeUnknownCost']}, "
         f"OpenAI LiteLLM cost={coverage['openaiLiteLLMCost']}, "
         "OpenAI total-only estimated cost="

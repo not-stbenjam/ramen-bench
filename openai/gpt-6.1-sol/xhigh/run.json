@@ -1,0 +1,110 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "openai/gpt-6.1-sol/xhigh",
+  "vendor": {
+    "slug": "openai",
+    "displayName": "OpenAI"
+  },
+  "model": {
+    "slug": "gpt-6.1-sol",
+    "displayName": "GPT 6.1 Sol",
+    "providerModelId": "gpt-6.1-sol"
+  },
+  "variation": {
+    "slug": "xhigh",
+    "displayName": "XHigh",
+    "reasoningEffort": "xhigh",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Codex",
+    "version": "0.159.2",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor codex agent; gpt-6.1-sol @ xhigh; ChatGPT subscription authentication"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-01T00:25:31.482956Z",
+    "completedAt": "2026-10-01T00:41:30.204037Z",
+    "wallDurationMs": 958721
+  },
+  "usage": {
+    "tokens": {
+      "input": 1015555,
+      "cachedInput": 964736,
+      "output": 27539,
+      "total": 1043094,
+      "reasoning": 8146,
+      "cacheCreationInput": 0
+    },
+    "cost": {
+      "currency": "USD",
+      "total": 0.47350159999999986,
+      "estimated": true
+    },
+    "toolCalls": 25,
+    "providerReported": true,
+    "raw": {
+      "harborAgentContext": {
+        "n_input_tokens": 1015555,
+        "n_cache_tokens": 964736,
+        "n_output_tokens": 27539,
+        "cost_usd": 0.47350159999999986,
+        "model_usage": {
+          "openai/gpt-6.1-sol": {
+            "n_input_tokens": 1015555,
+            "n_cache_tokens": 964736,
+            "n_output_tokens": 27539,
+            "cost_usd": 0.47350159999999986
+          }
+        },
+        "rollout_details": null,
+        "metadata": null
+      },
+      "harborFinalMetrics": {
+        "total_prompt_tokens": 1015555,
+        "total_completion_tokens": 27539,
+        "total_cached_tokens": 964736,
+        "total_cost_usd": 0.47350159999999986,
+        "total_steps": 31,
+        "extra": {
+          "reasoning_output_tokens": 8146,
+          "total_tokens": 1043094,
+          "last_token_usage": {
+            "input_tokens": 56454,
+            "cached_input_tokens": 55936,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 532,
+            "reasoning_output_tokens": 469,
+            "total_tokens": 56986
+          },
+          "total_cache_write_input_tokens": 0
+        }
+      },
+      "codexCumulativeTokens": {
+        "input_tokens": 1015555,
+        "cached_input_tokens": 964736,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 27539,
+        "reasoning_output_tokens": 8146,
+        "total_tokens": 1043094
+      },
+      "inputIncludesCachedInput": true,
+      "harborTrial": "gpt-6.1-sol-task__FT5vb5o",
+      "harborTaskChecksum": "f5b3c91799622cfce8f89178137ecdb4d42f30ac7741c4ae7b8ff9494ee6dd6f",
+      "artifactVerification": "recorded file-operation replay (22 operations)"
+    }
+  },
+  "resultStats": {
+    "bytes": 32936,
+    "lines": 466
+  },
+  "provenance": {
+    "pricingSource": "Harbor native AgentContext.cost_usd (Harbor LiteLLM estimate)"
+  },
+  "notes": "Generated and verified by native Harbor. Cost, tokens, and generation duration come from Harbor's recorded trial and Codex trajectory. Cached input is included in input; reasoning is included in output."
+}

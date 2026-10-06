@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ramen visual evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "evaluation",
+    "results"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "evaluation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rubricVersion",
+            "verifierSha256",
+            "judge",
+            "criteria",
+            "aggregation",
+            "weights"
+          ],
+          "properties": {
+            "rubricVersion": {
+              "const": "ramen-v3"
+            },
+            "verifierSha256": {
+              "$ref": "#/$defs/hash"
+            },
+            "judge": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "models",
+                "samples",
+                "efforts"
+              ],
+              "properties": {
+                "samples": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "models": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "efforts": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "enum": [
+                      "default",
+                      "none",
+                      "minimal",
+                      "low",
+                      "medium",
+                      "high",
+                      "xhigh",
+                      "max"
+                    ]
+                  }
+                }
+              }
+            },
+            "criteria": {
+              "const": [
+                "noodles",
+                "toppings",
+                "bowl",
+                "broth",
+                "steam",
+                "composition"
+              ]
+            },
+            "aggregation": {
+              "const": "compliance gates \u00d7 weighted mean of visual criteria; equal judge weights"
+            },
+            "weights": {
+              "const": {
+                "noodles": 0.2,
+                "toppings": 0.25,
+                "bowl": 0.2,
+                "broth": 0.1,
+                "steam": 0.15,
+                "composition": 0.1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "runId",
+          "artifactSha256",
+          "gradedAt",
+          "scores",
+          "reward",
+          "rewardStdDev",
+          "judgeResults",
+          "standaloneViolations",
+          "performance",
+          "complianceViolations",
+          "diagnostics"
+        ],
+        "properties": {
+          "runId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifactSha256": {
+            "$ref": "#/$defs/hash"
+          },
+          "gradedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scores": {
+            "type": "object",
+            "required": [
+              "standalone"
+            ],
+            "additionalProperties": {
+              "$ref": "#/$defs/score"
+            }
+          },
+          "reward": {
+            "$ref": "#/$defs/score"
+          },
+          "rewardStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "standaloneViolations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "performance": {
+            "type": "object"
+          },
+          "judgeResults": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "complianceViolations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "diagnostics": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evaluation": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "results": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  }
+}

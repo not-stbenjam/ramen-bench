@@ -44,8 +44,13 @@
     },
     "cost": {
       "currency": "USD",
-      "total": null,
-      "estimated": false
+      "input": 0.008728,
+      "output": 6.38359,
+      "cachedInput": 0.357475,
+      "cacheCreationInput": 1.669164,
+      "other": 0.001474,
+      "total": 8.420431,
+      "estimated": true
     },
     "requests": 25,
     "turns": 1,
@@ -80,6 +85,27 @@
             "costUSD": 16.457264
           }
         }
+      },
+      "listPriceCalculation": {
+        "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+        "asOf": "2026-09-30",
+        "usdPerMillionTokens": {
+          "input": 2,
+          "output": 10,
+          "cacheRead": 0.2,
+          "cacheWrite5m": 2.5,
+          "cacheWrite1h": 4
+        },
+        "cacheWrite5mTokens": 0,
+        "cacheWrite1hTokens": 409566,
+        "cacheWriteUnclassifiedTokens": 7725,
+        "unclassifiedCacheWriteTreatment": "upper tariff bound; duration unknown",
+        "totalRangeUsd": [
+          8.4088435,
+          8.420431
+        ],
+        "auxiliaryCostSource": "recorded Claude Code Haiku costUSD",
+        "thinkingIncludedInOutput": true
       }
     }
   },
@@ -88,7 +114,7 @@
     "lines": 1393
   },
   "provenance": {
-    "pricingSource": "Claude Code 2.1.283 final cost-state: unknown model pricing"
+    "pricingSource": "Anthropic official list prices as of 2026-09-30: https://platform.claude.com/docs/en/models/sonnet-5-5/overview"
   },
-  "notes": "Token totals are the exact final Claude Code cost-state totals, including harness auxiliary requests. Cost is unknown because Claude Code flagged hasUnknownModelCost; its raw dollar figures are not verified prices. The public transcript omits hidden thinking, private agent-mail activity, credentials, and private local path prefixes. The result matches its recorded file-operation replay (18 operations)."
+  "notes": "Token totals are the exact final Claude Code cost-state totals, including harness auxiliary requests. Cost is estimated at published Sonnet 5.5 list prices, with recorded cache durations and recorded auxiliary Haiku cost. Unclassified cache writes use the upper tariff bound; the exact range is retained in listPriceCalculation. Thinking is already included in output. The public transcript omits hidden thinking, private agent-mail activity, credentials, and private local path prefixes. The result matches its recorded file-operation replay (18 operations)."
 }

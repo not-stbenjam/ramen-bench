@@ -1,0 +1,337 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
+  "schemaVersion": 1,
+  "runId": "openai/gpt-6.1-sol/ultra",
+  "sessionId": "01a0f532-9de1-7302-b2bb-0afd726091ce",
+  "sourceFormat": "harbor-codex-jsonl",
+  "events": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": "Create a single-file HTML page (/app/index.html) with all CSS and JavaScript inline and zero external assets. Never use image generation tools or models. Draw the scene with code (HTML, CSS, SVG, canvas or WebGL); embedded raster artwork is disallowed. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.",
+      "timestamp": "2026-10-01T02:02:14.293Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "I’ll build a full-screen, code-drawn ramen scene with warm lighting, gentle steam, and subtle mouse interaction, then check the layout and reduced-motion behavior.\n",
+      "timestamp": "2026-10-01T02:02:18.126Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_Nuzwh3ZwQY9Xnp55dd3P2xcV",
+      "tool": "exec",
+      "input": "text(ALL_TOOLS.filter(x => /exec|file|browser|playwright/i.test(x.name+\" \"+x.description)).map(x=>({name:x.name,description:x.description.slice(0,90)})).slice(0,100));\ntext(await tools.exec_command({cmd:\"pwd && rg --files -g 'AGENTS.md' -g 'index.html' -g 'package.json' -g 'playwright*' -g '!node_modules' -g '!package-lock.json' .\",\"workdir\":\"/app\",\"max_output_tokens\":2000}));\n",
+      "timestamp": "2026-10-01T02:02:21.629Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_Nuzwh3ZwQY9Xnp55dd3P2xcV",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "[{\"name\":\"apply_patch\",\"description\":\"The `apply_patch` tool can be used to edit files. This is a FREEFORM tool, so do not wrap \"},{\"name\":\"clock__curr_time\",\"description\":\"Tools for reading and waiting on time.\\n\\nReturn the current time in UTC.\\n\\nexec tool declara\"},{\"name\":\"create_goal\",\"description\":\"Create a goal only when explicitly requested by the user or system/developer instructions;\"},{\"name\":\"exec_command\",\"description\":\"Runs a command in a PTY, returning output or a session ID for ongoing interaction.\\n\\nexec t\"},{\"name\":\"get_goal\",\"description\":\"Get the current goal for this thread, including status, budgets, token and elapsed-time us\"},{\"name\":\"image_gen__imagegen\",\"description\":\"Tools in the image_gen namespace.\\n\\nThe `image_gen.imagegen` tool enables image generation \"},{\"name\":\"list_mcp_resource_templates\",\"description\":\"Lists resource templates provided by MCP servers. Parameterized resource templates allow s\"},{\"name\":\"list_mcp_resources\",\"description\":\"Lists resources provided by MCP servers. Resources allow servers to share data that provid\"},{\"name\":\"mcp__codex_apps__chatgpt_space_attach_automation_to_page\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_create_canvas\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_create_controller_automation\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_create_page\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_create_page_visualization\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_create_presentation\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_create_space\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_create_spreadsheet\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_edit_page\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_find_pages\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_get_artifact_execution_status\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_get_page_auto_update\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_get_page_sharing\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_get_space\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_get_space_sharing\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_list_page_automations\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_list_page_comments\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_list_pages\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_list_spaces\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_manage_page_comment\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_move_page\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_patch_page\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_progress_update\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_read_page\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_read_page_changes\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_read_page_reference\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_read_page_transcript\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_reply_page_comment\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_run_page_auto_update\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_search_sharing_recipients\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_set_page_auto_update\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_trash_page\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_update_page_sharing\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_update_space_sharing\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__chatgpt_space_write_page_reference\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current acco\"},{\"name\":\"mcp__codex_apps__codex_document_control_execute_document_command\",\"description\":\"Use Codex Document Control to find connected document sessions, inspect the tools supporte\"},{\"name\":\"mcp__codex_apps__codex_document_control_get_document_tool_schemas\",\"description\":\"Use Codex Document Control to find connected document sessions, inspect the tools supporte\"},{\"name\":\"mcp__codex_apps__codex_document_control_list_document_sessions\",\"description\":\"Use Codex Document Control to find connected document sessions, inspect the tools supporte\"},{\"name\":\"mcp__codex_apps__hotline_get_local_hotline\",\"description\":\"Look up local suicide or self harm helpline information for the user based on country infe\"},{\"name\":\"mcp__codex_apps__pets_adopt\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_create_pet\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_delete_pet\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_get_pet_download_link\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_list_pets\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_prepare_pet_upload\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_select_pet\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_share_pet\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_unshare_pet\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_update_pet\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__pets_validate_pet_spritesheet\",\"description\":\"Create and manage the user's animated companion pets inside ChatGPT Work mode. Use only fo\"},{\"name\":\"mcp__codex_apps__plugin_management_get_app_permissions\",\"description\":\"Manage plugins, settings, permissions, and connections. Prefer available built-in tools or\"},{\"name\":\"mcp__codex_apps__plugin_management_get_plugin_dependencies\",\"description\":\"Manage plugins, settings, permissions, and connections. Prefer available built-in tools or\"},{\"name\":\"mcp__codex_apps__plugin_management_search_plugins\",\"description\":\"Manage plugins, settings, permissions, and connections. Prefer available built-in tools or\"},{\"name\":\"mcp__codex_apps__plugin_management_suggest_plugins\",\"description\":\"Manage plugins, settings, permissions, and connections. Prefer available built-in tools or\"},{\"name\":\"mcp__codex_apps__plugin_management_uninstall_app\",\"description\":\"Manage plugins, settings, permissions, and connections. Prefer available built-in tools or\"},{\"name\":\"mcp__codex_apps__plugin_management_update_app_permissions\",\"description\":\"Manage plugins, settings, permissions, and connections. Prefer available built-in tools or\"},{\"name\":\"mcp__codex_apps__safety_settings_get_family_info\",\"description\":\"For ChatGPT Parental Controls (your child or teen's settings, features, Study Mode, quiet \"},{\"name\":\"mcp__codex_apps__safety_settings_get_parental_controls\",\"description\":\"For ChatGPT Parental Controls (your child or teen's settings, features, Study Mode, quiet \"},{\"name\":\"mcp__codex_apps__safety_settings_get_trusted_contact\",\"description\":\"For ChatGPT Parental Controls (your child or teen's settings, features, Study Mode, quiet \"},{\"name\":\"mcp__codex_apps__safety_settings_prepare_parental_control_update\",\"description\":\"For ChatGPT Parental Controls (your child or teen's settings, features, Study Mode, quiet \"},{\"name\":\"mcp__codex_apps__safety_settings_update_parental_control\",\"description\":\"For ChatGPT Parental Controls (your child or teen's settings, features, Study Mode, quiet \"},{\"name\":\"mcp__codex_apps__sites_add_custom_domain\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_change_site_slug\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_create_schedule\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_create_site\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_create_source_repository_write_credential\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_deploy_private_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_deploy_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_generate_siwc_bypass_token\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_get_deployment_status\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_get_environment_variables\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_get_site\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_get_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_get_site_worker_logs\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_list_custom_domains\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_list_site_versions\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_list_sites\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_read_database_overview\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_read_database_table_rows\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_refresh_custom_domain_status\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_remove_custom_domain\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_save_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_save_version_and_deploy_private\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_update_environment_variables\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_update_site_access\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"mcp__codex_apps__sites_update_site_metadata\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, po\"},{\"name\":\"read_mcp_resource\",\"description\":\"Read a specific resource from an MCP server given the server name and resource URI.\\n\\nexec \"},{\"name\":\"request_plugin_install\",\"description\":\"# Suggest a recommended plugin installation\\n\\nUse this tool only when all of the following \"},{\"name\":\"update_goal\",\"description\":\"Update the existing goal.\\nSet status to `paused` only at the user's explicit request to pa\"},{\"name\":\"view_image\",\"description\":\"View a local image file from the filesystem when visual inspection is needed. Use this for\"},{\"name\":\"web__run\",\"description\":\"Tools in the web namespace.\\n\\nTool for accessing the internet.\\n\\n\\n---\\n\\n## Examples of differ\"},{\"name\":\"write_stdin\",\"description\":\"Writes characters to an existing unified exec session and returns recent output.\\n\\nexec too\"}]"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"fc7508\",\"wall_time_seconds\":0.000008419,\"exit_code\":1,\"original_token_count\":2,\"output\":\"/app\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T02:02:21.915Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_4ssLZEM2whhD5pacaZzeHRXg",
+      "tool": "spawn_agent",
+      "input": {
+        "task_name": "review",
+        "fork_turns": "all",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"632\">"
+      },
+      "timestamp": "2026-10-01T02:02:44.950Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_4ssLZEM2whhD5pacaZzeHRXg",
+      "status": "success",
+      "output": "{\"task_name\":\"/root/review\"}",
+      "timestamp": "2026-10-01T02:02:45.032Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ZiMMA4uVB3G3Qy4ILEqHtQck",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"ls -la /app; find / -name AGENTS.md -maxdepth 3 2>/dev/null; node -e \\\"for (const p of ['playwright','@playwright/test','puppeteer']) {try {console.log(p,require.resolve(p))} catch(e){}}\\\"\",\"max_output_tokens\":2000}));\n",
+      "timestamp": "2026-10-01T02:02:49.944Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ZiMMA4uVB3G3Qy4ILEqHtQck",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"7c4335\",\"wall_time_seconds\":0.000016996,\"exit_code\":127,\"original_token_count\":34,\"output\":\"total 0\\ndrwxr-xr-x. 1 root root  0 Oct  1 02:02 .\\ndrwxr-xr-x. 1 root root 70 Oct  1 02:02 ..\\n/bin/bash: line 1: node: command not found\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T02:02:50.042Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_L5PbIYDOfAZ8VhVbYeF8NnJv",
+      "tool": "send_message",
+      "input": {
+        "target": "review",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"484\">"
+      },
+      "timestamp": "2026-10-01T02:03:23.638Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_L5PbIYDOfAZ8VhVbYeF8NnJv",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-10-01T02:03:23.731Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The bowl will have warm ceramic, amber broth, tangled noodles, bok choy, mushrooms, and seared tofu. Steam will curl above it, with a gentle shift in perspective and light as the mouse moves.\n",
+      "timestamp": "2026-10-01T02:04:17.203Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_tb8JXIjcGvkLHts8ZfE2iyOl",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: /app/index.html\\n+<!DOCTYPE html>\\n+<html lang=\\\"en\\\">\\n+<head>\\n+  <meta charset=\\\"utf-8\\\">\\n+  <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1, viewport-fit=cover\\\">\\n+  <meta name=\\\"theme-color\\\" content=\\\"#100e0c\\\">\\n+  <title>Warmth — vegan ramen</title>\\n+  <style>\\n+    :root { color-scheme: dark; background: #100e0c; }\\n+    * { box-sizing: border-box; }\\n+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }\\n+    body { background: #100e0c; }\\n+    main { position: fixed; inset: 0; overflow: hidden; isolation: isolate; }\\n+    canvas { display: block; width: 100%; height: 100%; }\\n+    .description {\\n+      position: absolute; width: 1px; height: 1px; padding: 0;\\n+      margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;\\n+      border: 0;\\n+    }\\n+    @media (prefers-reduced-motion: reduce) {\\n+      *, *::before, *::after { animation: none !important; transition: none !important; }\\n+    }\\n+  </style>\\n+</head>\\n+<body>\\n+  <main aria-label=\\\"A quiet bowl of vegan ramen\\\">\\n+    <canvas id=\\\"scene\\\" role=\\\"img\\\" aria-describedby=\\\"scene-description\\\"></canvas>\\n+    <p id=\\\"scene-description\\\" class=\\\"description\\\">A handmade ceramic bowl of golden vegan ramen, with curled noodles, shiitake mushrooms, seared tofu, bok choy, corn, and scallions. Soft steam rises into the warm, dark surroundings.</p>\\n+  </main>\\n+  <script>\\n+  (() => {\\n+    'use strict';\\n+    const canvas = document.getElementById('scene');\\n+    const ctx = canvas.getContext('2d', { alpha: false });\\n+    if (!ctx) return;\\n+    const motion = matchMedia('(prefers-reduced-motion: reduce)');\\n+    const finePointer = matchMedia('(hover: hover) and (pointer: fine)');\\n+    const art = document.createElement('canvas');\\n+    const backdrop = document.createElement('canvas');\\n+    const ART_DPR = 2;\\n+    art.width = 1000 * ART_DPR; art.height = 810 * ART_DPR;\\n+    const g = art.getContext('2d');\\n+    g.scale(ART_DPR, ART_DPR);\\n+    let seed = 72819;\\n+    const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) | 0; return (seed >>> 0) / 4294967296; };\\n+    const between = (a, b) => a + random() * (b - a);\\n+    const TAU = Math.PI * 2;\\n+    function ellipse(c, x, y, rx, ry, fill, rotation = 0) {\\n+      c.beginPath(); c.ellipse(x, y, rx, ry, rotation, 0, TAU);\\n+      if (fill) { c.fillStyle = fill; c.fill(); }\\n+    }\\n+    function path(c, data, fill, stroke, width = 1) {\\n+      const p = new Path2D(data);\\n+      if (fill) { c.fillStyle = fill; c.fill(p); }\\n+      if (stroke) { c.strokeStyle = stroke; c.lineWidth = width; c.stroke(p); }\\n+      return p;\\n+    }\\n+    function gradient(c, x1, y1, x2, y2, stops) {\\n+      const gr = c.createLinearGradient(x1, y1, x2, y2);\\n+      stops.forEach(([offset, color]) => gr.addColorStop(offset, color));\\n+      return gr;\\n+    }\\n+    function softEllipse(c, x, y, rx, ry, color, blur) {\\n+      c.save(); c.filter = `blur(${blur}px)`; ellipse(c, x, y, rx, ry, color); c.restore();\\n+    }\\n+    const soup = new Path2D(); soup.ellipse(500, 407, 286, 105, 0, 0, TAU);\\n+    const body = new Path2D('M190 414 C208 567 286 674 423 706 Q500 728 577 706 C714 674 792 567 810 414 C810 482 671 536 500 536 C329 536 190 482 190 414Z');\\n+\\n+    // All of the artwork is drawn here, in vector paths and procedural pigment.\\n+    function drawBowl() {\\n+      softEllipse(g, 507, 744, 263, 26, 'rgba(0,0,0,.75)', 22);\\n+      softEllipse(g, 475, 742, 165, 12, 'rgba(194,112,46,.10)', 20);\\n+      ellipse(g, 500, 716, 92, 20, gradient(g, 412, 701, 576, 733, [[0,'#645443'],[.32,'#ad9575'],[.72,'#4e3b2c'],[1,'#211b16']]));\\n+      ellipse(g, 500, 727, 75, 9, '#272018');\\n+      g.fillStyle = gradient(g, 229, 481, 724, 688, [[0,'#baa98d'],[.16,'#b5a084'],[.4,'#96816a'],[.7,'#6e5945'],[1,'#34271d']]);\\n+      g.fill(body);\\n+      g.save(); g.clip(body);\\n+      const glow = g.createRadialGradient(295, 475, 5, 356, 511, 326);\\n+      glow.addColorStop(0, 'rgba(255,233,188,.47)'); glow.addColorStop(.43, 'rgba(229,204,164,.11)'); glow.addColorStop(1,'rgba(75,47,26,0)');\\n+      g.fillStyle = glow; g.fillRect(175, 430, 650, 305);\\n+      // Subtle thrown rings and mineral flecks give the ceramic a tactile surface.\\n+      for (let i = 0; i < 43; i++) {\\n+        const y = 489 + i * 5.25;\\n+        g.beginPath(); g.moveTo(176, y - 70);\\n+        g.bezierCurveTo(260, y + 64, 711, y + 72, 823, y - 70);\\n+        g.lineWidth = between(.45, 1.15); g.strokeStyle = i % 3 ? 'rgba(39,24,13,.075)' : 'rgba(255,231,190,.07)'; g.stroke();\\n+      }\\n+      for (let i = 0; i < 16500; i++) {\\n+        const x = between(180, 820), y = between(459, 724), r = between(.16, .75);\\n+        ellipse(g, x, y, r, r * between(.4, 1), random() > .23 ? `rgba(25,19,12,${between(.025,.19)})` : 'rgba(255,235,204,.12)');\\n+      }\\n+      const shade = gradient(g, 480, 548, 495, 735, [[0,'rgba(0,0,0,0)'],[.72,'rgba(24,13,7,.05)'],[1,'rgba(17,11,6,.5)']]);\\n+      g.fillStyle = shade; g.fillRect(180, 480, 650, 260); g.restore();\\n+      ellipse(g, 500, 414, 310, 121, gradient(g, 254, 330, 739, 522, [[0,'#d5c5a8'],[.23,'#dbc9a8'],[.6,'#b09b79'],[1,'#67503a']]));\\n+      g.save();\\n+      g.beginPath(); g.ellipse(500, 414, 307, 118, 0, 0, TAU); g.lineWidth = 2.4;\\n+      g.strokeStyle = gradient(g, 310, 320, 770, 502, [[0,'#eedbbb'],[.4,'#c8ae86'],[1,'#806142']]); g.stroke();\\n+      g.beginPath(); g.ellipse(500, 409, 290, 108, 0, 0, TAU); g.lineWidth = 4;\\n+      g.strokeStyle = 'rgba(78,49,23,.6)'; g.stroke(); g.restore();\\n+      g.fillStyle = gradient(g, 375, 300, 570, 528, [[0,'#5b2e13'],[.2,'#9e551e'],[.56,'#bc702b'],[.8,'#ad6121'],[1,'#713b17']]); g.fill(soup);\\n+      g.save(); g.clip(soup);\\n+      const brothLight = g.createRadialGradient(393, 382, 7, 479, 420, 288);\\n+      brothLight.addColorStop(0,'rgba(239,185,80,.38)'); brothLight.addColorStop(.55,'rgba(211,135,35,.1)'); brothLight.addColorStop(1,'rgba(71,29,5,.4)');\\n+      g.fillStyle = brothLight; g.fillRect(200, 290, 600, 230);\\n+      for (let i = 0; i < 1150; i++) {\\n+        const x = between(210, 790), y = between(305, 514), r = between(.25, 3.1);\\n+        ellipse(g, x, y, r * 1.5, r * .62, random() > .48 ? `rgba(255,207,112,${between(.02,.16)})` : `rgba(81,28,4,${between(.03,.17)})`);\\n+      }\\n+      for (let i = 0; i < 85; i++) {\\n+        const x = between(215, 785), y = between(306, 512), r = between(1.5, 7);\\n+        ellipse(g, x, y, r, r * .4, 'rgba(234,149,48,.2)');\\n+        g.strokeStyle = 'rgba(255,214,143,.2)'; g.lineWidth = .55; g.stroke();\\n+      }\\n+      g.restore();\\n+      drawNoodles();\\n+      drawNori(633, 331, -.12); drawNori(665, 340, .15);\\n+      drawBokChoy();\\n+      drawCorn();\\n+      drawTofu(303, 360, -.18, 1.04);\\n+      drawTofu(352, 326, .17, .93);\\n+      drawTofu(344, 409, .13, .85);\\n+      drawMushroom(627, 422, .19, 1.06);\\n+      drawMushroom(680, 386, -.33, .79);\\n+      drawMushroom(573, 461, -.19, .74);\\n+      drawGarnishes();\\n+      // The near edge catches the light, and gently occludes the broth.\\n+      g.save(); g.beginPath(); g.ellipse(500, 414, 298, 113, 0, .07, Math.PI - .07);\\n+      g.strokeStyle = gradient(g, 203, 420, 798, 500, [[0,'#e3cb9e'],[.45,'#c7ae83'],[1,'#967043']]); g.lineWidth = 8; g.stroke();\\n+      g.beginPath(); g.ellipse(500, 414, 307, 120, 0, .19, Math.PI - .22);\\n+      g.strokeStyle = 'rgba(247,224,184,.39)'; g.lineWidth = 1.4; g.stroke(); g.restore();\\n+    }\\n+    function drawNoodles() {\\n+      g.save(); g.clip(soup); g.lineCap = 'round'; g.lineJoin = 'round';\\n+      // Each strand follows its own softly irregular, interwoven curve.\\n+      for (let i = 0; i < 54; i++) {\\n+        const x = between(389, 555), y = between(361, 462), spread = between(37, 91);\\n+        const p = new Path2D();\\n+        p.moveTo(x - spread * .7, y + 3);\\n+        p.bezierCurveTo(x - spread * 1.2, y - 28, x + spread * .8, y - 28, x + spread, y - 6);\\n+        p.bezierCurveTo(x + spread * 1.15, y + 23, x - spread * .95, y + 16, x - spread * .9, y + 39);\\n+        p.bezierCurveTo(x - spread * .87, y + 59, x + spread * .65, y + 39, x + spread * .76, y + 55);\\n+        g.strokeStyle = 'rgba(73,35,7,.55)'; g.lineWidth = 6.5; g.stroke(p);\\n+        g.strokeStyle = gradient(g, x, y - 25, x, y + 56, [[0,'#e4ba69'],[.35,'#f3d08a'],[.7,'#c69446'],[1,'#e4b970']]); g.lineWidth = between(3.6, 4.8); g.stroke(p);\\n+        g.strokeStyle = 'rgba(255,229,158,.39)'; g.lineWidth = .85; g.stroke(p);\\n+      }\\n+      g.restore();\\n+    }\\n+    function drawNori(x, y, angle) {\\n+      g.save(); g.translate(x, y); g.rotate(angle);\\n+      const p = path(g, 'M-39 24 L-31 -70 L-19 -74 L-6 -71 L8 -77 L24 -73 L35 -65 L38 22 Q4 37 -39 24Z', gradient(g, -30, -75, 34, 34, [[0,'#202c1d'],[.35,'#162417'],[.7,'#283122'],[1,'#101c12']]));\\n+      g.clip(p);\\n+      for (let i = 0; i < 630; i++) {\\n+        const a = between(-38, 38), b = between(-79, 35);\\n+        g.strokeStyle = random() > .3 ? 'rgba(146,155,84,.12)' : 'rgba(0,0,0,.3)'; g.lineWidth = between(.3, 1.1);\\n+        g.beginPath(); g.moveTo(a,b); g.lineTo(a + between(1,5),b + between(0,2)); g.stroke();\\n+      }\\n+      g.restore();\\n+    }\\n+    function leaf(x, y, rotation, size, tint) {\\n+      g.save(); g.translate(x,y); g.rotate(rotation); g.scale(size,size);\\n+      g.shadowColor = 'rgba(20,21,5,.45)'; g.shadowBlur = 9; g.shadowOffsetY = 5;\\n+      const shape = path(g, 'M0 36 C-19 24 -51 10 -49 -19 C-61 -38 -41 -51 -32 -49 C-28 -65 -8 -65 1 -58 C18 -70 32 -52 32 -42 C54 -37 58 -13 43 1 C41 21 19 29 0 36Z', gradient(g,-38,-40,31,33,[[0,tint],[.33,'#4c7724'],[.65,'#335c21'],[1,'#153b17']]));\\n+      g.shadowColor = 'transparent'; g.clip(shape);\\n+      for (let i = 0; i < 28; i++) {\\n+        const a = between(-49,49), b = between(-64,36);\\n+        ellipse(g,a,b,between(1,6),between(1,4),'rgba(140,161,63,.085)');\\n+      }\\n+      g.strokeStyle = 'rgba(186,202,103,.37)'; g.lineWidth = 1.2;\\n+      path(g,'M0 34 C4 13 -6 -22 1 -52',null,g.strokeStyle,1.5);\\n+      for (let i=0;i<5;i++) {\\n+        const y1 = 22 - i * 13;\\n+        path(g,`M1 ${y1} Q-14 ${y1-13} -34 ${y1-18}`,null,'rgba(150,175,84,.21)',.9);\\n+        path(g,`M1 ${y1} Q17 ${y1-7} 36 ${y1-23}`,null,'rgba(150,175,84,.19)',.9);\\n+      }\\n+      g.restore();\\n+    }\\n+    function drawBokChoy() {\\n+      leaf(449,326,-.66,.9,'#64812c');\\n+      leaf(497,314,.12,1.02,'#76952e');\\n+      leaf(550,332,.78,.77,'#64882d');\\n+      g.save(); g.shadowColor = 'rgba(33,39,12,.3)'; g.shadowBlur = 5; g.shadowOffsetY = 4;\\n+      path(g,'M456 397 Q436 375 426 341 Q438 337 444 339 Q458 368 475 383 L479 397Z',gradient(g,431,338,470,398,[[0,'#81a45b'],[.45,'#c0ca7c'],[1,'#dee2a0']]));\\n+      path(g,'M475 399 Q479 367 479 340 Q486 333 495 339 Q490 374 495 396Z',gradient(g,478,337,494,399,[[0,'#84aa61'],[.4,'#d0d79a'],[1,'#e4dfb0']]));\\n+      path(g,'M494 399 Q518 379 535 351 L550 354 Q532 389 514 404Z',gradient(g,543,352,501,401,[[0,'#83a056'],[.52,'#c5cf8c'],[1,'#e0dfa6']]));\\n+      g.shadowColor = 'transparent';\\n+      path(g,'M438 346 Q448 369 466 391',null,'rgba(243,242,188,.39)',1.5);\\n+      path(g,'M488 344 Q483 373 486 394',null,'rgba(246,245,200,.5)',1.5);\\n+      path(g,'M541 359 Q528 383 506 399',null,'rgba(240,237,184,.4)',1.6);\\n+      g.restore();\\n+    }\\n+    function drawTofu(x, y, angle, scale) {\\n+      g.save(); g.translate(x,y); g.rotate(angle); g.scale(scale,scale);\\n+      g.shadowColor='rgba(40,18,4,.5)'; g.shadowBlur=8; g.shadowOffsetY=6;\\n+      path(g,'M-36 -10 L9 -31 L45 -8 L-1 15Z','#f0c780');\\n+      g.shadowColor='transparent';\\n+      path(g,'M-36 -10 L-1 15 L-2 39 L-37 12Z',gradient(g,-35,-10,-4,38,[[0,'#c69043'],[.5,'#e2b25f'],[1,'#a1682c']]));\\n+      path(g,'M-1 15 L45 -8 L44 15 L-2 39Z',gradient(g,3,9,39,27,[[0,'#e1b065'],[.4,'#b17c36'],[1,'#82511f']]));\\n+      const top = path(g,'M-36 -10 L9 -31 L45 -8 L-1 15Z',gradient(g,-12,-24,19,12,[[0,'#eac27a'],[.44,'#da9e42'],[.68,'#d7a653'],[1,'#f0cb85']]));\\n+      g.save(); g.clip(top);\\n+      for (let i=0;i<165;i++) {\\n+        const a=between(-37,45), b=between(-31,16), r=between(.3,2.9);\\n+        ellipse(g,a,b,r,r*.56,random()>.22?`rgba(99,47,7,${between(.04,.4)})`:'rgba(255,234,162,.42)',-.4);\\n+      }\\n+      for(let i=0;i<5;i++) path(g,`M${-36+i*13} -24 L${-16+i*13} 14`,null,'rgba(106,56,11,.12)',2.7);\\n+      g.restore();\\n+      path(g,'M-35 -11 L9 -31 L43 -9',null,'rgba(255,226,160,.63)',1);\\n+      for(let i=0;i<20;i++) ellipse(g,between(1,42),between(16,28),.65,.4,'rgba(51,26,8,.18)');\\n+      g.restore();\\n+    }\\n+    function drawMushroom(x, y, angle, scale) {\\n+      g.save(); g.translate(x,y); g.rotate(angle); g.scale(scale,scale);\\n+      g.shadowColor='rgba(33,14,3,.65)'; g.shadowBlur=8; g.shadowOffsetY=7;\\n+      path(g,'M-15 20 Q-9 43 5 43 L12 39 Q5 24 12 17Z',gradient(g,-11,20,9,44,[[0,'#c19d63'],[.5,'#cfba86'],[1,'#8c6d40']]));\\n+      ellipse(g,0,7,58,30,'#634025'); g.shadowColor='transparent';\\n+      for(let i=0;i<29;i++) {\\n+        const a=i/28*Math.PI;\\n+        path(g,`M2 8 Q${Math.cos(a)*25} ${8+Math.sin(a)*14} ${Math.cos(a)*55} ${6+Math.sin(a)*25}`,null,'rgba(218,189,132,.35)',1);\\n+      }\\n+      const cap = path(g,'M-60 0 C-57 -25 -25 -43 4 -41 C35 -42 58 -22 61 1 Q43 23 0 23 Q-42 21 -60 0Z',gradient(g,-26,-39,34,22,[[0,'#bd8651'],[.24,'#936039'],[.58,'#754a2b'],[.84,'#57321b'],[1,'#382211']]));\\n+      g.save(); g.clip(cap);\\n+      const shine=g.createRadialGradient(-21,-27,1,-13,-14,54);\\n+      shine.addColorStop(0,'rgba(236,183,121,.38)'); shine.addColorStop(.6,'rgba(192,130,69,.06)'); shine.addColorStop(1,'rgba(69,32,10,.12)'); g.fillStyle=shine; g.fillRect(-70,-50,140,85);\\n+      for(let i=0;i<650;i++) {\\n+        const a=between(-60,61),b=between(-43,24),r=between(.25,1.5);\\n+        ellipse(g,a,b,r,r*.65,random()>.4?'rgba(230,179,116,.14)':'rgba(30,13,3,.2)');\\n+      }\\n+      path(g,'M-26 -29 Q-6 -17 24 8 L29 5 Q9 -10 -18 -32Z','#c8a578');\\n+      path(g,'M25 -30 Q7 -16 -23 7 L-17 11 Q6 -3 31 -25Z','#d8b789');\\n+      path(g,'M-21 -29 Q-4 -16 24 6',null,'rgba(245,216,163,.65)',1.2);\\n+      path(g,'M27 -28 Q8 -11 -18 9',null,'rgba(238,208,159,.55)',1);\\n+      g.restore();\\n+      path(g,'M-58 -2 Q-51 -25 -23 -35',null,'rgba(230,173,110,.32)',1.2);\\n+      g.restore();\\n+    }\\n+    function drawCorn() {\\n+      g.save(); g.translate(582,350); g.rotate(-.16);\\n+      for(let i=0;i<36;i++) {\\n+        const x=(i%7)*10+between(-3,3),y=Math.floor(i/7)*7+between(-2,2);\\n+        g.shadowColor='rgba(82,44,0,.46)'; g.shadowBlur=3; g.shadowOffsetY=2;\\n+        const p=path(g,`M${x-4} ${y-3} Q${x-7} ${y+2} ${x-2} ${y+5} Q${x+5} ${y+7} ${x+5} ${y} Q${x+4} ${y-5} ${x-4} ${y-3}Z`,gradient(g,x-4,y-4,x+4,y+5,[[0,'#f7d378'],[.35,'#eaba4c'],[1,'#b47820']]));\\n+        g.shadowColor='transparent'; path(g,`M${x-3} ${y-1} Q${x-1} ${y-4} ${x+2} ${y-2}`,null,'rgba(255,230,140,.65)',1);\\n+      }\\n+      g.restore();\\n+    }\\n+    function scallion(x,y,r,angle) {\\n+      g.save(); g.translate(x,y); g.rotate(angle);\\n+      g.shadowColor='rgba(24,31,6,.6)'; g.shadowBlur=2; g.shadowOffsetY=1.5;\\n+      ellipse(g,0,0,r,r*.64,'#598241'); g.shadowColor='transparent';\\n+      ellipse(g,-.5,-.6,r*.73,r*.43,'#a5b86b');\\n+      ellipse(g,.4,.15,r*.45,r*.25,'#395827');\\n+      g.beginPath(); g.ellipse(-.2,-.6,r*.86,r*.53,0,Math.PI*1.03,Math.PI*1.87); g.strokeStyle='#ced59c'; g.lineWidth=.75; g.stroke(); g.restore();\\n+    }\\n+    function drawGarnishes() {\\n+      g.save(); g.clip(soup);\\n+      for(let i=0;i<56;i++) {\\n+        const x=between(339,674),y=between(365,494);\\n+        if (random()>.35 && x>560 && y<461) continue;\\n+        scallion(x,y,between(3,6.5),between(-.9,.9));\\n+      }\\n+      for(let i=0;i<115;i++) {\\n+        const x=between(299,708),y=between(337,491);\\n+        ellipse(g,x,y,between(.8,1.8),between(.45,.85),random()>.23?'#e5cd94':'#3a2517',between(0,Math.PI));\\n+      }\\n+      for(let i=0;i<28;i++) {\\n+        const x=between(298,720),y=between(345,486);\\n+        path(g,`M${x} ${y} l4 -1 l-1 3 l-3 1Z`,random()>.3?'#974125':'#c66536');\\n+      }\\n+      g.restore();\\n+      // A few slivers of red chili against the golden noodles.\\n+      g.save(); g.lineCap='round';\\n+      path(g,'M388 448 Q407 450 434 435',null,'rgba(69,29,9,.6)',6);\\n+      path(g,'M388 446 Q407 447 434 433',null,'#ae4329',4);\\n+      path(g,'M390 445 Q409 445 431 433',null,'#dc7750',1.1);\\n+      path(g,'M517 440 Q531 425 549 423',null,'#a73c24',4);\\n+      path(g,'M518 439 Q534 425 549 423',null,'#e38a5d',.9);\\n+      g.restore();\\n+    }\\n+    drawBowl();\\n+\\n+    let width=0, height=0, dpr=1, scale=1, anchorY=0;\\n+    let frame=0, time=0, lastTime=0, active=!document.hidden;\\n+    let pointer={x:0,y:0,tx:0,ty:0,inside:false};\\n+    function resize() {\\n+      width=window.innerWidth; height=window.innerHeight;\\n+      dpr=Math.min(window.devicePixelRatio || 1,2);\\n+      canvas.width=Math.round(width*dpr); canvas.height=Math.round(height*dpr);\\n+      backdrop.width=canvas.width; backdrop.height=canvas.height;\\n+      scale=Math.min(width*.89/650,height*.83/660,1.42);\\n+      anchorY=height*.58;\\n+      const b=backdrop.getContext('2d'); b.setTransform(dpr,0,0,dpr,0,0);\\n+      b.fillStyle='#100e0c'; b.fillRect(0,0,width,height);\\n+      const atmosphere=b.createRadialGradient(width*.47,height*.46,0,width*.48,height*.44,Math.max(width,height)*.67);\\n+      atmosphere.addColorStop(0,'#2e241a'); atmosphere.addColorStop(.35,'#1d1913'); atmosphere.addColorStop(.72,'#13120f'); atmosphere.addColorStop(1,'#0c0d0b');\\n+      b.fillStyle=atmosphere; b.fillRect(0,0,width,height);\\n+      // The table is only a suggestion of reflected light, without a horizon.\\n+      b.save(); b.translate(width*.5,anchorY+238*scale); b.scale(1,.24);\\n+      const pool=b.createRadialGradient(0,0,0,0,0,460*scale);\\n+      pool.addColorStop(0,'rgba(154,101,48,.14)'); pool.addColorStop(.45,'rgba(122,80,40,.045)'); pool.addColorStop(1,'rgba(68,43,20,0)');\\n+      b.fillStyle=pool; b.fillRect(-600*scale,-600*scale,1200*scale,1200*scale); b.restore();\\n+      const vignette=b.createRadialGradient(width*.5,height*.51,Math.min(width,height)*.16,width*.5,height*.5,Math.max(width,height)*.68);\\n+      vignette.addColorStop(0,'rgba(0,0,0,0)'); vignette.addColorStop(.7,'rgba(0,0,0,.08)'); vignette.addColorStop(1,'rgba(0,0,0,.42)');\\n+      b.fillStyle=vignette; b.fillRect(0,0,width,height);\\n+      // Fine, code-generated grain prevents broad gradients from looking flat.\\n+      for(let i=0;i<Math.min(width*height/55,28000);i++) {\\n+        b.fillStyle=i%3?'rgba(214,182,141,.017)':'rgba(0,0,0,.065)';\\n+        b.fillRect(random()*width,random()*height,.6,.6);\\n+      }\\n+      if(motion.matches || !active) render();\\n+      else start();\\n+    }\\n+    function drawSteam(t) {\\n+      ctx.save(); ctx.globalCompositeOperation='screen';\\n+      const breeze=pointer.x*20;\\n+      // Overlapping translucent wisps expand and disappear as they rise.\\n+      for(let plume=0;plume<7;plume++) {\\n+        const origin=348+plume*43;\\n+        const phase=t*.095+plume*.177;\\n+        for(let j=0;j<24;j++) {\\n+          const progress=(j/24+phase)%1;\\n+          const lift=progress*267;\\n+          const x=origin + Math.sin(progress*7+t*.42+plume*1.8)*(10+progress*29) + Math.sin(progress*3.6+plume)*progress*31+breeze*progress;\\n+          const y=390-lift + Math.sin(plume*2)*11;\\n+          const fade=Math.sin(progress*Math.PI)*Math.pow(1-progress,1.45);\\n+          const r=8+progress*31;\\n+          ctx.save(); ctx.translate(x,y); ctx.scale(1,1.75);\\n+          const vapor=ctx.createRadialGradient(0,0,0,0,0,r);\\n+          vapor.addColorStop(0,`rgba(204,194,171,${fade*.047})`);\\n+          vapor.addColorStop(.45,`rgba(181,172,151,${fade*.026})`);\\n+          vapor.addColorStop(1,'rgba(176,165,145,0)');\\n+          ctx.fillStyle=vapor; ctx.fillRect(-r,-r,r*2,r*2); ctx.restore();\\n+        }\\n+      }\\n+      for(let i=0;i<4;i++) {\\n+        const x=380+i*70;\\n+        ctx.beginPath();\\n+        for(let j=0;j<=30;j++) {\\n+          const p=j/30, y=384-p*242;\\n+          const px=x+Math.sin(p*8+t*.57+i*2)*(4+p*25)+p*breeze;\\n+          if(!j) ctx.moveTo(px,y); else ctx.lineTo(px,y);\\n+        }\\n+        const fog=ctx.createLinearGradient(0,384,0,142);\\n+        fog.addColorStop(0,'rgba(204,193,171,0)'); fog.addColorStop(.21,'rgba(215,206,183,.07)'); fog.addColorStop(.53,'rgba(207,199,180,.05)'); fog.addColorStop(1,'rgba(194,187,170,0)');\\n+        ctx.strokeStyle=fog; ctx.lineWidth=9+i*2; ctx.filter='blur(5px)'; ctx.stroke(); ctx.filter='none';\\n+      }\\n+      ctx.restore();\\n+    }\\n+    function render() {\\n+      ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(backdrop,0,0);\\n+      ctx.setTransform(dpr,0,0,dpr,0,0);\\n+      const px=motion.matches?0:pointer.x, py=motion.matches?0:pointer.y;\\n+      ctx.translate(width/2+px*6,anchorY+py*3);\\n+      ctx.scale(scale,scale); ctx.rotate(px*.006); ctx.translate(-500,-500);\\n+      ctx.drawImage(art,0,0,1000,810);\\n+      if(!motion.matches) {\\n+        ctx.save(); ctx.clip(soup);\\n+        for(let i=0;i<3;i++) {\\n+          const p=(time*.055+i/3)%1;\\n+          ctx.beginPath(); ctx.ellipse(434+px*28,432+py*9,32+p*153,8+p*38,0,.12,Math.PI*.78);\\n+          ctx.strokeStyle=`rgba(255,211,119,${Math.sin(p*Math.PI)*.045})`; ctx.lineWidth=.75; ctx.stroke();\\n+        }\\n+        ctx.restore();\\n+      }\\n+      // Moving lamplight responds gently to a nearby pointer.\\n+      if(finePointer.matches && !motion.matches && Math.abs(px)+Math.abs(py)>.01) {\\n+        ctx.save(); ctx.clip(body);\\n+        const glint=ctx.createRadialGradient(360+px*112,529+py*40,0,360+px*112,529+py*40,170);\\n+        glint.addColorStop(0,'rgba(255,218,159,.09)'); glint.addColorStop(1,'rgba(255,218,159,0)');\\n+        ctx.fillStyle=glint; ctx.fillRect(180,450,650,280); ctx.restore();\\n+      }\\n+      drawSteam(motion.matches?4:time);\\n+    }\\n+    function tick(now) {\\n+      frame=0;\\n+      if(!active || motion.matches) return;\\n+      const delta=Math.min((now-lastTime)/1000,.05); lastTime=now; time+=delta;\\n+      const ease=1-Math.exp(-delta*3.5);\\n+      pointer.x+=(pointer.tx-pointer.x)*ease; pointer.y+=(pointer.ty-pointer.y)*ease;\\n+      render(); frame=requestAnimationFrame(tick);\\n+    }\\n+    function start() {\\n+      if(!frame && active && !motion.matches) { lastTime=performance.now(); frame=requestAnimationFrame(tick); }\\n+    }\\n+    window.addEventListener('pointermove',e => {\\n+      if(!finePointer.matches || motion.matches || e.pointerType==='touch') return;\\n+      pointer.tx=Math.max(-1,Math.min(1,(e.clientX/width-.5)*2));\\n+      pointer.ty=Math.max(-1,Math.min(1,(e.clientY/height-.5)*2));\\n+    },{passive:true});\\n+    document.documentElement.addEventListener('pointerleave',() => { pointer.tx=0; pointer.ty=0; });\\n+    window.addEventListener('blur',() => { pointer.tx=0; pointer.ty=0; });\\n+    document.addEventListener('visibilitychange',() => {\\n+      active=!document.hidden;\\n+      if(!active) { cancelAnimationFrame(frame); frame=0; }\\n+      else { render(); start(); }\\n+    });\\n+    motion.addEventListener('change',() => {\\n+      cancelAnimationFrame(frame); frame=0;\\n+      pointer.x=pointer.y=pointer.tx=pointer.ty=0;\\n+      render(); start();\\n+    });\\n+    window.addEventListener('resize',resize,{passive:true});\\n+    resize(); render();\\n+  })();\\n+  </script>\\n+</body>\\n+</html>\\n*** End Patch\"));\n",
+      "timestamp": "2026-10-01T02:08:36.750Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_tb8JXIjcGvkLHts8ZfE2iyOl",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        }
+      ],
+      "timestamp": "2026-10-01T02:08:36.797Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_Er37s8DtVbe0VtGw95Pry2px",
+      "tool": "send_message",
+      "input": {
+        "target": "review",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"332\">"
+      },
+      "timestamp": "2026-10-01T02:08:40.693Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_Er37s8DtVbe0VtGw95Pry2px",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-10-01T02:08:40.723Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_tOoHVuAkEYP9F78r5iZTTP1x",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"wc -l /app/index.html; python - <<'PY'\\nfrom playwright.sync_api import sync_playwright\\nwith sync_playwright() as p:\\n    browser=p.chromium.launch(headless=True,args=['--no-sandbox'])\\n    page=browser.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)\\n    page.goto('file:///app/index.html')\\n    page.wait_for_timeout(1200)\\n    page.screenshot(path='<TMP>/ramen-first.png')\\n    print('Screenshot captured', page.title())\\n    browser.close()\\nPY\",\"max_output_tokens\":2000}));\nconst im = await tools.view_image({path:\"<TMP>/ramen-first.png\"}); image(im.image_url);\n",
+      "timestamp": "2026-10-01T02:08:48.280Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_tOoHVuAkEYP9F78r5iZTTP1x",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 5.6 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"f8e2f7\",\"wall_time_seconds\":5.337728501,\"exit_code\":0,\"original_token_count\":16,\"output\":\"405 /app/index.html\\nScreenshot captured Warmth — vegan ramen\\n\"}"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"1414284\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-10-01T02:08:53.902Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The scene is rendering correctly across desktop and phone sizes, and reduced-motion mode stays completely still. I’m refining the steam rendering to keep the animation and mouse response smooth.\n",
+      "timestamp": "2026-10-01T02:10:02.211Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_D6N9yH7v8hJMDuthILXKNaDT",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"sed -n '1,240p' <TMP>/verify_scene.py\",\"max_output_tokens\":5000}));\nconst ims = await Promise.allSettled([\"<TMP>/ramen-phone.png\",\"<TMP>/ramen-landscape.png\"].map(path=>tools.view_image({path})));\nfor(const im of ims){if(im.status===\"fulfilled\") image(im.value.image_url); else text(im.reason);}\n",
+      "timestamp": "2026-10-01T02:10:04.023Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_D6N9yH7v8hJMDuthILXKNaDT",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"3c60c3\",\"wall_time_seconds\":0.000008993,\"exit_code\":0,\"original_token_count\":547,\"output\":\"import json, hashlib, os\\nfrom playwright.sync_api import sync_playwright\\n\\nscenarios = [\\n ('desktop', {'width':1440,'height':1000}, 'no-preference'),\\n ('phone', {'width':390,'height':844}, 'no-preference'),\\n ('landscape', {'width':844,'height':390}, 'no-preference'),\\n ('small', {'width':320,'height':568}, 'reduce'),\\n ('reduced', {'width':1440,'height':1000}, 'reduce'),\\n]\\nwith sync_playwright() as p:\\n browser=p.chromium.launch(headless=True,args=['--no-sandbox'])\\n for name,viewport,motion in scenarios:\\n  page=browser.new_page(viewport=viewport,reduced_motion=motion,device_scale_factor=1)\\n  errors=[]; network=[]\\n  page.on('pageerror',lambda e:errors.append(str(e)))\\n  page.on('request',lambda r:network.append(r.url))\\n  page.add_init_script('''window.__sceneRAF=0; const orig=window.requestAnimationFrame.bind(window); window.requestAnimationFrame=(cb)=>orig((t)=>{window.__sceneRAF++;cb(t)});''')\\n  page.goto('file:///app/index.html')\\n  page.wait_for_timeout(500)\\n  metrics=page.evaluate('''()=>({width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,canvases:[...document.querySelectorAll('canvas')].map(c=>({width:c.width,height:c.height,role:c.getAttribute('role'),label:c.getAttribute('aria-label'),cssWidth:c.getBoundingClientRect().width,cssHeight:c.getBoundingClientRect().height})),visibleText:document.body.innerText,images:document.images.length,stylesheets:document.styleSheets.length,raf:window.__sceneRAF})''')\\n  page.screenshot(path=f'<TMP>/ramen-{name}.png')\\n  getframe=lambda:page.evaluate(\\\"[...document.querySelectorAll('canvas')].map(c=>c.toDataURL()).join('')\\\")\\n  before=getframe(); raf_before=page.evaluate('window.__sceneRAF')\\n  page.wait_for_timeout(350)\\n  after=getframe(); raf_after=page.evaluate('window.__sceneRAF')\\n  page.mouse.move(viewport['width']*.8,viewport['height']*.3)\\n  page.wait_for_timeout(200)\\n  pointer=getframe()\\n  print(json.dumps({'scenario':name,'motion':motion,'errors':errors,'requests':network,'metrics':metrics,'changesWithTime':before!=after,'changesWithPointer':pointer!=after,'rafOver350ms':raf_after-raf_before}))\\n  page.close()\\n browser.close()\\n\"}"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"304348\">",
+          "detail": "high"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"337036\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-10-01T02:10:04.127Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_bJT6wCKoPwoYZw9GAne9P9ze",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /app/index.html\\n@@\\n-    <canvas id=\\\"scene\\\" role=\\\"img\\\" aria-describedby=\\\"scene-description\\\"></canvas>\\n+    <canvas id=\\\"scene\\\" role=\\\"img\\\" aria-label=\\\"A steaming bowl of vegan ramen\\\" aria-describedby=\\\"scene-description\\\"></canvas>\\n@@\\n     const art = document.createElement('canvas');\\n     const backdrop = document.createElement('canvas');\\n+    const steam = document.createElement('canvas');\\n+    const puff = document.createElement('canvas');\\n+    steam.width = 312; steam.height = 228;\\n+    puff.width = puff.height = 128;\\n+    const vaporContext = steam.getContext('2d');\\n+    const puffContext = puff.getContext('2d');\\n+    const puffGlow = puffContext.createRadialGradient(64,64,0,64,64,64);\\n+    puffGlow.addColorStop(0,'rgba(204,194,171,.7)');\\n+    puffGlow.addColorStop(.45,'rgba(181,172,151,.37)');\\n+    puffGlow.addColorStop(1,'rgba(176,165,145,0)');\\n+    puffContext.fillStyle = puffGlow; puffContext.fillRect(0,0,128,128);\\n@@\\n-    let pointer={x:0,y:0,tx:0,ty:0,inside:false};\\n+    const pointer={x:0,y:0,tx:0,ty:0};\\n@@\\n     function drawSteam(t) {\\n-      ctx.save(); ctx.globalCompositeOperation='screen';\\n+      // Vapor is soft by nature; a small procedural layer keeps it inexpensive.\\n+      const v = vaporContext;\\n+      v.setTransform(1,0,0,1,0,0); v.clearRect(0,0,steam.width,steam.height);\\n+      v.setTransform(.6,0,0,.6,-144,-39);\\n+      v.globalCompositeOperation='source-over';\\n       const breeze=pointer.x*20;\\n@@\\n-          ctx.save(); ctx.translate(x,y); ctx.scale(1,1.75);\\n-          const vapor=ctx.createRadialGradient(0,0,0,0,0,r);\\n-          vapor.addColorStop(0,`rgba(204,194,171,${fade*.047})`);\\n-          vapor.addColorStop(.45,`rgba(181,172,151,${fade*.026})`);\\n-          vapor.addColorStop(1,'rgba(176,165,145,0)');\\n-          ctx.fillStyle=vapor; ctx.fillRect(-r,-r,r*2,r*2); ctx.restore();\\n+          v.globalAlpha=fade*.067;\\n+          v.drawImage(puff,x-r,y-r*1.75,r*2,r*3.5);\\n         }\\n       }\\n+      v.globalAlpha=1;\\n       for(let i=0;i<4;i++) {\\n         const x=380+i*70;\\n-        ctx.beginPath();\\n+        v.beginPath();\\n@@\\n-          if(!j) ctx.moveTo(px,y); else ctx.lineTo(px,y);\\n+          if(!j) v.moveTo(px,y); else v.lineTo(px,y);\\n         }\\n-        const fog=ctx.createLinearGradient(0,384,0,142);\\n+        const fog=v.createLinearGradient(0,384,0,142);\\n         fog.addColorStop(0,'rgba(204,193,171,0)'); fog.addColorStop(.21,'rgba(215,206,183,.07)'); fog.addColorStop(.53,'rgba(207,199,180,.05)'); fog.addColorStop(1,'rgba(194,187,170,0)');\\n-        ctx.strokeStyle=fog; ctx.lineWidth=9+i*2; ctx.filter='blur(5px)'; ctx.stroke(); ctx.filter='none';\\n+        v.strokeStyle=fog; v.lineWidth=9+i*2; v.filter='blur(5px)'; v.stroke(); v.filter='none';\\n       }\\n-      ctx.restore();\\n+      ctx.save(); ctx.globalCompositeOperation='screen';\\n+      ctx.drawImage(steam,240,65,520,380); ctx.restore();\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"python <TMP>/verify_scene.py\",\"max_output_tokens\":3500,\"yield_time_ms\":10000}));\n",
+      "timestamp": "2026-10-01T02:10:53.936Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_bJT6wCKoPwoYZw9GAne9P9ze",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 10.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"b6ee7e\",\"wall_time_seconds\":10.000995153,\"session_id\":59897,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T02:11:04.129Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_UgQhAXv2AgM4X57gWETOIsys",
+      "tool": "send_message",
+      "input": {
+        "target": "review",
+        "message": "<OMITTED_OPAQUE_PAYLOAD encoding=\"fernet/base64url\" original-characters=\"548\">"
+      },
+      "timestamp": "2026-10-01T02:11:12.879Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_UgQhAXv2AgM4X57gWETOIsys",
+      "status": "success",
+      "output": "",
+      "timestamp": "2026-10-01T02:11:12.956Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_zJpIfsNgIEIwWK4qLeuyZxWl",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:59897,chars:\"\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\nconst im=await tools.view_image({path:\"<TMP>/ramen-desktop.png\"}); image(im.image_url);\n",
+      "timestamp": "2026-10-01T02:11:27.940Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_zJpIfsNgIEIwWK4qLeuyZxWl",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"d89f8d\",\"wall_time_seconds\":0.000006668,\"exit_code\":0,\"original_token_count\":803,\"output\":\"{\\\"scenario\\\": \\\"desktop\\\", \\\"motion\\\": \\\"no-preference\\\", \\\"errors\\\": [], \\\"requests\\\": [\\\"file:///app/index.html\\\"], \\\"metrics\\\": {\\\"width\\\": 1440, \\\"height\\\": 1000, \\\"scrollWidth\\\": 1440, \\\"scrollHeight\\\": 1000, \\\"canvases\\\": [{\\\"width\\\": 1440, \\\"height\\\": 1000, \\\"role\\\": \\\"img\\\", \\\"label\\\": \\\"A steaming bowl of vegan ramen\\\", \\\"cssWidth\\\": 1440, \\\"cssHeight\\\": 1000}], \\\"visibleText\\\": \\\"A handmade ceramic bowl of golden vegan ramen, with curled noodles, shiitake mushrooms, seared tofu, bok choy, corn, and scallions. Soft steam rises into the warm, dark surroundings.\\\", \\\"images\\\": 0, \\\"stylesheets\\\": 1, \\\"raf\\\": 17}, \\\"changesWithTime\\\": true, \\\"changesWithPointer\\\": true, \\\"rafOver350ms\\\": 16}\\n{\\\"scenario\\\": \\\"phone\\\", \\\"motion\\\": \\\"no-preference\\\", \\\"errors\\\": [], \\\"requests\\\": [\\\"file:///app/index.html\\\"], \\\"metrics\\\": {\\\"width\\\": 390, \\\"height\\\": 844, \\\"scrollWidth\\\": 390, \\\"scrollHeight\\\": 844, \\\"canvases\\\": [{\\\"width\\\": 390, \\\"height\\\": 844, \\\"role\\\": \\\"img\\\", \\\"label\\\": \\\"A steaming bowl of vegan ramen\\\", \\\"cssWidth\\\": 390, \\\"cssHeight\\\": 844}], \\\"visibleText\\\": \\\"A handmade ceramic bowl of golden vegan ramen, with curled noodles, shiitake mushrooms, seared tofu, bok choy, corn, and scallions. Soft steam rises into the warm, dark surroundings.\\\", \\\"images\\\": 0, \\\"stylesheets\\\": 1, \\\"raf\\\": 31}, \\\"changesWithTime\\\": true, \\\"changesWithPointer\\\": true, \\\"rafOver350ms\\\": 24}\\n{\\\"scenario\\\": \\\"landscape\\\", \\\"motion\\\": \\\"no-preference\\\", \\\"errors\\\": [], \\\"requests\\\": [\\\"file:///app/index.html\\\"], \\\"metrics\\\": {\\\"width\\\": 844, \\\"height\\\": 390, \\\"scrollWidth\\\": 844, \\\"scrollHeight\\\": 390, \\\"canvases\\\": [{\\\"width\\\": 844, \\\"height\\\": 390, \\\"role\\\": \\\"img\\\", \\\"label\\\": \\\"A steaming bowl of vegan ramen\\\", \\\"cssWidth\\\": 844, \\\"cssHeight\\\": 390}], \\\"visibleText\\\": \\\"A handmade ceramic bowl of golden vegan ramen, with curled noodles, shiitake mushrooms, seared tofu, bok choy, corn, and scallions. Soft steam rises into the warm, dark surroundings.\\\", \\\"images\\\": 0, \\\"stylesheets\\\": 1, \\\"raf\\\": 31}, \\\"changesWithTime\\\": true, \\\"changesWithPointer\\\": true, \\\"rafOver350ms\\\": 24}\\n{\\\"scenario\\\": \\\"small\\\", \\\"motion\\\": \\\"reduce\\\", \\\"errors\\\": [], \\\"requests\\\": [\\\"file:///app/index.html\\\"], \\\"metrics\\\": {\\\"width\\\": 320, \\\"height\\\": 568, \\\"scrollWidth\\\": 320, \\\"scrollHeight\\\": 568, \\\"canvases\\\": [{\\\"width\\\": 320, \\\"height\\\": 568, \\\"role\\\": \\\"img\\\", \\\"label\\\": \\\"A steaming bowl of vegan ramen\\\", \\\"cssWidth\\\": 320, \\\"cssHeight\\\": 568}], \\\"visibleText\\\": \\\"A handmade ceramic bowl of golden vegan ramen, with curled noodles, shiitake mushrooms, seared tofu, bok choy, corn, and scallions. Soft steam rises into the warm, dark surroundings.\\\", \\\"images\\\": 0, \\\"stylesheets\\\": 1, \\\"raf\\\": 0}, \\\"changesWithTime\\\": false, \\\"changesWithPointer\\\": false, \\\"rafOver350ms\\\": 0}\\n{\\\"scenario\\\": \\\"reduced\\\", \\\"motion\\\": \\\"reduce\\\", \\\"errors\\\": [], \\\"requests\\\": [\\\"file:///app/index.html\\\"], \\\"metrics\\\": {\\\"width\\\": 1440, \\\"height\\\": 1000, \\\"scrollWidth\\\": 1440, \\\"scrollHeight\\\": 1000, \\\"canvases\\\": [{\\\"width\\\": 1440, \\\"height\\\": 1000, \\\"role\\\": \\\"img\\\", \\\"label\\\": \\\"A steaming bowl of vegan ramen\\\", \\\"cssWidth\\\": 1440, \\\"cssHeight\\\": 1000}], \\\"visibleText\\\": \\\"A handmade ceramic bowl of golden vegan ramen, with curled noodles, shiitake mushrooms, seared tofu, bok choy, corn, and scallions. Soft steam rises into the warm, dark surroundings.\\\", \\\"images\\\": 0, \\\"stylesheets\\\": 1, \\\"raf\\\": 0}, \\\"changesWithTime\\\": false, \\\"changesWithPointer\\\": false, \\\"rafOver350ms\\\": 0}\\n\"}"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"1350212\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-10-01T02:11:28.042Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_3gjcG2OjtzMrHmR1z3w2GNgl",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"ls -lh /app/index.html; rg -n 'https?:|data:|src=|url\\\\(|fetch\\\\(|XMLHttpRequest|import ' /app/index.html || true\",\"max_output_tokens\":1000}));\n",
+      "timestamp": "2026-10-01T02:11:46.621Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_3gjcG2OjtzMrHmR1z3w2GNgl",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"8b3949\",\"wall_time_seconds\":0.00000952,\"exit_code\":0,\"original_token_count\":15,\"output\":\"-rw-r--r--. 1 root root 23K Oct  1 02:10 /app/index.html\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T02:11:46.698Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Created [index.html](/app/index.html) with code-drawn ramen, curling steam, warm lighting, and subtle mouse response.\n\nAll CSS and JavaScript are inline, with zero external assets. Verified desktop/mobile layouts and a fully still reduced-motion mode.",
+      "timestamp": "2026-10-01T02:11:57.720Z"
+    }
+  ],
+  "metadata": {
+    "sourceRecord": "rollout-2026-10-01T02-02-11-01a0f532-9de1-7302-b2bb-0afd726091ce.jsonl",
+    "normalization": {
+      "excluded": [
+        "system and developer prompts",
+        "hidden thinking and reasoning",
+        "credentials and private agent-mail calls",
+        "large base64 and embedded image data (event retained with size marker)"
+      ],
+      "omittedPrivateToolCalls": 0
+    },
+    "eventCounts": {
+      "message": 5,
+      "tool_call": 12,
+      "tool_result": 12
+    }
+  }
+}

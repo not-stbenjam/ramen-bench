@@ -1,0 +1,205 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "mistralai/mistral-large-4-0/default",
+  "vendor": {
+    "slug": "mistralai",
+    "displayName": "Mistral"
+  },
+  "model": {
+    "slug": "mistral-large-4-0",
+    "displayName": "Mistral Large 4",
+    "providerModelId": "openrouter/mistralai/mistral-large-4-0"
+  },
+  "variation": {
+    "slug": "default",
+    "displayName": "Default",
+    "reasoningEffort": "other",
+    "parameters": {
+      "requestedThinking": null,
+      "recordedPiThinkingLevels": [
+        "medium"
+      ]
+    }
+  },
+  "harness": {
+    "name": "Pi",
+    "version": "1.0.4",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor Pi agent; OpenRouter mistralai/mistral-large-4-0; no reasoning-effort override"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-06T15:46:53.842195Z",
+    "completedAt": "2026-10-06T15:52:52.650221Z",
+    "wallDurationMs": 358808
+  },
+  "usage": {
+    "tokens": {
+      "input": 11661,
+      "output": 8500,
+      "cachedInput": 0,
+      "cacheCreationInput": 0,
+      "total": 20161
+    },
+    "cost": {
+      "currency": "USD",
+      "total": 0.01881568,
+      "estimated": false
+    },
+    "providerReported": true,
+    "raw": {
+      "harborAgentContext": {
+        "n_input_tokens": 11661,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 8500,
+        "cost_usd": 0.04507795,
+        "model_usage": null,
+        "rollout_details": null,
+        "metadata": null
+      },
+      "piUsage": [
+        {
+          "input": 1582,
+          "output": 8488,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 10070,
+          "cost": {
+            "input": 0.0015029,
+            "output": 0.033951999999999996,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0.0354549
+          }
+        },
+        {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "totalTokens": 0,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "totalTokens": 0,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 10079,
+          "output": 12,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 10091,
+          "cost": {
+            "input": 0.00957505,
+            "output": 4.8e-05,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0.00962305
+          }
+        }
+      ],
+      "inputIncludesCachedInput": true,
+      "harborPiCatalogCost": {
+        "currency": "USD",
+        "total": 0.04507795,
+        "estimated": true
+      },
+      "openrouterGenerations": [
+        {
+          "id": "gen-1791301614-E7VpGycXYOnFT5vfNCpc",
+          "model": "mistralai/mistral-large-4-0-20261006",
+          "created_at": "2026-10-06T15:46:54.858Z",
+          "total_cost": 0.01881568,
+          "native_tokens_prompt": 1582,
+          "native_tokens_completion": 8488,
+          "native_tokens_cached": 0,
+          "finish_reason": "tool_calls"
+        },
+        {
+          "id": "gen-1791301705-0iwiYw6911YsSPtOcjZB",
+          "model": "mistralai/mistral-large-4-0-20261006",
+          "created_at": "2026-10-06T15:48:25.267Z",
+          "total_cost": 0,
+          "native_tokens_prompt": 7844,
+          "native_tokens_completion": 13,
+          "native_tokens_cached": 0,
+          "finish_reason": null
+        },
+        {
+          "id": "gen-1791301830-F8E5bgcq3vSru1cUsXN4",
+          "model": "mistralai/mistral-large-4-0-20261006",
+          "created_at": "2026-10-06T15:50:30.066Z",
+          "total_cost": 0,
+          "native_tokens_prompt": 7844,
+          "native_tokens_completion": 13,
+          "native_tokens_cached": 0,
+          "finish_reason": null
+        },
+        {
+          "id": "gen-1791301955-6l6dw8pqP0TllYXFZ94s",
+          "model": "mistralai/mistral-large-4-0-20261006",
+          "created_at": "2026-10-06T15:52:35.659Z",
+          "total_cost": 0,
+          "native_tokens_prompt": 10079,
+          "native_tokens_completion": 12,
+          "native_tokens_cached": 0,
+          "finish_reason": "error"
+        }
+      ],
+      "generationOutcome": "artifact-written-final-api-error",
+      "recordedApiFailures": [
+        {
+          "stopReason": "error",
+          "responseId": "gen-1791301705-0iwiYw6911YsSPtOcjZB",
+          "errorMessage": "Upstream idle timeout exceeded"
+        },
+        {
+          "stopReason": "error",
+          "responseId": "gen-1791301830-F8E5bgcq3vSru1cUsXN4",
+          "errorMessage": "Upstream idle timeout exceeded"
+        },
+        {
+          "stopReason": "error",
+          "responseId": "gen-1791301955-6l6dw8pqP0TllYXFZ94s",
+          "errorMessage": "Provider finish_reason: error"
+        }
+      ],
+      "costNote": "Pi's catalog did not recognize this new model. Its fallback estimate is retained only as native accounting; the displayed cost is the sum of OpenRouter's recorded generation charges, or unknown when those records are incomplete.",
+      "harborTrial": "mistral-large-4-0-task__fZtERLU",
+      "harborTaskChecksum": "f5b3c91799622cfce8f89178137ecdb4d42f30ac7741c4ae7b8ff9494ee6dd6f",
+      "artifactVerification": "Recorded Pi file-operation replay (1 operations)"
+    },
+    "toolCalls": 1
+  },
+  "resultStats": {
+    "bytes": 22943,
+    "lines": 522
+  },
+  "provenance": {
+    "pricingSource": "OpenRouter generation records total_cost, matched to recorded Pi responseId and session ID; no independent pricing calculation"
+  },
+  "notes": "Generated by Pi through native Harbor and OpenRouter. Artifact verified against recorded final writes. Tokens and duration retain recorded session and Harbor accounting. Cost uses OpenRouter's recorded charges; the unsupported Pi catalog estimate is retained separately. No reasoning-effort control was advertised by the OpenRouter endpoint at generation time. Mistral's native API supports none/high; this run requested neither. Pi's internal thinking setting is recorded separately from the requested provider configuration. The artifact write succeeded, but Pi's final follow-up API requests failed after retries. Those recorded failures are retained; no final assistant completion was invented."
+}

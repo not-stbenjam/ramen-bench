@@ -1,0 +1,126 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "openai/gpt-6.1-sol/ultra",
+  "vendor": {
+    "slug": "openai",
+    "displayName": "OpenAI"
+  },
+  "model": {
+    "slug": "gpt-6.1-sol",
+    "displayName": "GPT 6.1 Sol",
+    "providerModelId": "gpt-6.1-sol"
+  },
+  "variation": {
+    "slug": "ultra",
+    "displayName": "Ultra",
+    "reasoningEffort": "ultra",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Codex",
+    "version": "0.159.2",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor codex agent; gpt-6.1-sol @ ultra; ChatGPT subscription authentication"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-01T02:02:08.624687Z",
+    "completedAt": "2026-10-01T02:11:59.133254Z",
+    "wallDurationMs": 590509
+  },
+  "usage": {
+    "tokens": {
+      "input": 1492190,
+      "cachedInput": 1406336,
+      "output": 19863,
+      "total": 1512053,
+      "reasoning": 4277,
+      "cacheCreationInput": 0
+    },
+    "cost": null,
+    "toolCalls": 12,
+    "providerReported": true,
+    "raw": {
+      "harborAgentContext": {
+        "n_input_tokens": 1114247,
+        "n_cache_tokens": 1053440,
+        "n_output_tokens": 5892,
+        "cost_usd": null,
+        "model_usage": {
+          "openai/gpt-6.1-sol": {
+            "n_input_tokens": 1114247,
+            "n_cache_tokens": 1053440,
+            "n_output_tokens": 5892,
+            "cost_usd": null
+          }
+        },
+        "rollout_details": null,
+        "metadata": null
+      },
+      "harborFinalMetrics": {
+        "total_prompt_tokens": 1114247,
+        "total_completion_tokens": 5892,
+        "total_cached_tokens": 1053440,
+        "total_steps": 43,
+        "extra": {
+          "reasoning_output_tokens": 1739,
+          "total_tokens": 1120139,
+          "last_token_usage": {
+            "input_tokens": 47483,
+            "cached_input_tokens": 47232,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 95,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 47578
+          },
+          "total_cache_write_input_tokens": 0
+        }
+      },
+      "codexCumulativeTokens": {
+        "input_tokens": 1114247,
+        "cached_input_tokens": 1053440,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 5892,
+        "reasoning_output_tokens": 1739,
+        "total_tokens": 1120139
+      },
+      "inputIncludesCachedInput": true,
+      "harborAccountingSessionId": "01a0f533-255e-7a60-aa36-d633fc7bf690",
+      "codexMainSessionId": "01a0f532-9de1-7302-b2bb-0afd726091ce",
+      "codexSessionTokenTotals": {
+        "01a0f532-9de1-7302-b2bb-0afd726091ce": {
+          "input_tokens": 377943,
+          "cached_input_tokens": 352896,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 13971,
+          "reasoning_output_tokens": 2538,
+          "total_tokens": 391914
+        },
+        "01a0f533-255e-7a60-aa36-d633fc7bf690": {
+          "input_tokens": 1114247,
+          "cached_input_tokens": 1053440,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 5892,
+          "reasoning_output_tokens": 1739,
+          "total_tokens": 1120139
+        }
+      },
+      "accountingNote": "Harbor exported a review subagent rather than the main session. Tokens sum the recorded per-session cumulative totals once each. Original Harbor accounting is retained separately; native cost was not recorded. Public transcript and artifact verification use the main session.",
+      "harborTrial": "gpt-6.1-sol-task__t3TCzpS",
+      "harborTaskChecksum": "f5b3c91799622cfce8f89178137ecdb4d42f30ac7741c4ae7b8ff9494ee6dd6f",
+      "artifactVerification": "recorded file-operation replay (7 operations)"
+    }
+  },
+  "resultStats": {
+    "bytes": 23307,
+    "lines": 418
+  },
+  "provenance": {
+    "pricingSource": "Harbor native AgentContext.cost_usd"
+  },
+  "notes": "Generated and verified by native Harbor. Cost, tokens, and generation duration come from Harbor's recorded trial and Codex trajectory. Cached input is included in input; reasoning is included in output. Harbor exported a review subagent rather than the main session. Tokens sum the recorded per-session cumulative totals once each. Original Harbor accounting is retained separately; native cost was not recorded. Public transcript and artifact verification use the main session."
+}

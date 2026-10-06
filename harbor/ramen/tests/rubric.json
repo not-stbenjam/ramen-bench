@@ -1,0 +1,23 @@
+{
+  "version": "ramen-v3",
+  "anchors": "Judge visual plausibility within the chosen style, not photographic realism or implementation technique. A carefully drawn illustration can be excellent. 0=absent/unreadable/fundamentally broken; .25=crude with substantial defects; .50=recognizable but artificial or visibly flawed; .65=competent with noticeable shortcomings; .85=highly polished and convincing with minor shortcomings; .95=excellent with only small refinements; 1=exceptional reference quality without a material visible defect. A blank or non-ramen scene earns zero on all visual criteria. Above .80, cite concrete details that justify the score. Identify visible strengths and defects before choosing a score; explicitly say when no material defect is observed. Attractive lighting or backgrounds cannot compensate for poor food or a distorted bowl. Do not penalize the same defect in unrelated categories. Use the full scale: recognizable ingredient symbols alone are not high quality.",
+  "weights": {
+    "noodles": 0.2,
+    "toppings": 0.25,
+    "bowl": 0.2,
+    "broth": 0.1,
+    "steam": 0.15,
+    "composition": 0.1
+  },
+  "criteria": {
+    "noodles": "Evaluate supple continuous strands, plausible thickness and bends, coherent overlap and volume, and believable placement in broth. Penalize rigid ribbons, wire or maze scribbles, repeated flat loops, broken strands and indistinct noodle masses. When rigid/maze-like strands or unreadable noodle masses dominate, score at most .50. Detailed, convincing noodles within a stylized scene can score highly.",
+    "toppings": "Evaluate recognizable vegetables, mushrooms, tofu and seaweed with organic shapes, appropriate texture, scale, variety and readable details. Leaves should read as leaves, mushrooms as mushrooms, and nori as thin irregular seaweed. Penalize featureless blocks, glossy plastic spheres, disks and thick rigid rounded cards standing in for food. If these generic or plastic-looking forms dominate the toppings, score at most .50. Assess quality of ingredient depiction here; vegan compliance is separate.",
+    "bowl": "Evaluate a coherent rim, cavity, walls, base, perspective, depth, thickness, ceramic/lacquer materials, highlights and support/contact. Penalize accidental distortion, incompatible rim/body/base perspective, impossible joins and detached or unsupported-looking parts. A conspicuous incompatible perspective or detached construction limits this category to .50. Do not mistake an intentional viewing angle or tasteful stylistic exaggeration for broken geometry.",
+    "broth": "Evaluate an appetizing liquid surface, restrained sheen, texture and depth, believable immersion, contact, occlusion and integration of the ingredients. Penalize solid-looking liquid, flat concentric target discs, murky unreadable soup and toppings pasted above rather than sitting in the broth. Keep bowl construction and individual ingredient shapes in their own categories.",
+    "steam": "Compare time-ordered desktop frames. Steam should emerge from the soup as translucent irregular wisps that rise, spread and fade continuously without hiding the food. Penalize opaque fog, disconnected floating blobs, identical mechanical plumes and static smoke. Missing steam earns 0; clearly static steam across normal temporal frames scores at most .25. Infer only motion supported by the labeled frames; do not claim fluidity from one still image.",
+    "composition": "Evaluate balanced proportions, a readable focal dish, attractive colors, coherent lighting/depth and restraint in a dark atmospheric scene. Food should remain the focus without distracting text, UI, menus, clutter or competing bowls. Evaluate overall presentation here, without rewarding background glow/bokeh as a substitute for convincing food or rescoring ingredient defects."
+  },
+  "diagnostics": {
+    "vegan": "Visible ingredients plausibly form vegan ramen. Meat-like slices, fish, shrimp, eggs (including egg halves), dairy, or other visibly animal-derived toppings lower this score; unmistakable animal ingredients earn 0. Tofu, mushrooms, vegetables, seaweed, noodles and plant broth are appropriate. Assess appearance only: an image cannot establish the actual recipe. A bowl without discernible ramen ingredients does not earn full credit. Use 0 only for clearly animal-derived ingredients; use an intermediate score when appearance is ambiguous. This is a compliance diagnostic, not a quality bonus."
+  }
+}

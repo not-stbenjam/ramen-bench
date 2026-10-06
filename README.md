@@ -4,12 +4,14 @@ Ramen Bench is a static creative-coding benchmark viewer. Every model receives t
 
 The viewer follows the Fedora Showdown format: browse entries in the sidebar, view one result at a time, or compare up to four in a grid.
 
+Ramen Bench also ships a Harbor task with a blind vision judge and an effort-connected Pareto viewer at `scores.html`. See [the Harbor workflow](harbor/README.md) to generate new bowls, rescore the existing artifacts, or regrade a recorded Harbor job.
+
 ## Run locally
 
-Serve the repository root with any static file server, for example:
+Serve the public repository files with the development server, which excludes local dot-directories such as `.harbor/`:
 
 ```sh
-python3 -m http.server 8000
+python3 scripts/serve.py
 ```
 
 Then open <http://localhost:8000>.

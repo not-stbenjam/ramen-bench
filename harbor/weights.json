@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "weights": {
+    "noodles": 0.10,
+    "toppings": 0.10,
+    "bowl": 0.20,
+    "broth": 0.10,
+    "steam": 0.25,
+    "composition": 0.25
+  }
+}

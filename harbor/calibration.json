@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "source": "User-provided approximate visual preferences, separate from benchmark results",
+  "purpose": "Rubric calibration examples; these are not an independent held-out evaluation",
+  "references": [
+    {
+      "runId": "anthropic/sonnet-5.5/max",
+      "approximateReward": 0.85
+    },
+    {
+      "runId": "xai/grok-4.7/medium",
+      "approximateReward": 0.6
+    },
+    {
+      "runId": "meta/muse-spark-1.3/xhigh",
+      "approximateReward": 0.6
+    },
+    {
+      "runId": "openai/gpt-6-astra/high",
+      "approximateReward": 0.85
+    },
+    {
+      "runId": "openai/gpt-6-astra/max",
+      "approximateReward": 0.9
+    },
+    {
+      "runId": "openai/gpt-6-astra/ultra",
+      "approximateReward": 0.95
+    },
+    {
+      "runId": "anthropic/opus-5.5/max",
+      "approximateReward": 1.0
+    },
+    {
+      "runId": "google/gemini-3.8-flash/low",
+      "expectedBelow": 0.6,
+      "note": "General Gemini quality expectation; no exact individual rating supplied"
+    }
+  ],
+  "disqualified": [
+    {
+      "runId": "openai/gpt-6-astra/xhigh",
+      "expectedReward": 0,
+      "reason": "Recorded imagegen use and embedded raster scene"
+    }
+  ]
+}

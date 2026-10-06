@@ -371,20 +371,13 @@
     return rank(a) - rank(b) || String(a.badge || "").localeCompare(String(b.badge || ""));
   }
 
-  function compareModels([nameA], [nameB]) {
-    const versionA = modelVersion(nameA);
-    const versionB = modelVersion(nameB);
-    const width = Math.max(versionA.length, versionB.length);
-    for (let index = 0; index < width; index += 1) {
-      const difference = (versionB[index] || 0) - (versionA[index] || 0);
-      if (difference) return difference;
-    }
-    return 0;
-  }
-
-  function modelVersion(name) {
-    const match = String(name).match(/\d+(?:\.\d+)*/);
-    return match ? match[0].split(".").map(Number) : [];
+  function compareModels([nameA, runsA], [nameB, runsB]) {
+    const latest = runs => Math.max(...runs.map(entry => {
+      const timestamp = Date.parse(entry.run.timing?.completedAt || entry.run.timing?.startedAt);
+      return Number.isFinite(timestamp) ? timestamp : -Infinity;
+    }));
+    const a = latest(runsA), b = latest(runsB);
+    return a === b ? nameA.localeCompare(nameB) : a > b ? -1 : 1;
   }
 
   function slugify(value) {
@@ -504,10 +497,9 @@
     }
   }
 
-  function setWelcome(kicker, title, body, showPrompt = true) {
-    elements.welcome.querySelector(".eyebrow").textContent = kicker;
+  function setWelcome(title, body, showPrompt = true) {
     elements.welcome.querySelector("h1").textContent = title;
-    elements.welcome.querySelector("p:not(.eyebrow)").textContent = body;
+    elements.welcome.querySelector("p").textContent = body;
     elements.welcome.querySelector("button").hidden = !showPrompt;
   }
 
@@ -520,7 +512,6 @@
 
     if (!hasEntries) {
       setWelcome(
-        "The kitchen is warming up",
         "Ready for the first bowl.",
         "Add run manifests to registry.json and their single-file results will appear here."
       );
@@ -533,7 +524,7 @@
 
     if (!visibleEntries.length) {
       elements.welcome.hidden = false;
-      setWelcome("Grid view", "Choose a bowl to compare.", "Select up to four models from the sidebar.", false);
+      setWelcome("Choose a bowl to compare.", "Select up to four models from the sidebar.", false);
     }
 
     const visibleIds = new Set(visibleEntries.map((entry) => entry.id));
@@ -1053,7 +1044,7 @@
 
   async function init() {
     bindEvents();
-    setWelcome("Setting the table", "Loading the kitchen…", "Reading the benchmark registry.", false);
+    setWelcome("Loading the kitchen…", "Reading the benchmark registry.", false);
     elements.previous.hidden = true;
     elements.next.hidden = true;
 
@@ -1075,7 +1066,6 @@
       elements.filterCount.textContent = "Registry unavailable";
       renderList();
       setWelcome(
-        "The kitchen is closed",
         "The registry could not be loaded.",
         "Serve the repository through a local web server and check registry.json.",
         false

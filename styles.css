@@ -629,16 +629,6 @@ select:focus-visible {
   50% { opacity: 0.7; transform: translate(-4px, -3px) scaleX(1.15); }
 }
 
-.eyebrow {
-  position: relative;
-  margin: 26px 0 10px;
-  color: var(--accent-bright);
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
 .welcome h1 {
   position: relative;
   margin: 0;
@@ -648,7 +638,7 @@ select:focus-visible {
   letter-spacing: -0.035em;
 }
 
-.welcome > p:not(.eyebrow) {
+.welcome > p {
   position: relative;
   max-width: 460px;
   margin: 15px 0 0;
@@ -961,16 +951,6 @@ select:focus-visible {
   gap: 20px;
   padding: 18px 20px 16px;
   border-bottom: 1px solid var(--border);
-}
-
-.modal-kicker {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--accent-bright);
-  font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
 }
 
 .modal h2 {

@@ -35,6 +35,10 @@
       </a>
 
       <nav class="utility-actions" aria-label="Project information">
+        <a href="scores.html">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4v16h16M7 16l4-5 4 2 5-7"></path></svg>
+          Scores
+        </a>
         <button type="button" data-dialog="about-dialog">
           <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7.5v.01"></path></svg>
           About
@@ -100,7 +104,6 @@
           <span class="welcome-rim"></span>
           <span class="welcome-dish"></span>
         </div>
-        <p class="eyebrow">The kitchen is warming up</p>
         <h1 id="welcome-title">Ready for the first bowl.</h1>
         <p>Add run manifests to <code>registry.json</code> and their single-file results will appear here.</p>
         <button type="button" data-dialog="prompt-dialog">Read the shared prompt</button>
@@ -111,7 +114,6 @@
     <dialog class="modal" id="prompt-dialog">
       <div class="modal-header">
         <div>
-          <span class="modal-kicker">The shared brief</span>
           <h2>Prompt</h2>
         </div>
         <button class="modal-close" type="button" aria-label="Close prompt">×</button>
@@ -128,7 +130,6 @@
     <dialog class="modal" id="about-dialog">
       <div class="modal-header">
         <div>
-          <span class="modal-kicker">About the bench</span>
           <h2>Same recipe. Different cooks.</h2>
         </div>
         <button class="modal-close" type="button" aria-label="Close about dialog">×</button>
@@ -142,7 +143,6 @@
     <dialog class="modal" id="leaderboard-dialog">
       <div class="modal-header">
         <div>
-          <span class="modal-kicker">Your ratings</span>
           <h2>Leaderboard</h2>
         </div>
         <button class="modal-close" type="button" aria-label="Close leaderboard">×</button>

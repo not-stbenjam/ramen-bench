@@ -1,0 +1,850 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
+  "schemaVersion": 1,
+  "runId": "openai/gpt-6.1-sol/max",
+  "sessionId": "01a0f4ec-3950-7222-be3b-3d79eb5b28d8",
+  "sourceFormat": "harbor-codex-jsonl",
+  "events": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": "Create a single-file HTML page (/app/index.html) with all CSS and JavaScript inline and zero external assets. Never use image generation tools or models. Draw the scene with code (HTML, CSS, SVG, canvas or WebGL); embedded raster artwork is disallowed. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.",
+      "timestamp": "2026-10-01T00:45:21.337Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "I’ll build the scene with inline SVG, CSS, and JavaScript, using warm lighting, drifting steam, and subtle mouse response to bring the ramen to life.\n",
+      "timestamp": "2026-10-01T00:45:25.430Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_p7zKepCvkzTkIhImiXNoQLn7",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"pwd && rg --files -g 'AGENTS.md' -g 'index.html' -g 'package.json' -g '*playwright*' -g '*vite*' -g '*README*' -g '!node_modules' -g '!package-lock.json' -g '!yarn.lock' -g '!pnpm-lock.yaml' . <TMP>/codex-home 2>/dev/null | head -100\",\"workdir\":\"/app\",\"max_output_tokens\":6000}));\ntext(ALL_TOOLS.filter(x=>/browser|playwright|puppeteer/i.test(x.name+\" \"+x.description)).map(x=>({name:x.name,description:x.description.slice(0,500)})));\n",
+      "timestamp": "2026-10-01T00:45:29.587Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_p7zKepCvkzTkIhImiXNoQLn7",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"91d200\",\"wall_time_seconds\":0.000022697,\"exit_code\":0,\"original_token_count\":23,\"output\":\"/app\\n<TMP>/codex-home/plugins/cache/openai-curated-remote/openai-templates/0.1.1/README.md\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "[]"
+        }
+      ],
+      "timestamp": "2026-10-01T00:45:29.703Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ae6x1pJ0QB3YXTXMnASI4XgN",
+      "tool": "exec",
+      "input": "const results = await Promise.allSettled([\ntools.exec_command({cmd:\"ls -la /app && for path in /AGENTS.md /app/AGENTS.md; do if [ -f \\\"$path\\\" ]; then cat \\\"$path\\\"; fi; done\",\"workdir\":\"/app\",\"max_output_tokens\":5000}),\ntools.exec_command({cmd:\"node -v && npm -v && python3 --version && command -v chromium && command -v google-chrome\",\"workdir\":\"/app\",\"max_output_tokens\":1500}),\ntools.exec_command({cmd:\"ls -la <TMP>/codex-home && ls -la /usr/bin | rg 'chrom|firefox|webkit'\",\"workdir\":\"/app\",\"max_output_tokens\":2000})\n]);\nresults.forEach((r,i)=>text({i,...r}));\n",
+      "timestamp": "2026-10-01T00:46:05.883Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ae6x1pJ0QB3YXTXMnASI4XgN",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"i\":0,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"2b75f6\",\"wall_time_seconds\":0.000004493,\"exit_code\":0,\"original_token_count\":24,\"output\":\"total 0\\ndrwxr-xr-x. 1 root root  0 Oct  1 00:45 .\\ndrwxr-xr-x. 1 root root 70 Oct  1 00:45 ..\\n\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"i\":1,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"cfa3c0\",\"wall_time_seconds\":0.000023065,\"exit_code\":127,\"original_token_count\":11,\"output\":\"/bin/bash: line 1: node: command not found\\n\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"i\":2,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"970d97\",\"wall_time_seconds\":0.000004412,\"exit_code\":1,\"original_token_count\":484,\"output\":\"total 3888\\ndrwxr-xr-x. 1 root root     926 Oct  1 00:45 .\\ndrwxrwxrwt. 1 root root      46 Oct  1 00:45 ..\\n-rw-------. 1 root root       3 Oct  1 00:45 .sandbox_migration\\nlrwxrwxrwx. 1 root root      28 Oct  1 00:45 auth.json -> <TMP>/codex-secrets/auth.json\\ndrwxr-xr-x. 1 root root     118 Oct  1 00:45 cache\\n-rw-r--r--. 1 1001 1001      99 Oct  1 00:45 config.toml\\n-rw-r--r--. 1 root root    4096 Oct  1 00:45 goals_1.sqlite\\n-rw-r--r--. 1 root root   32768 Oct  1 00:45 goals_1.sqlite-shm\\n-rw-r--r--. 1 root root   78312 Oct  1 00:45 goals_1.sqlite-wal\\n-rw-r--r--. 1 root root      36 Oct  1 00:45 installation_id\\n-rw-r--r--. 1 root root   49152 Oct  1 00:45 logs_2.sqlite\\n-rw-r--r--. 1 root root   32768 Oct  1 00:45 logs_2.sqlite-shm\\n-rw-r--r--. 1 root root  115392 Oct  1 00:45 logs_2.sqlite-wal\\n-rw-r--r--. 1 root root    4096 Oct  1 00:45 memories_1.sqlite\\n-rw-r--r--. 1 root root   32768 Oct  1 00:45 memories_1.sqlite-shm\\n-rw-r--r--. 1 root root   86552 Oct  1 00:45 memories_1.sqlite-wal\\n-rw-r--r--. 1 root root  418901 Oct  1 00:45 models_cache.json\\ndrwxr-xr-x. 1 root root      70 Oct  1 00:45 plugins\\n-rw-r--r--. 1 root root    4096 Oct  1 00:45 queue_1.sqlite\\n-rw-r--r--. 1 root root   32768 Oct  1 00:45 queue_1.sqlite-shm\\n-rw-r--r--. 1 root root   82432 Oct  1 00:45 queue_1.sqlite-wal\\ndrwxr-xr-x. 1 root root       8 Oct  1 00:45 sessions\\ndrwxr-xr-x. 1 root root     118 Oct  1 00:45 shell_snapshots\\ndrwxr-xr-x. 1 root root      14 Oct  1 00:45 skills\\n-rw-r--r--. 1 root root    4096 Oct  1 00:45 state_5.sqlite\\n-rw-r--r--. 1 root root   32768 Oct  1 00:46 state_5.sqlite-shm\\n-rw-r--r--. 1 root root 2467912 Oct  1 00:46 state_5.sqlite-wal\\ndrwxr-xr-x. 1 root root     118 Oct  1 00:45 thread-writer-locks\\n-rw-r--r--. 1 root root    4096 Oct  1 00:45 thread_history_1.sqlite\\n-rw-r--r--. 1 root root   32768 Oct  1 00:46 thread_history_1.sqlite-shm\\n-rw-r--r--. 1 root root  428512 Oct  1 00:46 thread_history_1.sqlite-wal\\n\"}}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:46:05.990Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_F1kULLrz7bLJpsACmKUvkQS1",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 --version; command -v python3; command -v pip; command -v pip3; command -v apt-get; command -v curl; command -v unzip; ls -la /opt; ls -la <TMP>\",\"workdir\":\"/app\",\"max_output_tokens\":2500}));\ntext(ALL_TOOLS.filter(x=>/computer|screenshot|render|website|terminal/i.test(x.name+\" \"+x.description)).map(x=>({name:x.name,description:x.description.slice(0,300)})));\n",
+      "timestamp": "2026-10-01T00:46:14.560Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_F1kULLrz7bLJpsACmKUvkQS1",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"a2f391\",\"wall_time_seconds\":0.000004578,\"exit_code\":0,\"original_token_count\":101,\"output\":\"Python 3.12.12\\n/usr/local/bin/python3\\n/usr/local/bin/pip\\n/usr/local/bin/pip3\\n/usr/bin/apt-get\\n/usr/bin/curl\\ntotal 0\\ndrwxr-xr-x. 1 root root  0 Feb 23  2026 .\\ndrwxr-xr-x. 1 root root 70 Oct  1 00:45 ..\\ntotal 0\\ndrwxrwxrwt. 1 root root  46 Oct  1 00:45 .\\ndrwxr-xr-x. 1 root root  70 Oct  1 00:45 ..\\ndrwxr-xr-x. 1 root root 926 Oct  1 00:45 codex-home\\ndrwxr-xr-x. 1 root root  18 Oct  1 00:45 codex-secrets\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "[{\"name\":\"mcp__codex_apps__chatgpt_space_get_artifact_execution_status\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current account.\\n\\nCheck whether an earlier execute_artifact_code request committed its changes. Use the original page_id and idempotency_key after acceptance, a timeout, or a lost response. This checks the whole execution \"},{\"name\":\"mcp__codex_apps__chatgpt_space_progress_update\",\"description\":\"Read, search, create, and edit pages and spaces in ChatGPT Space, within your current account.\\n\\nShow a short progress message at observed block IDs while working on an open Page. Ephemeral presence only; does not edit the Page or create a comment. Each call updates this task turn's indicator and ref\"},{\"name\":\"mcp__codex_apps__sites_add_custom_domain\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_change_site_slug\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_create_schedule\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_create_site\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_create_source_repository_write_credential\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_deploy_private_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_deploy_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_generate_siwc_bypass_token\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_get_deployment_status\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_get_environment_variables\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_get_site\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_get_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_get_site_worker_logs\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_list_custom_domains\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_list_site_versions\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_list_sites\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_read_database_overview\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_read_database_table_rows\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_refresh_custom_domain_status\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_remove_custom_domain\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_save_site_version\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_save_version_and_deploy_private\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_update_environment_variables\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_update_site_access\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"mcp__codex_apps__sites_update_site_metadata\",\"description\":\"Use Sites to build or modify websites, including landing pages, portfolios, dashboards, portals, trackers, hubs, and internal tools. Use Sites skills for local implementation, source preparation, and artifact packaging. Use this connector for site creation, runtime environment variables, versions, p\"},{\"name\":\"web__run\",\"description\":\"Tools in the web namespace.\\n\\nTool for accessing the internet.\\n\\n\\n---\\n\\n## Examples of different commands available in this tool\\n\\nExamples of different commands available in this tool:\\n* `search_query`: {\\\"search_query\\\": [{\\\"q\\\": \\\"What is the capital of France?\\\"}, {\\\"q\\\": \\\"What is the capital of belgium?\\\"}]\"}]"
+        }
+      ],
+      "timestamp": "2026-10-01T00:46:14.634Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_3S5aTNtVkAxwk1lkvoshePZm",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 -m pip install --quiet playwright\",\"workdir\":\"/app\",\"max_output_tokens\":2000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:46:19.947Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_3S5aTNtVkAxwk1lkvoshePZm",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"cfbcdf\",\"wall_time_seconds\":1.001086825,\"session_id\":16669,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:46:21.130Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The scene is taking shape around a charcoal ceramic bowl, golden broth, curled noodles, seared tofu, shiitake mushrooms, and glossy greens. I’m keeping the motion gentle, with rising steam and small reflections on the broth.\n",
+      "timestamp": "2026-10-01T00:49:08.536Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_9tKEybgbEf4FK0Uo59iUKX4z",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:16669,chars:\"\",\"max_output_tokens\":2000,\"yield_time_ms\":1000}));\ntext(await tools.exec_command({cmd:\"python3 -m playwright install chromium\",\"workdir\":\"/app\",\"yield_time_ms\":1000,\"max_output_tokens\":2000}));\n",
+      "timestamp": "2026-10-01T00:49:11.380Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_9tKEybgbEf4FK0Uo59iUKX4z",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"0fc0df\",\"wall_time_seconds\":0.000020476,\"exit_code\":0,\"original_token_count\":120,\"output\":\"WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.\\n\\n[notice] A new release of pip is available: 25.0.1 -> 26.2.1\\n[notice] To update, run: pip install --upgrade pip\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"355f5e\",\"wall_time_seconds\":1.00149039,\"session_id\":26116,\"original_token_count\":42,\"output\":\"Downloading Chrome for Testing 153.0.8010.12 (playwright chromium v1243)\\u001b[2m from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-linux64.zip\\u001b[22m\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:49:12.569Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_9VB14lWDzrRlxmayhP0O5OSc",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Add File: /app/index.html\\n+<!doctype html>\\n+<html lang=\\\"en\\\">\\n+<head>\\n+  <meta charset=\\\"utf-8\\\">\\n+  <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\">\\n+  <meta name=\\\"theme-color\\\" content=\\\"#0a0b0b\\\">\\n+  <meta name=\\\"description\\\" content=\\\"A quiet, living portrait of a steaming bowl of vegan ramen.\\\">\\n+  <title>Warmth</title>\\n+  <style>\\n+    * { box-sizing: border-box; }\\n+    html, body { width: 100%; height: 100%; margin: 0; }\\n+    body { overflow: hidden; background: #0a0b0b; }\\n+    .scene {\\n+      position: relative;\\n+      width: 100%;\\n+      height: 100%;\\n+      min-height: 100svh;\\n+      overflow: hidden;\\n+      isolation: isolate;\\n+      background:\\n+        radial-gradient(ellipse at 43% 48%, #29221b22 0%, #17171518 31%, transparent 66%),\\n+        radial-gradient(ellipse at 50% 100%, #030405 0%, transparent 58%),\\n+        #0b0c0c;\\n+    }\\n+    .light {\\n+      position: absolute;\\n+      inset: -15%;\\n+      background:\\n+        radial-gradient(ellipse 34% 38% at 43% 49%, #b87d3420, #7553370b 54%, transparent 80%),\\n+        radial-gradient(ellipse 30% 25% at 64% 67%, #63624b06, transparent);\\n+      transform: translate3d(var(--light-x, 0px), var(--light-y, 0px), 0);\\n+      will-change: transform;\\n+    }\\n+    .grain {\\n+      position: absolute;\\n+      inset: 0;\\n+      width: 100%;\\n+      height: 100%;\\n+      opacity: .047;\\n+      mix-blend-mode: soft-light;\\n+      pointer-events: none;\\n+    }\\n+    .stage {\\n+      position: absolute;\\n+      left: 50%;\\n+      top: 48%;\\n+      width: min(1220px, 130vw, calc(100svh * 1.23));\\n+      aspect-ratio: 11 / 9;\\n+      transform: translate(-50%, -50%);\\n+    }\\n+    .portrait {\\n+      position: absolute;\\n+      inset: 0;\\n+      transform-origin: 50% 64%;\\n+      transform: translate3d(var(--dish-x, 0px), var(--dish-y, 0px), 0) rotate(var(--dish-r, 0deg));\\n+      will-change: transform;\\n+    }\\n+    .ramen, .steam {\\n+      display: block;\\n+      position: absolute;\\n+      inset: 0;\\n+      width: 100%;\\n+      height: 100%;\\n+      overflow: visible;\\n+    }\\n+    .steam { pointer-events: none; }\\n+    .soup-glow { animation: simmer 7s ease-in-out infinite alternate; }\\n+    .oil-shine { animation: simmer 9s -3s ease-in-out infinite alternate; }\\n+    .vignette {\\n+      position: absolute;\\n+      inset: 0;\\n+      pointer-events: none;\\n+      background: radial-gradient(ellipse at 50% 52%, transparent 38%, #02030340 84%, #02030380 115%);\\n+    }\\n+    @keyframes simmer { from { opacity: .32; } to { opacity: .7; } }\\n+    @media (prefers-reduced-motion: reduce) {\\n+      *, *::before, *::after { animation: none !important; }\\n+      .portrait, .light { transform: none; will-change: auto; }\\n+      .soup-glow { opacity: .5; }\\n+      .oil-shine { opacity: .55; }\\n+    }\\n+  </style>\\n+</head>\\n+<body>\\n+  <main class=\\\"scene\\\" aria-label=\\\"A steaming bowl of vegan ramen in warm, quiet light\\\">\\n+    <div class=\\\"light\\\" aria-hidden=\\\"true\\\"></div>\\n+    <svg class=\\\"grain\\\" aria-hidden=\\\"true\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\">\\n+      <filter id=\\\"ambient-grain\\\">\\n+        <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".86\\\" numOctaves=\\\"3\\\" stitchTiles=\\\"stitch\\\"/>\\n+        <feColorMatrix type=\\\"saturate\\\" values=\\\"0\\\"/>\\n+      </filter>\\n+      <rect width=\\\"100%\\\" height=\\\"100%\\\" filter=\\\"url(#ambient-grain)\\\" opacity=\\\".8\\\"/>\\n+    </svg>\\n+    <div class=\\\"stage\\\">\\n+      <div class=\\\"portrait\\\">\\n+        <svg class=\\\"ramen\\\" viewBox=\\\"0 0 1100 900\\\" role=\\\"img\\\" aria-labelledby=\\\"dish-title dish-description\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\">\\n+          <title id=\\\"dish-title\\\">Vegan ramen</title>\\n+          <desc id=\\\"dish-description\\\">Golden noodles and broth, seared tofu, shiitake mushrooms, bok choy, nori, scallions, and sesame, in a handmade charcoal bowl. Delicate steam rises into the darkness.</desc>\\n+          <defs>\\n+            <radialGradient id=\\\"table-light\\\" cx=\\\"43%\\\" cy=\\\"35%\\\" r=\\\"55%\\\">\\n+              <stop stop-color=\\\"#8c6944\\\" stop-opacity=\\\".13\\\"/>\\n+              <stop offset=\\\".54\\\" stop-color=\\\"#5d4a36\\\" stop-opacity=\\\".055\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#322d27\\\" stop-opacity=\\\"0\\\"/>\\n+            </radialGradient>\\n+            <radialGradient id=\\\"shadow\\\">\\n+              <stop stop-color=\\\"#010202\\\" stop-opacity=\\\".96\\\"/>\\n+              <stop offset=\\\".52\\\" stop-color=\\\"#010202\\\" stop-opacity=\\\".77\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#010202\\\" stop-opacity=\\\"0\\\"/>\\n+            </radialGradient>\\n+            <radialGradient id=\\\"ceramic\\\" cx=\\\"25%\\\" cy=\\\"4%\\\" r=\\\"91%\\\" gradientTransform=\\\"matrix(1 0 0 .88 0 .04)\\\">\\n+              <stop stop-color=\\\"#777267\\\"/>\\n+              <stop offset=\\\".18\\\" stop-color=\\\"#494942\\\"/>\\n+              <stop offset=\\\".46\\\" stop-color=\\\"#303431\\\"/>\\n+              <stop offset=\\\".73\\\" stop-color=\\\"#1b2220\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#0a100f\\\"/>\\n+            </radialGradient>\\n+            <linearGradient id=\\\"ceramic-bottom\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#09100e\\\" stop-opacity=\\\"0\\\"/>\\n+              <stop offset=\\\".48\\\" stop-color=\\\"#08110e\\\" stop-opacity=\\\"0\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#030807\\\" stop-opacity=\\\".8\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"ceramic-reflection\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\".2\\\">\\n+              <stop stop-color=\\\"#d8c2a0\\\" stop-opacity=\\\".31\\\"/>\\n+              <stop offset=\\\".2\\\" stop-color=\\\"#a29b81\\\" stop-opacity=\\\".08\\\"/>\\n+              <stop offset=\\\".55\\\" stop-color=\\\"#a6ab9c\\\" stop-opacity=\\\".025\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#87998e\\\" stop-opacity=\\\".12\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"rim\\\" x1=\\\".04\\\" y1=\\\".12\\\" x2=\\\".9\\\" y2=\\\".9\\\">\\n+              <stop stop-color=\\\"#797369\\\"/>\\n+              <stop offset=\\\".27\\\" stop-color=\\\"#53574d\\\"/>\\n+              <stop offset=\\\".54\\\" stop-color=\\\"#303932\\\"/>\\n+              <stop offset=\\\".8\\\" stop-color=\\\"#1c2721\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#49554b\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"rim-light\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\".3\\\">\\n+              <stop stop-color=\\\"#d5b993\\\" stop-opacity=\\\".62\\\"/>\\n+              <stop offset=\\\".36\\\" stop-color=\\\"#c7c3aa\\\" stop-opacity=\\\".27\\\"/>\\n+              <stop offset=\\\".7\\\" stop-color=\\\"#d2d7be\\\" stop-opacity=\\\".08\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#c2d1bb\\\" stop-opacity=\\\".33\\\"/>\\n+            </linearGradient>\\n+            <radialGradient id=\\\"broth\\\" cx=\\\"36%\\\" cy=\\\"29%\\\" r=\\\"78%\\\">\\n+              <stop stop-color=\\\"#d9a552\\\"/>\\n+              <stop offset=\\\".26\\\" stop-color=\\\"#bf873e\\\"/>\\n+              <stop offset=\\\".57\\\" stop-color=\\\"#a3672b\\\"/>\\n+              <stop offset=\\\".83\\\" stop-color=\\\"#7d3f20\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#4b271c\\\"/>\\n+            </radialGradient>\\n+            <radialGradient id=\\\"broth-depth\\\">\\n+              <stop offset=\\\".65\\\" stop-color=\\\"#20190d\\\" stop-opacity=\\\"0\\\"/>\\n+              <stop offset=\\\".91\\\" stop-color=\\\"#23190e\\\" stop-opacity=\\\".17\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#130e09\\\" stop-opacity=\\\".65\\\"/>\\n+            </radialGradient>\\n+            <linearGradient id=\\\"oil\\\" x1=\\\".2\\\" y1=\\\"0\\\" x2=\\\".75\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#f4c363\\\" stop-opacity=\\\".6\\\"/>\\n+              <stop offset=\\\".38\\\" stop-color=\\\"#d78223\\\" stop-opacity=\\\".34\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#7c2f13\\\" stop-opacity=\\\".52\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"tofu-top\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".5\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#fff0bb\\\"/>\\n+              <stop offset=\\\".27\\\" stop-color=\\\"#edcc80\\\"/>\\n+              <stop offset=\\\".75\\\" stop-color=\\\"#daaa58\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#b9833b\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"tofu-side\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\".15\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#d5a961\\\"/>\\n+              <stop offset=\\\".54\\\" stop-color=\\\"#c69346\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#805322\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"tofu-end\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\".8\\\">\\n+              <stop stop-color=\\\"#d9b574\\\"/>\\n+              <stop offset=\\\".5\\\" stop-color=\\\"#aa7637\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#795024\\\"/>\\n+            </linearGradient>\\n+            <radialGradient id=\\\"mushroom-cap\\\" cx=\\\"35%\\\" cy=\\\"22%\\\" r=\\\"76%\\\">\\n+              <stop stop-color=\\\"#bf9460\\\"/>\\n+              <stop offset=\\\".2\\\" stop-color=\\\"#a37747\\\"/>\\n+              <stop offset=\\\".52\\\" stop-color=\\\"#80522f\\\"/>\\n+              <stop offset=\\\".84\\\" stop-color=\\\"#54341f\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#35271b\\\"/>\\n+            </radialGradient>\\n+            <linearGradient id=\\\"mushroom-gills\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#baa17a\\\"/>\\n+              <stop offset=\\\".47\\\" stop-color=\\\"#9e845c\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#615134\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"stem\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"0\\\">\\n+              <stop stop-color=\\\"#999a5f\\\"/>\\n+              <stop offset=\\\".35\\\" stop-color=\\\"#e2e4af\\\"/>\\n+              <stop offset=\\\".65\\\" stop-color=\\\"#c1d390\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#6b9341\\\"/>\\n+            </linearGradient>\\n+            <radialGradient id=\\\"leaf\\\" cx=\\\"37%\\\" cy=\\\"28%\\\" r=\\\"85%\\\">\\n+              <stop stop-color=\\\"#799e3f\\\"/>\\n+              <stop offset=\\\".25\\\" stop-color=\\\"#56832c\\\"/>\\n+              <stop offset=\\\".54\\\" stop-color=\\\"#2d6426\\\"/>\\n+              <stop offset=\\\".8\\\" stop-color=\\\"#174720\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#0a2c17\\\"/>\\n+            </radialGradient>\\n+            <linearGradient id=\\\"leaf-light\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#c0d46e\\\" stop-opacity=\\\".64\\\"/>\\n+              <stop offset=\\\".44\\\" stop-color=\\\"#84b052\\\" stop-opacity=\\\".36\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#78ac58\\\" stop-opacity=\\\".07\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"nori\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"1\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#29352a\\\"/>\\n+              <stop offset=\\\".2\\\" stop-color=\\\"#1b2720\\\"/>\\n+              <stop offset=\\\".65\\\" stop-color=\\\"#0d1c18\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#0a1513\\\"/>\\n+            </linearGradient>\\n+            <linearGradient id=\\\"chili\\\" x1=\\\"0\\\" y1=\\\"0\\\" x2=\\\"0\\\" y2=\\\"1\\\">\\n+              <stop stop-color=\\\"#d95828\\\"/>\\n+              <stop offset=\\\".45\\\" stop-color=\\\"#ac301a\\\"/>\\n+              <stop offset=\\\"1\\\" stop-color=\\\"#6e2116\\\"/>\\n+            </linearGradient>\\n+            <filter id=\\\"soft-shadow\\\" x=\\\"-30%\\\" y=\\\"-40%\\\" width=\\\"160%\\\" height=\\\"190%\\\">\\n+              <feDropShadow dx=\\\"1\\\" dy=\\\"6\\\" stdDeviation=\\\"4\\\" flood-color=\\\"#27140b\\\" flood-opacity=\\\".65\\\"/>\\n+            </filter>\\n+            <filter id=\\\"small-shadow\\\" x=\\\"-40%\\\" y=\\\"-70%\\\" width=\\\"180%\\\" height=\\\"250%\\\">\\n+              <feDropShadow dx=\\\".5\\\" dy=\\\"2\\\" stdDeviation=\\\"1.2\\\" flood-color=\\\"#392311\\\" flood-opacity=\\\".62\\\"/>\\n+            </filter>\\n+            <filter id=\\\"ceramic-texture\\\">\\n+              <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".64\\\" numOctaves=\\\"3\\\" seed=\\\"19\\\" stitchTiles=\\\"stitch\\\"/>\\n+              <feColorMatrix type=\\\"saturate\\\" values=\\\"0\\\"/>\\n+              <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n+            </filter>\\n+            <filter id=\\\"food-texture\\\">\\n+              <feTurbulence type=\\\"fractalNoise\\\" baseFrequency=\\\".35 .65\\\" numOctaves=\\\"3\\\" seed=\\\"4\\\" stitchTiles=\\\"stitch\\\"/>\\n+              <feColorMatrix type=\\\"saturate\\\" values=\\\"0\\\"/>\\n+              <feComposite in2=\\\"SourceGraphic\\\" operator=\\\"in\\\"/>\\n+            </filter>\\n+            <clipPath id=\\\"body-clip\\\">\\n+              <path d=\\\"M217 529 C231 660 327 774 477 804 Q550 824 624 803 C776 774 869 660 883 529Z\\\"/>\\n+            </clipPath>\\n+            <clipPath id=\\\"soup-clip\\\"><ellipse cx=\\\"550\\\" cy=\\\"522\\\" rx=\\\"317\\\" ry=\\\"120\\\"/></clipPath>\\n+            <clipPath id=\\\"nori-clip\\\">\\n+              <path d=\\\"M296 465 L274 380 L279 378 L277 370 L361 342 L365 347 L371 345 L405 447Z\\\"/>\\n+              <path d=\\\"M327 459 L337 351 L344 354 L347 350 L428 370 L425 376 L433 377 L419 457Z\\\"/>\\n+            </clipPath>\\n+            <g id=\\\"tofu-piece\\\">\\n+              <path d=\\\"M0 12 L32 -2 L67 12 L67 34 L33 53 L1 32Z\\\" fill=\\\"#603718\\\" opacity=\\\".35\\\" transform=\\\"translate(1 5)\\\"/>\\n+              <path d=\\\"M1 12 L33 29 L33 51 L1 31Z\\\" fill=\\\"url(#tofu-side)\\\"/>\\n+              <path d=\\\"M33 29 L66 12 L65 33 L33 51Z\\\" fill=\\\"url(#tofu-end)\\\"/>\\n+              <path d=\\\"M0 12 L31 -2 L38 0 L43 1 L66 11 L67 14 L35 30 L29 28 L1 15Z\\\" fill=\\\"url(#tofu-top)\\\" stroke=\\\"#f5d999\\\" stroke-width=\\\".7\\\"/>\\n+              <path d=\\\"M4 11 L30 1 M4 17 L29 31 M35 33 L61 20\\\" fill=\\\"none\\\" stroke=\\\"#fff0bc\\\" stroke-width=\\\"1.3\\\" opacity=\\\".55\\\"/>\\n+              <path d=\\\"M9 13 L20 9 L32 13 L25 19Z M40 8 L52 12 L43 17 L34 12Z M28 23 L35 18 L40 22 L33 26Z\\\" fill=\\\"#9b5c21\\\" opacity=\\\".48\\\"/>\\n+              <path d=\\\"M11 13 L19 10 M40 9 L51 12 M30 23 L34 21\\\" fill=\\\"none\\\" stroke=\\\"#b7772a\\\" stroke-width=\\\"2.7\\\" stroke-linecap=\\\"round\\\" opacity=\\\".65\\\"/>\\n+              <g fill=\\\"#804b1f\\\" opacity=\\\".5\\\">\\n+                <ellipse cx=\\\"23\\\" cy=\\\"6\\\" rx=\\\"1.7\\\" ry=\\\".8\\\"/><ellipse cx=\\\"47\\\" cy=\\\"20\\\" rx=\\\"2\\\" ry=\\\".7\\\"/>\\n+                <ellipse cx=\\\"15\\\" cy=\\\"20\\\" rx=\\\"1.7\\\" ry=\\\".9\\\"/><ellipse cx=\\\"34\\\" cy=\\\"8\\\" rx=\\\"2\\\" ry=\\\".9\\\"/>\\n+                <circle cx=\\\"8\\\" cy=\\\"25\\\" r=\\\".8\\\"/><circle cx=\\\"21\\\" cy=\\\"33\\\" r=\\\"1\\\"/><circle cx=\\\"40\\\" cy=\\\"35\\\" r=\\\"1\\\"/>\\n+                <ellipse cx=\\\"54\\\" cy=\\\"26\\\" rx=\\\"1.1\\\" ry=\\\"2\\\"/><ellipse cx=\\\"37\\\" cy=\\\"43\\\" rx=\\\".6\\\" ry=\\\"1.2\\\"/>\\n+              </g>\\n+              <path d=\\\"M7 24 L7 28 M17 29 L17 33 M27 35 L27 39 M43 29 L43 33 M55 23 L55 28\\\" stroke=\\\"#efd69a\\\" stroke-width=\\\".65\\\" opacity=\\\".45\\\"/>\\n+              <path d=\\\"M1 12 L33 29 L66 13 L65 33 L33 51 L1 31Z\\\" fill=\\\"#fff\\\" filter=\\\"url(#food-texture)\\\" opacity=\\\".11\\\" style=\\\"mix-blend-mode:soft-light\\\"/>\\n+            </g>\\n+            <g id=\\\"shiitake\\\">\\n+              <path d=\\\"M-9 6 Q-13 27 -4 39 Q9 43 15 34 L9 10Z\\\" fill=\\\"url(#mushroom-gills)\\\"/>\\n+              <path d=\\\"M-4 18 L-1 34 M2 16 L5 35 M8 16 L9 30\\\" stroke=\\\"#dec296\\\" stroke-width=\\\"1.1\\\" fill=\\\"none\\\" opacity=\\\".53\\\"/>\\n+              <path d=\\\"M-54 1 C-43 -25 28 -33 54 -3 C52 18 17 28 -17 23 C-44 23 -59 13 -54 1Z\\\" fill=\\\"url(#mushroom-gills)\\\"/>\\n+              <g stroke=\\\"#5d482f\\\" fill=\\\"none\\\" stroke-width=\\\".9\\\" opacity=\\\".65\\\">\\n+                <path d=\\\"M-45 7 L-10 19 M-38 12 L-7 21 M-28 18 L-5 20 M-4 23 L-2 13 M10 24 L4 12 M21 22 L8 11 M31 18 L13 9 M43 12 L17 8 M49 5 L18 4\\\"/>\\n+              </g>\\n+              <path d=\\\"M-57 3 C-58 -10 -40 -31 -21 -38 C2 -48 27 -37 43 -24 C53 -17 61 -2 54 8 C42 21 17 14 -4 19 C-22 23 -43 16 -51 14 C-57 12 -60 9 -57 3Z\\\" fill=\\\"url(#mushroom-cap)\\\" stroke=\\\"#3f2c1e\\\" stroke-width=\\\"1\\\"/>\\n+              <path d=\\\"M-48 -9 C-32 -32 -9 -40 12 -32\\\" fill=\\\"none\\\" stroke=\\\"#d8b383\\\" stroke-width=\\\"1.8\\\" stroke-linecap=\\\"round\\\" opacity=\\\".48\\\"/>\\n+              <path d=\\\"M-52 4 C-41 12 -23 14 -5 15 C18 9 39 17 51 5\\\" fill=\\\"none\\\" stroke=\\\"#cfb083\\\" stroke-width=\\\"1\\\" opacity=\\\".35\\\"/>\\n+              <path d=\\\"M-27 -19 C-11 -11 7 -9 24 -3 L14 -1 C-3 -8 -16 -9 -34 -16Z\\\" fill=\\\"#e4d1a3\\\"/>\\n+              <path d=\\\"M-15 -32 C-7 -18 -2 -6 7 6 L-1 5 C-8 -9 -10 -15 -20 -30Z\\\" fill=\\\"#ecdbb1\\\"/>\\n+              <path d=\\\"M17 -27 C10 -16 -1 -8 -14 2 L-21 2 C-4 -14 4 -19 12 -28Z\\\" fill=\\\"#c7ad80\\\"/>\\n+              <path d=\\\"M-25 -19 L20 -4 M-16 -29 L3 3 M14 -26 L-17 1\\\" fill=\\\"none\\\" stroke=\\\"#9d774b\\\" stroke-width=\\\".85\\\" opacity=\\\".7\\\"/>\\n+              <path d=\\\"M-57 3 C-58 -10 -40 -31 -21 -38 C2 -48 27 -37 43 -24 C53 -17 61 -2 54 8 C42 21 17 14 -4 19 C-22 23 -43 16 -51 14 C-57 12 -60 9 -57 3Z\\\" fill=\\\"#fff\\\" filter=\\\"url(#food-texture)\\\" opacity=\\\".16\\\" style=\\\"mix-blend-mode:soft-light\\\"/>\\n+              <g fill=\\\"#e2ba83\\\" opacity=\\\".4\\\">\\n+                <ellipse cx=\\\"-34\\\" cy=\\\"-11\\\" rx=\\\"1.3\\\" ry=\\\".7\\\"/><circle cx=\\\"-25\\\" cy=\\\"-26\\\" r=\\\"1\\\"/><ellipse cx=\\\"-33\\\" cy=\\\"1\\\" rx=\\\"1.6\\\" ry=\\\".9\\\"/>\\n+                <circle cx=\\\"28\\\" cy=\\\"-15\\\" r=\\\".9\\\"/><ellipse cx=\\\"41\\\" cy=\\\"-1\\\" rx=\\\"1.6\\\" ry=\\\".65\\\"/><circle cx=\\\"19\\\" cy=\\\"7\\\" r=\\\".8\\\"/>\\n+                <ellipse cx=\\\"-8\\\" cy=\\\"-32\\\" rx=\\\"1.5\\\" ry=\\\".8\\\"/><circle cx=\\\"-44\\\" cy=\\\"-3\\\" r=\\\".8\\\"/>\\n+              </g>\\n+            </g>\\n+            <g id=\\\"bok-leaf\\\">\\n+              <path d=\\\"M0 6 C-13 -20 -20 -36 -16 -59 L6 -74 C7 -45 13 -22 14 0 Q7 10 0 6Z\\\" fill=\\\"url(#stem)\\\"/>\\n+              <path d=\\\"M-15 -43 C-32 -53 -48 -68 -43 -79 C-52 -90 -49 -100 -40 -105 C-45 -115 -37 -126 -27 -125 C-30 -137 -17 -144 -7 -139 C0 -149 15 -143 21 -138 C34 -143 43 -131 40 -123 C54 -121 57 -107 50 -99 C61 -90 53 -79 47 -74 C50 -60 29 -44 12 -41 C2 -35 -5 -40 -15 -43Z\\\" fill=\\\"url(#leaf)\\\" stroke=\\\"#325e23\\\" stroke-width=\\\"1.1\\\"/>\\n+              <path d=\\\"M1 1 C-5 -35 -6 -67 0 -122\\\" fill=\\\"none\\\" stroke=\\\"url(#stem)\\\" stroke-width=\\\"7\\\" stroke-linecap=\\\"round\\\"/>\\n+              <path d=\\\"M0 -2 C-6 -45 -5 -78 0 -125\\\" fill=\\\"none\\\" stroke=\\\"#d4dfa0\\\" stroke-width=\\\"1.5\\\" opacity=\\\".54\\\"/>\\n+              <g stroke=\\\"url(#leaf-light)\\\" stroke-width=\\\"1.3\\\" fill=\\\"none\\\" stroke-linecap=\\\"round\\\">\\n+                <path d=\\\"M-4 -55 C-19 -61 -33 -68 -37 -77 M-5 -71 C-22 -78 -34 -88 -37 -98 M-4 -88 C-16 -94 -26 -107 -27 -117 M-3 -105 C-11 -111 -14 -123 -10 -132\\\"/>\\n+                <path d=\\\"M-4 -55 C13 -59 32 -67 39 -78 M-4 -72 C16 -76 34 -86 43 -98 M-3 -90 C14 -96 25 -108 29 -123 M-1 -108 C8 -117 11 -128 9 -134\\\"/>\\n+              </g>\\n+              <g stroke=\\\"#80a545\\\" stroke-width=\\\".7\\\" opacity=\\\".35\\\" fill=\\\"none\\\">\\n+                <path d=\\\"M-20 -64 L-20 -75 M-30 -71 L-30 -79 M-22 -85 L-23 -98 M-13 -97 L-13 -108 M18 -66 L23 -77 M26 -82 L29 -94 M12 -98 L13 -109\\\"/>\\n+              </g>\\n+              <path d=\\\"M-42 -88 Q-45 -99 -35 -104 M-25 -127 Q-16 -135 -7 -131 M19 -132 Q33 -132 32 -122 M43 -107 Q49 -97 44 -91\\\" fill=\\\"none\\\" stroke=\\\"#9cbc59\\\" stroke-width=\\\"1.3\\\" opacity=\\\".53\\\" stroke-linecap=\\\"round\\\"/>\\n+              <path d=\\\"M-15 -43 C-32 -53 -48 -68 -43 -79 C-52 -90 -49 -100 -40 -105 C-45 -115 -37 -126 -27 -125 C-30 -137 -17 -144 -7 -139 C0 -149 15 -143 21 -138 C34 -143 43 -131 40 -123 C54 -121 57 -107 50 -99 C61 -90 53 -79 47 -74 C50 -60 29 -44 12 -41 C2 -35 -5 -40 -15 -43Z\\\" fill=\\\"#fff\\\" filter=\\\"url(#food-texture)\\\" opacity=\\\".1\\\" style=\\\"mix-blend-mode:soft-light\\\"/>\\n+              <path d=\\\"M-21 -106 Q-16 -102 -13 -103 M23 -83 Q29 -84 32 -88 M8 -118 L12 -121\\\" fill=\\\"none\\\" stroke=\\\"#d1dc9a\\\" stroke-width=\\\"1.4\\\" stroke-linecap=\\\"round\\\" opacity=\\\".6\\\"/>\\n+            </g>\\n+          </defs>\\n+\\n+          <!-- Light and the grounded shadow are drawn, too: no photographs. -->\\n+          <ellipse cx=\\\"535\\\" cy=\\\"793\\\" rx=\\\"470\\\" ry=\\\"130\\\" fill=\\\"url(#table-light)\\\"/>\\n+          <ellipse cx=\\\"562\\\" cy=\\\"810\\\" rx=\\\"373\\\" ry=\\\"72\\\" fill=\\\"url(#shadow)\\\"/>\\n+          <ellipse cx=\\\"552\\\" cy=\\\"806\\\" rx=\\\"163\\\" ry=\\\"25\\\" fill=\\\"#010403\\\" opacity=\\\".6\\\"/>\\n+          <path d=\\\"M478 779 L480 805 Q548 838 622 805 L624 779Z\\\" fill=\\\"#0d1512\\\"/>\\n+          <path d=\\\"M484 804 Q550 824 616 804\\\" fill=\\\"none\\\" stroke=\\\"#5a6150\\\" stroke-width=\\\"2\\\" opacity=\\\".16\\\"/>\\n+\\n+          <!-- Thrown stoneware, with a soft irregular glaze and turning marks. -->\\n+          <path d=\\\"M217 529 C231 660 327 774 477 804 Q550 824 624 803 C776 774 869 660 883 529Z\\\" fill=\\\"url(#ceramic)\\\"/>\\n+          <g clip-path=\\\"url(#body-clip)\\\">\\n+            <rect x=\\\"210\\\" y=\\\"526\\\" width=\\\"680\\\" height=\\\"300\\\" fill=\\\"url(#ceramic-bottom)\\\"/>\\n+            <g id=\\\"throwing-lines\\\"></g>\\n+            <rect x=\\\"210\\\" y=\\\"526\\\" width=\\\"680\\\" height=\\\"300\\\" fill=\\\"#d0c7b2\\\" filter=\\\"url(#ceramic-texture)\\\" opacity=\\\".17\\\" style=\\\"mix-blend-mode:soft-light\\\"/>\\n+            <g id=\\\"glaze-specks\\\"></g>\\n+            <path d=\\\"M231 546 C245 650 328 739 404 775\\\" fill=\\\"none\\\" stroke=\\\"#d4c6a7\\\" stroke-width=\\\"2\\\" opacity=\\\".065\\\"/>\\n+            <path d=\\\"M870 551 C855 646 802 708 748 751\\\" fill=\\\"none\\\" stroke=\\\"#a7b6a0\\\" stroke-width=\\\"1.6\\\" opacity=\\\".11\\\"/>\\n+          </g>\\n+\\n+          <!-- A deep lip contains the slightly translucent, golden miso broth. -->\\n+          <ellipse cx=\\\"550\\\" cy=\\\"529\\\" rx=\\\"335\\\" ry=\\\"137\\\" fill=\\\"#121b16\\\"/>\\n+          <ellipse cx=\\\"550\\\" cy=\\\"524\\\" rx=\\\"333\\\" ry=\\\"135\\\" fill=\\\"url(#rim)\\\"/>\\n+          <ellipse cx=\\\"550\\\" cy=\\\"525\\\" rx=\\\"323\\\" ry=\\\"125\\\" fill=\\\"#262b1d\\\"/>\\n+          <ellipse cx=\\\"550\\\" cy=\\\"522\\\" rx=\\\"317\\\" ry=\\\"120\\\" fill=\\\"url(#broth)\\\"/>\\n+          <g clip-path=\\\"url(#soup-clip)\\\">\\n+            <g id=\\\"broth-oil\\\"></g>\\n+            <path d=\\\"M277 490 C327 443 411 435 466 450 C455 465 417 477 371 477 C327 478 299 505 277 490Z\\\" fill=\\\"#f5cf7a\\\" opacity=\\\".08\\\"/>\\n+            <path d=\\\"M265 559 C274 591 315 608 362 610 C319 595 302 573 298 548Z\\\" fill=\\\"#e9b35d\\\" opacity=\\\".13\\\"/>\\n+            <ellipse cx=\\\"550\\\" cy=\\\"522\\\" rx=\\\"317\\\" ry=\\\"120\\\" fill=\\\"url(#broth-depth)\\\"/>\\n+            <g id=\\\"broth-flecks\\\"></g>\\n+            <g class=\\\"soup-glow\\\" fill=\\\"none\\\" stroke=\\\"#ffe1a2\\\" stroke-linecap=\\\"round\\\">\\n+              <path d=\\\"M254 534 Q252 557 272 570\\\" stroke-width=\\\"1.8\\\"/>\\n+              <path d=\\\"M279 580 Q292 590 310 594 M530 621 Q558 623 575 620\\\" stroke-width=\\\"1.2\\\"/>\\n+              <path d=\\\"M813 561 Q823 551 827 543 M805 570 L807 568\\\" stroke-width=\\\"1.6\\\"/>\\n+            </g>\\n+          </g>\\n+\\n+          <!-- Crisp sheets of nori sit at the back of the bowl. -->\\n+          <g filter=\\\"url(#soft-shadow)\\\">\\n+            <path d=\\\"M296 465 L274 380 L279 378 L277 370 L361 342 L365 347 L371 345 L405 447Z\\\" fill=\\\"url(#nori)\\\" stroke=\\\"#546044\\\" stroke-width=\\\".8\\\"/>\\n+            <path d=\\\"M327 459 L337 351 L344 354 L347 350 L428 370 L425 376 L433 377 L419 457Z\\\" fill=\\\"url(#nori)\\\" stroke=\\\"#4e5840\\\" stroke-width=\\\".7\\\"/>\\n+            <g id=\\\"nori-texture\\\" clip-path=\\\"url(#nori-clip)\\\"></g>\\n+            <path d=\\\"M278 373 L361 345 M340 354 L426 374\\\" fill=\\\"none\\\" stroke=\\\"#afb282\\\" stroke-width=\\\"1.2\\\" opacity=\\\".24\\\"/>\\n+          </g>\\n+\\n+          <!-- Noodles are individual shaded curves, woven into a loose nest. -->\\n+          <g clip-path=\\\"url(#soup-clip)\\\">\\n+            <ellipse cx=\\\"513\\\" cy=\\\"549\\\" rx=\\\"157\\\" ry=\\\"73\\\" fill=\\\"#683c17\\\" opacity=\\\".21\\\"/>\\n+            <g id=\\\"noodles\\\"></g>\\n+          </g>\\n+\\n+          <!-- Every topping is plant based. -->\\n+          <g filter=\\\"url(#soft-shadow)\\\">\\n+            <use href=\\\"#tofu-piece\\\" transform=\\\"translate(328 467) rotate(-14) scale(1.08)\\\"/>\\n+            <use href=\\\"#tofu-piece\\\" transform=\\\"translate(380 444) rotate(4) scale(1.01)\\\"/>\\n+            <use href=\\\"#tofu-piece\\\" transform=\\\"translate(427 465) rotate(18) scale(.94)\\\"/>\\n+            <use href=\\\"#tofu-piece\\\" transform=\\\"translate(318 508) rotate(-19) scale(1.01)\\\"/>\\n+            <use href=\\\"#tofu-piece\\\" transform=\\\"translate(373 499) rotate(7) scale(1.04)\\\"/>\\n+            <use href=\\\"#tofu-piece\\\" transform=\\\"translate(415 527) rotate(-14) scale(.91)\\\"/>\\n+          </g>\\n+          <g id=\\\"corn\\\" filter=\\\"url(#small-shadow)\\\"></g>\\n+          <g filter=\\\"url(#soft-shadow)\\\">\\n+            <use href=\\\"#shiitake\\\" transform=\\\"translate(600 466) rotate(-21) scale(.94)\\\"/>\\n+            <use href=\\\"#shiitake\\\" transform=\\\"translate(675 470) rotate(14) scale(1.1)\\\"/>\\n+            <use href=\\\"#shiitake\\\" transform=\\\"translate(715 523) rotate(-13) scale(.95)\\\"/>\\n+          </g>\\n+          <g filter=\\\"url(#soft-shadow)\\\">\\n+            <use href=\\\"#bok-leaf\\\" transform=\\\"translate(702 580) rotate(33) scale(.88)\\\"/>\\n+            <use href=\\\"#bok-leaf\\\" transform=\\\"translate(685 603) rotate(73) scale(1.03)\\\"/>\\n+            <use href=\\\"#bok-leaf\\\" transform=\\\"translate(667 602) rotate(42) scale(1.05)\\\"/>\\n+            <path d=\\\"M659 603 Q670 582 681 568 Q676 593 679 610Z\\\" fill=\\\"url(#stem)\\\"/>\\n+            <path d=\\\"M663 602 L672 583\\\" fill=\\\"none\\\" stroke=\\\"#e6e7bb\\\" stroke-width=\\\"1.5\\\" opacity=\\\".7\\\"/>\\n+          </g>\\n+          <g id=\\\"garnish\\\" clip-path=\\\"url(#soup-clip)\\\"></g>\\n+\\n+          <!-- A few fine red chili threads, and the last oil reflections. -->\\n+          <g fill=\\\"none\\\" stroke-linecap=\\\"round\\\" filter=\\\"url(#small-shadow)\\\">\\n+            <path d=\\\"M482 464 C510 438 546 438 559 460 C568 477 526 485 519 466 C513 450 543 434 551 451 C559 468 517 484 495 478\\\" stroke=\\\"#a2371c\\\" stroke-width=\\\"2\\\"/>\\n+            <path d=\\\"M489 468 C526 468 521 439 544 444 C566 451 537 463 525 475\\\" stroke=\\\"#d45b2b\\\" stroke-width=\\\"1.7\\\"/>\\n+            <path d=\\\"M499 454 C491 440 525 445 534 458 C549 479 514 485 509 471\\\" stroke=\\\"#eb7741\\\" stroke-width=\\\"1.15\\\"/>\\n+            <path d=\\\"M504 481 Q539 462 565 469\\\" stroke=\\\"#8d2619\\\" stroke-width=\\\"1.5\\\"/>\\n+          </g>\\n+          <g class=\\\"oil-shine\\\" fill=\\\"none\\\" stroke=\\\"#ffe9b5\\\" stroke-linecap=\\\"round\\\">\\n+            <path d=\\\"M283 525 Q284 519 291 518 M291 534 L294 535 M462 608 Q471 611 479 609 M577 593 L583 590\\\" stroke-width=\\\"1.5\\\"/>\\n+            <path d=\\\"M755 581 Q765 581 770 578 M794 539 L799 536\\\" stroke-width=\\\"1.2\\\"/>\\n+          </g>\\n+\\n+          <!-- The front lip catches a thin, interrupted ribbon of warm light. -->\\n+          <path d=\\\"M217 526 C218 600 366 662 548 662 C731 662 879 601 883 526\\\" fill=\\\"none\\\" stroke=\\\"#09100d\\\" stroke-width=\\\"5\\\" opacity=\\\".5\\\"/>\\n+          <path d=\\\"M219 522 C218 598 366 656 550 657 C734 657 881 599 881 522\\\" fill=\\\"none\\\" stroke=\\\"url(#ceramic-reflection)\\\" stroke-width=\\\"3.5\\\"/>\\n+          <path d=\\\"M224 507 C243 442 382 392 551 392 C687 392 805 426 852 473\\\" fill=\\\"none\\\" stroke=\\\"url(#rim-light)\\\" stroke-width=\\\"1.6\\\"/>\\n+          <path d=\\\"M227 514 C237 542 251 558 273 572 M301 596 Q343 622 394 631\\\" fill=\\\"none\\\" stroke=\\\"#d1c3a0\\\" stroke-width=\\\"1.5\\\" opacity=\\\".3\\\" stroke-linecap=\\\"round\\\"/>\\n+          <path d=\\\"M769 625 Q810 610 834 590\\\" fill=\\\"none\\\" stroke=\\\"#a0af91\\\" stroke-width=\\\"1.3\\\" opacity=\\\".25\\\" stroke-linecap=\\\"round\\\"/>\\n+        </svg>\\n+        <canvas class=\\\"steam\\\" aria-hidden=\\\"true\\\"></canvas>\\n+      </div>\\n+    </div>\\n+    <div class=\\\"vignette\\\" aria-hidden=\\\"true\\\"></div>\\n+  </main>\\n+  <script>\\n+    (() => {\\n+      'use strict';\\n+\\n+      // Deterministic variation gives each small drawn detail its own shape.\\n+      let seed = 71427;\\n+      const random = () => {\\n+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;\\n+        return seed / 4294967296;\\n+      };\\n+      const between = (a, b) => a + random() * (b - a);\\n+      const ns = 'http://www.w3.org/2000/svg';\\n+      const make = (tag, attributes, parent) => {\\n+        const element = document.createElementNS(ns, tag);\\n+        for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);\\n+        if (parent) parent.appendChild(element);\\n+        return element;\\n+      };\\n+      const group = id => document.getElementById(id);\\n+      const round = n => Math.round(n * 100) / 100;\\n+      const ellipsePoint = (rx, ry, cx = 550, cy = 522) => {\\n+        const a = between(0, Math.PI * 2);\\n+        const r = Math.sqrt(random());\\n+        return { x: cx + Math.cos(a) * rx * r, y: cy + Math.sin(a) * ry * r };\\n+      };\\n+\\n+      // The bowl's very fine concentric grooves follow its curved profile.\\n+      for (let i = 0; i < 52; i++) {\\n+        const y = 557 + i * 4.9;\\n+        make('path', {\\n+          d: `M218 ${round(y - 26)} Q549 ${round(y + 105 - i * .6)} 882 ${round(y - 26)}`,\\n+          fill: 'none', stroke: i % 3 ? '#a6ab95' : '#020906',\\n+          'stroke-width': between(.4, 1.1), opacity: between(.024, .065)\\n+        }, group('throwing-lines'));\\n+      }\\n+      for (let i = 0; i < 530; i++) {\\n+        make('ellipse', {\\n+          cx: between(225, 880), cy: between(566, 810),\\n+          rx: between(.3, 1.2), ry: between(.25, .7),\\n+          fill: i % 3 ? '#c6c3a9' : '#07100b', opacity: between(.04, .23)\\n+        }, group('glaze-specks'));\\n+      }\\n+\\n+      // Oil collects in irregular lenses instead of evenly spaced circles.\\n+      for (let i = 0; i < 43; i++) {\\n+        const {x, y} = ellipsePoint(307, 109);\\n+        const rx = between(7, 38), ry = rx * between(.21, .47);\\n+        make('path', {\\n+          d: `M${round(x-rx)} ${round(y)} C${round(x-rx)} ${round(y-ry)} ${round(x-rx*.3)} ${round(y-ry*1.3)} ${round(x+rx*.4)} ${round(y-ry*.7)} C${round(x+rx*1.15)} ${round(y-ry*.4)} ${round(x+rx)} ${round(y+ry*.7)} ${round(x+rx*.2)} ${round(y+ry)} C${round(x-rx*.4)} ${round(y+ry*.7)} ${round(x-rx*.8)} ${round(y+ry*.8)} ${round(x-rx)} ${round(y)}Z`,\\n+          fill: 'url(#oil)', opacity: between(.16, .5),\\n+          stroke: i % 3 ? '#e3ad50' : '#9d461c', 'stroke-width': .65\\n+        }, group('broth-oil'));\\n+      }\\n+      for (let i = 0; i < 240; i++) {\\n+        const {x, y} = ellipsePoint(310, 112);\\n+        const r = between(.3, 1.3);\\n+        make('ellipse', {\\n+          cx: round(x), cy: round(y), rx: r, ry: r * .52,\\n+          fill: i % 4 ? '#ffdc80' : '#713916', opacity: between(.12, .6)\\n+        }, group('broth-flecks'));\\n+      }\\n+\\n+      // Nori is crinkled: little overlapping fibers catch the grazing light.\\n+      for (let i = 0; i < 470; i++) {\\n+        const x = between(279, 434), y = between(344, 464);\\n+        const width = between(1, 9);\\n+        make('path', {\\n+          d: `M${round(x)} ${round(y)} l${round(width*.6)} ${round(between(-3, 1))} l${round(width*.4)} ${round(between(-1, 3))}`,\\n+          fill: 'none', stroke: i % 4 ? '#7e8b60' : '#020b08',\\n+          'stroke-width': between(.45, 1.7), opacity: between(.12, .36)\\n+        }, group('nori-texture'));\\n+      }\\n+\\n+      // Smooth Catmull–Rom curves keep the noodles loose and organic.\\n+      const smoothPath = points => {\\n+        let d = `M${round(points[0].x)} ${round(points[0].y)}`;\\n+        for (let i = 0; i < points.length - 1; i++) {\\n+          const a = points[Math.max(0, i-1)], b = points[i];\\n+          const c = points[i+1], e = points[Math.min(points.length-1, i+2)];\\n+          d += ` C${round(b.x+(c.x-a.x)/6)} ${round(b.y+(c.y-a.y)/6)} ${round(c.x-(e.x-b.x)/6)} ${round(c.y-(e.y-b.y)/6)} ${round(c.x)} ${round(c.y)}`;\\n+        }\\n+        return d;\\n+      };\\n+      const noodleColors = ['#e4bd70', '#e8c77f', '#d9a859', '#f0cd84', '#d5a258', '#ebc279'];\\n+      for (let i = 0; i < 48; i++) {\\n+        const cx = between(462, 558), cy = between(512, 559);\\n+        const rx = between(55, 111), ry = between(24, 52);\\n+        const phase = between(0, Math.PI * 2), curl = between(.85, 1.45);\\n+        const points = [];\\n+        const segments = 26;\\n+        for (let j = 0; j <= segments; j++) {\\n+          const t = phase + j / segments * Math.PI * 2 * curl;\\n+          const wobble = Math.sin(t * 3 + i * .8) * 6 + Math.cos(t * 5 + i) * 3;\\n+          points.push({\\n+            x: cx + Math.cos(t) * (rx + wobble) + Math.sin(t * 2 + i) * 7,\\n+            y: cy + Math.sin(t) * (ry + wobble * .36) + Math.sin(t * 3 + i) * 2\\n+          });\\n+        }\\n+        const d = smoothPath(points);\\n+        const width = between(3.3, 5.4);\\n+        make('path', {d, fill:'none', stroke:'#6b401c', 'stroke-width':width+2, 'stroke-linecap':'round', opacity:.58, transform:'translate(.7 2)'}, group('noodles'));\\n+        make('path', {d, fill:'none', stroke:noodleColors[i%noodleColors.length], 'stroke-width':width, 'stroke-linecap':'round', 'stroke-linejoin':'round'}, group('noodles'));\\n+        make('path', {d, fill:'none', stroke:'#ffe3a2', 'stroke-width':width*.26, 'stroke-linecap':'round', opacity:between(.32,.62), transform:'translate(-.4 -.85)'}, group('noodles'));\\n+      }\\n+\\n+      for (let i = 0; i < 17; i++) {\\n+        const {x, y} = ellipsePoint(29, 20, 318, 571);\\n+        const angle = between(-35, 35);\\n+        const kernel = make('g', {transform:`translate(${round(x)} ${round(y)}) rotate(${angle})`}, group('corn'));\\n+        make('path', {d:'M-5 -3 Q-5 -8 0 -7 Q7 -7 7 -1 L5 5 Q0 8 -5 4Z', fill:i%3 ? '#e6b348' : '#f2c85c', stroke:'#ba7c27', 'stroke-width':.6}, kernel);\\n+        make('path', {d:'M-3 -3 Q0 -6 4 -3', fill:'none', stroke:'#ffe69a', 'stroke-width':1.5, 'stroke-linecap':'round', opacity:.75}, kernel);\\n+      }\\n+\\n+      // Thin scallion slices, toasted sesame, and tiny chili flakes.\\n+      for (let i = 0; i < 34; i++) {\\n+        let point;\\n+        if (i < 24) point = ellipsePoint(137, 58, 516, 537);\\n+        else point = ellipsePoint(276, 91);\\n+        const {x, y} = point;\\n+        const rx = between(4, 7.7), ry = rx * between(.4, .66);\\n+        const g = make('g', {transform:`translate(${round(x)} ${round(y)}) rotate(${between(-50, 50)})`, filter:'url(#small-shadow)'}, group('garnish'));\\n+        make('ellipse', {cx:0, cy:1, rx, ry, fill:'#2c662a'}, g);\\n+        make('ellipse', {cx:0, cy:0, rx, ry, fill:'#82ac47'}, g);\\n+        make('ellipse', {cx:0, cy:-.4, rx:rx*.57, ry:ry*.57, fill:'#c8d992'}, g);\\n+        make('ellipse', {cx:.4, cy:.3, rx:rx*.34, ry:ry*.34, fill:'#536d2e'}, g);\\n+        make('path', {d:`M${-rx*.73} -1 Q${-rx*.45} ${-ry*.9} 0 ${-ry*.8}`, fill:'none', stroke:'#dce5a0', 'stroke-width':.9, opacity:.8}, g);\\n+      }\\n+      for (let i = 0; i < 78; i++) {\\n+        const {x, y} = ellipsePoint(231, 84, 549, 526);\\n+        make('ellipse', {\\n+          cx:round(x), cy:round(y), rx:between(1.4, 2.5), ry:between(.65, .95),\\n+          fill:i%6 ? '#f3d597' : '#734d2c', stroke:'#8b5e31', 'stroke-width':.25,\\n+          transform:`rotate(${between(-70, 70)} ${round(x)} ${round(y)})`, opacity:between(.65, 1)\\n+        }, group('garnish'));\\n+      }\\n+      for (let i = 0; i < 24; i++) {\\n+        const {x, y} = ellipsePoint(189, 69, 558, 550);\\n+        make('path', {d:`M${round(x)} ${round(y)} l${between(1,3)} -1 l1 ${between(1,3)} l-3 1Z`, fill:i%3 ? '#a34021' : '#d6642b', opacity:.8}, group('garnish'));\\n+      }\\n+      const chili = make('g', {transform:'translate(554 591) rotate(-23)', filter:'url(#small-shadow)'}, group('garnish'));\\n+      make('path', {d:'M-17 -2 C-13 -14 6 -15 17 -6 C23 4 7 13 -7 11 C-15 9 -20 5 -17 -2Z M-10 -1 C-10 5 -1 8 8 3 C17 -1 7 -8 -2 -6 C-6 -6 -9 -4 -10 -1Z', fill:'url(#chili)', 'fill-rule':'evenodd', stroke:'#e27338', 'stroke-width':1}, chili);\\n+      make('path', {d:'M-12 -4 Q-3 -13 12 -6', fill:'none', stroke:'#f2ad66', 'stroke-width':1.2, opacity:.8}, chili);\\n+      make('ellipse', {cx:-1, cy:1, rx:2.5, ry:1.1, fill:'#edcf8f'}, chili);\\n+\\n+      const scene = document.querySelector('.scene');\\n+      const stage = document.querySelector('.stage');\\n+      const portrait = document.querySelector('.portrait');\\n+      const light = document.querySelector('.light');\\n+      const canvas = document.querySelector('.steam');\\n+      const ctx = canvas.getContext('2d');\\n+      const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');\\n+      let reduced = motionQuery.matches;\\n+      let frame = 0, lastTime = 0, time = 0, rect, resolution = 1;\\n+      const pointer = {x:0, y:0, targetX:0, targetY:0, active:false};\\n+      const disturbances = [];\\n+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));\\n+\\n+      // Several continuous, unevenly timed ribbons mingle as real vapor does.\\n+      const ribbons = Array.from({length:14}, (_, i) => ({\\n+        x:between(381, 717), y:between(470, 533),\\n+        height:between(222, 340), width:between(9, 22),\\n+        amplitude:between(9, 26), phase:between(0, Math.PI*2),\\n+        speed:between(.3, .58), alpha:between(.029, .063),\\n+        drift:between(-32, 22), index:i\\n+      }));\\n+\\n+      function drawSteam(t) {\\n+        if (!ctx) return;\\n+        ctx.setTransform(resolution, 0, 0, resolution, 0, 0);\\n+        ctx.clearRect(0, 0, 1100, 900);\\n+        ctx.globalCompositeOperation = 'screen';\\n+        const draft = pointer.x * 33;\\n+        for (const ribbon of ribbons) {\\n+          const life = (Math.sin(t * ribbon.speed + ribbon.phase) + 1) * .5;\\n+          const strength = ribbon.alpha * (.45 + life * .65);\\n+          const points = [];\\n+          const count = 39;\\n+          for (let j = 0; j <= count; j++) {\\n+            const p = j / count;\\n+            const wave = Math.sin(p * 7.5 - t * .58 + ribbon.phase);\\n+            const detail = Math.sin(p * 17 - t * .83 + ribbon.phase * 2) * .3;\\n+            let x = ribbon.x + (wave + detail) * ribbon.amplitude * Math.sin(p * Math.PI * .8)\\n+              + (ribbon.drift + draft) * p * p;\\n+            let y = ribbon.y - p * ribbon.height;\\n+            for (const disturbance of disturbances) {\\n+              const age = t - disturbance.start;\\n+              if (age < 0 || age > 3.8) continue;\\n+              const dy = Math.abs(y - (disturbance.y - age * 47));\\n+              const influence = Math.exp(-dy * dy / 6800) * Math.exp(-age * .8);\\n+              x += Math.sin(p * 8 + age * 2) * influence * disturbance.force;\\n+            }\\n+            points.push({x, y, p});\\n+          }\\n+          // Broad translucent haze beneath a finer, brighter twisting core.\\n+          for (let pass = 0; pass < 2; pass++) {\\n+            ctx.filter = pass ? 'blur(2px)' : 'blur(8px)';\\n+            for (let j = 0; j < points.length - 1; j++) {\\n+              const a = points[j], b = points[j+1];\\n+              const p = (a.p + b.p) * .5;\\n+              const fade = Math.pow(Math.sin(Math.PI * p), .8) * (1 - p * .6);\\n+              const width = ribbon.width * (.25 + p * 1.65) * (pass ? .43 : 1.15);\\n+              ctx.strokeStyle = `rgba(205, 209, 185, ${strength * fade * (pass ? .75 : .65)})`;\\n+              ctx.lineWidth = width;\\n+              ctx.lineCap = 'round';\\n+              ctx.beginPath();\\n+              ctx.moveTo(a.x, a.y);\\n+              ctx.lineTo(b.x, b.y);\\n+              ctx.stroke();\\n+            }\\n+          }\\n+        }\\n+        // A little warm haze just above the surface joins the individual wisps.\\n+        ctx.filter = 'blur(11px)';\\n+        const haze = ctx.createRadialGradient(538, 482, 10, 538, 482, 168);\\n+        haze.addColorStop(0, 'rgba(224, 194, 132, .033)');\\n+        haze.addColorStop(1, 'rgba(224, 194, 132, 0)');\\n+        ctx.fillStyle = haze;\\n+        ctx.save();\\n+        ctx.translate(0, 300);\\n+        ctx.scale(1, .38);\\n+        ctx.fillRect(322, 278, 448, 380);\\n+        ctx.restore();\\n+        ctx.filter = 'none';\\n+        ctx.globalCompositeOperation = 'source-over';\\n+      }\\n+\\n+      function resize() {\\n+        rect = stage.getBoundingClientRect();\\n+        const dpr = Math.min(window.devicePixelRatio || 1, 1.75);\\n+        resolution = Math.min(1.7, rect.width / 1100 * dpr);\\n+        canvas.width = Math.round(1100 * resolution);\\n+        canvas.height = Math.round(900 * resolution);\\n+        drawSteam(time || 11);\\n+      }\\n+\\n+      function animate(now) {\\n+        frame = 0;\\n+        if (reduced || document.hidden) return;\\n+        const dt = lastTime ? Math.min((now-lastTime)/1000, .05) : 0;\\n+        lastTime = now;\\n+        time += dt;\\n+        const ease = 1 - Math.exp(-dt * 3.2);\\n+        pointer.x += (pointer.targetX-pointer.x) * ease;\\n+        pointer.y += (pointer.targetY-pointer.y) * ease;\\n+        portrait.style.setProperty('--dish-x', `${pointer.x * 7}px`);\\n+        portrait.style.setProperty('--dish-y', `${pointer.y * 3}px`);\\n+        portrait.style.setProperty('--dish-r', `${pointer.x * .55}deg`);\\n+        light.style.setProperty('--light-x', `${pointer.x * 24}px`);\\n+        light.style.setProperty('--light-y', `${pointer.y * 13}px`);\\n+        for (let i = disturbances.length-1; i >= 0; i--) {\\n+          if (time - disturbances[i].start > 4) disturbances.splice(i, 1);\\n+        }\\n+        drawSteam(time);\\n+        frame = requestAnimationFrame(animate);\\n+      }\\n+\\n+      function start() {\\n+        if (!reduced && !document.hidden && !frame) {\\n+          lastTime = 0;\\n+          frame = requestAnimationFrame(animate);\\n+        }\\n+      }\\n+\\n+      scene.addEventListener('pointermove', event => {\\n+        if (reduced || event.pointerType === 'touch') return;\\n+        pointer.active = true;\\n+        pointer.targetX = clamp((event.clientX / window.innerWidth - .5) * 2, -1, 1);\\n+        pointer.targetY = clamp((event.clientY / window.innerHeight - .5) * 2, -1, 1);\\n+      }, {passive:true});\\n+      scene.addEventListener('pointerleave', () => {\\n+        pointer.active = false;\\n+        pointer.targetX = pointer.targetY = 0;\\n+      }, {passive:true});\\n+      scene.addEventListener('pointerdown', event => {\\n+        if (reduced || !rect) return;\\n+        const x = (event.clientX-rect.left) / rect.width * 1100;\\n+        const y = (event.clientY-rect.top) / rect.height * 900;\\n+        if (x > 225 && x < 880 && y > 250 && y < 650) {\\n+          disturbances.push({x, y, start:time, force:between(24, 43)});\\n+          if (disturbances.length > 4) disturbances.shift();\\n+        }\\n+      }, {passive:true});\\n+\\n+      motionQuery.addEventListener('change', event => {\\n+        reduced = event.matches;\\n+        if (reduced) {\\n+          cancelAnimationFrame(frame);\\n+          frame = 0;\\n+          pointer.x = pointer.y = pointer.targetX = pointer.targetY = 0;\\n+          portrait.removeAttribute('style');\\n+          light.removeAttribute('style');\\n+          drawSteam(11);\\n+        } else start();\\n+      });\\n+      document.addEventListener('visibilitychange', () => {\\n+        if (document.hidden) {\\n+          cancelAnimationFrame(frame);\\n+          frame = 0;\\n+        } else start();\\n+      });\\n+      window.addEventListener('resize', resize, {passive:true});\\n+      resize();\\n+      time = 11;\\n+      start();\\n+    })();\\n+  </script>\\n+</body>\\n+</html>\\n*** End Patch\"));\n",
+      "timestamp": "2026-10-01T00:56:43.027Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_9VB14lWDzrRlxmayhP0O5OSc",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:56:43.088Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_uGktv8xdDjeF4T5s3GVd1B60",
+      "tool": "exec",
+      "input": "const r = await Promise.allSettled([\ntools.write_stdin({session_id:26116,chars:\"\",\"max_output_tokens\":2500,\"yield_time_ms\":1000}),\ntools.exec_command({cmd:\"python3 -m http.server 8000 --bind <LAN_IP>\",\"workdir\":\"/app\",\"yield_time_ms\":1000,\"max_output_tokens\":1500}),\ntools.exec_command({cmd:\"wc -l -c index.html && python3 -c \\\"from pathlib import Path; import re; s=Path('index.html').read_text(); print('External resource attributes:', re.findall(r'(?:src|href)=[\\\\\\\"\\\\x27](?!#)[^\\\\\\\"\\\\x27]*',s)); print('Image elements:', len(re.findall(r'<(?:img|image)\\\\\\\\b',s)))\\\"\",\"workdir\":\"/app\",\"max_output_tokens\":2000})\n]);r.forEach((v,i)=>text({i,...v}));\n",
+      "timestamp": "2026-10-01T00:57:02.442Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_uGktv8xdDjeF4T5s3GVd1B60",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"i\":0,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"568c89\",\"wall_time_seconds\":0.000020934,\"exit_code\":0,\"original_token_count\":1663,\"output\":\"|                                                                                |   0% of 186.8 MiB\\n|■■■■■■■■                                                                        |  10% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■                                                                |  20% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 186.8 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 186.8 MiB\\nChrome for Testing 153.0.8010.12 (playwright chromium v1243) downloaded to /root/.cache/ms-playwright/chromium-1243\\nDownloading FFmpeg (playwright ffmpeg v1011)\\u001b[2m from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip\\u001b[22m\\n|                                                                                |   0% of 2.3 MiB\\n|■■■■■■■■                                                                        |  10% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB\\nFFmpeg (playwright ffmpeg v1011) downloaded to /root/.cache/ms-playwright/ffmpeg-1011\\nDownloading Chrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243)\\u001b[2m from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-headless-shell-linux64.zip\\u001b[22m\\n|                                                                                |   0% of 114.3 MiB\\n|■■■■■■■■                                                                        |  10% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■                                                                |  20% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 114.3 MiB\\n|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 114.3 MiB\\nChrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243) downloaded to /root/.cache/ms-playwright/chromium_headless_shell-1243\\n\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"i\":1,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"cbfe22\",\"wall_time_seconds\":1.00133906,\"session_id\":12885,\"original_token_count\":0,\"output\":\"\"}}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"i\":2,\"status\":\"fulfilled\",\"value\":{\"chunk_id\":\"b3eb77\",\"wall_time_seconds\":0.00000795,\"exit_code\":0,\"original_token_count\":19,\"output\":\"  700 39730 index.html\\nExternal resource attributes: []\\nImage elements: 0\\n\"}}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:57:03.638Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The page is built. I’m checking desktop and phone layouts, mouse response, and reduced-motion behavior, then reviewing the rendering for any visual or performance issues.\n",
+      "timestamp": "2026-10-01T00:57:07.369Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_xqmmtSWIa8uHS9x4VjnS3UfO",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport asyncio\\nfrom pathlib import Path\\nfrom playwright.async_api import async_playwright\\n\\nasync def main():\\n    async with async_playwright() as p:\\n        browser = await p.chromium.launch(args=['--no-sandbox'])\\n        page = await browser.new_page(viewport={'width':1440,'height':1000}, device_scale_factor=1)\\n        errors = []\\n        page.on('pageerror', lambda error: errors.append(str(error)))\\n        await page.goto('http://<LAN_IP>:8000', wait_until='networkidle')\\n        await page.wait_for_timeout(1500)\\n        await page.screenshot(path='<TMP>/ramen-desktop.png')\\n        print({'errors':errors,'body_scroll':await page.evaluate('({w:document.body.scrollWidth,h:document.body.scrollHeight,vw:innerWidth,vh:innerHeight})'),'elements':await page.locator('svg *').count()})\\n        await page.mouse.move(1300,330)\\n        await page.wait_for_timeout(1000)\\n        print('Pointer response:',await page.locator('.portrait').evaluate('(element)=>getComputedStyle(element).transform'))\\n        await page.set_viewport_size({'width':390,'height':844})\\n        await page.mouse.move(0,0)\\n        await page.wait_for_timeout(700)\\n        await page.screenshot(path='<TMP>/ramen-mobile.png')\\n        await page.emulate_media(reduced_motion='reduce')\\n        await page.wait_for_timeout(200)\\n        await page.screenshot(path='<TMP>/ramen-reduced.png')\\n        print('Reduced motion:',await page.evaluate('({transform:getComputedStyle(document.querySelector(\\\".portrait\\\")).transform,animation:getComputedStyle(document.querySelector(\\\".soup-glow\\\")).animationName})'))\\n        await browser.close()\\n\\nasyncio.run(main())\\nPY\",\"workdir\":\"/app\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:57:21.010Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_xqmmtSWIa8uHS9x4VjnS3UfO",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"140c88\",\"wall_time_seconds\":1.000586635,\"session_id\":67822,\"original_token_count\":164,\"output\":\"Traceback (most recent call last):\\n  File \\\"<stdin>\\\", line 28, in <module>\\n  File \\\"/usr/local/lib/python3.12/asyncio/runners.py\\\", line 195, in run\\n    return runner.run(main)\\n           ^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/asyncio/runners.py\\\", line 118, in run\\n    return self._loop.run_until_complete(task)\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/asyncio/base_events.py\\\", line 691, in run_until_complete\\n    return future.result()\\n           ^^^^^^^^^^^^^^^\\n  File \\\"<stdin>\\\", line 7, in main\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/async_api/_generated.py\\\", line 16851, in launch\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:57:22.193Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_hplpWZTKh4MGysNaKfYjzUVE",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:67822,chars:\"\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\ntext(await tools.exec_command({cmd:\"python3 -m playwright install-deps chromium\",\"workdir\":\"/app\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:57:27.167Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_hplpWZTKh4MGysNaKfYjzUVE",
+      "status": "error",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"e57f5c\",\"wall_time_seconds\":0.00000572,\"exit_code\":1,\"original_token_count\":1287,\"output\":\"    await self._impl_obj.launch(\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_browser_type.py\\\", line 101, in launch\\n    await self._channel.send(\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py\\\", line 76, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py\\\", line 632, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.TargetClosedError: BrowserType.launch: Target page, context or browser has been closed\\nBrowser logs:\\n\\n<launching> /root/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=<TMP>/playwright_chromiumdev_profile-9K1YzC --remote-debugging-pipe --no-startup-window\\n<launched> pid=233\\n[pid=233][err] /root/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell: error while loading shared libraries: libglib-2.0.so.0: cannot open shared object file: No such file or directory\\nCall log:\\n  - <launching> /root/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=<TMP>/playwright_chromiumdev_profile-9K1YzC --remote-debugging-pipe --no-startup-window\\n  - <launched> pid=233\\n  - [pid=233][err] /root/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell: error while loading shared libraries: libglib-2.0.so.0: cannot open shared object file: No such file or directory\\n  - [pid=233] <gracefully close start>\\n  - [pid=233] <kill>\\n  - [pid=233] <will force kill>\\n  - [pid=233] exception while trying to kill process: Error: kill ESRCH\\n  - [pid=233] <process did exit: exitCode=127, signal=null>\\n  - [pid=233] starting temporary directories cleanup\\n  - [pid=233] finished temporary directories cleanup\\n  - [pid=233] <gracefully close end>\\n\\n\"}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"907d0e\",\"wall_time_seconds\":1.00140729,\"session_id\":55642,\"original_token_count\":123,\"output\":\"Installing dependencies...\\nGet:1 http://deb.debian.org/debian bookworm InRelease [151 kB]\\nGet:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]\\nGet:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]\\nGet:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]\\nGet:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]\\nGet:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [343 kB]\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:57:28.364Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_Ou0RcyuW65UGZnutaHXc8TZP",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:55642,chars:\"\",\"max_output_tokens\":2500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:58:02.548Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_Ou0RcyuW65UGZnutaHXc8TZP",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"ea0b6c\",\"wall_time_seconds\":0.000006745,\"exit_code\":0,\"original_token_count\":9245,\"output\":\"Warning: truncated output (original token count: 9245)\\nTotal output lines: 579\\n\\nFetched 9381 kB in 2s (5856 kB/s)\\nReading package lists...\\nReading package lists...\\nBuilding dependency tree...\\nReading state information...\\nThe following additional packages will be installed:\\n  at-spi2-common fontconfig fontconfig-config libasound2-data libavahi-client3\\n  libavahi-common-data libavahi-common3 libbsd0 libdatrie1 libdrm-amdgpu1\\n  libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libedit2 libelf1\\n  libfontenc1 libfribidi0 libgl1 libgl1-mesa-dri libglapi-mesa libglvnd0\\n  libglx-mesa0 libglx0 libgraphite2-3 libharfbuzz0b libice6 libicu72 libllvm15\\n  libpciaccess0 libpixman-1-0 libpng16-16 libsensors-config libsensors5 libsm6\\n  libthai-data libthai0 libunwind8 libwayland-server0 libx11-data libx11-xcb1\\n  libxau6 libxaw7 libxcb-dri2-0 libxcb-dri3-0 libxcb-glx0 libxcb-present0\\n  libxcb-randr0 libxcb-render0 libxcb-shm0 libxcb-sync1 libxcb-xfixes0\\n  libxdmcp6 libxfont2 libxi6 libxkbfile1 libxml2 libxmu6 libxpm4 libxrender1\\n  libxshmfence1 libxt6 libxxf86vm1 libz3-4 x11-common x11-xkb-utils\\n  xfonts-encodings xfonts-utils xkb-data xserver-common\\nSuggested packages:\\n  libasound2-plugins alsa-utils cups-common low-memory-monitor pciutils\\n  lm-sensors\\nRecommended packages:\\n  fonts-ipafont-mincho fonts-tlwg-loma alsa-ucm-conf alsa-topology-conf\\n  at-spi2-core dbus libglib2.0-data shared-mime-info xdg-user-dirs xfonts-base\\n  xauth\\nThe following NEW packages will be installed:\\n  at-spi2-common fontconfig fontconfig-config fonts-freefont-ttf\\n  fonts-ipafont-gothic fonts-liberation fonts-noto-color-emoji\\n  fonts-tlwg-loma-otf fonts-unifont fonts-wqy-zenhei libasound2\\n  libasound2-data libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0\\n  libavahi-client3 libavahi-common-data libavahi-common3 libbsd0 libcairo2\\n  libcups2 libdatrie1 libdbus-1-3 libdrm-amdgpu1 libdrm-common libdrm-intel1\\n  libdrm-nouveau2 libdrm-radeon1 libdrm2 libedit2 libelf1 libfontconfig1\\n  libfontenc1 libfreetype6 libfribidi0 libgbm1 libgl1 libgl1-mesa-dri\\n  libglapi-mesa libglib2.0-0 libglvnd0 libglx-mesa0 libglx0 libgraphite2-3\\n  libharfbuzz0b libice6 libicu72 libllvm15 libnspr4 libnss3 libpango-1.0-0\\n  libpciaccess0 libpixman-1-0 libpng16-16 libsensors-config libsensors5 libsm6\\n  libthai-data libthai0 libunwind8 libwayland-server0 libx11-6 libx11-data\\n  libx11-xcb1 libxau6 libxaw7 libxcb-dri2-0 libxcb-dri3-0 libxcb-glx0\\n  libxcb-present0 libxcb-randr0 libxcb-render0 libxcb-shm0 libxcb-sync1\\n  libxcb-xfixes0 libxcb1 libxcomposite1 libxdamage1 libxdmcp6 libxext6\\n  libxfixes3 libxfont2 libxi6 libxkbcommon0 libxkbfile1 libxml2 libxmu6\\n  libxpm4 libxrandr2 libxrender1 libxshmfence1 libxt6 libxxf86vm1 libz3-4\\n  x11-common x11-xkb-utils xfonts-encodings xfonts-scalable xfonts-utils\\n  xkb-data xserver-common xvfb\\n0 upgraded, 102 newly installed, 0 to remove and 20 not upgraded.\\nNeed to get 96.3 MB of archives.\\nAfter this operation, 324 MB of additional disk space will be used.\\nGet:1 http://deb.debian.org/debian bookworm/main amd64 fonts-ipafont-gothic all 00303-23 [3515 kB]\\nGet:2 http://deb.debian.org/debian bookworm/main amd64 at-spi2-common all 2.46.0-5 [162 kB]\\nGet:3 http://deb.debian.org/debian bookworm/main amd64 libpng16-16 amd64 1.6.39-2+deb12u5 [277 kB]\\nGet:4 http://deb.debian.org/debian bookworm/main amd64 libfreetype6 amd64 2.12.1+dfsg-5+deb12u4 [398 kB]\\nGet:5 http://deb.debian.org/debian bookworm/main amd64 fonts-liberation all 1:1.07.4-11 [828 kB]\\nGet:6 http://deb.debian.org/debian bookworm/main amd64 fonts-freefont-ttf all 20120503-10 [2552 kB]\\nGet:7 http://deb.debian.org/debian bookworm/main amd64 fontconfig-config amd64 2.14.1-4 [315 kB]\\nGet:8 http://deb.debian.org/debian bookworm/main amd64 libfontconfig1 amd64 2.14.1-4 [386 kB]\\nGet:9 http://deb.debian.org/debian bookworm/main amd64 fontconfig amd64 2.14.1-4 [449 kB]\\nGet:10 http://deb.debian.org/debian bookworm/main amd64 fonts-noto-color-emoji all 2.042-0+deb12u1 [9894 kB]\\nGet:11 http://deb.debian.org/debian bookworm/main amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [147 kB]\\nGet:12 http://deb.debian.org/debian bookworm/main amd64 fonts-unifont all 1:15.0.01-2 [2019 kB]\\nGet:13 http://deb.debian.org/debian bookworm/main amd64 fonts-wqy-zenhei all 0.9.45-8 [7479 kB]\\nGet:14 http://deb.debian.org/debian bookworm/main amd64 libasound2-data all 1.2.8-1 [20.5 kB]\\nGet:15 http://deb.debian.org/debian bookworm/main amd64 libasound2 amd64 1.2.8-1+b1 [362 kB]\\nGet:16 http://deb.debian.org/debian bookworm/main amd64 libglib2.0-0 amd64 2.74.6-2+deb12u9 [1403 kB]\\nGet:17 http://deb.debian.org/debian bookworm/main amd64 libatk1.0-0 amd64 2.46.0-5 [49.6 kB]\\nGet:18 http://deb.debian.org/debian bookworm/main amd64 libdbus-1-3 amd64 1.14.10-1~deb12u1 [201 kB]\\nGet:19 http://deb.debian.org/debian bookworm/main amd64 libxau6 amd64 1:1.0.9-1 [19.7 kB]\\nGet:20 http://deb.debian.org/debian bookworm/main amd64 libbsd0 amd64 0.11.7-2 [117 kB]\\nGet:21 http://deb.debian.org/debian bookworm/main amd64 libxdmcp6 amd64 1:1.1.2-3 [26.3 kB]\\nGet:22 http://deb.debian.org/debian bookworm/main amd64 libxcb1 amd64 1.15-1 […6745 tokens truncated…nvoke-rc.d: could not determine current runlevel\\r\\ninvoke-rc.d: policy-rc.d denied execution of restart.\\r\\nSetting up libsensors-config (1:3.6.0-7.1) ...\\r\\nSetting up fonts-freefont-ttf (20120503-10) ...\\r\\nSetting up xkb-data (2.35.1-1) ...\\r\\nSetting up libunwind8:amd64 (1.6.2-3) ...\\r\\nSetting up libasound2-data (1.2.8-1) ...\\r\\nSetting up libfontenc1:amd64 (1:1.1.4-1) ...\\r\\nSetting up libz3-4:amd64 (4.8.12-3.1) ...\\r\\nSetting up fonts-tlwg-loma-otf (1:0.7.3-1) ...\\r\\nSetting up libx11-data (2:1.8.4-2+deb12u2) ...\\r\\nSetting up libnspr4:amd64 (2:4.35-1) ...\\r\\nSetting up libavahi-common-data:amd64 (0.8-10+deb12u1) ...\\r\\nSetting up libdbus-1-3:amd64 (1.14.10-1~deb12u1) ...\\r\\nSetting up xfonts-encodings (1:1.0.4-2.2) ...\\r\\nSetting up libfribidi0:amd64 (1.0.8-2.1) ...\\r\\nSetting up libpng16-16:amd64 (1.6.39-2+deb12u5) ...\\r\\nSetting up libsensors5:amd64 (1:3.6.0-7.1) ...\\r\\nSetting up libglapi-mesa:amd64 (22.3.6-1+deb12u2) ...\\r\\nSetting up fonts-ipafont-gothic (00303-23) ...\\r\\nupdate-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode\\r\\nSetting up libxshmfence1:amd64 (1.3-1) ...\\r\\nSetting up at-spi2-common (2.46.0-5) ...\\r\\nSetting up libasound2:amd64 (1.2.8-1+b1) ...\\r\\nSetting up fonts-liberation (1:1.07.4-11) ...\\r\\nSetting up libthai-data (0.1.29-1) ...\\r\\nSetting up libatk1.0-0:amd64 (2.46.0-5) ...\\r\\nSetting up libbsd0:amd64 (0.11.7-2) ...\\r\\nSetting up libdrm-common (2.4.114-1) ...\\r\\nSetting up libelf1:amd64 (0.188-2.1) ...\\r\\nSetting up libxml2:amd64 (2.9.14+dfsg-1.3~deb12u6) ...\\r\\nSetting up fonts-unifont (1:15.0.01-2) ...\\r\\nSetting up libxkbcommon0:amd64 (1.5.0-1) ...\\r\\nSetting up libice6:amd64 (2:1.0.10-1) ...\\r\\nSetting up libxdmcp6:amd64 (1:1.1.2-3) ...\\r\\nSetting up libxcb1:amd64 (1.15-1) ...\\r\\nSetting up libxcb-xfixes0:amd64 (1.15-1) ...\\r\\nSetting up libxcb-render0:amd64 (1.15-1) ...\\r\\nSetting up fontconfig-config (2.14.1-4) ...\\r\\ndebconf: unable to initialize frontend: Dialog\\r\\ndebconf: (Dialog frontend will not work on a dumb terminal, an emacs shell buffer, or without a controlling terminal.)\\r\\ndebconf: falling back to frontend: Readline\\r\\ndebconf: unable to initialize frontend: Readline\\r\\ndebconf: (This frontend requires a controlling tty.)\\r\\ndebconf: falling back to frontend: Teletype\\r\\nSetting up libxcb-glx0:amd64 (1.15-1) ...\\r\\nSetting up libedit2:amd64 (3.1-20221030-2) ...\\r\\nSetting up libavahi-common3:amd64 (0.8-10+deb12u1) ...\\r\\nSetting up libnss3:amd64 (2:3.87.1-1+deb12u4) ...\\r\\nSetting up libxcb-shm0:amd64 (1.15-1) ...\\r\\nSetting up libxcb-present0:amd64 (1.15-1) ...\\r\\nSetting up libthai0:amd64 (0.1.29-1) ...\\r\\nSetting up libfreetype6:amd64 (2.12.1+dfsg-5+deb12u4) ...\\r\\nSetting up libxcb-sync1:amd64 (1.15-1) ...\\r\\nSetting up libxcb-dri2-0:amd64 (1.15-1) ...\\r\\nSetting up libdrm2:amd64 (2.4.114-1+b1) ...\\r\\nSetting up libxcb-randr0:amd64 (1.15-1) ...\\r\\nSetting up libllvm15:amd64 (1:15.0.6-4+b1) ...\\r\\nSetting up libx11-6:amd64 (2:1.8.4-2+deb12u2) ...\\r\\nSetting up libharfbuzz0b:amd64 (6.0.0+dfsg-3) ...\\r\\nSetting up libfontconfig1:amd64 (2.14.1-4) ...\\r\\nSetting up libxkbfile1:amd64 (1:1.1.0-1) ...\\r\\nSetting up libxcomposite1:amd64 (1:0.4.5-1) ...\\r\\nSetting up libsm6:amd64 (2:1.2.3-1) ...\\r\\nSetting up libxfont2:amd64 (1:2.0.6-1+deb12u1) ...\\r\\nSetting up libavahi-client3:amd64 (0.8-10+deb12u1) ...\\r\\nSetting up libdrm-amdgpu1:amd64 (2.4.114-1+b1) ...\\r\\nSetting up libxcb-dri3-0:amd64 (1.15-1) ...\\r\\nSetting up libx11-xcb1:amd64 (2:1.8.4-2+deb12u2) ...\\r\\nSetting up fontconfig (2.14.1-4) ...\\r\\nRegenerating fonts cache... done.\\r\\nSetting up libdrm-nouveau2:amd64 (2.4.114-1+b1) ...\\r\\nSetting up libxdamage1:amd64 (1:1.1.6-1) ...\\r\\nSetting up libxpm4:amd64 (1:3.5.12-1.1+deb12u1) ...\\r\\nSetting up libxrender1:amd64 (1:0.9.10-1.1) ...\\r\\nSetting up libgbm1:amd64 (22.3.6-1+deb12u2) ...\\r\\nSetting up libdrm-radeon1:amd64 (2.4.114-1+b1) ...\\r\\nSetting up libpango-1.0-0:amd64 (1.50.12+ds-1) ...\\r\\nSetting up libdrm-intel1:amd64 (2.4.114-1+b1) ...\\r\\nSetting up libgl1-mesa-dri:amd64 (22.3.6-1+deb12u2) ...\\r\\nSetting up fonts-wqy-zenhei (0.9.45-8) ...\\r\\nSetting up libxext6:amd64 (2:1.3.4-1+b1) ...\\r\\nSetting up xfonts-utils (1:7.7+6) ...\\r\\nSetting up libcairo2:amd64 (1.16.0-7) ...\\r\\nSetting up libxxf86vm1:amd64 (1:1.1.4-1+b2) ...\\r\\nSetting up libxfixes3:amd64 (1:6.0.0-2) ...\\r\\nSetting up libxrandr2:amd64 (2:1.5.2-2+b1) ...\\r\\nSetting up libxt6:amd64 (1:1.2.1-1.1) ...\\r\\nSetting up libcups2:amd64 (2.4.2-3+deb12u9) ...\\r\\nSetting up xfonts-scalable (1:1.0.3-1.3) ...\\r\\nSetting up libxmu6:amd64 (2:1.1.3-3) ...\\r\\nSetting up libglx-mesa0:amd64 (22.3.6-1+deb12u2) ...\\r\\nSetting up libxi6:amd64 (2:1.8-1+b1) ...\\r\\nSetting up libglx0:amd64 (1.6.0-1) ...\\r\\nSetting up libxaw7:amd64 (2:1.0.14-1) ...\\r\\nSetting up libatspi2.0-0:amd64 (2.46.0-5) ...\\r\\nSetting up libatk-bridge2.0-0:amd64 (2.46.0-5) ...\\r\\nSetting up libgl1:amd64 (1.6.0-1) ...\\r\\nSetting up x11-xkb-utils (7.7+7) ...\\r\\nSetting up xserver-common (2:21.1.7-3+deb12u13) ...\\r\\nSetting up xvfb (2:21.1.7-3+deb12u13) ...\\r\\nProcessing triggers for libc-bin (2.36-9+deb12u13) ...\\r\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:58:02.640Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_Bui4eDZCaJa76RgdxZW5Scxy",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"cat > <TMP>/ramen-check.py <<'PY'\\nimport asyncio\\nfrom playwright.async_api import async_playwright\\n\\nasync def main():\\n    async with async_playwright() as p:\\n        browser = await p.chromium.launch(args=['--no-sandbox'])\\n        page = await browser.new_page(viewport={'width':1440,'height':1000}, device_scale_factor=1)\\n        errors, requests = [], []\\n        page.on('pageerror', lambda error: errors.append(str(error)))\\n        page.on('request', lambda request: requests.append(request.url))\\n        await page.goto('http://<LAN_IP>:8000', wait_until='networkidle')\\n        await page.wait_for_timeout(1000)\\n        await page.screenshot(path='<TMP>/ramen-desktop.png')\\n        print({'errors':errors, 'requests':requests, 'dimensions':await page.evaluate('({w:document.body.scrollWidth,h:document.body.scrollHeight,vw:innerWidth,vh:innerHeight})'), 'svg_elements':await page.locator('svg *').count()}, flush=True)\\n        await page.mouse.move(1300,330)\\n        await page.wait_for_timeout(700)\\n        print('Pointer response:',await page.locator('.portrait').evaluate('(element)=>getComputedStyle(element).transform'), flush=True)\\n        await page.set_viewport_size({'width':390,'height':844})\\n        await page.mouse.move(0,0)\\n        await page.wait_for_timeout(500)\\n        await page.screenshot(path='<TMP>/ramen-mobile.png')\\n        await page.emulate_media(reduced_motion='reduce')\\n        await page.wait_for_timeout(100)\\n        await page.screenshot(path='<TMP>/ramen-reduced.png')\\n        print('Reduced motion:',await page.evaluate('({transform:getComputedStyle(document.querySelector(\\\".portrait\\\")).transform,animation:getComputedStyle(document.querySelector(\\\".soup-glow\\\")).animationName})'), flush=True)\\n        await page.set_viewport_size({'width':844,'height':390})\\n        await page.screenshot(path='<TMP>/ramen-landscape.png')\\n        print('Landscape:',await page.evaluate('({w:document.body.scrollWidth,h:document.body.scrollHeight,vw:innerWidth,vh:innerHeight})'), flush=True)\\n        await browser.close()\\n\\nasyncio.run(main())\\nPY\\npython3 <TMP>/ramen-check.py\",\"workdir\":\"/app\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:58:24.392Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_Bui4eDZCaJa76RgdxZW5Scxy",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"b38a3a\",\"wall_time_seconds\":1.00155734,\"session_id\":92248,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:58:25.577Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_WtgFrYlVH0U7N1hbEtRzoeGi",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:92248,chars:\"\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:58:31.997Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_WtgFrYlVH0U7N1hbEtRzoeGi",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 5.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"478a84\",\"wall_time_seconds\":5.000778174,\"session_id\":92248,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:58:37.015Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_qzf30KXw0lIbX11gPBsjN4Jp",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /app/index.html\\n@@\\n-              const dy = Math.abs(y - (disturbance.y - age * 47));\\n-              const influence = Math.exp(-dy * dy / 6800) * Math.exp(-age * .8);\\n+              const dy = Math.abs(y - (disturbance.y - age * 47));\\n+              const dx = x - disturbance.x;\\n+              const influence = Math.exp(-dy * dy / 6800 - dx * dx / 40000) * Math.exp(-age * .8);\\n@@\\n-          // Broad translucent haze beneath a finer, brighter twisting core.\\n+          // Feathered ribbon silhouettes need only two draws per wisp.\\n           for (let pass = 0; pass < 2; pass++) {\\n-            ctx.filter = pass ? 'blur(2px)' : 'blur(8px)';\\n-            for (let j = 0; j < points.length - 1; j++) {\\n-              const a = points[j], b = points[j+1];\\n-              const p = (a.p + b.p) * .5;\\n-              const fade = Math.pow(Math.sin(Math.PI * p), .8) * (1 - p * .6);\\n-              const width = ribbon.width * (.25 + p * 1.65) * (pass ? .43 : 1.15);\\n-              ctx.strokeStyle = `rgba(205, 209, 185, ${strength * fade * (pass ? .75 : .65)})`;\\n-              ctx.lineWidth = width;\\n-              ctx.lineCap = 'round';\\n-              ctx.beginPath();\\n-              ctx.moveTo(a.x, a.y);\\n-              ctx.lineTo(b.x, b.y);\\n-              ctx.stroke();\\n+            ctx.filter = pass ? 'blur(3px)' : 'blur(8px)';\\n+            const gradient = ctx.createLinearGradient(0, ribbon.y, 0, ribbon.y-ribbon.height);\\n+            const alpha = strength * (pass ? .76 : .65);\\n+            gradient.addColorStop(0, 'rgba(205, 209, 185, 0)');\\n+            gradient.addColorStop(.12, `rgba(205, 209, 185, ${alpha*.5})`);\\n+            gradient.addColorStop(.32, `rgba(205, 209, 185, ${alpha})`);\\n+            gradient.addColorStop(.58, `rgba(205, 209, 185, ${alpha*.7})`);\\n+            gradient.addColorStop(.82, `rgba(205, 209, 185, ${alpha*.25})`);\\n+            gradient.addColorStop(1, 'rgba(205, 209, 185, 0)');\\n+            ctx.fillStyle = gradient;\\n+            ctx.beginPath();\\n+            for (let side = 0; side < 2; side++) {\\n+              for (let j = 0; j < points.length; j++) {\\n+                const point = points[side ? points.length-1-j : j];\\n+                const p = point.p;\\n+                const width = ribbon.width * (.25+p*1.65) * Math.pow(Math.sin(Math.PI*p), .5) * (pass ? .22 : .6);\\n+                const x = point.x + width * (side ? 1 : -1);\\n+                if (!side && !j) ctx.moveTo(x, point.y);\\n+                else ctx.lineTo(x, point.y);\\n+              }\\n             }\\n+            ctx.closePath();\\n+            ctx.fill();\\n           }\\n*** End Patch\"));\ntext(await tools.write_stdin({session_id:92248,chars:\"\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:59:25.207Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_qzf30KXw0lIbX11gPBsjN4Jp",
+      "status": "error",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"0d633b\",\"wall_time_seconds\":0.000013838,\"exit_code\":1,\"original_token_count\":426,\"output\":\"Traceback (most recent call last):\\n  File \\\"<TMP>/ramen-check.py\\\", line 31, in <module>\\n    asyncio.run(main())\\n  File \\\"/usr/local/lib/python3.12/asyncio/runners.py\\\", line 195, in run\\n    return runner.run(main)\\n           ^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/asyncio/runners.py\\\", line 118, in run\\n    return self._loop.run_until_complete(task)\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/asyncio/base_events.py\\\", line 691, in run_until_complete\\n    return future.result()\\n           ^^^^^^^^^^^^^^^\\n  File \\\"<TMP>/ramen-check.py\\\", line 11, in main\\n    await page.goto('http://<LAN_IP>:8000', wait_until='networkidle')\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/async_api/_generated.py\\\", line 9901, in goto\\n    await self._impl_obj.goto(\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_page.py\\\", line 562, in goto\\n    return await self._main_frame.goto(**locals_to_params(locals()))\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_frame.py\\\", line 157, in goto\\n    await self._channel.send(\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py\\\", line 76, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py\\\", line 632, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.\\nCall log:\\n  - navigating to \\\"http://<LAN_IP>:8000/\\\", waiting until \\\"networkidle\\\"\\n\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:59:25.242Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "I’m refining the steam renderer so the wisps stay soft and fluid without becoming expensive to draw. Reduced-motion mode keeps the vapor visible as a still image and disables mouse-driven movement.\n",
+      "timestamp": "2026-10-01T00:59:34.591Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_7grk0FUMt5qdLAE7a3Vf9f1a",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 <TMP>/ramen-check.py\",\"workdir\":\"/app\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:59:35.400Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_7grk0FUMt5qdLAE7a3Vf9f1a",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"fc6240\",\"wall_time_seconds\":1.001497591,\"session_id\":92868,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:59:36.591Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_j73LaBiQ9wVUS6TVg01Ai6ib",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:92868,chars:\"\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T00:59:49.809Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_j73LaBiQ9wVUS6TVg01Ai6ib",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 4.6 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"701443\",\"wall_time_seconds\":4.632478552,\"exit_code\":0,\"original_token_count\":83,\"output\":\"{'errors': [], 'requests': ['http://<LAN_IP>:8000/'], 'dimensions': {'w': 1440, 'h': 1000, 'vw': 1440, 'vh': 1000}, 'svg_elements': 2084}\\nPointer response: matrix(1, -0.000384373, 0.000384373, 1, -0.280292, -1.74466)\\nReduced motion: {'transform': 'none', 'animation': 'none'}\\nLandscape: {'w': 844, 'h': 390, 'vw': 844, 'vh': 390}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T00:59:54.465Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_X5SXuOnqzJ5i1mB3h9udl3ua",
+      "tool": "exec",
+      "input": "const r = await Promise.allSettled([\ntools.view_image({path:\"<TMP>/ramen-desktop.png\"}),\ntools.view_image({path:\"<TMP>/ramen-mobile.png\"})\n]);for (const v of r) {if(v.status===\"fulfilled\") image(v.value.image_url); else text(v.reason);}\n",
+      "timestamp": "2026-10-01T01:00:11.474Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_X5SXuOnqzJ5i1mB3h9udl3ua",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"1146904\">",
+          "detail": "high"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"295928\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-10-01T01:00:11.585Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_EmFiCb5uDqTggUZm1xElo2EO",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport asyncio, statistics\\nfrom playwright.async_api import async_playwright\\n\\nasync def main():\\n    async with async_playwright() as p:\\n        browser = await p.chromium.launch(args=['--no-sandbox'])\\n        page = await browser.new_page(viewport={'width':1440,'height':900})\\n        await page.add_init_script('''window.frameCosts=[]; window.frameTimes=[]; const nativeRAF=window.requestAnimationFrame.bind(window); window.requestAnimationFrame=callback=>nativeRAF(time=>{window.frameTimes.push(time); const start=performance.now(); callback(time); window.frameCosts.push(performance.now()-start);});''')\\n        await page.goto('http://<LAN_IP>:8000', wait_until='load')\\n        await page.wait_for_timeout(2000)\\n        print('Initial pointer transform:',await page.locator('.portrait').get_attribute('style'), flush=True)\\n        await page.mouse.move(1300,300)\\n        await page.wait_for_timeout(2000)\\n        data=await page.evaluate('({costs:frameCosts,times:frameTimes,style:document.querySelector(\\\".portrait\\\").getAttribute(\\\"style\\\")})')\\n        intervals=[b-a for a,b in zip(data['times'],data['times'][1:])]\\n        print({'frames':len(data['costs']),'average_draw_ms':round(statistics.mean(data['costs']),2),'average_frame_interval_ms':round(statistics.mean(intervals),2),'style':data['style']}, flush=True)\\n        await page.emulate_media(reduced_motion='reduce')\\n        before=await page.evaluate('frameCosts.length')\\n        await page.wait_for_timeout(200)\\n        after=await page.evaluate('frameCosts.length')\\n        print('Frames while reduced:',after-before, flush=True)\\n        await browser.close()\\n\\nasyncio.run(main())\\nPY\",\"workdir\":\"/app\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:00:54.953Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_EmFiCb5uDqTggUZm1xElo2EO",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"d14744\",\"wall_time_seconds\":1.001416866,\"session_id\":71511,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:00:56.151Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_GJkq0e87wHUIHO5AxQUKQp92",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:71511,chars:\"\",\"max_output_tokens\":3000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:01:09.710Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_GJkq0e87wHUIHO5AxQUKQp92",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"f4c2fe\",\"wall_time_seconds\":0.000003477,\"exit_code\":0,\"original_token_count\":85,\"output\":\"Initial pointer transform: --dish-x: -3.854697251179449px; --dish-y: -1.6520131076483353px; --dish-r: -0.3028690697355282deg;\\n{'frames': 10, 'average_draw_ms': 1.82, 'average_frame_interval_ms': 848.11, 'style': '--dish-x: -0.5233513356638726px; --dish-y: -1.5267835075659164px; --dish-r: -0.0411204620878757deg;'}\\nFrames while reduced: 0\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:01:09.764Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The bowl renders correctly on desktop and phone screens, with no external requests or JavaScript errors. I found a rendering bottleneck in the live effects and am tuning that before the final check.\n",
+      "timestamp": "2026-10-01T01:01:49.342Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_etgshKui3xWcy2ZXz1BUzFcD",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"cat > <TMP>/ramen-performance.py <<'PY'\\nimport asyncio\\nfrom playwright.async_api import async_playwright\\n\\nasync def sample(page,label):\\n    data=await page.evaluate('''()=>new Promise(resolve=>{const times=[];const end=performance.now()+1200;function tick(t){times.push(t);if(performance.now()<end)requestAnimationFrame(tick);else resolve({frames:times.length,ms:(times[times.length-1]-times[0])/Math.max(1,times.length-1)});}requestAnimationFrame(tick);})''')\\n    print(label,data,flush=True)\\n\\nasync def main():\\n    async with async_playwright() as p:\\n        browser=await p.chromium.launch(args=['--no-sandbox'])\\n        page=await browser.new_page(viewport={'width':1440,'height':900})\\n        await page.goto('http://<LAN_IP>:8000',wait_until='load')\\n        await page.add_style_tag(content='.steam{display:none!important}')\\n        await sample(page,'No steam')\\n        await page.add_style_tag(content='svg *{animation:none!important}')\\n        await sample(page,'No steam or soup animation')\\n        await page.add_style_tag(content='svg [filter]{filter:none!important}.grain{display:none!important}')\\n        await sample(page,'No steam, soup animation, or SVG filters')\\n        await page.add_style_tag(content='.steam{display:block!important}')\\n        await sample(page,'Steam only, no SVG filters')\\n        await browser.close()\\nasyncio.run(main())\\nPY\\npython3 <TMP>/ramen-performance.py\",\"workdir\":\"/app\",\"yield_time_ms\":1000,\"max_output_tokens\":4000}));\n",
+      "timestamp": "2026-10-01T01:01:58.583Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_etgshKui3xWcy2ZXz1BUzFcD",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"c7a61d\",\"wall_time_seconds\":1.0015171,\"session_id\":40587,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:01:59.769Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_YU07QUYnDkOOSMxW4a0dwWc5",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:40587,chars:\"\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:02:19.061Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_YU07QUYnDkOOSMxW4a0dwWc5",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 5.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"4195a1\",\"wall_time_seconds\":5.000882259,\"session_id\":40587,\"original_token_count\":9,\"output\":\"No steam {'frames': 3, 'ms': 775}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:02:24.077Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_ggoCzeMQXwwFmeykaK4spz0K",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:40587,chars:\"\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:02:49.614Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_ggoCzeMQXwwFmeykaK4spz0K",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 5.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"61a111\",\"wall_time_seconds\":5.002059755,\"session_id\":40587,\"original_token_count\":13,\"output\":\"No steam or soup animation {'frames': 3, 'ms': 675}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:02:54.633Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_y4gZEdrhmBxJ9oWtlXUN19tO",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:40587,chars:\"\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:03:14.986Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_y4gZEdrhmBxJ9oWtlXUN19tO",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 4.8 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"a8cce7\",\"wall_time_seconds\":4.829646983,\"exit_code\":0,\"original_token_count\":37,\"output\":\"No steam, soup animation, or SVG filters {'frames': 3, 'ms': 641.6500000000015}\\nSteam only, no SVG filters {'frames': 3, 'ms': 708.2999999999956}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:03:19.832Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The scene fits portrait and landscape screens, and reduced-motion mode stops the animation entirely. I’ve traced the slowdown to live blur filters; I’m replacing them with softly layered shapes to preserve the steam’s appearance.\n",
+      "timestamp": "2026-10-01T01:04:04.094Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_Xs3lSUZDy8YJ5QHo6SJlBKj1",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /app/index.html\\n@@\\n     .steam { pointer-events: none; }\\n+    .ramen, .steam { transform: translateZ(0); }\\n@@\\n-          // Feathered ribbon silhouettes need only two draws per wisp.\\n-          for (let pass = 0; pass < 2; pass++) {\\n-            ctx.filter = pass ? 'blur(3px)' : 'blur(8px)';\\n-            const gradient = ctx.createLinearGradient(0, ribbon.y, 0, ribbon.y-ribbon.height);\\n-            const alpha = strength * (pass ? .76 : .65);\\n-            gradient.addColorStop(0, 'rgba(205, 209, 185, 0)');\\n-            gradient.addColorStop(.12, `rgba(205, 209, 185, ${alpha*.5})`);\\n-            gradient.addColorStop(.32, `rgba(205, 209, 185, ${alpha})`);\\n-            gradient.addColorStop(.58, `rgba(205, 209, 185, ${alpha*.7})`);\\n-            gradient.addColorStop(.82, `rgba(205, 209, 185, ${alpha*.25})`);\\n-            gradient.addColorStop(1, 'rgba(205, 209, 185, 0)');\\n-            ctx.fillStyle = gradient;\\n+          // Nested translucent contours feather the vapor without live blur.\\n+          const gradient = ctx.createLinearGradient(0, ribbon.y, 0, ribbon.y-ribbon.height);\\n+          gradient.addColorStop(0, 'rgba(205, 209, 185, 0)');\\n+          gradient.addColorStop(.12, 'rgba(205, 209, 185, .5)');\\n+          gradient.addColorStop(.32, 'rgba(205, 209, 185, 1)');\\n+          gradient.addColorStop(.58, 'rgba(205, 209, 185, .7)');\\n+          gradient.addColorStop(.82, 'rgba(205, 209, 185, .25)');\\n+          gradient.addColorStop(1, 'rgba(205, 209, 185, 0)');\\n+          ctx.fillStyle = gradient;\\n+          const widths = [.8, .65, .5, .38, .27, .16];\\n+          const opacities = [.10, .13, .18, .21, .27, .35];\\n+          for (let pass = 0; pass < widths.length; pass++) {\\n+            ctx.globalAlpha = strength * opacities[pass];\\n             ctx.beginPath();\\n@@\\n-                const width = ribbon.width * (.25+p*1.65) * Math.pow(Math.sin(Math.PI*p), .5) * (pass ? .22 : .6);\\n+                const width = ribbon.width * (.25+p*1.65) * Math.pow(Math.sin(Math.PI*p), .5) * widths[pass];\\n@@\\n-        ctx.filter = 'blur(11px)';\\n+        ctx.globalAlpha = 1;\\n@@\\n-        ctx.filter = 'none';\\n         ctx.globalCompositeOperation = 'source-over';\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"python3 <TMP>/ramen-check.py\",\"workdir\":\"/app\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:04:20.189Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_Xs3lSUZDy8YJ5QHo6SJlBKj1",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"239ce6\",\"wall_time_seconds\":1.001036238,\"session_id\":5478,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:04:21.384Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_axzzvNxwMy0PQzoEouHWeL94",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:5478,chars:\"\",\"max_output_tokens\":3000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:04:30.851Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_axzzvNxwMy0PQzoEouHWeL94",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"7c2122\",\"wall_time_seconds\":0.000017161,\"exit_code\":0,\"original_token_count\":86,\"output\":\"{'errors': [], 'requests': ['http://<LAN_IP>:8000/'], 'dimensions': {'w': 1440, 'h': 1000, 'vw': 1440, 'vh': 1000}, 'svg_elements': 2084}\\nPointer response: matrix(0.999998, 0.00221234, -0.00221234, 0.999998, 1.61328, -1.62394)\\nReduced motion: {'transform': 'none', 'animation': 'none'}\\nLandscape: {'w': 844, 'h': 390, 'vw': 844, 'vh': 390}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:04:31.151Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_KEUBRxm30yJMyiVBQNRA9Rf6",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport asyncio\\nfrom playwright.async_api import async_playwright\\n\\nasync def sample(page,label):\\n    data=await page.evaluate('''()=>new Promise(resolve=>{const times=[];const end=performance.now()+1200;function tick(t){times.push(t);if(performance.now()<end)requestAnimationFrame(tick);else resolve({frames:times.length,ms:(times.at(-1)-times[0])/Math.max(1,times.length-1)});}requestAnimationFrame(tick);})''')\\n    print(label,data,flush=True)\\n\\nasync def main():\\n    async with async_playwright() as p:\\n        browser=await p.chromium.launch(args=['--no-sandbox'])\\n        page=await browser.new_page(viewport={'width':1440,'height':900})\\n        await page.goto('http://<LAN_IP>:8000',wait_until='load')\\n        await sample(page,'Full scene')\\n        await page.add_style_tag(content='svg *{animation:none!important}')\\n        await sample(page,'Static soup reflections')\\n        await page.add_style_tag(content='svg [filter]{filter:none!important}.grain{display:none!important}')\\n        await sample(page,'Without SVG filters')\\n        await page.evaluate('CanvasRenderingContext2D.prototype.fill=function(){}; CanvasRenderingContext2D.prototype.fillRect=function(){};')\\n        await sample(page,'Without canvas paint')\\n        await browser.close()\\nasyncio.run(main())\\nPY\",\"workdir\":\"/app\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:04:46.889Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_KEUBRxm30yJMyiVBQNRA9Rf6",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"208cee\",\"wall_time_seconds\":1.002014192,\"session_id\":6424,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:04:48.074Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_HhEiX2LJOB60jSKT1qWm5Ch3",
+      "tool": "exec",
+      "input": "image((await tools.view_image({path:\"<TMP>/ramen-desktop.png\"})).image_url);\n",
+      "timestamp": "2026-10-01T01:04:52.566Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_HhEiX2LJOB60jSKT1qWm5Ch3",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.1 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_image",
+          "image_url": "<OMITTED_BINARY_PAYLOAD media-type=\"image/png\" encoding=\"base64\" original-characters=\"1161792\">",
+          "detail": "high"
+        }
+      ],
+      "timestamp": "2026-10-01T01:04:52.736Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_KdS7a7cADHn5s15dd14FLAvZ",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:6424,chars:\"\",\"max_output_tokens\":3500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:05:01.885Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_KdS7a7cADHn5s15dd14FLAvZ",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 0.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"0910f3\",\"wall_time_seconds\":0.000003556,\"exit_code\":0,\"original_token_count\":60,\"output\":\"Full scene {'frames': 12, 'ms': 131.8181818181818}\\nStatic soup reflections {'frames': 12, 'ms': 118.17272727272729}\\nWithout SVG filters {'frames': 17, 'ms': 79.16875000000002}\\nWithout canvas paint {'frames': 17, 'ms': 76.04374999999999}\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:05:01.944Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_PDMYkvdKi6MeuaKAWnmHhVIT",
+      "tool": "exec",
+      "input": "text(await tools.apply_patch(\"*** Begin Patch\\n*** Update File: /app/index.html\\n@@\\n-    .ramen, .steam {\\n+    .ramen, .steam, .surface-light {\\n@@\\n-    .steam { pointer-events: none; }\\n-    .ramen, .steam { transform: translateZ(0); }\\n+    .steam, .surface-light { pointer-events: none; }\\n+    .ramen, .steam, .surface-light { transform: translateZ(0); }\\n+    .surface-light { will-change: opacity; }\\n@@\\n-            <g class=\\\"soup-glow\\\" fill=\\\"none\\\" stroke=\\\"#ffe1a2\\\" stroke-linecap=\\\"round\\\">\\n-              <path d=\\\"M254 534 Q252 557 272 570\\\" stroke-width=\\\"1.8\\\"/>\\n-              <path d=\\\"M279 580 Q292 590 310 594 M530 621 Q558 623 575 620\\\" stroke-width=\\\"1.2\\\"/>\\n-              <path d=\\\"M813 561 Q823 551 827 543 M805 570 L807 568\\\" stroke-width=\\\"1.6\\\"/>\\n-            </g>\\n@@\\n-          <g class=\\\"oil-shine\\\" fill=\\\"none\\\" stroke=\\\"#ffe9b5\\\" stroke-linecap=\\\"round\\\">\\n-            <path d=\\\"M283 525 Q284 519 291 518 M291 534 L294 535 M462 608 Q471 611 479 609 M577 593 L583 590\\\" stroke-width=\\\"1.5\\\"/>\\n-            <path d=\\\"M755 581 Q765 581 770 578 M794 539 L799 536\\\" stroke-width=\\\"1.2\\\"/>\\n-          </g>\\n@@\\n         </svg>\\n+        <svg class=\\\"surface-light soup-glow\\\" viewBox=\\\"0 0 1100 900\\\" aria-hidden=\\\"true\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\">\\n+          <g fill=\\\"none\\\" stroke=\\\"#ffe1a2\\\" stroke-linecap=\\\"round\\\">\\n+            <path d=\\\"M254 534 Q252 557 272 570\\\" stroke-width=\\\"1.8\\\"/>\\n+            <path d=\\\"M279 580 Q292 590 310 594 M530 621 Q558 623 575 620\\\" stroke-width=\\\"1.2\\\"/>\\n+            <path d=\\\"M813 561 Q823 551 827 543 M805 570 L807 568\\\" stroke-width=\\\"1.6\\\"/>\\n+          </g>\\n+        </svg>\\n+        <svg class=\\\"surface-light oil-shine\\\" viewBox=\\\"0 0 1100 900\\\" aria-hidden=\\\"true\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\">\\n+          <g fill=\\\"none\\\" stroke=\\\"#ffe9b5\\\" stroke-linecap=\\\"round\\\">\\n+            <path d=\\\"M283 525 Q284 519 291 518 M291 534 L294 535 M462 608 Q471 611 479 609 M577 593 L583 590\\\" stroke-width=\\\"1.5\\\"/>\\n+            <path d=\\\"M755 581 Q765 581 770 578 M794 539 L799 536\\\" stroke-width=\\\"1.2\\\"/>\\n+          </g>\\n+        </svg>\\n         <canvas class=\\\"steam\\\" aria-hidden=\\\"true\\\"></canvas>\\n@@\\n-        const dt = lastTime ? Math.min((now-lastTime)/1000, .05) : 0;\\n+        const dt = lastTime ? Math.min((now-lastTime)/1000, .15) : 0;\\n@@\\n-        portrait.style.setProperty('--dish-x', `${pointer.x * 7}px`);\\n-        portrait.style.setProperty('--dish-y', `${pointer.y * 3}px`);\\n-        portrait.style.setProperty('--dish-r', `${pointer.x * .55}deg`);\\n-        light.style.setProperty('--light-x', `${pointer.x * 24}px`);\\n-        light.style.setProperty('--light-y', `${pointer.y * 13}px`);\\n+        portrait.style.transform = `translate3d(${pointer.x*7}px, ${pointer.y*3}px, 0) rotate(${pointer.x*.55}deg)`;\\n+        light.style.transform = `translate3d(${pointer.x*24}px, ${pointer.y*13}px, 0)`;\\n*** End Patch\"));\ntext(await tools.exec_command({cmd:\"python3 - <<'PY'\\nimport asyncio\\nfrom playwright.async_api import async_playwright\\n\\nasync def main():\\n    async with async_playwright() as p:\\n        browser=await p.chromium.launch(args=['--no-sandbox'])\\n        page=await browser.new_page(viewport={'width':1440,'height':900})\\n        await page.goto('http://<LAN_IP>:8000',wait_until='load')\\n        data=await page.evaluate('''()=>new Promise(resolve=>{const times=[];const end=performance.now()+1500;function tick(t){times.push(t);if(performance.now()<end)requestAnimationFrame(tick);else resolve({frames:times.length,ms:(times.at(-1)-times[0])/Math.max(1,times.length-1)});}requestAnimationFrame(tick);})''')\\n        print('Full scene after layer isolation:',data,flush=True)\\n        await page.mouse.move(1300,300)\\n        await page.wait_for_timeout(800)\\n        print('Pointer:',await page.locator('.portrait').get_attribute('style'),flush=True)\\n        await browser.close()\\nasyncio.run(main())\\nPY\",\"workdir\":\"/app\",\"yield_time_ms\":1000,\"max_output_tokens\":3000}));\n",
+      "timestamp": "2026-10-01T01:06:19.256Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_PDMYkvdKi6MeuaKAWnmHhVIT",
+      "status": "error",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.0 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{}"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"f59538\",\"wall_time_seconds\":0.849040939,\"exit_code\":1,\"original_token_count\":399,\"output\":\"Traceback (most recent call last):\\n  File \\\"<stdin>\\\", line 15, in <module>\\n  File \\\"/usr/local/lib/python3.12/asyncio/runners.py\\\", line 195, in run\\n    return runner.run(main)\\n           ^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/asyncio/runners.py\\\", line 118, in run\\n    return self._loop.run_until_complete(task)\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/asyncio/base_events.py\\\", line 691, in run_until_complete\\n    return future.result()\\n           ^^^^^^^^^^^^^^^\\n  File \\\"<stdin>\\\", line 8, in main\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/async_api/_generated.py\\\", line 9901, in goto\\n    await self._impl_obj.goto(\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_page.py\\\", line 562, in goto\\n    return await self._main_frame.goto(**locals_to_params(locals()))\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_frame.py\\\", line 157, in goto\\n    await self._channel.send(\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py\\\", line 76, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py\\\", line 632, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.Error: Page.goto: net::ERR_CONNECTION_REFUSED at http://<LAN_IP>:8000/\\nCall log:\\n  - navigating to \\\"http://<LAN_IP>:8000/\\\", waiting until \\\"load\\\"\\n\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:06:20.311Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The steam now uses lighter drawing operations. I’m also giving the bowl artwork and moving reflections separate rendering layers so the detailed texture can stay cached while the animation runs.\n",
+      "timestamp": "2026-10-01T01:06:29.182Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_FNEN7zvOGzRdijHz5zeCMcqE",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"python3 -m http.server 8000 --bind <LAN_IP>\",\"workdir\":\"/app\",\"yield_time_ms\":1000,\"max_output_tokens\":1000}));\n",
+      "timestamp": "2026-10-01T01:06:30.110Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_FNEN7zvOGzRdijHz5zeCMcqE",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"9034ef\",\"wall_time_seconds\":1.001226036,\"session_id\":53274,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:06:31.289Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_llvFX2jf4x2HZoEJR86dXYeo",
+      "tool": "exec",
+      "input": "text(await tools.exec_command({cmd:\"cat > <TMP>/ramen-final-check.py <<'PY'\\nimport asyncio, hashlib\\nfrom playwright.async_api import async_playwright\\n\\nasync def main():\\n    async with async_playwright() as p:\\n        browser=await p.chromium.launch(args=['--no-sandbox'])\\n        page=await browser.new_page(viewport={'width':1440,'height':900})\\n        errors, requests=[],[]\\n        page.on('pageerror',lambda error:errors.append(str(error)))\\n        page.on('request',lambda request:requests.append(request.url))\\n        await page.goto('file:///app/index.html',wait_until='load')\\n        fps=await page.evaluate('''()=>new Promise(resolve=>{const times=[];const end=performance.now()+1300;function tick(t){times.push(t);if(performance.now()<end)requestAnimationFrame(tick);else resolve({frames:times.length,average_interval_ms:(times.at(-1)-times[0])/Math.max(1,times.length-1)});}requestAnimationFrame(tick);})''')\\n        print('Animation timing:',fps,flush=True)\\n        await page.mouse.move(1350,340)\\n        await page.wait_for_timeout(1000)\\n        print('Mouse response:',await page.locator('.portrait').evaluate('(e)=>getComputedStyle(e).transform'),flush=True)\\n        await page.mouse.click(770,400)\\n        await page.mouse.move(720,450)\\n        await page.wait_for_timeout(600)\\n        await page.screenshot(path='<TMP>/ramen-final-desktop.png')\\n        for width,height in [(320,568),(390,844),(768,1024),(844,390),(2560,1440)]:\\n            await page.set_viewport_size({'width':width,'height':height})\\n            result=await page.evaluate('''()=>{const r=document.querySelector('.ramen > path[fill=\\\"url(#ceramic)\\\"]').getBoundingClientRect();return {viewport:[innerWidth,innerHeight],scroll:[document.body.scrollWidth,document.body.scrollHeight],bowlFits:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight};}''')\\n            print('Responsive:',result,flush=True)\\n            if width==390:await page.screenshot(path='<TMP>/ramen-final-mobile.png')\\n        await page.set_viewport_size({'width':390,'height':844})\\n        await page.emulate_media(reduced_motion='reduce')\\n        before=await page.locator('canvas').evaluate('(e)=>e.toDataURL()')\\n        await page.mouse.move(30,30)\\n        await page.mouse.click(200,410)\\n        await page.wait_for_timeout(350)\\n        after=await page.locator('canvas').evaluate('(e)=>e.toDataURL()')\\n        print('Reduced motion:',{'steam_static':before==after,**await page.evaluate('({transform:getComputedStyle(document.querySelector(\\\".portrait\\\")).transform,animation:getComputedStyle(document.querySelector(\\\".soup-glow\\\")).animationName})')},flush=True)\\n        await page.screenshot(path='<TMP>/ramen-final-reduced.png')\\n        await page.emulate_media(reduced_motion='no-preference')\\n        await page.wait_for_timeout(250)\\n        print('Motion resumes:',await page.locator('.portrait').get_attribute('style'),flush=True)\\n        print('Errors:',errors,'Requests:',requests,flush=True)\\n        print('Visible text:',repr(await page.locator('body').inner_text()),flush=True)\\n        await browser.close()\\n\\nasyncio.run(main())\\nPY\\npython3 <TMP>/ramen-final-check.py\",\"workdir\":\"/app\",\"max_output_tokens\":4500,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:07:14.498Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_llvFX2jf4x2HZoEJR86dXYeo",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 1.2 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"b60445\",\"wall_time_seconds\":1.000931353,\"session_id\":30529,\"original_token_count\":0,\"output\":\"\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:07:15.689Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "call_W7V3lTwARQtWAoPtx59YXs7G",
+      "tool": "exec",
+      "input": "text(await tools.write_stdin({session_id:30529,chars:\"\",\"max_output_tokens\":4000,\"yield_time_ms\":1000}));\n",
+      "timestamp": "2026-10-01T01:07:19.071Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "call_W7V3lTwARQtWAoPtx59YXs7G",
+      "status": "success",
+      "output": [
+        {
+          "type": "input_text",
+          "text": "Script completed\nWall time 2.5 seconds\nOutput:\n"
+        },
+        {
+          "type": "input_text",
+          "text": "{\"chunk_id\":\"64054d\",\"wall_time_seconds\":2.528572246,\"exit_code\":0,\"original_token_count\":192,\"output\":\"Animation timing: {'frames': 23, 'average_interval_ms': 71.20909090909092}\\nMouse response: matrix(0.999969, 0.00789662, -0.00789662, 0.999969, 5.75843, -0.796203)\\nResponsive: {'viewport': [320, 568], 'scroll': [320, 568], 'bowlFits': True}\\nResponsive: {'viewport': [390, 844], 'scroll': [390, 844], 'bowlFits': True}\\nResponsive: {'viewport': [768, 1024], 'scroll': [768, 1024], 'bowlFits': True}\\nResponsive: {'viewport': [844, 390], 'scroll': [844, 390], 'bowlFits': True}\\nResponsive: {'viewport': [2560, 1440], 'scroll': [2560, 1440], 'bowlFits': True}\\nReduced motion: {'steam_static': True, 'transform': 'none', 'animation': 'none'}\\nMotion resumes: transform: translate3d(0px, 0px, 0px) rotate(0deg);\\nErrors: [] Requests: ['file:///app/index.html']\\nVisible text: ''\\n\"}"
+        }
+      ],
+      "timestamp": "2026-10-01T01:07:21.617Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Final checks passed: the bowl fits small phones, tablets, landscape screens, and large displays. Mouse response works, reduced-motion steam stays still, and the page runs offline with no external assets or visible text.\n",
+      "timestamp": "2026-10-01T01:09:27.942Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Created [index.html](/app/index.html) with SVG ramen, drifting steam, warm lighting, and subtle mouse interaction.\n\nAll CSS and JavaScript are inline, with zero external assets or visible UI. Verified responsive layouts, offline rendering, and reduced-motion support.",
+      "timestamp": "2026-10-01T01:09:49.991Z"
+    }
+  ],
+  "metadata": {
+    "sourceRecord": "rollout-2026-10-01T00-45-17-01a0f4ec-3950-7222-be3b-3d79eb5b28d8.jsonl",
+    "normalization": {
+      "excluded": [
+        "system and developer prompts",
+        "hidden thinking and reasoning",
+        "credentials and private agent-mail calls",
+        "large base64 and embedded image data (event retained with size marker)"
+      ],
+      "omittedPrivateToolCalls": 0
+    },
+    "eventCounts": {
+      "message": 10,
+      "tool_call": 31,
+      "tool_result": 31
+    }
+  }
+}

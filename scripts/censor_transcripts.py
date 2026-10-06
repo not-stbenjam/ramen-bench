@@ -434,7 +434,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     paths = args.paths or [
         REPO_ROOT / name
-        for name in ("anthropic", "openai", "google", "meta", "xai", "z.ai")
+        for name in ("anthropic", "openai", "google", "meta", "xai", "z.ai", "mistralai")
     ]
     paths = [path if path.is_absolute() else REPO_ROOT / path for path in paths]
 

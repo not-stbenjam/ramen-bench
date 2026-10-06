@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100f0d">
+  <title>A bowl of warmth</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #100f0d; }
+    .room {
+      position: relative; width: 100%; height: 100%; height: 100svh;
+      overflow: hidden; isolation: isolate;
+      background:
+        radial-gradient(ellipse at 50% 58%, #30221b46 0%, #211a1640 30%, transparent 64%),
+        radial-gradient(ellipse at 24% 19%, #5143341b, transparent 48%),
+        linear-gradient(145deg, #181713, #100f0e 60%, #12100e);
+    }
+    .room::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 48%, transparent 24%, #05050580 100%);
+      z-index: 4;
+    }
+    .ambient {
+      position: absolute; width: 85vmin; height: 70vmin; left: 50%; top: 55%;
+      transform: translate(-50%, -50%); border-radius: 50%;
+      background: radial-gradient(ellipse, #aa683014, #714f2810 40%, transparent 70%);
+      filter: blur(35px); pointer-events: none;
+    }
+    .stage {
+      position: absolute; width: min(1440px, 136vw, 168vh); aspect-ratio: 4 / 3;
+      left: 50%; top: 43%; transform: translate(-50%, -50%);
+    }
+    .dish {
+      position: absolute; inset: 0; transform-origin: 50% 66%;
+      will-change: transform;
+    }
+    svg, canvas { display: block; width: 100%; height: 100%; }
+    .art { overflow: visible; will-change: transform; }
+    .steam {
+      position: absolute; left: 30%; top: 18%; width: 40%; height: 40%;
+      pointer-events: none; will-change: transform; filter: blur(2px);
+    }
+    .grain {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      opacity: .018; pointer-events: none; z-index: 5; will-change: transform;
+    }
+    .glint { opacity: .8; }
+    @media (max-width: 600px) { .stage { width: min(190vw, 152vh); top: 47%; } }
+    @media (prefers-reduced-motion: reduce) {
+      .dish { will-change: auto; transform: none !important; }
+      .art, .steam { will-change: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="room" aria-label="A steaming bowl of vegan ramen in a warm, dimly lit room">
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="stage">
+      <div class="dish">
+        <svg class="art" viewBox="0 0 1400 1050" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="scene-title scene-description">
+          <title id="scene-title">A quiet bowl of vegan ramen</title>
+          <desc id="scene-description">Golden noodles in amber broth, with shiitake mushrooms, tender bok choy, roasted tofu, scallions and chili, in a dark handmade ceramic bowl. Steam rises into the darkness.</desc>
+          <defs>
+            <radialGradient id="ground"><stop stop-color="#010100" stop-opacity=".85"/><stop offset=".65" stop-color="#070604" stop-opacity=".55"/><stop offset="1" stop-color="#0c0b09" stop-opacity="0"/></radialGradient>
+            <linearGradient id="ceramic" x1=".04" y1=".15" x2=".95" y2=".6" gradientUnits="objectBoundingBox">
+              <stop stop-color="#40382d"/><stop offset=".16" stop-color="#343028"/><stop offset=".36" stop-color="#26251f"/><stop offset=".7" stop-color="#181a17"/><stop offset="1" stop-color="#111411"/>
+            </linearGradient>
+            <radialGradient id="bowlWarmth" cx=".25" cy=".05" r=".88"><stop stop-color="#be8d57" stop-opacity=".16"/><stop offset=".6" stop-color="#5b4731" stop-opacity=".04"/><stop offset="1" stop-color="#050704" stop-opacity=".4"/></radialGradient>
+            <linearGradient id="rim" x1="0" y1="0" x2=".65" y2="1"><stop stop-color="#8c7453"/><stop offset=".32" stop-color="#61533f"/><stop offset=".7" stop-color="#403b2d"/><stop offset="1" stop-color="#a18454"/></linearGradient>
+            <linearGradient id="inner" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#171b12"/><stop offset=".6" stop-color="#55503a"/><stop offset="1" stop-color="#786347"/></linearGradient>
+            <radialGradient id="broth" cx=".39" cy=".42" r=".65"><stop stop-color="#ba802e"/><stop offset=".35" stop-color="#9a5b1e"/><stop offset=".7" stop-color="#6e3816"/><stop offset=".9" stop-color="#482918"/><stop offset="1" stop-color="#302115"/></radialGradient>
+            <radialGradient id="brothLight" cx=".28" cy=".28" r=".73"><stop stop-color="#f2b24f" stop-opacity=".26"/><stop offset="1" stop-color="#d79633" stop-opacity="0"/></radialGradient>
+            <linearGradient id="noodle" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f5d18b"/><stop offset=".35" stop-color="#e9b95e"/><stop offset=".7" stop-color="#c88731"/><stop offset="1" stop-color="#e6b362"/></linearGradient>
+            <linearGradient id="leaf" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#8a9b43"/><stop offset=".22" stop-color="#576d2b"/><stop offset=".58" stop-color="#294722"/><stop offset="1" stop-color="#152e19"/></linearGradient>
+            <linearGradient id="leaf2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a7aa4c"/><stop offset=".2" stop-color="#648134"/><stop offset=".7" stop-color="#355c29"/><stop offset="1" stop-color="#1c3c20"/></linearGradient>
+            <linearGradient id="stalk" x1="0" y1="0" x2="1" y2=".7"><stop stop-color="#d9d494"/><stop offset=".45" stop-color="#b6c780"/><stop offset="1" stop-color="#61844a"/></linearGradient>
+            <radialGradient id="cap" cx=".35" cy=".23" r=".82"><stop stop-color="#b28a59"/><stop offset=".2" stop-color="#936b43"/><stop offset=".57" stop-color="#68472e"/><stop offset=".85" stop-color="#3d291b"/><stop offset="1" stop-color="#2b2017"/></radialGradient>
+            <linearGradient id="mushroomEdge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9c794f"/><stop offset=".35" stop-color="#d3b483"/><stop offset="1" stop-color="#695031"/></linearGradient>
+            <linearGradient id="tofu" x1="0" y1="0" x2=".5" y2="1"><stop stop-color="#e1bf78"/><stop offset=".4" stop-color="#c39146"/><stop offset="1" stop-color="#9c5928"/></linearGradient>
+            <linearGradient id="tofuSide" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a47333"/><stop offset="1" stop-color="#663519"/></linearGradient>
+            <linearGradient id="chili" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e98944"/><stop offset=".3" stop-color="#cf4d27"/><stop offset="1" stop-color="#761f14"/></linearGradient>
+            <linearGradient id="scallion" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c0cd78"/><stop offset=".4" stop-color="#86a350"/><stop offset="1" stop-color="#315b2c"/></linearGradient>
+            <filter id="shadow" x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="13"/></filter>
+            <filter id="foodShadow" x="-30%" y="-40%" width="160%" height="180%"><feDropShadow dx="1" dy="5" stdDeviation="3.5" flood-color="#271608" flood-opacity=".65"/></filter>
+            <filter id="ceramicGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="3" seed="23"/><feColorMatrix type="saturate" values="0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+            <filter id="fineGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".42" numOctaves="3" seed="8"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".15"/></feComponentTransfer><feComposite in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+            <filter id="steamBlur" x="-100%" y="-20%" width="300%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+            <clipPath id="soupClip"><ellipse cx="700" cy="631" rx="305" ry="109"/></clipPath>
+            <clipPath id="bowlClip"><path d="M370 637 C390 806 504 883 700 897 C895 883 1010 806 1030 637 C987 714 413 714 370 637Z"/></clipPath>
+            <path id="bowlShape" d="M370 637 C390 806 504 883 700 897 C895 883 1010 806 1030 637 C987 714 413 714 370 637Z"/>
+          </defs>
+
+          <!-- The only object in the room; the low pool of light anchors it. -->
+          <ellipse cx="709" cy="888" rx="405" ry="64" fill="url(#ground)"/>
+          <ellipse cx="700" cy="884" rx="224" ry="25" fill="#000" opacity=".5" filter="url(#shadow)"/>
+          <path d="M603 863 Q700 840 797 863 L786 895 Q699 920 614 895Z" fill="#181913"/>
+          <path d="M615 893 Q700 912 785 893" fill="none" stroke="#59503b" stroke-width="2" opacity=".5"/>
+          <use href="#bowlShape" fill="url(#ceramic)"/>
+          <use href="#bowlShape" fill="url(#bowlWarmth)"/>
+          <g clip-path="url(#bowlClip)" opacity=".16" filter="url(#ceramicGrain)">
+            <rect x="369" y="638" width="662" height="260" fill="#696454"/>
+          </g>
+          <g clip-path="url(#bowlClip)" fill="none" stroke-linecap="round">
+            <path d="M370 712 Q688 878 1030 706" stroke="#a78b59" stroke-width="2.8" opacity=".17"/>
+            <path d="M389 747 Q696 906 1013 743" stroke="#c3a172" stroke-width="1" opacity=".13"/>
+            <path d="M411 793 Q691 935 986 790" stroke="#060b09" stroke-width="2" opacity=".3"/>
+            <path d="M394 678 Q404 781 503 837" stroke="#d3b886" stroke-width="9" opacity=".045"/>
+            <path d="M407 691 Q420 775 474 803" stroke="#d3b886" stroke-width="2" opacity=".09"/>
+          </g>
+
+          <ellipse cx="700" cy="632" rx="331" ry="127" fill="#151911"/>
+          <ellipse cx="700" cy="630" rx="326" ry="123" fill="url(#rim)"/>
+          <ellipse cx="700" cy="629" rx="317" ry="116" fill="url(#inner)"/>
+          <ellipse cx="700" cy="631" rx="305" ry="109" fill="url(#broth)"/>
+          <ellipse cx="700" cy="631" rx="305" ry="109" fill="url(#brothLight)"/>
+          <path d="M401 614 C423 558 553 524 676 523" stroke="#e5c184" stroke-width="1.5" fill="none" opacity=".34"/>
+          <g clip-path="url(#soupClip)">
+            <g id="broth-details"></g>
+            <g id="noodles" fill="none" stroke-linecap="round"></g>
+            <g fill="none" stroke="#dfac55" opacity=".24" stroke-width="1.1">
+              <path d="M431 644 C456 655 486 657 510 653"/>
+              <path d="M857 682 C897 683 938 668 950 656"/>
+              <path d="M598 714 C645 729 718 732 754 724"/>
+              <path d="M870 547 C901 551 919 559 927 568"/>
+            </g>
+          </g>
+
+          <!-- Three leaves, folded stems, and the small irregularities of cooked greens. -->
+          <g filter="url(#foodShadow)">
+            <g transform="rotate(-17 548 599)">
+              <path d="M571 619 C543 610 504 597 485 575 C469 567 474 555 466 545 C461 532 477 528 480 518 C495 501 512 514 521 507 C541 505 544 521 559 529 C584 536 580 553 588 562 C600 581 584 602 571 619Z" fill="url(#leaf)"/>
+              <path d="M570 614 C548 580 514 550 487 528 M538 576 Q507 569 483 550 M522 557 Q523 529 513 517 M552 594 Q523 591 499 575 M550 588 Q568 569 562 545" fill="none" stroke="#9ba954" stroke-width="2" opacity=".35"/>
+              <path d="M563 611 C555 588 546 576 535 566 C548 572 569 594 584 615 L617 641 C612 649 596 655 586 648Z" fill="url(#stalk)"/>
+              <path d="M569 609 L603 644" stroke="#e3ddab" opacity=".55" stroke-width="3"/>
+            </g>
+            <g transform="rotate(9 548 585)">
+              <path d="M586 626 C562 612 539 605 518 585 C504 583 500 569 501 558 C486 541 501 529 506 516 C515 505 532 512 541 504 C553 499 565 512 574 513 C593 518 587 533 597 542 C609 557 597 570 602 584 C605 599 594 615 586 626Z" fill="url(#leaf2)"/>
+              <path d="M584 621 C568 585 543 553 522 522 M554 576 Q529 571 511 546 M568 596 Q541 594 521 580 M548 565 Q560 539 551 520 M576 604 Q592 581 589 563" fill="none" stroke="#c4c67a" stroke-width="1.6" opacity=".36"/>
+              <path d="M581 615 C577 600 569 585 558 572 C578 584 587 602 597 616 L619 638 C617 649 602 654 593 645Z" fill="url(#stalk)"/>
+              <path d="M582 612 Q591 629 608 640" fill="none" stroke="#e3e0ac" stroke-width="3" opacity=".6"/>
+            </g>
+            <g>
+              <path d="M551 640 C517 631 480 628 459 612 C446 605 451 592 445 584 C448 568 464 574 474 566 C491 559 501 574 513 575 C533 581 531 595 544 600 C557 609 557 628 551 640Z" fill="url(#leaf)"/>
+              <path d="M548 636 Q506 600 461 587 M509 608 Q482 611 465 600 M507 607 Q514 591 503 581" fill="none" stroke="#91a45b" stroke-width="1.5" opacity=".5"/>
+              <path d="M538 624 Q561 627 593 645 Q600 651 591 658 Q568 659 541 639Z" fill="url(#stalk)"/>
+              <path d="M547 632 L585 652" fill="none" stroke="#dbd59e" stroke-width="2" opacity=".5"/>
+            </g>
+          </g>
+
+          <!-- Roasted tofu: light, porous centers with caramelized edges. -->
+          <g id="tofu-group" filter="url(#foodShadow)">
+            <g transform="translate(626 544) rotate(-12)">
+              <path d="M0 0 L61 -5 L74 30 L14 38Z" fill="url(#tofu)"/>
+              <path d="M14 38 L74 30 L72 47 L15 55Z" fill="url(#tofuSide)"/>
+              <path d="M0 0 L14 38 L15 55 L2 20Z" fill="#b18447"/>
+              <path d="M5 3 L57 -1 M18 35 L67 29" stroke="#f0d08e" stroke-width="2" opacity=".57"/>
+              <g class="tofu-pores"></g>
+            </g>
+            <g transform="translate(698 534) rotate(9)">
+              <path d="M0 0 L59 1 L66 34 L9 37Z" fill="url(#tofu)"/>
+              <path d="M9 37 L66 34 L65 50 L10 53Z" fill="url(#tofuSide)"/>
+              <path d="M0 0 L9 37 L10 53 L0 17Z" fill="#b18447"/>
+              <path d="M5 4 L54 5 M14 34 L59 31" stroke="#f0d08e" stroke-width="2" opacity=".5"/>
+              <g class="tofu-pores"></g>
+            </g>
+          </g>
+
+          <!-- Shiitake caps are cut by hand, their pale interiors catching the light. -->
+          <g filter="url(#foodShadow)">
+            <g transform="translate(838 580) rotate(17)">
+              <path d="M-64 0 C-63 -43 -34 -61 7 -60 C49 -59 74 -37 76 -2 C61 25 -45 30 -64 0Z" fill="url(#mushroomEdge)"/>
+              <path d="M-65 -7 C-64 -46 -33 -65 5 -64 C45 -63 73 -42 76 -9 C63 10 41 12 6 13 C-30 13 -54 5 -65 -7Z" fill="url(#cap)" filter="url(#fineGrain)"/>
+              <path d="M-29 -47 L-5 -30 L24 -52 L13 -29 L48 -10 L13 -17 L0 5 L-6 -17 L-45 -18 L-19 -26Z" fill="#d6bc8b" opacity=".88"/>
+              <path d="M-29 -47 L-5 -24 L24 -52 M-44 -18 L-5 -24 L48 -10 M-5 -24 L0 5" fill="none" stroke="#704b2d" stroke-width="2"/>
+              <path d="M-51 -36 Q-27 -60 2 -58" fill="none" stroke="#d8ae77" stroke-width="2" opacity=".25"/>
+              <path d="M-56 5 C-22 26 43 24 66 6" fill="none" stroke="#efd6a6" stroke-width="1.5" opacity=".4"/>
+            </g>
+            <g transform="translate(892 624) rotate(-17) scale(.88)">
+              <path d="M-60 3 C-57 -32 -27 -57 13 -51 C48 -48 63 -23 64 7 C46 35 -39 34 -60 3Z" fill="url(#mushroomEdge)"/>
+              <path d="M-61 -5 C-59 -38 -29 -62 10 -57 C44 -54 64 -30 66 0 C48 18 -40 20 -61 -5Z" fill="url(#cap)" filter="url(#fineGrain)"/>
+              <path d="M-21 -44 L1 -24 L28 -41 L14 -21 L46 -8 L11 -12 L0 8 L-5 -12 L-41 -16 L-12 -23Z" fill="#d5b98a"/>
+              <path d="M-21 -44 L1 -20 L28 -41 M-41 -16 L1 -20 L46 -8 M1 -20 L0 8" fill="none" stroke="#715035" stroke-width="1.6"/>
+              <path d="M-53 -23 Q-39 -47 -12 -51" fill="none" stroke="#d8ae77" stroke-width="2" opacity=".24"/>
+            </g>
+            <g transform="translate(809 623) rotate(-26)">
+              <path d="M-41 0 Q0 -31 45 -2 L42 12 Q0 -8 -36 15Z" fill="#634125"/>
+              <path d="M-37 5 Q-1 -18 41 5 L34 17 Q1 0 -30 22Z" fill="url(#mushroomEdge)"/>
+              <path d="M-24 12 L-19 18 M-12 7 L-8 13 M1 6 L3 11 M13 8 L13 14 M24 10 L23 15" fill="none" stroke="#725437" stroke-width="1.5"/>
+            </g>
+          </g>
+
+          <g id="garnish" filter="url(#foodShadow)"></g>
+          <g id="sesame"></g>
+          <g id="oil-glints" class="glint" clip-path="url(#soupClip)"></g>
+
+          <!-- The front lip overlaps the soup, giving the bowl its depth. -->
+          <path d="M370 632 C375 695 521 756 700 756 C879 756 1025 695 1030 632 C1018 697 875 747 700 747 C525 747 382 697 370 632Z" fill="url(#rim)"/>
+          <path d="M376 650 C399 711 540 751 700 751 C860 751 1001 711 1024 650" fill="none" stroke="#d2b07d" stroke-width="1.8" opacity=".39"/>
+          <path d="M409 692 C468 732 579 755 699 755" fill="none" stroke="#ead2a0" stroke-width="1" opacity=".28"/>
+          <path d="M442 713 C533 756 650 766 777 757" fill="none" stroke="#070a07" stroke-width="2" opacity=".5"/>
+
+          <g id="still-steam" fill="none" stroke="#d7c7ad" stroke-linecap="round" filter="url(#steamBlur)" opacity=".1">
+            <path d="M582 544 C542 490 636 468 610 402 C589 350 557 333 585 274" stroke-width="12"/>
+            <path d="M717 541 C754 487 684 448 713 390 C742 334 732 317 706 277" stroke-width="9"/>
+            <path d="M828 550 C866 497 795 466 807 427 C821 383 858 375 834 327" stroke-width="13"/>
+          </g>
+        </svg>
+        <canvas class="steam" aria-hidden="true"></canvas>
+      </div>
+    </div>
+    <svg class="grain" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <filter id="roomGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".82" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+        <pattern id="grainTile" width="128" height="128" patternUnits="userSpaceOnUse"><rect width="128" height="128" filter="url(#roomGrain)" opacity=".9"/></pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grainTile)"/>
+    </svg>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+      const NS = 'http://www.w3.org/2000/svg';
+      let seed = 83;
+      const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+      const between = (a, b) => a + random() * (b - a);
+      const el = (tag, attrs, parent) => {
+        const node = document.createElementNS(NS, tag);
+        Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+        parent.appendChild(node);
+        return node;
+      };
+      const broth = document.querySelector('#broth-details');
+      for (let i = 0; i < 145; i++) {
+        const a = between(0, Math.PI * 2), r = Math.sqrt(random());
+        const x = 700 + Math.cos(a) * r * 294, y = 631 + Math.sin(a) * r * 103;
+        const radius = between(.8, 5.8);
+        el('ellipse', { cx: x, cy: y, rx: radius, ry: radius * .48, fill: i % 3 ? '#e9ae45' : '#f4d08a', opacity: between(.06, .23), stroke: '#f6b657', 'stroke-width': .55 }, broth);
+      }
+
+      // Each strand is its own continuous, uneven curve; layered light gives it volume.
+      const noodles = document.querySelector('#noodles');
+      const strands = [];
+      for (let i = 0; i < 48; i++) {
+        const cx = between(626, 768), cy = between(629, 666);
+        const rx = between(58, 139), ry = between(20, 53);
+        const phase = between(0, Math.PI * 2), loops = between(1.1, 1.95);
+        let d = '';
+        for (let j = 0; j <= 84; j++) {
+          const u = j / 84, a = phase + u * Math.PI * 2 * loops;
+          const taper = .74 + .26 * Math.sin(u * Math.PI);
+          const x = cx + Math.cos(a) * rx * taper + Math.sin(a * 3 + i) * 6 + u * 17;
+          const y = cy + Math.sin(a) * ry * taper + Math.sin(a * 2 + i * .7) * 5 + u * 8;
+          d += `${j ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)} `;
+        }
+        strands.push({ d, width: between(3.4, 5.2) });
+      }
+      strands.forEach(({d, width}) => {
+        el('path', {d, stroke: '#48280e', 'stroke-width': width + 3, opacity: .55, transform: 'translate(0 2)'}, noodles);
+        el('path', {d, stroke: 'url(#noodle)', 'stroke-width': width}, noodles);
+        el('path', {d, stroke: '#ffe1a0', 'stroke-width': .75, opacity: .36, transform: 'translate(-.6 -.9)'}, noodles);
+      });
+
+      document.querySelectorAll('.tofu-pores').forEach(group => {
+        for (let i = 0; i < 42; i++) {
+          const x = between(9, 56), y = between(4, 30);
+          el('ellipse', {cx: x, cy: y, rx: between(.6, 2), ry: between(.4, 1.1), fill: i % 4 ? '#77441d' : '#ffdfa0', opacity: between(.18, .5)}, group);
+        }
+        for (let i = 0; i < 5; i++) {
+          const x = between(10, 48), y = between(7, 25);
+          el('path', {d: `M${x} ${y} q7 -3 11 1 q-1 5 -8 5Z`, fill: '#854319', opacity: .32}, group);
+        }
+      });
+
+      const garnish = document.querySelector('#garnish');
+      // Fresh scallion rings, scattered loosely across the center of the bowl.
+      const scallions = [[626,609,12],[652,615,-25],[673,596,32],[700,609,-13],[720,630,16],[672,635,-20],[739,602,35],[750,645,-12],[630,650,20],[707,678,13],[772,674,-28],[610,672,-10],[793,641,16],[656,687,26],[749,581,-4],[678,574,18],[850,669,-24]];
+      scallions.forEach(([x,y,angle],i) => {
+        const g = el('g', {transform: `translate(${x} ${y}) rotate(${angle})`}, garnish);
+        const rx = between(7,11), ry = between(4,6.5);
+        el('ellipse', {cx: 0,cy: 2,rx,ry,fill: '#355023'},g);
+        el('ellipse', {cx: 0,cy: 0,rx,ry,fill: 'url(#scallion)',stroke: '#b2c576','stroke-width': .6},g);
+        el('ellipse', {cx: 0,cy: 0,rx: rx*.57,ry: ry*.52,fill: '#5d6d32'},g);
+        el('path', {d: `M${-rx*.7} ${-ry*.3} Q0 ${-ry*1.15} ${rx*.65} ${-ry*.25}`,fill:'none',stroke:'#d3d9a0','stroke-width':1.3,opacity:.67},g);
+        if (i % 4 === 0) el('path', {d:`M${rx-1} -2 l5 -2 l-2 7 l-4 -1Z`,fill:'#a8bf67'},g);
+      });
+      // Small slices of red chili with exposed pale seeds.
+      [[765,655,-29],[602,632,17],[744,698,21],[820,689,-10],[701,584,-12]].forEach(([x,y,angle],i) => {
+        const g = el('g', {transform:`translate(${x} ${y}) rotate(${angle})`},garnish);
+        el('path',{d:'M-15 0 C-15 -8 -5 -11 5 -9 C17 -8 20 -2 16 5 C12 12 -2 12 -11 7Z',fill:'url(#chili)',stroke:'#ea9459','stroke-width':.7},g);
+        el('ellipse',{cx:1,cy:0,rx:9.2,ry:4.7,fill:'#54271a'},g);
+        el('path',{d:'M-10 -3 Q0 -9 10 -4',fill:'none',stroke:'#fbad73','stroke-width':1.2,opacity:.7},g);
+        for(let j=0;j<3;j++) el('ellipse',{cx:between(-6,7),cy:between(-2,3),rx:1.8,ry:1,fill:'#eace8c',transform:`rotate(${between(-40,40)})`},g);
+      });
+      // Thin green curls follow the loose shape of the noodles.
+      ['M644 616 Q672 595 714 615 Q732 623 744 613','M683 646 Q722 660 756 626','M610 646 Q627 628 648 635','M716 673 Q742 655 788 658'].forEach(d=> {
+        el('path',{d,fill:'none',stroke:'#324e26','stroke-width':4,'stroke-linecap':'round'},garnish);
+        el('path',{d,fill:'none',stroke:'#9bb264','stroke-width':1.5,'stroke-linecap':'round'},garnish);
+      });
+      const sesame = document.querySelector('#sesame');
+      for (let i=0;i<83;i++) {
+        const a=between(0,Math.PI*2), r=Math.sqrt(random());
+        const x=700+Math.cos(a)*r*232, y=633+Math.sin(a)*r*79;
+        el('ellipse',{cx:x,cy:y,rx:between(1.6,2.5),ry:between(.7,1.05),fill:i%7===0?'#35251b':'#e9d29c',opacity:between(.65,.95),transform:`rotate(${between(-70,70)} ${x} ${y})`},sesame);
+      }
+      const glints=document.querySelector('#oil-glints');
+      [[447,627,8],[492,665,12],[887,691,10],[933,637,9],[793,717,7],[554,700,7],[914,590,5],[782,550,5]].forEach(([x,y,r])=> {
+        el('path',{d:`M${x-r} ${y} q${r} -5 ${r*2} -1`,fill:'none',stroke:'#f5cf88','stroke-width':1.2,opacity:.5},glints);
+      });
+
+      const canvas=document.querySelector('.steam'), ctx=canvas.getContext('2d');
+      const dish=document.querySelector('.dish'), stage=document.querySelector('.stage');
+      const motion=matchMedia('(prefers-reduced-motion: reduce)');
+      const pointer={x:0,y:0}, smooth={x:0,y:0};
+      let frame=0, previous=0, elapsed=0, visible=!document.hidden;
+      let pixelRatio=1;
+      const resize=()=> {
+        const rect=stage.getBoundingClientRect();
+        pixelRatio=Math.min(devicePixelRatio||1,1.5);
+        // Vapor is soft by nature: a small drawing surface avoids full-screen blur work.
+        canvas.width=Math.round(Math.min(rect.width*.4*pixelRatio,224));
+        canvas.height=Math.round(canvas.width*.75);
+        if(motion.matches) drawSteam(0);
+      };
+      const wisps=Array.from({length:9},(_,i)=>({x:between(550,854),phase:between(0,Math.PI*2),speed:between(.17,.29),bend:between(17,37),height:between(235,345),width:between(6,15),opacity:between(.021,.045)}));
+
+      function drawSteam(t) {
+        if(!ctx) return;
+        const sx=canvas.width/560, sy=canvas.height/420;
+        ctx.setTransform(sx,0,0,sy,-420*sx,-189*sy);
+        ctx.clearRect(420,189,560,420);
+        ctx.lineCap='round'; ctx.lineJoin='round';
+        wisps.forEach((w,i)=> {
+          // An unbroken ribbon flows upward; its sides dissolve as it cools.
+          const drift=Math.sin(t*w.speed+w.phase)*15;
+          const baseY=550+(i%3)*18;
+          const path=new Path2D();
+          for(let j=0;j<=42;j++) {
+            const u=j/42;
+            const wave=Math.sin(u*8-t*.7+w.phase)*w.bend*(.2+u*.8);
+            const mouseBend=smooth.x*75*u*u;
+            const x=w.x+wave+drift*u+mouseBend+u*u*14;
+            const y=baseY-u*w.height;
+            j?path.lineTo(x,y):path.moveTo(x,y);
+          }
+          // Nested translucent strokes form a soft profile without repeated blur passes.
+          const widths=[4.1,3.3,2.7,2.1,1.5,1,.45];
+          const weights=[.08,.1,.15,.2,.26,.34,.4];
+          for(let layer=0;layer<widths.length;layer++) {
+            const gradient=ctx.createLinearGradient(0,baseY,0,baseY-w.height);
+            const alpha=w.opacity*weights[layer];
+            gradient.addColorStop(0,'rgba(216,205,179,0)');
+            gradient.addColorStop(.15,`rgba(216,205,179,${alpha})`);
+            gradient.addColorStop(.45,`rgba(216,205,179,${alpha*.8})`);
+            gradient.addColorStop(1,'rgba(216,205,179,0)');
+            ctx.strokeStyle=gradient;
+            ctx.lineWidth=w.width*widths[layer];
+            ctx.stroke(path);
+          }
+        });
+      }
+      function animate(now) {
+        frame=0;
+        if(!visible||motion.matches) return;
+        const dt=previous?Math.min((now-previous)/1000,.05):0;
+        previous=now; elapsed+=dt;
+        const ease=1-Math.exp(-dt*3.5);
+        smooth.x+=(pointer.x-smooth.x)*ease;
+        smooth.y+=(pointer.y-smooth.y)*ease;
+        dish.style.transform=`translate(${smooth.x*5}px, ${smooth.y*3}px) rotate(${smooth.x*.4}deg)`;
+        drawSteam(elapsed);
+        frame=requestAnimationFrame(animate);
+      }
+      function updateMotion() {
+        cancelAnimationFrame(frame); frame=0; previous=0;
+        if(motion.matches) {
+          pointer.x=pointer.y=smooth.x=smooth.y=0;
+          dish.style.transform='none'; drawSteam(0);
+        } else if(visible) frame=requestAnimationFrame(animate);
+      }
+      window.addEventListener('pointermove',event=> {
+        if(motion.matches||event.pointerType==='touch') return;
+        pointer.x=(event.clientX/innerWidth-.5)*2;
+        pointer.y=(event.clientY/innerHeight-.5)*2;
+      },{passive:true});
+      document.documentElement.addEventListener('pointerleave',()=>{pointer.x=pointer.y=0;});
+      window.addEventListener('blur',()=>{pointer.x=pointer.y=0;});
+      document.addEventListener('visibilitychange',()=> {visible=!document.hidden;updateMotion();});
+      motion.addEventListener('change',updateMotion);
+      const observer=new ResizeObserver(resize); observer.observe(stage);
+      resize(); updateMotion();
+    })();
+  </script>
+</body>
+</html>

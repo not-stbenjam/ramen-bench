@@ -1,0 +1,4 @@
+# Keep judging separate from the historical importer pricing catalog.
+harbor==0.23.0
+litellm==1.103.1
+playwright==1.63.0

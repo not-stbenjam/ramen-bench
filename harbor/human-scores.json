@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "panelName": "Expert panel of ramen eaters",
+  "panelNote": "Ratings supplied by the user; initial appearance ratings are approximate. Additional ratings can be entered after judging.",
+  "weight": 0.8,
+  "ratings": [
+    {
+      "runId": "anthropic/sonnet-5.5/max",
+      "humanScore": 0.85
+    },
+    {
+      "runId": "anthropic/sonnet-5.5/xhigh",
+      "humanScore": 0.78
+    },
+    {
+      "runId": "anthropic/sonnet-5.5/high",
+      "humanScore": 0.75
+    },
+    {
+      "runId": "anthropic/sonnet-5.5/medium",
+      "humanScore": 0.72
+    },
+    {
+      "runId": "anthropic/sonnet-5.5/low",
+      "humanScore": 0.65
+    },
+    {
+      "runId": "anthropic/opus-5.5/max",
+      "humanScore": 1.0
+    },
+    {
+      "runId": "anthropic/opus-5.5/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5.5/high",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5.5/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5.5/low",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/fable-5.1/max",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/fable-5.1/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/fable-5.1/high",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/fable-5.1/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/fable-5.1/low",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5/max",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5/high",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/opus-5/low",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-astra/ultra",
+      "humanScore": 0.95
+    },
+    {
+      "runId": "openai/gpt-6-astra/max",
+      "humanScore": 0.9
+    },
+    {
+      "runId": "openai/gpt-6-astra/xhigh",
+      "humanScore": 0
+    },
+    {
+      "runId": "openai/gpt-6-astra/high",
+      "humanScore": 0.85
+    },
+    {
+      "runId": "openai/gpt-6-astra/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-astra/low",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-sol/ultra",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-sol/max",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-sol/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-sol/high",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-sol/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-sol/low",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-luna/max",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-luna/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-luna/high",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-luna/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6-luna/low",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-sol/ultra",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-sol/max",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-sol/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-sol/high",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-sol/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-sol/low",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-terra/ultra",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-terra/max",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-terra/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-terra/high",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-terra/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-terra/low",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-luna/max",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-luna/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-luna/high",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-luna/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.6-luna/low",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.5/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.5/high",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.5/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-5.5/low",
+      "humanScore": null
+    },
+    {
+      "runId": "google/gemini-3.8-flash/high",
+      "humanScore": null
+    },
+    {
+      "runId": "google/gemini-3.8-flash/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "google/gemini-3.8-flash/low",
+      "humanScore": null
+    },
+    {
+      "runId": "google/gemini-3.7-flash/high",
+      "humanScore": null
+    },
+    {
+      "runId": "google/gemini-3.7-flash/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "google/gemini-3.7-flash/low",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-spark-1.3/xhigh",
+      "humanScore": 0.6
+    },
+    {
+      "runId": "meta/muse-spark-1.3/high",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-spark-1.3/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-spark-1.3/low",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.7/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.7/high",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.7/medium",
+      "humanScore": 0.6
+    },
+    {
+      "runId": "xai/grok-4.7/low",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.6/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.6/high",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.6/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.6/low",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.5/high",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.5/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "xai/grok-4.5/low",
+      "humanScore": null
+    },
+    {
+      "runId": "z.ai/glm-5.3/max",
+      "humanScore": null
+    },
+    {
+      "runId": "z.ai/glm-5.3/high",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6.1-sol/medium",
+      "humanScore": 0.8
+    },
+    {
+      "runId": "openai/gpt-6.1-sol/low",
+      "humanScore": 0.75
+    },
+    {
+      "runId": "openai/gpt-6.1-sol/high",
+      "humanScore": 0.85
+    },
+    {
+      "runId": "openai/gpt-6.1-sol/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6.1-sol/max",
+      "humanScore": null
+    },
+    {
+      "runId": "openai/gpt-6.1-sol/ultra",
+      "humanScore": null
+    },
+    {
+      "runId": "mistralai/mistral-large-4-0/default",
+      "humanScore": null
+    }
+  ]
+}

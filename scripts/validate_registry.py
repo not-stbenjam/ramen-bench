@@ -85,10 +85,15 @@ def main() -> int:
     if audit_censoring(
         [
             str(ROOT / name)
-            for name in ("anthropic", "openai", "google", "meta", "xai", "z.ai")
+            for name in ("anthropic", "openai", "google", "meta", "xai", "z.ai", "mistralai")
         ]
     ):
         raise ValueError("one or more public JSON files need censoring")
+    from ramen_harbor import audit, audit_display_config, registered_runs
+
+    runs = registered_runs()
+    audit(ROOT / "scores.json", runs)
+    audit_display_config(runs)
     print(f"Validated {run_count} registered runs and {event_count} public transcript events.")
     return 0
 

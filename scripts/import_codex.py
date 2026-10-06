@@ -13,7 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> int:
-    import_sessions(["--harness", "codex", *sys.argv[1:]])
+    if "--harbor-job" in sys.argv[1:]:
+        from import_harbor_codex import main as import_harbor
+
+        import_harbor(sys.argv[1:])
+    else:
+        import_sessions(["--harness", "codex", *sys.argv[1:]])
     if "--dry-run" not in sys.argv[1:]:
         censor_transcripts(["--write", str(ROOT / "openai")])
     return censor_transcripts([str(ROOT / "openai")])

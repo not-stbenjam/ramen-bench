@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ramen display criterion weights",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "weights"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["noodles", "toppings", "bowl", "broth", "steam", "composition"],
+      "properties": {
+        "noodles": {"type": "number", "minimum": 0, "maximum": 1},
+        "toppings": {"type": "number", "minimum": 0, "maximum": 1},
+        "bowl": {"type": "number", "minimum": 0, "maximum": 1},
+        "broth": {"type": "number", "minimum": 0, "maximum": 1},
+        "steam": {"type": "number", "minimum": 0, "maximum": 1},
+        "composition": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    }
+  }
+}

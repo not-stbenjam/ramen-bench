@@ -7,3 +7,5 @@ api/.dev.vars
 api/.env
 api/.wrangler/
 api/wrangler.jsonc
+.harbor/
+.ruff_cache/

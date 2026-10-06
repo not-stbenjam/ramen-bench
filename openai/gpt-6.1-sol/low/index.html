@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111411"><title>Warmth</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101310}body{display:grid;place-items:center}main{width:100%;height:100%;position:relative;isolation:isolate;background:radial-gradient(ellipse at 50% 48%,#282b20 0%,#191d17 33%,#101410 66%,#0b0e0c 100%)}main:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,#05080680 100%)}svg.scene{position:absolute;width: min(110vw,1250px);height:min(100vh,1000px);left:50%;top:50%;transform:translate(-50%,-50%);overflow:visible}#dish{transform-origin:600px 640px;transition:transform .65s ease-out}.steam{fill:none;stroke:#e1e2c5;stroke-linecap:round;filter:url(#steamBlur);mix-blend-mode:screen;animation:breathe 7s ease-in-out infinite;transform-origin:600px 520px}.steam:nth-child(2){animation-delay:-2.7s}.steam:nth-child(3){animation-delay:-4.2s}.steam:nth-child(4){animation-delay:-1.3s}@keyframes breathe{0%,100%{opacity:.06;transform:translate(0,12px) scaleX(.94)}50%{opacity:.21;transform:translate(8px,-23px) scaleX(1.06)}}.glint{animation:shimmer 6s ease-in-out infinite}@keyframes shimmer{50%{opacity:.5}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.steam{opacity:.12}}
+</style>
+</head>
+<body>
+<main aria-label="A warm ceramic bowl of vegan ramen, with noodles, mushrooms, tofu and fresh greens, gently steaming in the dark.">
+<svg class="scene" viewBox="0 0 1200 950" role="img" aria-label="Steaming vegan ramen" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="ambient"><stop stop-color="#a87538" stop-opacity=".15"/><stop offset="1" stop-color="#a87538" stop-opacity="0"/></radialGradient>
+<linearGradient id="ceramic" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#6b7162"/><stop offset=".23" stop-color="#3b463c"/><stop offset=".57" stop-color="#26362e"/><stop offset=".85" stop-color="#14241e"/><stop offset="1" stop-color="#101b17"/></linearGradient>
+<linearGradient id="rim"><stop stop-color="#9b9a7f"/><stop offset=".28" stop-color="#777e68"/><stop offset=".65" stop-color="#444f3e"/><stop offset="1" stop-color="#70725a"/></linearGradient>
+<radialGradient id="broth" cx="43%" cy="35%" r="70%"><stop stop-color="#be782f"/><stop offset=".42" stop-color="#965620"/><stop offset=".8" stop-color="#643616"/><stop offset="1" stop-color="#38250f"/></radialGradient>
+<linearGradient id="leaf" x2="1" y2="1"><stop stop-color="#8a9b43"/><stop offset=".35" stop-color="#547a34"/><stop offset="1" stop-color="#173e25"/></linearGradient>
+<linearGradient id="tofu" x2=".3" y2="1"><stop stop-color="#f1d69c"/><stop offset=".7" stop-color="#d2a964"/><stop offset="1" stop-color="#a77436"/></linearGradient>
+<linearGradient id="mushroom" x2=".2" y2="1"><stop stop-color="#b68655"/><stop offset=".35" stop-color="#78512e"/><stop offset="1" stop-color="#372518"/></linearGradient>
+<filter id="shadow" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="22"/></filter>
+<filter id="steamBlur" x="-100%" y="-50%" width="300%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
+<filter id="foodShadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="1" dy="6" stdDeviation="4" flood-color="#261609" flood-opacity=".6"/></filter>
+<filter id="texture"><feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="3" seed="8"/><feColorMatrix type="saturate" values="0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+<clipPath id="soupClip"><ellipse cx="600" cy="547" rx="263" ry="117"/></clipPath>
+</defs>
+<ellipse cx="600" cy="580" rx="460" ry="340" fill="url(#ambient)"/>
+<ellipse cx="600" cy="784" rx="285" ry="35" fill="#000" opacity=".65" filter="url(#shadow)"/>
+<g id="dish">
+<ellipse cx="600" cy="759" rx="106" ry="22" fill="#17251e"/><ellipse cx="600" cy="756" rx="103" ry="18" fill="#384437"/>
+<path d="M307 545 C319 673 405 774 600 779 C789 780 878 677 893 545Z" fill="url(#ceramic)"/>
+<path d="M326 590 C353 686 418 743 522 759" stroke="#87917a" opacity=".13" stroke-width="3" fill="none"/>
+<path d="M338 621 C361 669 388 701 413 715" stroke="#a6ab8e" opacity=".08" stroke-width="12" fill="none"/>
+<ellipse cx="600" cy="546" rx="294" ry="141" fill="url(#rim)"/>
+<ellipse cx="600" cy="544" rx="278" ry="126" fill="#17261b"/>
+<ellipse cx="600" cy="547" rx="263" ry="117" fill="url(#broth)"/>
+<g clip-path="url(#soupClip)">
+<g id="oil"></g><g id="noodles" fill="none" stroke-linecap="round"></g>
+<g filter="url(#foodShadow)">
+<!-- Crisp bok choy leaves and pale stems -->
+<path d="M489 538 C446 514 393 511 385 463 C379 422 433 419 454 448 C457 402 498 413 507 447 C544 420 561 451 546 474 C580 474 569 499 541 510Z" fill="url(#leaf)"/>
+<path d="M497 531 Q475 482 426 445 M484 504 L401 465 M477 488 L493 440 M491 510 L539 475" fill="none" stroke="#a4b663" stroke-width="2" opacity=".44"/>
+<path d="M505 555 Q484 523 449 486 Q469 525 476 563Z" fill="#bfcb7d"/><path d="M492 558 Q474 523 458 506" fill="none" stroke="#e0d9a1" stroke-width="5"/>
+<path d="M737 545 C759 515 811 503 813 466 C816 441 784 437 767 458 C757 423 725 436 722 463 C693 440 675 461 690 483 C659 486 683 520 713 531Z" fill="url(#leaf)"/>
+<path d="M736 539 Q747 496 789 460 M752 500 L735 459 M750 506 L799 480" fill="none" stroke="#abc166" opacity=".4" stroke-width="2"/>
+<path d="M705 562 Q733 528 769 491 Q748 527 735 572Z" fill="#bac97b"/>
+<!-- Roasted tofu -->
+<g transform="rotate(-13 559 477)"><path d="M523 451 L589 453 L596 494 L531 500Z" fill="#9a662e"/><path d="M523 451 L581 440 L589 453 L531 466Z" fill="#e0bc7d"/><path d="M531 466 L589 453 L596 486 L537 499Z" fill="url(#tofu)"/><path d="M542 470 l38 -8 M545 480 l39 -9 M548 489 l36 -8" stroke="#95602b" stroke-width="3" opacity=".64"/></g>
+<g transform="rotate(14 637 463)"><path d="M607 443 L657 436 L675 451 L667 485 L615 493Z" fill="#9e6f37"/><path d="M607 443 L657 436 L668 449 L615 458Z" fill="#ead0a0"/><path d="M615 458 L668 449 L667 482 L615 490Z" fill="url(#tofu)"/><path d="M626 458 l-2 25 M640 455 l-1 27 M654 452 l-1 26" stroke="#a87537" stroke-width="3" opacity=".7"/></g>
+<!-- Shiitake caps -->
+<g transform="rotate(-22 423 556)"><path d="M418 558 L419 585 Q431 591 438 578 L433 553" fill="#d7b98b"/><path d="M384 552 C382 518 448 507 463 543 Q460 564 421 565 Q391 566 384 552" fill="url(#mushroom)"/><path d="M404 542 L439 536 M422 525 L423 552" stroke="#d1aa77" stroke-width="4" stroke-linecap="round"/><path d="M391 554 Q424 568 456 550" stroke="#c19c68" stroke-width="2" fill="none"/></g>
+<g transform="rotate(19 766 578)"><path d="M759 577 l-5 28 q10 11 20 -1 l3 -29" fill="#cbb083"/><path d="M726 576 C726 541 796 537 808 572 Q798 593 764 590 Q737 589 726 576" fill="url(#mushroom)"/><path d="M747 567 L784 568 M766 552 L764 581" stroke="#d4ac77" stroke-width="4" stroke-linecap="round"/><path d="M733 578 Q769 594 800 576" fill="none" stroke="#bb9362" stroke-width="2"/></g>
+</g>
+<g id="garnish"></g>
+<g fill="#fff0ac" opacity=".35" class="glint"><ellipse cx="570" cy="619" rx="23" ry="2"/><ellipse cx="674" cy="591" rx="12" ry="1.5"/><ellipse cx="477" cy="596" rx="8" ry="1.3"/></g>
+</g>
+<path d="M312 552 C343 721 855 721 889 552" fill="none" stroke="#abb092" stroke-width="2" opacity=".22"/>
+<path d="M332 503 C357 451 454 416 527 411" stroke="#d0c6a0" opacity=".28" stroke-width="2" fill="none"/>
+</g>
+<g aria-hidden="true">
+<path class="steam" d="M502 454 C448 409 537 366 500 310 S485 232 515 184" stroke-width="23"/>
+<path class="steam" d="M592 451 C635 402 555 361 590 308 S624 228 590 155" stroke-width="29"/>
+<path class="steam" d="M692 463 C731 415 660 373 691 329 S719 274 692 226" stroke-width="20"/>
+<path class="steam" d="M559 446 C528 397 583 373 550 339 S536 281 554 247" stroke-width="10"/>
+</g>
+</svg>
+</main>
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg';let seed=27;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+const add=(parent,tag,attrs)=>{const el=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));parent.appendChild(el);return el};
+const oil=document.getElementById('oil');for(let i=0;i<110;i++){const x=340+rand()*520,y=435+rand()*220,r=1+rand()*6;add(oil,'ellipse',{cx:x,cy:y,rx:r,ry:r*.45,fill:'none',stroke:rand()>.5?'#ebae50':'#d69232','stroke-width':.7,opacity:.12+rand()*.23})}
+const noodles=document.getElementById('noodles');for(let i=0;i<44;i++){const x=465+rand()*200,y=506+rand()*97;let d=`M ${x} ${y}`;for(let j=0;j<4;j++){const nx=x-55+rand()*135,ny=y-28+rand()*52;d+=` Q ${x-65+rand()*130} ${y-45+rand()*90} ${nx} ${ny}`}add(noodles,'path',{d,stroke:'#502c11','stroke-width':7,opacity:.5,transform:'translate(1 3)'});add(noodles,'path',{d,stroke:['#d9b469','#e4c27d','#c69a51'][i%3],'stroke-width':3.4+rand()*1.3});add(noodles,'path',{d,stroke:'#f4d799','stroke-width':.8,opacity:.35,transform:'translate(0 -1)'})}
+const garnish=document.getElementById('garnish');for(let i=0;i<45;i++){let x=510+rand()*185,y=491+rand()*105;add(garnish,'ellipse',{cx:x,cy:y,rx:4+rand()*4,ry:2+rand()*2,fill:'none',stroke:['#90aa57','#b3bd70','#527f39'][i%3],'stroke-width':2.3,transform:`rotate(${rand()*150} ${x} ${y})`})}for(let i=0;i<65;i++){const x=398+rand()*403,y=474+rand()*146;add(garnish,'ellipse',{cx:x,cy:y,rx:1.5,ry:.75,fill:i%4===0?'#392818':'#e2c599',opacity:.8,transform:`rotate(${rand()*180} ${x} ${y})`})}for(let i=0;i<13;i++){const x=548+rand()*100,y=530+rand()*42;add(garnish,'path',{d:`M${x} ${y}q${rand()*17-8} -20 ${rand()*25-12} -30`,fill:'none',stroke:'#ac4926','stroke-width':1.7,'stroke-linecap':'round'})}
+const motion=matchMedia('(prefers-reduced-motion: reduce)'),dish=document.getElementById('dish');window.addEventListener('pointermove',e=>{if(motion.matches)return;const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;dish.style.transform=`translate(${x*9}px,${y*5}px) rotate(${x*.8}deg)`},{passive:true});document.addEventListener('pointerleave',()=>dish.style.transform='');motion.addEventListener('change',()=>dish.style.transform='');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ramen human panel ratings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "panelName", "panelNote", "weight", "ratings"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "panelName": {"type": "string", "minLength": 1},
+    "panelNote": {"type": "string", "minLength": 1},
+    "weight": {"type": "number", "minimum": 0, "maximum": 1},
+    "ratings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["runId", "humanScore"],
+        "properties": {
+          "runId": {"type": "string", "minLength": 1},
+          "humanScore": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+        }
+      }
+    }
+  }
+}

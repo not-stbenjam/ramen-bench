@@ -1,0 +1,101 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "openai/gpt-6.1-sol/max",
+  "vendor": {
+    "slug": "openai",
+    "displayName": "OpenAI"
+  },
+  "model": {
+    "slug": "gpt-6.1-sol",
+    "displayName": "GPT 6.1 Sol",
+    "providerModelId": "gpt-6.1-sol"
+  },
+  "variation": {
+    "slug": "max",
+    "displayName": "Max",
+    "reasoningEffort": "max",
+    "parameters": {}
+  },
+  "harness": {
+    "name": "Codex",
+    "version": "0.159.2",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor codex agent; gpt-6.1-sol @ max; ChatGPT subscription authentication"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-01T00:45:17.936Z",
+    "completedAt": "2026-10-01T01:09:50.017Z",
+    "wallDurationMs": 1472081
+  },
+  "usage": {
+    "tokens": {
+      "input": 1507861,
+      "cachedInput": 1445888,
+      "output": 37392,
+      "total": 1545253,
+      "reasoning": 14338,
+      "cacheCreationInput": 0
+    },
+    "cost": {
+      "currency": "USD",
+      "total": 0.6424548,
+      "estimated": true
+    },
+    "toolCalls": 31,
+    "providerReported": true,
+    "raw": {
+      "harborFinalMetrics": {
+        "total_prompt_tokens": 1507861,
+        "total_completion_tokens": 37392,
+        "total_cached_tokens": 1445888,
+        "total_cost_usd": 0.6424548,
+        "total_steps": 37,
+        "extra": {
+          "reasoning_output_tokens": 14338,
+          "total_tokens": 1545253,
+          "last_token_usage": {
+            "input_tokens": 66837,
+            "cached_input_tokens": 66304,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 3193,
+            "reasoning_output_tokens": 3085,
+            "total_tokens": 70030
+          },
+          "total_cache_write_input_tokens": 0
+        }
+      },
+      "codexCumulativeTokens": {
+        "input_tokens": 1507861,
+        "cached_input_tokens": 1445888,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 37392,
+        "reasoning_output_tokens": 14338,
+        "total_tokens": 1545253
+      },
+      "inputIncludesCachedInput": true,
+      "harborTrial": "gpt-6.1-sol-task__huLYwRo",
+      "harborTaskLock": {
+        "name": "gpt-6.1-sol-task",
+        "type": "local",
+        "digest": "sha256:4182d91805e20295715f4062827c3c0a8bae25378cffef60f4cd5c1d4a94c2dd",
+        "path": ".harbor/gpt-6.1-sol-task"
+      },
+      "artifactVerification": "recorded file-operation replay (15 operations)",
+      "harborTrialResultMissing": true,
+      "timingSource": "Recorded Codex session start through task_complete"
+    }
+  },
+  "resultStats": {
+    "bytes": 40589,
+    "lines": 713
+  },
+  "provenance": {
+    "pricingSource": "Harbor native ATIF final_metrics.total_cost_usd (Harbor LiteLLM estimate)"
+  },
+  "notes": "Recovered from the completed Codex session, Harbor ATIF trajectory, collected artifact, and saved native verifier grade/reward. Harbor did not finalize result.json. Generation timing uses the recorded Codex session bounds; cost and tokens use Harbor's saved trajectory. No trial result or AgentContext was reconstructed."
+}
