@@ -355,6 +355,26 @@
     {
       "runId": "mistralai/mistral-large-4-0/default",
       "humanScore": null
+    },
+    {
+      "runId": "anthropic/haiku-5.5/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/haiku-5.5/low",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/haiku-5.5/high",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/haiku-5.5/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "anthropic/haiku-5.5/max",
+      "humanScore": null
     }
   ]
 }
