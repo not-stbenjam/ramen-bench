@@ -1,0 +1,1530 @@
+{
+  "$schema": "https://not-stbenjam.github.io/ramen-bench/schemas/transcript.schema.json",
+  "schemaVersion": 1,
+  "runId": "anthropic/haiku-5.5/max",
+  "sessionId": "04b5ce31-3a61-4095-9393-5bd2b1b14934",
+  "sourceFormat": "harbor-claude-code-jsonl",
+  "events": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": "Create a single-file HTML page (/app/index.html) with all CSS and JavaScript inline and zero external assets. Never use image generation tools or models. Draw the scene with code (HTML, CSS, SVG, canvas or WebGL); embedded raster artwork is disallowed. Render a dark, atmospheric hero scene featuring a single, steaming bowl of vegan ramen as the sole visual focus. Make the dish feel alive and appetizing — with natural motion, ambient warmth, and interactive response to the mouse. Keep the scene pure (no UI, text, or menus), responsive on all screens, and respectful of prefers-reduced-motion.",
+      "timestamp": "2026-10-08T21:22:17.637Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "I'll start by checking what's already in `/app` and which browser tools are available for verifying the render.",
+      "timestamp": "2026-10-08T21:22:19.608Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_012wVTEj6fZXj4bToHAYot2X",
+      "tool": "Bash",
+      "input": {
+        "command": "ls -la /app 2>&1; echo \"---\"; which chromium chromium-browser google-chrome firefox node python3 2>&1; echo \"---\"; node --version 2>&1; python3 -c \"import playwright; print('playwright ok')\" 2>&1 | tail -1",
+        "description": "List /app and check for browser and runtime tools"
+      },
+      "timestamp": "2026-10-08T21:22:20.129Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_012wVTEj6fZXj4bToHAYot2X",
+      "status": "success",
+      "output": "total 0\ndrwxr-xr-x. 1 root root  0 Oct  8 20:53 .\ndrwxr-xr-x. 1 root root 84 Oct  8 21:20 ..\n---\n/usr/bin/node\n/usr/local/bin/python3\n---\nv18.20.4\nModuleNotFoundError: No module named 'playwright'",
+      "timestamp": "2026-10-08T21:22:20.346Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "`/app` is empty, and there's no browser installed. I'll check whether I can install a headless Chromium so I can screenshot the scene and test the interactions, not just read the code.",
+      "timestamp": "2026-10-08T21:31:03.922Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01L1Yxen2vFCuH7hC9b6fLdh",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP> && (timeout 20 npm view puppeteer-core version 2>&1 | tail -1); (timeout 10 curl -sI https://registry.npmjs.org/ 2>&1 | head -1); (timeout 10 curl -sI https://storage.googleapis.com/ 2>&1 | head -1); ls <HOME>/.cache 2>/dev/null; echo \"exit: $?\"",
+        "description": "Check npm registry and browser CDN reachability"
+      },
+      "timestamp": "2026-10-08T21:31:04.676Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01L1Yxen2vFCuH7hC9b6fLdh",
+      "status": "success",
+      "output": "25.13.0\nHTTP/2 200 \r\nHTTP/2 400 \r\nclaude\nclaude-cli-nodejs\nexit: 0\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:31:06.141Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The npm registry is reachable. I'll install Puppeteer in a scratch directory outside `/app` so it can drive a headless Chrome.",
+      "timestamp": "2026-10-08T21:31:08.035Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01P1z8R3NsesRyJE94HsHnP1",
+      "tool": "Bash",
+      "input": {
+        "command": "mkdir -p <TMP>/ramen-check && cd <TMP>/ramen-check && timeout 400 npm init -y >/dev/null 2>&1 && timeout 500 npm install puppeteer@23 --no-audit --no-fund 2>&1 | tail -5; ls <HOME>/.cache/puppeteer 2>/dev/null || echo \"no puppeteer cache\"",
+        "description": "Install Puppeteer in a scratch directory",
+        "timeout": 520000
+      },
+      "timestamp": "2026-10-08T21:31:08.700Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01P1z8R3NsesRyJE94HsHnP1",
+      "status": "success",
+      "output": "npm WARN deprecated puppeteer@23.11.1: < 24.15.0 is no longer supported\n\nadded 102 packages in 16s\nchrome\nchrome-headless-shell\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:31:25.805Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Puppeteer and a Chrome build installed. Before writing the page, I'll confirm the browser actually launches here.",
+      "timestamp": "2026-10-08T21:31:26.931Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01UtJQGNMmuDN4bxWB2wJbXP",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && cat > smoke.js <<'EOF'\nconst puppeteer = require('puppeteer');\n(async () => {\n  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });\n  const page = await browser.newPage();\n  await page.setContent('<canvas id=c width=50 height=50></canvas><script>const x=document.getElementById(\"c\").getContext(\"2d\");x.fillStyle=\"red\";x.fillRect(0,0,50,50);</script>');\n  console.log('browser version:', await browser.version());\n  await browser.close();\n})().catch((e) => { console.error('FAILED', e.message); process.exit(1); });\nEOF\ntimeout 120 node smoke.js 2>&1 | tail -3",
+        "description": "Smoke-test headless Chrome launch",
+        "timeout": 150000
+      },
+      "timestamp": "2026-10-08T21:31:28.122Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01UtJQGNMmuDN4bxWB2wJbXP",
+      "status": "success",
+      "output": "TROUBLESHOOTING: https://pptr.dev/troubleshooting\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:31:28.634Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01NiDqDByQuHaivVAzRMTMBg",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && timeout 120 node smoke.js 2>&1 | head -30; ls -R <HOME>/.cache/puppeteer | head -20",
+        "description": "Show full smoke-test error output",
+        "timeout": 150000
+      },
+      "timestamp": "2026-10-08T21:31:29.512Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01NiDqDByQuHaivVAzRMTMBg",
+      "status": "success",
+      "output": "FAILED Failed to launch the browser process!\n/root/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome: error while loading shared libraries: libnss3.so: cannot open shared object file: No such file or directory\n\n\nTROUBLESHOOTING: https://pptr.dev/troubleshooting\n\n/root/.cache/puppeteer:\nchrome\nchrome-headless-shell\n\n/root/.cache/puppeteer/chrome:\nlinux-131.0.6778.204\n\n/root/.cache/puppeteer/chrome/linux-131.0.6778.204:\nchrome-linux64\n\n/root/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64:\nABOUT\nMEIPreload\nPrivacySandboxAttestationsPreloaded\nWidevineCdm\nchrome\nchrome-wrapper\nchrome_100_percent.pak\nchrome_200_percent.pak\nchrome_crashpad_handler\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:31:30.037Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Chrome is missing the system `libnss3` library. I'll try the bundled headless shell first, since it needs fewer system libraries.",
+      "timestamp": "2026-10-08T21:31:31.732Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01WyXxPXdN9tb6AcMpXZSGMX",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && SHELL_BIN=$(ls -d <HOME>/.cache/puppeteer/chrome-headless-shell/*/chrome-headless-shell-linux64/chrome-headless-shell 2>/dev/null | head -1); echo \"bin: $SHELL_BIN\"; ldd \"$SHELL_BIN\" 2>/dev/null | grep \"not found\" ; echo \"---\"; sed -i \"s|headless: true,|headless: true, executablePath: process.env.CHROME_BIN \\|\\| undefined,|\" smoke.js && CHROME_BIN=\"$SHELL_BIN\" timeout 120 node smoke.js 2>&1 | head -5",
+        "description": "Try headless shell binary and check missing libraries",
+        "timeout": 150000
+      },
+      "timestamp": "2026-10-08T21:31:32.673Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01WyXxPXdN9tb6AcMpXZSGMX",
+      "status": "success",
+      "output": "bin: /root/.cache/puppeteer/chrome-headless-shell/linux-131.0.6778.204/chrome-headless-shell-linux64/chrome-headless-shell\n\tlibnss3.so => not found\n\tlibnssutil3.so => not found\n\tlibnspr4.so => not found\n\tlibatk-1.0.so.0 => not found\n\tlibatk-bridge-2.0.so.0 => not found\n\tlibatspi.so.0 => not found\n\tlibXdamage.so.1 => not found\n\tlibxkbcommon.so.0 => not found\n\tlibasound.so.2 => not found\n---\nFAILED Failed to launch the browser process!\n/root/.cache/puppeteer/chrome-headless-shell/linux-131.0.6778.204/chrome-headless-shell-linux64/chrome-headless-shell: error while loading shared libraries: libnss3.so: cannot open shared object file: No such file or directory\n\n\nTROUBLESHOOTING: https://pptr.dev/troubleshooting\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:31:33.214Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01ToQJsGL7pdPq6QYxh8cYHu",
+      "tool": "Bash",
+      "input": {
+        "command": "(command -v dnf && timeout 400 dnf install -y -q nss nspr atk at-spi2-atk at-spi2-core libXdamage libxkbcommon alsa-lib libXcomposite libXrandr libgbm mesa-libgbm 2>&1 | tail -3); echo \"dnf exit: $?\"; ldd <HOME>/.cache/puppeteer/chrome-headless-shell/linux-131.0.6778.204/chrome-headless-shell-linux64/chrome-headless-shell | grep \"not found\" || echo \"all libs resolved\"",
+        "description": "Install missing system libraries for headless Chrome",
+        "timeout": 420000
+      },
+      "timestamp": "2026-10-08T21:31:34.901Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01ToQJsGL7pdPq6QYxh8cYHu",
+      "status": "success",
+      "output": "dnf exit: 1\n\tlibnss3.so => not found\n\tlibnssutil3.so => not found\n\tlibnspr4.so => not found\n\tlibatk-1.0.so.0 => not found\n\tlibatk-bridge-2.0.so.0 => not found\n\tlibatspi.so.0 => not found\n\tlibXdamage.so.1 => not found\n\tlibxkbcommon.so.0 => not found\n\tlibasound.so.2 => not found",
+      "timestamp": "2026-10-08T21:31:34.950Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01EQD3DnfpCvC523SVjH5scK",
+      "tool": "Bash",
+      "input": {
+        "command": "echo \"PATH=$PATH\"; ls /usr/bin | grep -E '^(dnf|yum|apt-get|microdnf|rpm)$'; cat /etc/os-release | head -2; id -u",
+        "description": "Check package manager availability and user"
+      },
+      "timestamp": "2026-10-08T21:31:36.325Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01EQD3DnfpCvC523SVjH5scK",
+      "status": "success",
+      "output": "PATH=/root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\napt-get\nPRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\nNAME=\"Debian GNU/Linux\"\n0",
+      "timestamp": "2026-10-08T21:31:36.377Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The sandbox is Debian 12, so I'll use `apt-get` to install the Chrome runtime libraries.",
+      "timestamp": "2026-10-08T21:31:37.883Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HrZx1n4s6Uha3Qg2EG2JRh",
+      "tool": "Bash",
+      "input": {
+        "command": "export DEBIAN_FRONTEND=noninteractive; (timeout 300 apt-get update -qq 2>&1 | tail -2); timeout 500 apt-get install -y -qq libnss3 libatk1.0-0 libatk-bridge2.0-0 libatspi2.0-0 libxdamage1 libxkbcommon0 libasound2 libgbm1 libxcomposite1 libxrandr2 libpango-1.0-0 libcairo2 libcups2 libdrm2 libxfixes3 fonts-liberation ><TMP>/ramen-check/apt.log 2>&1; echo \"apt exit: $?\"; tail -2 <TMP>/ramen-check/apt.log; ldd <HOME>/.cache/puppeteer/chrome-headless-shell/linux-131.0.6778.204/chrome-headless-shell-linux64/chrome-headless-shell | grep \"not found\" || echo \"all libs resolved\"",
+        "description": "Install Chrome runtime libraries via apt-get",
+        "timeout": 600000
+      },
+      "timestamp": "2026-10-08T21:31:39.044Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HrZx1n4s6Uha3Qg2EG2JRh",
+      "status": "success",
+      "output": "apt exit: 0\nProcessing triggers for dbus (1.14.10-1~deb12u1) ...\r\nSetting up at-spi2-core (2.46.0-5) ...\r\nall libs resolved",
+      "timestamp": "2026-10-08T21:31:49.912Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Kr6CPb25qVmmp9tnaPWNJb",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && CHROME_BIN=$(ls -d <HOME>/.cache/puppeteer/chrome-headless-shell/*/chrome-headless-shell-linux64/chrome-headless-shell | head -1) timeout 120 node smoke.js 2>&1 | head -5; echo \"---full chrome check---\"; ldd <HOME>/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome | grep \"not found\" || echo \"full chrome libs resolved\"",
+        "description": "Re-run headless smoke test after installing libraries",
+        "timeout": 150000
+      },
+      "timestamp": "2026-10-08T21:31:51.447Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Kr6CPb25qVmmp9tnaPWNJb",
+      "status": "success",
+      "output": "browser version: HeadlessChrome/131.0.6778.204\n---full chrome check---\nfull chrome libs resolved\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:31:52.349Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Headless Chrome works now. Next I'll write the page: a Canvas 2D scene with a procedurally drawn bowl, steam from a particle system, pointer-driven ripples, wind, and parallax, a static still frame under reduced motion, and no external assets.",
+      "timestamp": "2026-10-08T21:32:12.619Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01MCqVM1WPYLQCcPjibmdosZ",
+      "tool": "Write",
+      "input": {
+        "file_path": "/app/index.html",
+        "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\n<meta name=\"color-scheme\" content=\"dark\">\n<meta name=\"theme-color\" content=\"#0b0604\">\n<title>Vegan Ramen</title>\n<style>\n  html, body {\n    margin: 0;\n    height: 100%;\n    overflow: hidden;\n    background: #0b0604;\n    overscroll-behavior: none;\n  }\n  #scene {\n    position: fixed;\n    inset: 0;\n    width: 100%;\n    height: 100%;\n    display: block;\n    touch-action: none;\n  }\n  /* Soft falloff keeps the eye on the bowl. */\n  .vignette {\n    position: fixed;\n    inset: 0;\n    pointer-events: none;\n    background: radial-gradient(ellipse 75% 70% at 50% 46%, rgba(0, 0, 0, 0) 55%, rgba(3, 2, 1, 0.85) 100%);\n  }\n</style>\n</head>\n<body>\n<canvas id=\"scene\" role=\"img\" aria-label=\"A steaming bowl of vegan ramen\"></canvas>\n<div class=\"vignette\" aria-hidden=\"true\"></div>\n<script>\n(() => {\n  'use strict';\n\n  const canvas = document.getElementById('scene');\n  const ctx = canvas.getContext('2d');\n  const calmQuery = window.matchMedia('(prefers-reduced-motion: reduce)');\n  const TAU = Math.PI * 2;\n\n  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));\n  const lerp = (a, b, t) => a + (b - a) * t;\n  const smooth = (t) => {\n    const c = clamp(t, 0, 1);\n    return c * c * (3 - 2 * c);\n  };\n\n  // Seeded PRNG (mulberry32): the composition is identical on every load.\n  function mulberry32(seed) {\n    return () => {\n      seed = (seed + 0x6d2b79f5) | 0;\n      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);\n      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;\n      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;\n    };\n  }\n  let rnd = mulberry32(1);\n  const span = (a, b) => a + (b - a) * rnd();\n\n  // ---- Design space: authored in 1000 units and scaled to fit the viewport.\n  const FIT = { x: 130, y: 30, w: 740, h: 840 };\n  const BOWL_X = 500;\n  const RIM_Y = 560, RIM_R = 318, WALL = 16;  // outer rim and wall thickness\n  const BROTH_Y = 586, BROTH_R = 286;         // broth sits a little below the rim\n  const FOOT_Y = 735, FOOT_R = 170;           // foot ring on the table\n\n  const view = { W: 1, H: 1, dpr: 1, S: 1, ox: 0, oy: 0, ui: 1 };\n  const par = { x: 0, y: 0 };                 // eased parallax, -1..1\n  const ptr = { tx: 0, ty: 0, px: 0, py: 0, x: 0, y: 0, vx: 0, vy: 0, on: false, touch: false, seen: 0, glow: 0 };\n  let K = 0.58;                               // ellipse ratio = viewing angle\n  let bx = BOWL_X, by = BROTH_Y;              // broth centre, including parallax\n  let reduced = false;\n  let rippleAcc = 0, puffAcc = 0, bubbleAcc = 0;\n\n  // ---- Soft sprites, painted once and reused.\n  function blob(size, stops) {\n    const c = document.createElement('canvas');\n    c.width = c.height = size;\n    const g = c.getContext('2d');\n    const h = size / 2;\n    const grd = g.createRadialGradient(h, h, 0, h, h, h);\n    for (const [o, col] of stops) grd.addColorStop(o, col);\n    g.fillStyle = grd;\n    g.fillRect(0, 0, size, size);\n    return c;\n  }\n  const steamImg = blob(128, [[0, 'rgba(255,244,230,0.9)'], [0.45, 'rgba(255,232,210,0.3)'], [1, 'rgba(255,226,200,0)']]);\n  const warmImg = (rgb) => blob(128, [[0, `rgba(${rgb},0.9)`], [0.5, `rgba(${rgb},0.22)`], [1, `rgba(${rgb},0)`]]);\n  const bokehImg = [warmImg('255,160,80'), warmImg('255,198,130'), warmImg('90,180,165')];\n  const moteImg = blob(32, [[0, 'rgba(255,242,220,1)'], [0.4, 'rgba(255,220,170,0.5)'], [1, 'rgba(255,200,140,0)']]);\n\n  const NOODLE_TONES = ['#f2c875', '#e9b35c', '#f8dc96'];\n\n  // ---- Scene composition. Toppings live in \"plane\" units: the unit disc of the broth.\n  let noodles, nori, leaves, shiitake, menma, tofu, corn, scallions, sesame, chili, chiliSheen, oil;\n  let motes, bokeh, steam, ripples;\n\n  const scatter = (n, rad) => Array.from({ length: n }, () => {\n    const a = rnd() * TAU, d = Math.sqrt(rnd()) * rad;\n    return { u: Math.cos(a) * d, v: Math.sin(a) * d };\n  });\n\n  function build() {\n    rnd = mulberry32(20261008);\n    noodles = Array.from({ length: 34 }, () => {\n      const a0 = span(0, TAU), arc = span(1, 2.2), r0 = span(0.15, 0.8);\n      const r1 = clamp(r0 + span(-0.5, 0.5), 0.1, 0.88);\n      const pts = [0, 1, 2, 3].map((k) => {\n        const f = k / 3, a = a0 + arc * f;\n        const r = lerp(r0, r1, f) + (k === 1 || k === 2 ? span(-0.12, 0.12) : 0);\n        return [Math.cos(a) * r, Math.sin(a) * r];\n      });\n      const roll = rnd();\n      return { pts, lift: roll < 0.55 ? 0 : roll < 0.85 ? 1 : 2, ph: span(0, TAU), sd: span(0, 40), tone: Math.floor(rnd() * 3) };\n    });\n    nori = { u: -0.44, v: -0.34, hl: 0.26, hw: 0.065, rot: -0.45 };\n    leaves = [\n      { u: 0.42, v: -0.3, rx: 0.2, ry: 0.085, rot: 0.55 },\n      { u: 0.0, v: -0.52, rx: 0.16, ry: 0.07, rot: -0.2 },\n    ];\n    shiitake = [\n      { u: -0.14, v: -0.12, r: 0.13 },\n      { u: 0.3, v: 0.1, r: 0.115 },\n      { u: -0.62, v: 0.04, r: 0.1 },\n    ];\n    menma = [\n      { u: -0.3, v: 0.24, hl: 0.11, hw: 0.04, rot: 0.6 },\n      { u: 0.12, v: 0.42, hl: 0.1, hw: 0.04, rot: -0.3 },\n      { u: 0.6, v: 0.3, hl: 0.09, hw: 0.035, rot: 0.9 },\n    ];\n    tofu = [\n      { u: 0.0, v: 0.18, s: 0.2, rot: 0.4, gold: true },\n      { u: 0.56, v: -0.08, s: 0.16, rot: -0.3, gold: true },\n      { u: -0.5, v: 0.36, s: 0.17, rot: 0.25, gold: false },\n    ];\n    corn = Array.from({ length: 8 }, () => ({ u: 0.44 + span(-0.11, 0.11), v: 0.4 + span(-0.08, 0.08), rot: span(0, 3.1) }));\n    scallions = scatter(26, 0.86).map((p) => ({ ...p, r: span(0.02, 0.03) }));\n    sesame = scatter(90, 0.92).map((p) => ({ ...p, r: span(0.006, 0.011), dark: rnd() < 0.3 }));\n    chili = scatter(16, 0.7).map((p) => ({ ...p, r: span(0.01, 0.022) }));\n    chiliSheen = [{ u: -0.3, v: 0.3, r: 0.42 }, { u: 0.5, v: -0.2, r: 0.3 }];\n    oil = scatter(18, 0.9).map((p) => ({ ...p, r: span(0.02, 0.05), ph: span(0, TAU) }));\n    motes = Array.from({ length: 80 }, () => ({\n      x: rnd(), y: rnd(), z: span(0.25, 1), sz: span(0.8, 2.4), sp: span(3, 12),\n      ph: span(0, TAU), tw: span(0.5, 1.6), a: span(0.25, 0.8),\n    }));\n    bokeh = Array.from({ length: 9 }, (_, i) => ({\n      x: rnd(), y: rnd(), r: span(60, 170), img: bokehImg[i % 3], a: span(0.05, 0.1), z: span(0.2, 0.7), ph: span(0, TAU),\n    }));\n    steam = [];\n    ripples = [];\n  }\n\n  // ---- Layout: fit the design space to the viewport, sharp on high-DPI screens.\n  function layout() {\n    view.W = window.innerWidth;\n    view.H = window.innerHeight;\n    view.dpr = Math.min(window.devicePixelRatio || 1, 2);\n    canvas.width = Math.round(view.W * view.dpr);\n    canvas.height = Math.round(view.H * view.dpr);\n    view.S = Math.min((view.W * 0.92) / FIT.w, (view.H * 0.9) / FIT.h);\n    view.ox = view.W / 2 - (FIT.x + FIT.w / 2) * view.S;\n    view.oy = view.H / 2 - (FIT.y + FIT.h / 2) * view.S;\n    view.ui = clamp(Math.min(view.W, view.H) / 800, 0.6, 1.6);\n  }\n\n  function setDesign() {\n    const { S, ox, oy, dpr } = view;\n    ctx.setTransform(S * dpr, 0, 0, S * dpr, ox * dpr, oy * dpr);\n  }\n  // Plane: the unit disc of the broth surface, foreshortened by K.\n  function setPlane() {\n    setDesign();\n    ctx.translate(bx, by);\n    ctx.scale(BROTH_R, BROTH_R * K);\n  }\n\n  // ---- Helpers for gradients and shapes.\n  function gradient(g, stops) {\n    for (const [o, c] of stops) g.addColorStop(o, c);\n    return g;\n  }\n  const linear = (x0, y0, x1, y1, stops) => gradient(ctx.createLinearGradient(x0, y0, x1, y1), stops);\n  const radial = (x0, y0, r0, x1, y1, r1, stops) => gradient(ctx.createRadialGradient(x0, y0, r0, x1, y1, r1), stops);\n  function softEllipse(x, y, rx, ry, stops) {\n    ctx.save();\n    ctx.translate(x, y);\n    ctx.scale(1, ry / rx);\n    ctx.fillStyle = radial(0, 0, 0, 0, 0, rx, stops);\n    ctx.beginPath();\n    ctx.arc(0, 0, rx, 0, TAU);\n    ctx.fill();\n    ctx.restore();\n  }\n  // Corners of a rectangle centred at (u, v), in plane units.\n  function rect(u, v, hl, hw, rot) {\n    const c = Math.cos(rot), s = Math.sin(rot);\n    return [[-hl, -hw], [hl, -hw], [hl, hw], [-hl, hw]].map(([x, y]) => [u + x * c - y * s, v + x * s + y * c]);\n  }\n  function poly(pts) {\n    ctx.beginPath();\n    pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));\n    ctx.closePath();\n  }\n  function bowlPath(cx, cy) {\n    const r = RIM_R, fr = FOOT_R, fy = cy + FOOT_Y - RIM_Y;\n    ctx.beginPath();\n    ctx.moveTo(cx - r, cy);\n    ctx.ellipse(cx, cy, r, r * K, 0, Math.PI, TAU);                             // back rim\n    ctx.bezierCurveTo(cx + r, cy + 150, cx + fr * 1.08, fy - 40, cx + fr, fy);  // right flank\n    ctx.ellipse(cx, fy, fr, fr * K, 0, 0, Math.PI);                             // foot\n    ctx.bezierCurveTo(cx - fr * 1.08, fy - 40, cx - r, cy + 150, cx - r, cy);   // left flank\n    ctx.closePath();\n  }\n\n  // ---- Backdrop: deep warm dark, breathing ambient glow, out-of-focus lights.\n  function drawBackdrop(t) {\n    const { W, H, dpr, S, ox, oy, ui } = view;\n    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\n    ctx.globalCompositeOperation = 'source-over';\n    const cx = ox + BOWL_X * S, cy = oy + BROTH_Y * S, big = Math.max(W, H);\n    ctx.fillStyle = radial(cx, cy, 0, cx, cy, big * 0.8, [[0, '#2b170c'], [0.4, '#130a05'], [1, '#050302']]);\n    ctx.fillRect(0, 0, W, H);\n\n    const breathe = 1 + 0.07 * Math.sin(t * 0.9) + 0.03 * Math.sin(t * 2.7 + 1.1);\n    ctx.globalCompositeOperation = 'lighter';\n    ctx.fillStyle = radial(cx, cy, 0, cx, cy, big * 0.45, [[0, `rgba(255,150,70,${0.3 * breathe})`], [1, 'rgba(255,120,50,0)']]);\n    ctx.fillRect(0, 0, W, H);\n\n    for (const b of bokeh) {\n      const x = b.x * W + par.x * 26 * b.z;\n      const y = b.y * H + par.y * 18 * b.z + Math.sin(t * 0.08 + b.ph) * 10;\n      const r = b.r * ui;\n      ctx.globalAlpha = b.a * (0.8 + 0.2 * Math.sin(t * 0.4 + b.ph));\n      ctx.drawImage(b.img, x - r, y - r, r * 2, r * 2);\n    }\n    ctx.globalAlpha = 1;\n    ctx.globalCompositeOperation = 'source-over';\n  }\n\n  // ---- The bowl.\n  function drawBowl(t) {\n    setDesign();\n    const cx = BOWL_X + par.x * 4, cy = RIM_Y + par.y * 2.5;\n    const ir = RIM_R - WALL;\n\n    // Warm pool of light on the table, and the contact shadow under the foot.\n    softEllipse(BOWL_X, FOOT_Y + 100, 480, 124, [[0, 'rgba(255,150,70,0.2)'], [1, 'rgba(255,120,40,0)']]);\n    softEllipse(BOWL_X + 10, FOOT_Y + 102, 236, 46, [[0, 'rgba(0,0,0,0.9)'], [1, 'rgba(0,0,0,0)']]);\n\n    // Outer wall: glossy dark lacquer, lit from the left.\n    bowlPath(cx, cy);\n    ctx.fillStyle = linear(cx - RIM_R, 0, cx + RIM_R, 0, [[0, '#3d3129'], [0.28, '#241d18'], [0.8, '#120e0b'], [1, '#0b0807']]);\n    ctx.fill();\n\n    // Inner glaze, visible on the far wall above the broth.\n    ctx.beginPath();\n    ctx.ellipse(cx, cy, ir, ir * K, 0, 0, TAU);\n    ctx.fillStyle = linear(0, cy - ir * K, 0, cy + ir * K, [[0, '#5d3c26'], [0.45, '#2c1c12'], [1, '#170e08']]);\n    ctx.fill();\n\n    // Everything inside the bowl is clipped to the inner glaze.\n    ctx.save();\n    ctx.beginPath();\n    ctx.ellipse(cx, cy, ir, ir * K, 0, 0, TAU);\n    ctx.clip();\n    drawBroth(t);\n    drawRipples();\n    drawToppingsBase();\n    drawNoodles(0, t);\n    drawToppingsTop();\n    drawNoodles(1, t);\n    drawNoodles(2, t);\n    drawGarnish();\n    drawGlint();\n    ctx.restore();\n\n    // Rim: lit far edge and a glossy front lip.\n    setDesign();\n    ctx.lineWidth = 2;\n    ctx.strokeStyle = 'rgba(255,226,186,0.3)';\n    ctx.beginPath();\n    ctx.ellipse(cx, cy, RIM_R, RIM_R * K, 0, Math.PI, TAU);\n    ctx.stroke();\n    ctx.lineWidth = 3.2;\n    ctx.strokeStyle = 'rgba(255,198,136,0.26)';\n    ctx.beginPath();\n    ctx.ellipse(cx, cy, RIM_R, RIM_R * K, 0, 0, Math.PI);\n    ctx.stroke();\n\n    drawChopsticks();\n  }\n\n  function drawBroth(t) {\n    setPlane();\n    ctx.beginPath();\n    for (let i = 0; i <= 140; i++) {\n      const a = (i / 140) * TAU;\n      const w = 1 + 0.006 * Math.sin(3 * a + t * 0.7) + 0.004 * Math.sin(5 * a - t * 0.9);\n      if (i) ctx.lineTo(Math.cos(a) * w, Math.sin(a) * w);\n      else ctx.moveTo(Math.cos(a) * w, Math.sin(a) * w);\n    }\n    ctx.closePath();\n    ctx.fillStyle = radial(-0.22, -0.3, 0.02, 0, 0, 1.12, [[0, '#ffd98e'], [0.3, '#e39d48'], [0.66, '#94491a'], [1, '#3a1d09']]);\n    ctx.fill();\n\n    // Chilli oil pooling under the noodles.\n    for (const s of chiliSheen) {\n      ctx.beginPath();\n      ctx.arc(s.u, s.v, s.r, 0, TAU);\n      ctx.fillStyle = radial(s.u, s.v, 0, s.u, s.v, s.r, [[0, 'rgba(230,70,35,0.28)'], [1, 'rgba(230,70,35,0)']]);\n      ctx.fill();\n    }\n    // Glossy fat droplets drifting on the surface.\n    for (const o of oil) {\n      const u = o.u + Math.sin(t * 0.2 + o.ph) * 0.008, v = o.v + Math.cos(t * 0.17 + o.ph) * 0.005;\n      ctx.beginPath();\n      ctx.arc(u, v, o.r, 0, TAU);\n      ctx.fillStyle = radial(u - o.r * 0.3, v - o.r * 0.3, o.r * 0.1, u, v, o.r, [[0, 'rgba(255,246,214,0.95)'], [0.35, 'rgba(255,190,90,0.55)'], [1, 'rgba(214,110,30,0.1)']]);\n      ctx.fill();\n    }\n  }\n\n  // Ripples and simmer bubbles, drawn in design units so their rings stay round.\n  function drawRipples() {\n    setDesign();\n    ctx.lineWidth = 1.4;\n    ctx.strokeStyle = 'rgb(255,236,206)';\n    for (const r of ripples) {\n      const k = r.age / r.life;\n      const rr = r.rmax * (1 - (1 - k) * (1 - k)) * BROTH_R;\n      ctx.globalAlpha = r.a * (1 - k) * (1 - k);\n      ctx.beginPath();\n      ctx.ellipse(bx + r.u * BROTH_R, by + r.v * BROTH_R * K, rr, rr * K, 0, 0, TAU);\n      ctx.stroke();\n    }\n    ctx.globalAlpha = 1;\n  }\n\n  function drawToppingsBase() {\n    setPlane();\n    // Nori, half-submerged at the back.\n    const nc = rect(nori.u, nori.v, nori.hl, nori.hw, nori.rot);\n    poly(nc);\n    ctx.fillStyle = linear(nc[0][0], nc[0][1], nc[2][0], nc[2][1], [[0, '#26402f'], [0.5, '#0d1a12'], [1, '#1d3224']]);\n    ctx.fill();\n    // Bok choy: glossy leaves with a pale midrib.\n    for (const L of leaves) {\n      ctx.beginPath();\n      ctx.ellipse(L.u, L.v, L.rx, L.ry, L.rot, 0, TAU);\n      ctx.fillStyle = radial(L.u - 0.05, L.v - 0.03, 0.02, L.u, L.v, L.rx, [[0, '#c6ea8c'], [0.6, '#5d9b3a'], [1, '#2c5a22']]);\n      ctx.fill();\n      const dx = Math.cos(L.rot) * L.rx * 0.75, dy = Math.sin(L.rot) * L.rx * 0.75;\n      ctx.beginPath();\n      ctx.moveTo(L.u - dx, L.v - dy);\n      ctx.lineTo(L.u + dx, L.v + dy);\n      ctx.strokeStyle = 'rgba(240,255,220,0.5)';\n      ctx.lineWidth = 0.007;\n      ctx.stroke();\n    }\n    // Shiitake caps.\n    for (const s of shiitake) {\n      ctx.beginPath();\n      ctx.arc(s.u, s.v, s.r, 0, TAU);\n      ctx.fillStyle = radial(s.u - s.r * 0.3, s.v - s.r * 0.3, s.r * 0.1, s.u, s.v, s.r, [[0, '#8e5d38'], [0.7, '#4b2a16'], [1, '#2a160a']]);\n      ctx.fill();\n      ctx.strokeStyle = 'rgba(232,206,165,0.45)';\n      ctx.lineWidth = 0.008;\n      ctx.stroke();\n    }\n    // Menma (seasoned bamboo) slices.\n    for (const m of menma) {\n      const pts = rect(m.u, m.v, m.hl, m.hw, m.rot);\n      poly(pts);\n      ctx.fillStyle = linear(pts[0][0], pts[0][1], pts[2][0], pts[2][1], [[0, '#f2e2b6'], [1, '#c4a263']]);\n      ctx.fill();\n    }\n  }\n\n  // Tofu cubes and corn sit on the noodles.\n  function drawToppingsTop() {\n    setPlane();\n    for (const f of tofu) {\n      const top = rect(f.u, f.v, f.s / 2, f.s / 2, f.rot);\n      poly(top.map(([x, y]) => [x, y + 0.02]));\n      ctx.fillStyle = f.gold ? '#8c4c1b' : '#bfb392';\n      ctx.fill();\n      poly(top);\n      const a = top[0], c = top[2];\n      ctx.fillStyle = f.gold\n        ? linear(a[0], a[1], c[0], c[1], [[0, '#ffe2a0'], [0.5, '#e7a955'], [1, '#b8692a']])\n        : linear(a[0], a[1], c[0], c[1], [[0, '#fffdf7'], [1, '#e4d9bd']]);\n      ctx.fill();\n      ctx.strokeStyle = 'rgba(120,70,25,0.35)';\n      ctx.lineWidth = 0.005;\n      ctx.stroke();\n    }\n    for (const k of corn) {\n      ctx.beginPath();\n      ctx.ellipse(k.u, k.v, 0.05, 0.03, k.rot, 0, TAU);\n      ctx.fillStyle = radial(k.u - 0.015, k.v - 0.01, 0.005, k.u, k.v, 0.05, [[0, '#fff1a0'], [0.5, '#ffcc3a'], [1, '#d28d12']]);\n      ctx.fill();\n    }\n  }\n\n  // Scallion rings, sesame, and chilli flecks.\n  function drawGarnish() {\n    setPlane();\n    ctx.beginPath();\n    for (const s of scallions) { ctx.moveTo(s.u + s.r, s.v); ctx.arc(s.u, s.v, s.r, 0, TAU); }\n    ctx.fillStyle = 'rgba(92,156,58,0.92)';\n    ctx.fill();\n    ctx.beginPath();\n    for (const s of scallions) { ctx.moveTo(s.u + s.r * 0.55, s.v); ctx.arc(s.u, s.v, s.r * 0.55, 0, TAU); }\n    ctx.fillStyle = 'rgba(242,252,224,0.95)';\n    ctx.fill();\n\n    ctx.beginPath();\n    for (const s of sesame) if (!s.dark) { ctx.moveTo(s.u + s.r, s.v); ctx.arc(s.u, s.v, s.r, 0, TAU); }\n    ctx.fillStyle = '#f2dfb4';\n    ctx.fill();\n    ctx.beginPath();\n    for (const s of sesame) if (s.dark) { ctx.moveTo(s.u + s.r, s.v); ctx.arc(s.u, s.v, s.r, 0, TAU); }\n    ctx.fillStyle = '#4a2b16';\n    ctx.fill();\n\n    ctx.beginPath();\n    for (const c of chili) { ctx.moveTo(c.u + c.r, c.v); ctx.arc(c.u, c.v, c.r, 0, TAU); }\n    ctx.fillStyle = 'rgba(214,52,30,0.9)';\n    ctx.fill();\n  }\n\n  // Specular sheen across the broth, following the pointer a little.\n  function drawGlint() {\n    setPlane();\n    ctx.globalCompositeOperation = 'screen';\n    ctx.beginPath();\n    ctx.arc(0, 0, 1, 0, TAU);\n    const gx = -0.3 + par.x * 0.1, gy = -0.42 + par.y * 0.05;\n    ctx.fillStyle = radial(gx, gy, 0, gx, gy, 0.5, [[0, 'rgba(255,240,210,0.32)'], [1, 'rgba(255,240,210,0)']]);\n    ctx.fill();\n    ctx.globalCompositeOperation = 'source-over';\n  }\n\n  // Each noodle is a wavy cubic strand: a shadow, the noodle body, then a highlight.\n  function strand(n, t, ox, oy) {\n    const q = n.pts.map(([u, v], k) => [\n      bx + u * BROTH_R + ox + Math.sin(t * 0.55 + n.sd + k * 1.9) * 2.4,\n      by + v * BROTH_R * K + oy + Math.cos(t * 0.42 + n.sd * 0.6 + k * 1.3) * 1.6 - n.lift * 12,\n    ]);\n    const p = new Path2D();\n    const N = 60;\n    for (let i = 0; i <= N; i++) {\n      const s = i / N, m = 1 - s;\n      const x = m * m * m * q[0][0] + 3 * m * m * s * q[1][0] + 3 * m * s * s * q[2][0] + s * s * s * q[3][0];\n      const y = m * m * m * q[0][1] + 3 * m * m * s * q[1][1] + 3 * m * s * s * q[2][1] + s * s * s * q[3][1];\n      const dx = 3 * (m * m * (q[1][0] - q[0][0]) + 2 * m * s * (q[2][0] - q[1][0]) + s * s * (q[3][0] - q[2][0]));\n      const dy = 3 * (m * m * (q[1][1] - q[0][1]) + 2 * m * s * (q[2][1] - q[1][1]) + s * s * (q[3][1] - q[2][1]));\n      const len = Math.hypot(dx, dy) || 1;\n      const crimp = Math.sin(i * 2.1 + n.ph + t * 1.3) * 2.6;\n      const px = x - (dy / len) * crimp, py = y + (dx / len) * crimp;\n      if (i) p.lineTo(px, py);\n      else p.moveTo(px, py);\n    }\n    return p;\n  }\n\n  function drawNoodles(level, t) {\n    setDesign();\n    ctx.lineCap = 'round';\n    ctx.lineJoin = 'round';\n    for (const n of noodles) {\n      if (n.lift !== level) continue;\n      const path = strand(n, t, par.x * 4, par.y * 3);\n      ctx.strokeStyle = 'rgba(32,14,5,0.45)';\n      ctx.lineWidth = 6.4;\n      ctx.save();\n      ctx.translate(1.6, 2.6);\n      ctx.stroke(path);\n      ctx.restore();\n      ctx.strokeStyle = NOODLE_TONES[n.tone];\n      ctx.lineWidth = 5.2;\n      ctx.stroke(path);\n      ctx.strokeStyle = 'rgba(255,246,214,0.75)';\n      ctx.lineWidth = 1.5;\n      ctx.save();\n      ctx.translate(-1.1, -1.3);\n      ctx.stroke(path);\n      ctx.restore();\n    }\n  }\n\n  // Chopsticks resting across the right-hand rim.\n  function drawChopsticks() {\n    setDesign();\n    ctx.lineCap = 'round';\n    for (const [dx, dy] of [[0, 0], [-10, 12]]) {\n      const x0 = 690 + dx, y0 = 396 + dy, x1 = 872 + dx, y1 = 520 + dy;\n      ctx.beginPath();\n      ctx.moveTo(x0 + 6, y0 + 10);\n      ctx.lineTo(x1 + 6, y1 + 12);\n      ctx.strokeStyle = 'rgba(0,0,0,0.5)';\n      ctx.lineWidth = 10;\n      ctx.stroke();\n      ctx.beginPath();\n      ctx.moveTo(x0, y0);\n      ctx.lineTo(x1, y1);\n      ctx.strokeStyle = linear(x0, y0, x1, y1, [[0, '#e0ad74'], [1, '#8a5628']]);\n      ctx.lineWidth = 8;\n      ctx.stroke();\n      ctx.beginPath();\n      ctx.moveTo(x0 - 2, y0 - 2);\n      ctx.lineTo(x1 - 2, y1 - 2);\n      ctx.strokeStyle = 'rgba(255,236,200,0.45)';\n      ctx.lineWidth = 1.6;\n      ctx.stroke();\n    }\n  }\n\n  // ---- Steam: soft puffs that rise, widen, and drift; the pointer pushes them.\n  function puff(x, y, push) {\n    steam.push({\n      x0: x, y0: y, wx: 0, wv: push, age: 0, life: span(5, 8),\n      speed: span(38, 70), r0: span(14, 30), grow: span(60, 120),\n      peak: span(0.07, 0.15), ph: span(0, TAU), fw: span(0.5, 1.1), amp: span(10, 26),\n    });\n  }\n\n  function drawSteam() {\n    setDesign();\n    ctx.globalCompositeOperation = 'lighter';\n    for (const p of steam) {\n      const k = p.age / p.life;\n      const a = p.peak * smooth(k / 0.15) * Math.pow(1 - k, 1.6);\n      if (a < 0.002) continue;\n      const r = p.r0 + p.grow * smooth(k);\n      const x = p.x0 + p.wx + Math.sin(p.age * p.fw + p.ph) * p.amp * (0.25 + k);\n      const y = p.y0 - p.speed * p.age * (1 - 0.3 * k);\n      ctx.globalAlpha = a;\n      ctx.drawImage(steamImg, x - r, y - r, r * 2, r * 2);\n    }\n    ctx.globalAlpha = 1;\n    ctx.globalCompositeOperation = 'source-over';\n  }\n\n  // Warm light that follows the pointer.\n  function drawCursorGlow() {\n    if (ptr.glow < 0.01) return;\n    const { W, H, dpr } = view;\n    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\n    const r = Math.min(W, H) * 0.45;\n    ctx.globalCompositeOperation = 'lighter';\n    ctx.fillStyle = radial(ptr.x, ptr.y, 0, ptr.x, ptr.y, r, [[0, `rgba(255,170,90,${0.16 * ptr.glow})`], [1, 'rgba(255,140,60,0)']]);\n    ctx.fillRect(0, 0, W, H);\n    ctx.globalCompositeOperation = 'source-over';\n  }\n\n  // Drifting dust catching the warm light.\n  function drawMotes(t) {\n    const { W, H, dpr, S, ox, oy, ui } = view;\n    const cx = ox + BOWL_X * S, cy = oy + BROTH_Y * S, reach = 420 * S * 2.2;\n    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\n    ctx.globalCompositeOperation = 'lighter';\n    for (const m of motes) {\n      const x = m.x * W + par.x * 14 * m.z + Math.sin(t * 0.25 + m.ph) * 8;\n      const y = m.y * H + par.y * 9 * m.z;\n      const near = 1 - clamp(Math.hypot(x - cx, y - cy) / reach, 0, 1);\n      const tw = 0.5 + 0.5 * Math.sin(t * m.tw + m.ph * 3);\n      const s = m.sz * m.z * 5 * ui;\n      ctx.globalAlpha = m.a * m.z * tw * (0.35 + 0.65 * near);\n      ctx.drawImage(moteImg, x - s / 2, y - s / 2, s, s);\n    }\n    ctx.globalAlpha = 1;\n    ctx.globalCompositeOperation = 'source-over';\n  }\n\n  // ---- Simulation.\n  function update(dt, t) {\n    const now = performance.now();\n    if (ptr.on && ptr.touch && now - ptr.seen > 2500) ptr.on = false;\n\n    // Parallax target: the pointer, or a slow wander when nobody is pointing.\n    let tx = 0, ty = 0;\n    if (!reduced) {\n      tx = ptr.on ? (ptr.tx / view.W) * 2 - 1 : Math.sin(t * 0.11) * 0.5;\n      ty = ptr.on ? (ptr.ty / view.H) * 2 - 1 : Math.sin(t * 0.07 + 1.3) * 0.35;\n    }\n    const ease = 1 - Math.exp(-dt * 2.4);\n    par.x += (tx - par.x) * ease;\n    par.y += (ty - par.y) * ease;\n    bx = BOWL_X + par.x * 9;\n    by = BROTH_Y + par.y * 5;\n    K = 0.58 + 0.03 * par.y;\n\n    // Cursor light, its eased position, and pointer velocity in design units.\n    ptr.glow += ((ptr.on ? 1 : 0) - ptr.glow) * (1 - Math.exp(-dt * 3));\n    ptr.x += (ptr.tx - ptr.x) * (1 - Math.exp(-dt * 10));\n    ptr.y += (ptr.ty - ptr.y) * (1 - Math.exp(-dt * 10));\n    const inv = 1 / Math.max(dt, 1e-3) / view.S;\n    ptr.vx = clamp(lerp(ptr.vx, (ptr.tx - ptr.px) * inv, 0.3), -4000, 4000);\n    ptr.vy = clamp(lerp(ptr.vy, (ptr.ty - ptr.py) * inv, 0.3), -4000, 4000);\n    ptr.px = ptr.tx;\n    ptr.py = ptr.ty;\n\n    const pdx = (ptr.tx - view.ox) / view.S, pdy = (ptr.ty - view.oy) / view.S;\n    if (ptr.on && !reduced) {\n      // Moving the pointer through the steam pushes it along.\n      for (const p of steam) {\n        const d = Math.hypot(p.x0 + p.wx - pdx, p.y0 - p.speed * p.age - pdy);\n        if (d < 160) {\n          const k = 1 - d / 160;\n          p.wv += ptr.vx * k * dt * 0.1;\n          p.y0 += ptr.vy * k * dt * 0.05;\n        }\n      }\n      // Dragging across the broth leaves ripples behind.\n      const pu = (pdx - bx) / BROTH_R, pv = (pdy - by) / (BROTH_R * K);\n      const speed = Math.hypot(ptr.vx, ptr.vy);\n      if (pu * pu + pv * pv < 0.8 && speed > 40) {\n        rippleAcc += speed * dt;\n        if (rippleAcc > 70) {\n          rippleAcc = 0;\n          ripples.push({ u: pu, v: pv, age: 0, life: 1.8, rmax: span(0.14, 0.2), a: 0.6 });\n        }\n      }\n    }\n\n    // Steam keeps rising from the broth; small bubbles break the surface.\n    puffAcc += dt * 24;\n    while (puffAcc >= 1) {\n      puffAcc -= 1;\n      puff(bx + (rnd() + rnd() - 1) * BROTH_R * 0.7, by - 10 + span(-12, 12), 0);\n    }\n    bubbleAcc += dt;\n    if (bubbleAcc > 0.3) {\n      bubbleAcc = 0;\n      const a = span(0, TAU), d = Math.sqrt(rnd()) * 0.8;\n      ripples.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, age: 0, life: span(0.9, 1.4), rmax: span(0.02, 0.03), a: 0.35 });\n    }\n\n    for (let i = steam.length - 1; i >= 0; i--) {\n      const p = steam[i];\n      p.age += dt;\n      if (p.age >= p.life) {\n        steam[i] = steam[steam.length - 1];\n        steam.pop();\n        continue;\n      }\n      p.wv *= Math.exp(-dt * 1.4);\n      p.wx += p.wv * dt;\n    }\n    for (let i = ripples.length - 1; i >= 0; i--) {\n      const r = ripples[i];\n      r.age += dt;\n      if (r.age >= r.life) {\n        ripples[i] = ripples[ripples.length - 1];\n        ripples.pop();\n      }\n    }\n    for (const m of motes) {\n      m.y -= (m.sp * dt) / view.H;\n      if (m.y < -0.03) {\n        m.y += 1.06;\n        m.x = rnd();\n      }\n    }\n  }\n\n  function render(t) {\n    drawBackdrop(t);\n    drawBowl(t);\n    drawCursorGlow();\n    drawSteam();\n    drawMotes(t);\n    ctx.globalCompositeOperation = 'source-over';\n    ctx.globalAlpha = 1;\n  }\n\n  // ---- Loop and modes.\n  let raf = 0, last = 0, clock = 0;\n  function frame(now) {\n    const dt = clamp((now - last) / 1000, 0, 0.05);\n    last = now;\n    clock += dt;\n    update(dt, clock);\n    render(clock);\n    raf = requestAnimationFrame(frame);\n  }\n  function start() {\n    if (raf) return;\n    last = performance.now();\n    raf = requestAnimationFrame(frame);\n  }\n  function stop() {\n    cancelAnimationFrame(raf);\n    raf = 0;\n  }\n\n  // Reduced motion: a single still frame, with the steam already mid-simmer.\n  function renderStill() {\n    build();\n    for (let i = 0; i < 180; i++) update(1 / 30, i / 30);\n    render(6);\n  }\n\n  function applyMode() {\n    reduced = calmQuery.matches;\n    layout();\n    build();\n    if (reduced) {\n      stop();\n      renderStill();\n    } else {\n      start();\n    }\n  }\n\n  // ---- Pointer: parallax, cursor light, wind, ripples, and bursts of steam.\n  function onPointer(e) {\n    if (reduced) return;\n    if (!ptr.on) {\n      ptr.x = ptr.px = e.clientX;\n      ptr.y = ptr.py = e.clientY;\n    }\n    ptr.tx = e.clientX;\n    ptr.ty = e.clientY;\n    ptr.on = true;\n    ptr.touch = e.pointerType === 'touch';\n    ptr.seen = performance.now();\n  }\n  window.addEventListener('pointermove', onPointer, { passive: true });\n  window.addEventListener('pointerdown', (e) => {\n    onPointer(e);\n    if (reduced) return;\n    const dx = (e.clientX - view.ox) / view.S, dy = (e.clientY - view.oy) / view.S;\n    const pu = (dx - bx) / BROTH_R, pv = (dy - by) / (BROTH_R * K);\n    if (pu * pu + pv * pv < 0.8) ripples.push({ u: pu, v: pv, age: 0, life: 2.2, rmax: 0.3, a: 0.8 });\n    for (let i = 0; i < 14; i++) puff(dx + span(-20, 20), dy + span(-10, 10), span(-1, 1) * 40);\n  }, { passive: true });\n  window.addEventListener('pointerout', (e) => {\n    if (!e.relatedTarget) ptr.on = false;\n  });\n\n  window.addEventListener('resize', () => {\n    layout();\n    if (reduced) renderStill();\n  });\n  if (calmQuery.addEventListener) calmQuery.addEventListener('change', applyMode);\n  else calmQuery.addListener(applyMode);\n\n  applyMode();\n})();\n</script>\n</body>\n</html>\n"
+      },
+      "timestamp": "2026-10-08T21:32:54.615Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01MCqVM1WPYLQCcPjibmdosZ",
+      "status": "success",
+      "output": "File created successfully at: /app/index.html (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:32:54.656Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The page is written. Next I'll write a harness, kept outside `/app`, that loads it in headless Chrome, captures screenshots at several viewport sizes, checks for console and network errors, checks that no text is rendered, and measures the frame rate.",
+      "timestamp": "2026-10-08T21:32:58.124Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01FUs8u28TRn5RiLNyAvmXa6",
+      "tool": "Bash",
+      "input": {
+        "command": "mkdir -p <TMP>/ramen-check/shots && cd <TMP>/ramen-check && cat > shoot.js <<'EOF'\nconst puppeteer = require('puppeteer');\nconst path = require('path');\nconst URL_ = 'file://' + path.resolve('/app/index.html');\nconst OUT = '<TMP>/ramen-check/shots/';\nconst sizes = [\n  { name: 'desktop', w: 1440, h: 900, dpr: 1 },\n  { name: 'phone-portrait', w: 390, h: 844, dpr: 2, mobile: true },\n  { name: 'phone-landscape', w: 844, h: 390, dpr: 2, mobile: true },\n  { name: 'ultrawide', w: 2560, h: 1080, dpr: 1 },\n];\n(async () => {\n  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });\n  const report = {};\n  for (const s of sizes) {\n    const page = await browser.newPage();\n    const errors = [];\n    const requests = [];\n    page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));\n    page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(m.type() + ': ' + m.text()); });\n    page.on('request', (r) => requests.push(r.url()));\n    await page.setViewport({ width: s.w, height: s.h, deviceScaleFactor: s.dpr, isMobile: !!s.mobile, hasTouch: !!s.mobile });\n    await page.goto(URL_, { waitUntil: 'load' });\n    await new Promise((r) => setTimeout(r, 2500));\n    await page.screenshot({ path: OUT + s.name + '.png' });\n    const info = await page.evaluate(() => ({\n      text: document.body.innerText.trim(),\n      canvas: [document.getElementById('scene').width, document.getElementById('scene').height],\n      scroll: [document.documentElement.scrollWidth, document.documentElement.scrollHeight],\n      inner: [innerWidth, innerHeight],\n    }));\n    // frame rate over 3 seconds (headless, software GL: indicative only)\n    const fps = await page.evaluate(() => new Promise((resolve) => {\n      let n = 0; const t0 = performance.now();\n      const tick = () => { n++; if (performance.now() - t0 < 3000) requestAnimationFrame(tick); else resolve(n / ((performance.now() - t0) / 1000)); };\n      requestAnimationFrame(tick);\n    }));\n    report[s.name] = { ...info, fps: fps.toFixed(1), errors, externalRequests: requests.filter((u) => !u.startsWith('file:') && !u.startsWith('data:') && !u.startsWith('blob:')) };\n    await page.close();\n  }\n  console.log(JSON.stringify(report, null, 2));\n  await browser.close();\n})().catch((e) => { console.error('FAILED', e); process.exit(1); });\nEOF\ntimeout 300 node shoot.js 2>&1 | tail -80",
+        "description": "Screenshot the scene at four viewport sizes and collect checks",
+        "timeout": 320000
+      },
+      "timestamp": "2026-10-08T21:33:01.779Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01FUs8u28TRn5RiLNyAvmXa6",
+      "status": "success",
+      "output": "{\n  \"desktop\": {\n    \"text\": \"\",\n    \"canvas\": [\n      1440,\n      900\n    ],\n    \"scroll\": [\n      1440,\n      900\n    ],\n    \"inner\": [\n      1440,\n      900\n    ],\n    \"fps\": \"15.6\",\n    \"errors\": [],\n    \"externalRequests\": []\n  },\n  \"phone-portrait\": {\n    \"text\": \"\",\n    \"canvas\": [\n      780,\n      1688\n    ],\n    \"scroll\": [\n      390,\n      844\n    ],\n    \"inner\": [\n      390,\n      844\n    ],\n    \"fps\": \"15.5\",\n    \"errors\": [],\n    \"externalRequests\": []\n  },\n  \"phone-landscape\": {\n    \"text\": \"\",\n    \"canvas\": [\n      1688,\n      780\n    ],\n    \"scroll\": [\n      844,\n      390\n    ],\n    \"inner\": [\n      844,\n      390\n    ],\n    \"fps\": \"16.7\",\n    \"errors\": [],\n    \"externalRequests\": []\n  },\n  \"ultrawide\": {\n    \"text\": \"\",\n    \"canvas\": [\n      2560,\n      1080\n    ],\n    \"scroll\": [\n      2560,\n      1080\n    ],\n    \"inner\": [\n      2560,\n      1080\n    ],\n    \"fps\": \"11.4\",\n    \"errors\": [],\n    \"externalRequests\": []\n  }\n}\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:33:31.910Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The page runs without errors, makes no external requests, and renders no visible text. Software rendering gives about 15 fps, which mostly reflects this headless setup, but I'll look at it later. First, the desktop screenshot:",
+      "timestamp": "2026-10-08T21:33:33.244Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01VRFwX2p32aX8LWDqhVMEK8",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/desktop.png"
+      },
+      "timestamp": "2026-10-08T21:33:33.389Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01VRFwX2p32aX8LWDqhVMEK8",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"136360\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:33:33.443Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The bowl reads well, but three things need work: no steam is visible at all, the noodle crimp looks like zigzag wire, and the broth and background are too flat and brown. The missing steam is the biggest problem, so I'll inspect the particle state before changing anything.",
+      "timestamp": "2026-10-08T21:33:51.927Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01QwW62Nd36oLfTZZFobVM1h",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && sed 's|  applyMode();\\n})();|X|' /app/index.html | awk '{ if ($0 ~ /^  applyMode\\(\\);$/) print \"  window.__dbg = () => ({ steam: steam.length, sample: steam.slice(0,3).map(p => ({x0:p.x0,y0:p.y0,age:p.age,life:p.life,peak:p.peak,r0:p.r0,wx:p.wx})), ripples: ripples.length, S: view.S, ox: view.ox, oy: view.oy, bx, by, K, par, puffAcc });\"; print }' > debug.html && grep -c \"__dbg\" debug.html && cat > dbg.js <<'EOF'\nconst puppeteer = require('puppeteer');\n(async () => {\n  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });\n  const page = await browser.newPage();\n  await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });\n  page.on('pageerror', (e) => console.log('pageerror', e.message));\n  await page.goto('file://<TMP>/ramen-check/debug.html', { waitUntil: 'load' });\n  await new Promise((r) => setTimeout(r, 2500));\n  console.log(JSON.stringify(await page.evaluate(() => window.__dbg()), null, 1));\n  await browser.close();\n})();\nEOF\ntimeout 120 node dbg.js 2>&1 | head -60",
+        "description": "Inspect steam particle state in a debug copy",
+        "timeout": 150000
+      },
+      "timestamp": "2026-10-08T21:33:53.832Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01QwW62Nd36oLfTZZFobVM1h",
+      "status": "success",
+      "output": "1\n{\n \"steam\": 56,\n \"sample\": [\n  {\n   \"x0\": 439.5820347563351,\n   \"y0\": 567.9034091570204,\n   \"age\": 2.3495,\n   \"life\": 5.856865230249241,\n   \"peak\": 0.14704333230853078,\n   \"r0\": 16.71670376881957,\n   \"wx\": 0\n  },\n  {\n   \"x0\": 556.1214338239288,\n   \"y0\": 572.0311284826721,\n   \"age\": 2.2995,\n   \"life\": 6.573602698044851,\n   \"peak\": 0.14515528174117207,\n   \"r0\": 24.553057480603456,\n   \"wx\": 0\n  },\n  {\n   \"x0\": 537.95043958332,\n   \"y0\": 565.5576729976067,\n   \"age\": 2.2495000000000003,\n   \"life\": 7.686110920039937,\n   \"peak\": 0.14882780810818075,\n   \"r0\": 26.991034895181656,\n   \"wx\": 0\n  }\n ],\n \"ripples\": 3,\n \"S\": 0.9642857142857143,\n \"ox\": 237.85714285714283,\n \"oy\": 16.071428571428555,\n \"bx\": 500.9612289636583,\n \"by\": 587.7276804455454,\n \"K\": 0.5903660826732721,\n \"par\": {\n  \"x\": 0.10680321818425459,\n  \"y\": 0.3455360891090688\n },\n \"puffAcc\": 0.38800000000000345\n}\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:33:57.668Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The steam is being simulated correctly: 56 live puffs, rising at 40 to 70 units per second. The real problem is that the plumes rise too slowly and stay faint over the bright broth, so they never reach the space above the bowl. I'll check the phone layout before changing anything.",
+      "timestamp": "2026-10-08T21:34:13.918Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_012HjsLq2uNakHsWu6DNKoKr",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/phone-portrait.png"
+      },
+      "timestamp": "2026-10-08T21:34:14.049Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_012HjsLq2uNakHsWu6DNKoKr",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"140144\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:34:14.088Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The phone layout works: the bowl is centered and scales to width. The steam will fill the empty space above it once it rises properly. I'll make these changes:\n\n- **Steam:** rise in plumes. Each column shares a wobble phase so it sways as one shape, and it climbs faster.\n- **Backdrop:** a darker cached base with a tighter warm glow, instead of the muddy brown.\n- **Broth:** deeper color and darker edges.\n- **Noodles:** a gentler crimp and a lighter tone.\n- **Tofu, rim, and chopsticks:** more golden, with a lit rim edge.\n\nI'll start with the state declarations and the steam system.",
+      "timestamp": "2026-10-08T21:35:05.532Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Q6qNnAXA318EzoU3M97Qps",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "  let motes, bokeh, steam, ripples;",
+        "new_string": "  let motes, bokeh, plumes, steam, ripples;\n  let base = null;                            // cached dark backdrop, rebuilt on resize"
+      },
+      "timestamp": "2026-10-08T21:35:06.090Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Q6qNnAXA318EzoU3M97Qps",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:06.111Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01T2EiC9LtWyppT4W6xcswLp",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    steam = [];\n    ripples = [];\n  }",
+        "new_string": "    plumes = Array.from({ length: 7 }, (_, i) => ({\n      u: (i / 6 - 0.5) * 1.0 + span(-0.05, 0.05), ph: span(0, TAU), fw: span(0.5, 0.9),\n      amp: span(12, 26), speed: span(80, 115), rate: span(3, 5), acc: 0,\n    }));\n    steam = [];\n    ripples = [];\n  }"
+      },
+      "timestamp": "2026-10-08T21:35:06.740Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01T2EiC9LtWyppT4W6xcswLp",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:06.760Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HmQoxaigRPDUqqL6aqTwXA",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    view.ui = clamp(Math.min(view.W, view.H) / 800, 0.6, 1.6);\n  }",
+        "new_string": "    view.ui = clamp(Math.min(view.W, view.H) / 800, 0.6, 1.6);\n    buildBase();\n  }"
+      },
+      "timestamp": "2026-10-08T21:35:07.209Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HmQoxaigRPDUqqL6aqTwXA",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:07.223Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01DLTQKuMR9eq3isvc6nYKot",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "  // ---- Backdrop: deep warm dark, breathing ambient glow, out-of-focus lights.\n  function drawBackdrop(t) {\n    const { W, H, dpr, S, ox, oy, ui } = view;\n    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\n    ctx.globalCompositeOperation = 'source-over';\n    const cx = ox + BOWL_X * S, cy = oy + BROTH_Y * S, big = Math.max(W, H);\n    ctx.fillStyle = radial(cx, cy, 0, cx, cy, big * 0.8, [[0, '#2b170c'], [0.4, '#130a05'], [1, '#050302']]);\n    ctx.fillRect(0, 0, W, H);\n\n    const breathe = 1 + 0.07 * Math.sin(t * 0.9) + 0.03 * Math.sin(t * 2.7 + 1.1);\n    ctx.globalCompositeOperation = 'lighter';\n    ctx.fillStyle = radial(cx, cy, 0, cx, cy, big * 0.45, [[0, `rgba(255,150,70,${0.3 * breathe})`], [1, 'rgba(255,120,50,0)']]);\n    ctx.fillRect(0, 0, W, H);",
+        "new_string": "  // ---- Backdrop: a cached dark base, a breathing ambient glow, out-of-focus lights.\n  function buildBase() {\n    const { W, H, dpr, S, ox, oy } = view;\n    const cx = (ox + BOWL_X * S) * dpr, cy = (oy + BROTH_Y * S) * dpr, big = Math.max(W, H) * dpr;\n    base = document.createElement('canvas');\n    base.width = Math.round(W * dpr);\n    base.height = Math.round(H * dpr);\n    const g = base.getContext('2d');\n    g.fillStyle = gradient(g.createRadialGradient(cx, cy, 0, cx, cy, big * 0.8), [[0, '#1d100a'], [0.4, '#0d0604'], [1, '#040302']]);\n    g.fillRect(0, 0, base.width, base.height);\n  }\n\n  function drawBackdrop(t) {\n    const { W, H, dpr, S, ox, oy, ui } = view;\n    ctx.setTransform(1, 0, 0, 1, 0, 0);\n    ctx.globalCompositeOperation = 'source-over';\n    ctx.drawImage(base, 0, 0);\n    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\n    const cx = ox + BOWL_X * S, cy = oy + BROTH_Y * S, big = Math.max(W, H);\n\n    const breathe = 1 + 0.07 * Math.sin(t * 0.9) + 0.03 * Math.sin(t * 2.7 + 1.1);\n    const gr = big * 0.45;\n    ctx.globalCompositeOperation = 'lighter';\n    ctx.fillStyle = radial(cx, cy, 0, cx, cy, gr, [[0, `rgba(255,150,70,${0.24 * breathe})`], [1, 'rgba(255,120,50,0)']]);\n    ctx.fillRect(cx - gr, cy - gr, gr * 2, gr * 2);"
+      },
+      "timestamp": "2026-10-08T21:35:10.426Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01DLTQKuMR9eq3isvc6nYKot",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:10.449Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The first four edits applied. Next: broth depth, noodle crimp and tone, golden tofu, the lit rim, and chopstick wood.",
+      "timestamp": "2026-10-08T21:35:11.722Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HrAFm7PqRbgry49KquEnTa",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    ctx.fillStyle = radial(-0.22, -0.3, 0.02, 0, 0, 1.12, [[0, '#ffd98e'], [0.3, '#e39d48'], [0.66, '#94491a'], [1, '#3a1d09']]);\n    ctx.fill();",
+        "new_string": "    ctx.fillStyle = radial(-0.25, -0.35, 0.02, 0, 0, 1.15, [[0, '#ffd27f'], [0.2, '#e4974a'], [0.5, '#a35a22'], [0.78, '#5e2f11'], [1, '#2e1507']]);\n    ctx.fill();\n    // Deeper toward the wall.\n    ctx.fillStyle = radial(0, 0, 0.55, 0, 0, 1.02, [[0, 'rgba(20,8,2,0)'], [1, 'rgba(20,8,2,0.55)']]);\n    ctx.fill();"
+      },
+      "timestamp": "2026-10-08T21:35:12.873Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HrAFm7PqRbgry49KquEnTa",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:12.891Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01YA1ZjQxt2FhKMTfsTawW2d",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "  const NOODLE_TONES = ['#f2c875', '#e9b35c', '#f8dc96'];",
+        "new_string": "  const NOODLE_TONES = ['#f0cb7e', '#e6b766', '#f7dc9a'];"
+      },
+      "timestamp": "2026-10-08T21:35:13.402Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01YA1ZjQxt2FhKMTfsTawW2d",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:13.425Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_012LqrRCPDfFRUAim2Bk6Zpz",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      const crimp = Math.sin(i * 2.1 + n.ph + t * 1.3) * 2.6;",
+        "new_string": "      const crimp = Math.sin(i * 1.5 + n.ph + t * 1.3) * 2.0;"
+      },
+      "timestamp": "2026-10-08T21:35:13.890Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_012LqrRCPDfFRUAim2Bk6Zpz",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:13.904Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01AAgLpKnbb4XXnayW1pMnjv",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      ctx.lineWidth = 6.4;\n      ctx.save();\n      ctx.translate(1.6, 2.6);\n      ctx.stroke(path);\n      ctx.restore();\n      ctx.strokeStyle = NOODLE_TONES[n.tone];\n      ctx.lineWidth = 5.2;\n      ctx.stroke(path);\n      ctx.strokeStyle = 'rgba(255,246,214,0.75)';\n      ctx.lineWidth = 1.5;",
+        "new_string": "      ctx.lineWidth = 6.0;\n      ctx.save();\n      ctx.translate(1.6, 2.6);\n      ctx.stroke(path);\n      ctx.restore();\n      ctx.strokeStyle = NOODLE_TONES[n.tone];\n      ctx.lineWidth = 4.8;\n      ctx.stroke(path);\n      ctx.strokeStyle = 'rgba(255,246,214,0.75)';\n      ctx.lineWidth = 1.4;"
+      },
+      "timestamp": "2026-10-08T21:35:15.055Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01AAgLpKnbb4XXnayW1pMnjv",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:15.070Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01SwPB1eUSWQjwG9qZz6U6JX",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      ctx.fillStyle = f.gold ? '#8c4c1b' : '#bfb392';",
+        "new_string": "      ctx.fillStyle = f.gold ? '#6b3712' : '#bfb392';"
+      },
+      "timestamp": "2026-10-08T21:35:15.543Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01SwPB1eUSWQjwG9qZz6U6JX",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:15.559Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_0178nzfVvp59LxEbH2Q6ZpMw",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "        ? linear(a[0], a[1], c[0], c[1], [[0, '#ffe2a0'], [0.5, '#e7a955'], [1, '#b8692a']])",
+        "new_string": "        ? linear(a[0], a[1], c[0], c[1], [[0, '#f9cc7c'], [0.5, '#d98f3e'], [1, '#a95d1e']])"
+      },
+      "timestamp": "2026-10-08T21:35:16.155Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_0178nzfVvp59LxEbH2Q6ZpMw",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:16.171Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01J1bSjbtJA3o2hUWB64cada",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    ctx.lineWidth = 2;\n    ctx.strokeStyle = 'rgba(255,226,186,0.3)';",
+        "new_string": "    ctx.lineWidth = 2;\n    ctx.strokeStyle = linear(cx - RIM_R, 0, cx + RIM_R, 0, [[0, 'rgba(255,230,190,0.55)'], [0.5, 'rgba(255,226,186,0.14)'], [1, 'rgba(255,226,186,0.06)']]);"
+      },
+      "timestamp": "2026-10-08T21:35:16.901Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01J1bSjbtJA3o2hUWB64cada",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:16.916Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_014qD2CPcpJnbqTSwsf9PjbB",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      ctx.strokeStyle = linear(x0, y0, x1, y1, [[0, '#e0ad74'], [1, '#8a5628']]);\n      ctx.lineWidth = 8;",
+        "new_string": "      ctx.strokeStyle = linear(x0, y0, x1, y1, [[0, '#d9a46c'], [1, '#7a4822']]);\n      ctx.lineWidth = 9;"
+      },
+      "timestamp": "2026-10-08T21:35:17.511Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_014qD2CPcpJnbqTSwsf9PjbB",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:17.532Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Now the steam plumes, emission, the cursor glow bounds, and the vignette.",
+      "timestamp": "2026-10-08T21:35:18.266Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01LPeSA9GABJdCUhopQzzedM",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "  function puff(x, y, push) {\n    steam.push({\n      x0: x, y0: y, wx: 0, wv: push, age: 0, life: span(5, 8),\n      speed: span(38, 70), r0: span(14, 30), grow: span(60, 120),\n      peak: span(0.07, 0.15), ph: span(0, TAU), fw: span(0.5, 1.1), amp: span(10, 26),\n    });\n  }",
+        "new_string": "  // Each puff inherits its plume's wobble, so every column sways as one shape.\n  function puff(x, y, push, pl = plumes[(rnd() * plumes.length) | 0]) {\n    steam.push({\n      x0: x, y0: y, wx: 0, wv: push, age: 0, life: span(6, 9),\n      speed: pl.speed * span(0.85, 1.15), r0: span(14, 26), grow: span(60, 110),\n      peak: span(0.09, 0.16), ph: pl.ph + span(-0.12, 0.12), fw: pl.fw, amp: pl.amp * span(0.85, 1.15),\n    });\n  }"
+      },
+      "timestamp": "2026-10-08T21:35:19.560Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01LPeSA9GABJdCUhopQzzedM",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:19.575Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01UTm65Ys9n7L3uA38dvBkaT",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    // Steam keeps rising from the broth; small bubbles break the surface.\n    puffAcc += dt * 24;\n    while (puffAcc >= 1) {\n      puffAcc -= 1;\n      puff(bx + (rnd() + rnd() - 1) * BROTH_R * 0.7, by - 10 + span(-12, 12), 0);\n    }",
+        "new_string": "    // Steam keeps rising from the broth in plumes; small bubbles break the surface.\n    for (const pl of plumes) {\n      pl.acc += dt * pl.rate;\n      while (pl.acc >= 1) {\n        pl.acc -= 1;\n        puff(bx + pl.u * BROTH_R * 0.9 + span(-6, 6), by - 20 + span(-8, 8), 0, pl);\n      }\n    }"
+      },
+      "timestamp": "2026-10-08T21:35:20.539Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01UTm65Ys9n7L3uA38dvBkaT",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:20.553Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01RjomKrme3JCTxmKDpTxJwg",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    ctx.fillStyle = radial(ptr.x, ptr.y, 0, ptr.x, ptr.y, r, [[0, `rgba(255,170,90,${0.16 * ptr.glow})`], [1, 'rgba(255,140,60,0)']]);\n    ctx.fillRect(0, 0, W, H);",
+        "new_string": "    ctx.fillStyle = radial(ptr.x, ptr.y, 0, ptr.x, ptr.y, r, [[0, `rgba(255,170,90,${0.16 * ptr.glow})`], [1, 'rgba(255,140,60,0)']]);\n    ctx.fillRect(ptr.x - r, ptr.y - r, r * 2, r * 2);"
+      },
+      "timestamp": "2026-10-08T21:35:21.500Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01RjomKrme3JCTxmKDpTxJwg",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:21.516Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Q3vHqRhFZYzuKB5VizPnSe",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "rgba(3, 2, 1, 0.85) 100%);",
+        "new_string": "rgba(3, 2, 1, 0.9) 100%);"
+      },
+      "timestamp": "2026-10-08T21:35:21.887Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Q3vHqRhFZYzuKB5VizPnSe",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:21.906Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "All the edits are in. Steam needs several seconds to build up, so I'll wait 8 seconds before the desktop capture.",
+      "timestamp": "2026-10-08T21:35:23.661Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_015fZtBJGUAYJ8A4zZJYKfN2",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && sed -i 's/await new Promise((r) => setTimeout(r, 2500));\\n    await page.screenshot/X/' shoot.js && node -e \"\nconst fs=require('fs');let s=fs.readFileSync('shoot.js','utf8');\ns=s.replace('await new Promise((r) => setTimeout(r, 2500));\\n    await page.screenshot','await new Promise((r) => setTimeout(r, +(process.env.WAIT||8000)));\\n    await page.screenshot');\ns=s.replace(\\\"const sizes = [\\\",\\\"const only = process.env.ONLY;\\nconst sizes = [\\\");\ns=s.replace('for (const s of sizes) {','for (const s of sizes.filter((x) => !only || only.split(\\\",\\\").includes(x.name))) {');\nfs.writeFileSync('shoot.js',s);\" && ONLY=desktop timeout 200 node shoot.js 2>&1 | grep -E '\"(fps|errors|text)\"|FAILED|pageerror' ",
+        "description": "Re-render desktop view after steam and palette changes",
+        "timeout": 220000
+      },
+      "timestamp": "2026-10-08T21:35:25.146Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_015fZtBJGUAYJ8A4zZJYKfN2",
+      "status": "success",
+      "output": "    \"text\": \"\",\n    \"fps\": \"13.1\",\n    \"errors\": [],\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:35:38.897Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HLMNp6U9WGRrxdZDxLu7JZ",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/desktop.png"
+      },
+      "timestamp": "2026-10-08T21:35:39.652Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HLMNp6U9WGRrxdZDxLu7JZ",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"134900\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:35:39.692Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Steam now rises above the bowl as plumes, which fixes the main problem. The columns are still too straight and blocky at the top, so I'll tune the sway amplitude, puff size, and noodle brightness. The background also needs to be a bit darker.",
+      "timestamp": "2026-10-08T21:35:51.244Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_014uiaUMZktF518msCdSbsYK",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      amp: span(12, 26), speed: span(80, 115), rate: span(3, 5), acc: 0,",
+        "new_string": "      amp: span(20, 40), speed: span(80, 115), rate: span(3, 5), acc: 0,"
+      },
+      "timestamp": "2026-10-08T21:35:51.738Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_014uiaUMZktF518msCdSbsYK",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:51.760Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_012ok5orpBYXu2zVBKskNZZm",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      u: (i / 6 - 0.5) * 1.0 + span(-0.05, 0.05), ph: span(0, TAU), fw: span(0.5, 0.9),",
+        "new_string": "      u: (i / 6 - 0.5) * 1.0 + span(-0.05, 0.05), ph: span(0, TAU), fw: span(0.35, 0.7),"
+      },
+      "timestamp": "2026-10-08T21:35:52.356Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_012ok5orpBYXu2zVBKskNZZm",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:52.373Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01RYoAm4ujuu1BC1kn6JeYsX",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      speed: pl.speed * span(0.85, 1.15), r0: span(14, 26), grow: span(60, 110),\n      peak: span(0.09, 0.16), ph: pl.ph + span(-0.12, 0.12), fw: pl.fw, amp: pl.amp * span(0.85, 1.15),",
+        "new_string": "      speed: pl.speed * span(0.85, 1.15), r0: span(12, 22), grow: span(40, 85),\n      peak: span(0.08, 0.14), ph: pl.ph + span(-0.12, 0.12), fw: pl.fw, amp: pl.amp * span(0.85, 1.15),"
+      },
+      "timestamp": "2026-10-08T21:35:53.211Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01RYoAm4ujuu1BC1kn6JeYsX",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:53.224Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_014xiKWgb9DN9CNBByFNJn3L",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      const x = p.x0 + p.wx + Math.sin(p.age * p.fw + p.ph) * p.amp * (0.25 + k);",
+        "new_string": "      const x = p.x0 + p.wx + Math.sin(p.age * p.fw + p.ph) * p.amp * (0.2 + 1.3 * k);"
+      },
+      "timestamp": "2026-10-08T21:35:53.781Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_014xiKWgb9DN9CNBByFNJn3L",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:53.795Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01EBEg7ufJe3Y3kwJFCNfS81",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "  const NOODLE_TONES = ['#f0cb7e', '#e6b766', '#f7dc9a'];",
+        "new_string": "  const NOODLE_TONES = ['#f7d480', '#efc26a', '#fbe4a4'];"
+      },
+      "timestamp": "2026-10-08T21:35:54.298Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01EBEg7ufJe3Y3kwJFCNfS81",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:54.315Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01X6KfhvwM2SVy5CPktmMFQM",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    ctx.fillStyle = radial(gx, gy, 0, gx, gy, 0.5, [[0, 'rgba(255,240,210,0.32)'], [1, 'rgba(255,240,210,0)']]);",
+        "new_string": "    ctx.fillStyle = radial(gx, gy, 0, gx, gy, 0.5, [[0, 'rgba(255,240,210,0.4)'], [1, 'rgba(255,240,210,0)']]);"
+      },
+      "timestamp": "2026-10-08T21:35:55.051Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01X6KfhvwM2SVy5CPktmMFQM",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:55.065Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Q7sozsVbMcFBnEVRxqc5ro",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    ctx.fillStyle = radial(cx, cy, 0, cx, cy, gr, [[0, `rgba(255,150,70,${0.24 * breathe})`], [1, 'rgba(255,120,50,0)']]);",
+        "new_string": "    ctx.fillStyle = radial(cx, cy, 0, cx, cy, gr, [[0, `rgba(255,150,70,${0.2 * breathe})`], [1, 'rgba(255,120,50,0)']]);"
+      },
+      "timestamp": "2026-10-08T21:35:55.742Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Q7sozsVbMcFBnEVRxqc5ro",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:35:55.761Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Next I'll test the interactions and the reduced-motion path together. The script moves the pointer across the broth, clicks it, and captures canvas hashes to confirm reduced motion produces a static frame while normal mode keeps animating.",
+      "timestamp": "2026-10-08T21:35:59.086Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_013NGHtQ8XzcpAmtX8jTsVV8",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && cat > interact.js <<'EOF'\nconst puppeteer = require('puppeteer');\nconst crypto = require('crypto');\nconst path = require('path');\nconst URL_ = 'file://' + path.resolve('/app/index.html');\nconst OUT = '<TMP>/ramen-check/shots/';\nconst sleep = (ms) => new Promise((r) => setTimeout(r, ms));\n(async () => {\n  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });\n  const hash = (page) => page.evaluate(() => document.getElementById('scene').toDataURL('image/png')).then((u) => crypto.createHash('md5').update(u).digest('hex').slice(0, 10));\n\n  // 1) Interactive session on desktop.\n  const page = await browser.newPage();\n  const errors = [];\n  page.on('pageerror', (e) => errors.push(e.message));\n  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });\n  await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });\n  await page.goto(URL_, { waitUntil: 'load' });\n  await sleep(7000);\n  console.log('animated hash A:', await hash(page));\n  await sleep(700);\n  console.log('animated hash B (should differ):', await hash(page));\n\n  // Sweep the pointer across the broth.\n  for (let i = 0; i <= 45; i++) {\n    const x = 560 + (i / 45) * 320, y = 540 + Math.sin(i / 7) * 25;\n    await page.mouse.move(x, y);\n    await sleep(22);\n    if (i === 30) await page.screenshot({ path: OUT + 'interact-sweep.png' });\n  }\n  await sleep(200);\n  await page.screenshot({ path: OUT + 'interact-after-sweep.png' });\n\n  // Click on the broth and capture the burst.\n  await page.mouse.move(700, 600);\n  await sleep(200);\n  await page.mouse.down();\n  await page.mouse.up();\n  await sleep(350);\n  await page.screenshot({ path: OUT + 'interact-click.png' });\n\n  // Move far to the top-left corner to check parallax and cursor light.\n  for (let i = 0; i <= 30; i++) { await page.mouse.move(700 - i * 20, 600 - i * 15); await sleep(16); }\n  await sleep(1200);\n  await page.screenshot({ path: OUT + 'interact-corner.png' });\n  console.log('errors (interactive):', JSON.stringify(errors));\n  await page.close();\n\n  // 2) Reduced motion: a still frame that never changes.\n  const rm = await browser.newPage();\n  const rmErrors = [];\n  rm.on('pageerror', (e) => rmErrors.push(e.message));\n  await rm.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);\n  await rm.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });\n  await rm.goto(URL_, { waitUntil: 'load' });\n  await sleep(1500);\n  const r1 = await hash(rm);\n  await sleep(2000);\n  const r2 = await hash(rm);\n  await rm.mouse.move(300, 300);\n  await sleep(100);\n  await rm.mouse.move(900, 700);\n  await sleep(600);\n  const r3 = await hash(rm);\n  console.log('reduced-motion hashes:', r1, r2, r3, r1 === r2 && r2 === r3 ? '=> static (OK)' : '=> CHANGED (check)');\n  await rm.screenshot({ path: OUT + 'reduced-motion.png' });\n  console.log('errors (reduced):', JSON.stringify(rmErrors));\n\n  // 3) Live switch: turn reduced-motion on at runtime; the loop should stop.\n  await rm.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);\n  await sleep(1200);\n  const live1 = await hash(rm);\n  await sleep(900);\n  const live2 = await hash(rm);\n  console.log('after switching back to motion, frames change:', live1 !== live2);\n  await rm.close();\n  await browser.close();\n})().catch((e) => { console.error('FAILED', e); process.exit(1); });\nEOF\ntimeout 280 node interact.js 2>&1 | tail -20",
+        "description": "Test pointer interaction, click bursts, and reduced-motion behavior",
+        "timeout": 300000
+      },
+      "timestamp": "2026-10-08T21:36:04.556Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_013NGHtQ8XzcpAmtX8jTsVV8",
+      "status": "success",
+      "output": "animated hash A: efb58836f3\nanimated hash B (should differ): 721019275e\nerrors (interactive): []\nreduced-motion hashes: a7b6808f47 a7b6808f47 a7b6808f47 => static (OK)\nerrors (reduced): []\nafter switching back to motion, frames change: true\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:36:34.290Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The behavior checks pass: the animated canvas changes over time, interactions raise no errors, reduced motion gives an identical frame before and after pointer movement, and switching motion back on resumes animation. Now I'll look at the screenshot taken during the pointer sweep, which uses the tuned steam.",
+      "timestamp": "2026-10-08T21:36:36.185Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01RjWvRrqjqHiaB9J7wGiLrA",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/interact-sweep.png"
+      },
+      "timestamp": "2026-10-08T21:36:36.333Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01RjWvRrqjqHiaB9J7wGiLrA",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"136896\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:36:36.375Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The composition is working now: steam rises above the bowl, the cursor light shows as a warm bloom, and the broth glows. Next I'll check the click burst.",
+      "timestamp": "2026-10-08T21:36:39.781Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_014sJijXVk2BVxmB5c3SX6ue",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/interact-click.png"
+      },
+      "timestamp": "2026-10-08T21:36:39.909Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_014sJijXVk2BVxmB5c3SX6ue",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"135668\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:36:39.949Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The click bloom and cursor light show up, and the scene stays coherent. Next I'll check the phone and ultrawide layouts after the tuning.",
+      "timestamp": "2026-10-08T21:36:44.298Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HSYDdyLMofWYUe6sxDKJw8",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && ONLY=phone-portrait,ultrawide,phone-landscape WAIT=8000 timeout 280 node shoot.js 2>&1 | grep -E '\"(fps|errors|text)\"|FAILED|pageerror|externalRequests' | head -20",
+        "description": "Re-render phone and ultrawide layouts after tuning",
+        "timeout": 300000
+      },
+      "timestamp": "2026-10-08T21:36:44.851Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HSYDdyLMofWYUe6sxDKJw8",
+      "status": "success",
+      "output": "    \"text\": \"\",\n    \"fps\": \"15.3\",\n    \"errors\": [],\n    \"externalRequests\": []\n    \"text\": \"\",\n    \"fps\": \"17.4\",\n    \"errors\": [],\n    \"externalRequests\": []\n    \"text\": \"\",\n    \"fps\": \"11.1\",\n    \"errors\": [],\n    \"externalRequests\": []\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:37:24.200Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01FGo18cjeuh7k6UT5GxCnzv",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/phone-landscape.png"
+      },
+      "timestamp": "2026-10-08T21:37:24.923Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01FGo18cjeuh7k6UT5GxCnzv",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"118644\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:37:24.964Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The landscape phone layout fits the bowl and steam to the height and stays centered. Next, the ultrawide screen:",
+      "timestamp": "2026-10-08T21:37:26.352Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01KGvoCom6WzHF58xSePdCN5",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/ultrawide.png"
+      },
+      "timestamp": "2026-10-08T21:37:26.489Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01KGvoCom6WzHF58xSePdCN5",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"133872\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:37:27.034Z"
+    },
+    {
+      "type": "message",
+      "role": "user",
+      "content": "[Image: original 2560x1080, displayed at 2000x844. Multiply coordinates by 1.28 to map to original image.]",
+      "timestamp": "2026-10-08T21:37:27.030Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The ultrawide layout also works: the bowl stays centered with room for the steam. Next I'll make three small polish changes: a warm rim light traced along the bowl silhouette, slightly more visible ripples and dust motes, and removing the `puffAcc` variable that the plume system no longer uses.",
+      "timestamp": "2026-10-08T21:37:56.175Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01UakGtQzbuj6F47KRV57AEx",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    ctx.fillStyle = linear(cx - RIM_R, 0, cx + RIM_R, 0, [[0, '#3d3129'], [0.28, '#241d18'], [0.8, '#120e0b'], [1, '#0b0807']]);\n    ctx.fill();",
+        "new_string": "    ctx.fillStyle = linear(cx - RIM_R, 0, cx + RIM_R, 0, [[0, '#3d3129'], [0.28, '#241d18'], [0.8, '#120e0b'], [1, '#0b0807']]);\n    ctx.fill();\n    // Warm rim light traces the silhouette.\n    ctx.lineWidth = 2;\n    ctx.strokeStyle = linear(cx - RIM_R, 0, cx + RIM_R, 0, [[0, 'rgba(255,214,160,0.3)'], [1, 'rgba(255,140,70,0.16)']]);\n    ctx.stroke();"
+      },
+      "timestamp": "2026-10-08T21:37:57.324Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01UakGtQzbuj6F47KRV57AEx",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:37:57.344Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01X1XGcvM6edbSkShCeWSj5u",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "  function drawRipples() {\n    setDesign();\n    ctx.lineWidth = 1.4;",
+        "new_string": "  function drawRipples() {\n    setDesign();\n    ctx.lineWidth = 1.8;"
+      },
+      "timestamp": "2026-10-08T21:37:57.815Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01X1XGcvM6edbSkShCeWSj5u",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:37:57.829Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01WMxc2KubPYDzSJfCobPW1E",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "      ph: span(0, TAU), tw: span(0.5, 1.6), a: span(0.25, 0.8),",
+        "new_string": "      ph: span(0, TAU), tw: span(0.5, 1.6), a: span(0.35, 0.95),"
+      },
+      "timestamp": "2026-10-08T21:37:58.324Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01WMxc2KubPYDzSJfCobPW1E",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:37:58.337Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HMxac6bcahMDtgoqNwkr1j",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "  let rippleAcc = 0, puffAcc = 0, bubbleAcc = 0;",
+        "new_string": "  let rippleAcc = 0, bubbleAcc = 0;"
+      },
+      "timestamp": "2026-10-08T21:37:58.755Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HMxac6bcahMDtgoqNwkr1j",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:37:58.774Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Before re-running the full verification, I'll grep the file for leftover references and for anything that could count as an external or raster asset.",
+      "timestamp": "2026-10-08T21:38:00.231Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01WpPPM3nDSozUkA2vjMk6Qc",
+      "tool": "Bash",
+      "input": {
+        "command": "echo \"puffAcc refs: $(grep -c 'puffAcc' index.html)\"; echo \"--- external/raster/asset patterns (expect none):\"; grep -nE 'https?:|//[a-z0-9.-]+\\.(com|net|org|io)|data:|<img|<link|<script[^>]+src|@import|url\\(|\\.png|\\.jpg|\\.webp|\\.gif|\\.svg|font-family' index.html || echo \"none found\"; echo \"--- size:\"; wc -c -l index.html",
+        "description": "Check for leftover variables and any external or raster asset references"
+      },
+      "timestamp": "2026-10-08T21:38:01.223Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01WpPPM3nDSozUkA2vjMk6Qc",
+      "status": "success",
+      "output": "puffAcc refs: 0\n--- external/raster/asset patterns (expect none):\nnone found\n--- size:\n  787 29260 index.html",
+      "timestamp": "2026-10-08T21:38:01.301Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The file has no external or raster references. It's 787 lines, which is more than I expected, so I'll check for duplicated function definitions before trusting it.",
+      "timestamp": "2026-10-08T21:38:03.493Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Go8w77xDpjnMR9mQFUhPVG",
+      "tool": "Bash",
+      "input": {
+        "command": "grep -n \"^  function \\|^  const [a-zA-Z]* = (\" index.html | awk -F: '{print $1\": \"$2}' | sed 's/(.*//' | head -80; echo \"--- duplicates:\"; grep -o \"^  function [a-zA-Z0-9_]*\" index.html | sort | uniq -d || true; echo \"(end)\"",
+        "description": "List top-level functions and check for duplicate definitions"
+      },
+      "timestamp": "2026-10-08T21:38:04.206Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Go8w77xDpjnMR9mQFUhPVG",
+      "status": "success",
+      "output": "46:   const clamp = \n47:   const lerp = \n48:   const smooth = \n54:   function mulberry32\n63:   const span = \n81:   function blob\n93:   const warmImg = \n104:   const scatter = \n109:   function build\n164:   function layout\n177:   function setDesign\n182:   function setPlane\n189:   function gradient\n193:   const linear = \n194:   const radial = \n195:   function softEllipse\n206:   function rect\n210:   function poly\n215:   function bowlPath\n227:   function buildBase\n238:   function drawBackdrop\n264:   function drawBowl\n320:   function drawBroth\n354:   function drawRipples\n369:   function drawToppingsBase\n410:   function drawToppingsTop\n436:   function drawGarnish\n463:   function drawGlint\n475:   function strand\n497:   function drawNoodles\n523:   function drawChopsticks\n551:   function puff\n559:   function drawSteam\n577:   function drawCursorGlow\n589:   function drawMotes\n608:   function update\n701:   function render\n713:   function frame\n721:   function start\n726:   function stop\n732:   function renderStill\n738:   function applyMode\n751:   function onPointer\n--- duplicates:\n(end)",
+      "timestamp": "2026-10-08T21:38:04.275Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "No duplicates, and the structure matches the design. Now the full verification pass: all four viewport sizes, the interaction and reduced-motion checks, and the console and network checks.",
+      "timestamp": "2026-10-08T21:38:06.191Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01RUJJKW6MtuE34QEoPYisE5",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && WAIT=8000 timeout 280 node shoot.js 2>&1 | node -e \"\nlet s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);for(const [k,v] of Object.entries(j)){console.log(k.padEnd(16),'text:',JSON.stringify(v.text),'| canvas:',v.canvas.join('x'),'| viewport:',v.inner.join('x'),'| overflow:',v.scroll.join('x'),'| fps(headless):',v.fps,'| errors:',v.errors.length,'| external:',v.externalRequests.length);}}catch(e){console.log('raw:',s.slice(0,800))}});\"",
+        "description": "Re-run screenshots at four sizes and summarize checks",
+        "timeout": 300000
+      },
+      "timestamp": "2026-10-08T21:38:07.421Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01VLPjfoT8GW2X4aSPryJ1Dw",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && timeout 280 node interact.js 2>&1 | tail -12",
+        "description": "Re-run interaction and reduced-motion checks",
+        "timeout": 300000
+      },
+      "timestamp": "2026-10-08T21:38:07.767Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01RUJJKW6MtuE34QEoPYisE5",
+      "status": "success",
+      "output": "desktop          text: \"\" | canvas: 1440x900 | viewport: 1440x900 | overflow: 1440x900 | fps(headless): 15.2 | errors: 0 | external: 0\nphone-portrait   text: \"\" | canvas: 780x1688 | viewport: 390x844 | overflow: 390x844 | fps(headless): 15.5 | errors: 0 | external: 0\nphone-landscape  text: \"\" | canvas: 1688x780 | viewport: 844x390 | overflow: 844x390 | fps(headless): 16.9 | errors: 0 | external: 0\nultrawide        text: \"\" | canvas: 2560x1080 | viewport: 2560x1080 | overflow: 2560x1080 | fps(headless): 10.8 | errors: 0 | external: 0\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:38:59.205Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01VLPjfoT8GW2X4aSPryJ1Dw",
+      "status": "success",
+      "output": "animated hash A: 210f8eeb05\nanimated hash B (should differ): 2e5588b2c8\nerrors (interactive): []\nreduced-motion hashes: e33629a965 e33629a965 e33629a965 => static (OK)\nerrors (reduced): []\nafter switching back to motion, frames change: true\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:39:28.881Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "Every check passes at all four sizes: no visible text, no scroll overflow, no console errors, no external requests, and the reduced-motion frame stays identical while normal motion keeps changing. Next I'll look at the reduced-motion still, since that's the frame users with the preference will see.",
+      "timestamp": "2026-10-08T21:39:30.147Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01T9ikepZr1MrBB7GnvfKTd3",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/reduced-motion.png"
+      },
+      "timestamp": "2026-10-08T21:39:30.281Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01T9ikepZr1MrBB7GnvfKTd3",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"133128\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:39:30.322Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The reduced-motion still is good: the steam is already in place, the rim light outlines the silhouette, and nothing moves. I still want to confirm the pointer ripples actually render, since they're small on screen. I'll capture a zoomed crop during a fast drag across the broth.",
+      "timestamp": "2026-10-08T21:39:42.901Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_015kxk5YMW5222RU1Uc7yGdj",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && cat > ripple.js <<'EOF'\nconst puppeteer = require('puppeteer');\nconst path = require('path');\nconst sleep = (ms) => new Promise((r) => setTimeout(r, ms));\n(async () => {\n  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });\n  const page = await browser.newPage();\n  await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });\n  await page.goto('file:///app/index.html', { waitUntil: 'load' });\n  await sleep(5000);\n  // Fast drag across the broth, then a click.\n  for (let i = 0; i <= 14; i++) { await page.mouse.move(560 + i * 24, 600 - i * 3); await sleep(12); }\n  await page.screenshot({ path: '<TMP>/ramen-check/shots/ripple-drag.png', clip: { x: 430, y: 380, width: 620, height: 340 } });\n  await page.mouse.move(760, 640);\n  await sleep(120);\n  await page.mouse.down();\n  await page.mouse.up();\n  await sleep(250);\n  await page.screenshot({ path: '<TMP>/ripple-click-tmp.png', clip: { x: 560, y: 480, width: 400, height: 260 } });\n  await page.screenshot({ path: '<TMP>/ramen-check/shots/ripple-click.png', clip: { x: 560, y: 480, width: 400, height: 260 } });\n  await browser.close();\n})().catch((e) => { console.error('FAILED', e); process.exit(1); });\nEOF\ntimeout 200 node ripple.js && echo \"captured\"",
+        "description": "Capture zoomed crops of pointer drag ripples and click burst",
+        "timeout": 220000
+      },
+      "timestamp": "2026-10-08T21:39:45.081Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_015kxk5YMW5222RU1Uc7yGdj",
+      "status": "success",
+      "output": "captured\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:39:53.687Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01RvHDeQsaPbWbGzK4cKUEL7",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/ripple-drag.png"
+      },
+      "timestamp": "2026-10-08T21:39:54.658Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01RvHDeQsaPbWbGzK4cKUEL7",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"383132\">",
+            "media_type": "image/png"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:39:54.675Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The zoomed crop shows the topping detail well: noodle highlights, nori, shiitake, golden tofu, corn, scallion rings, and chilli flecks. The drag ripples are faint, though, almost lost against the bright noodles. I'll check the click burst next.",
+      "timestamp": "2026-10-08T21:39:57.102Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01WWvX8coD1LXE5N9ZEhJtxW",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/ripple-click.png"
+      },
+      "timestamp": "2026-10-08T21:39:57.226Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01WWvX8coD1LXE5N9ZEhJtxW",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"216756\">",
+            "media_type": "image/png"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:39:57.241Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The click ripple is there but faint, because the pale ring disappears against the bright broth and noodles. I'll draw each ring as a dark groove with a bright crest so it reads on both light and dark areas, and raise the drag-ripple strength a little.",
+      "timestamp": "2026-10-08T21:40:06.151Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_018uqDN8aVj343F26Qo8Jc9T",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "    ctx.lineWidth = 1.8;\n    ctx.strokeStyle = 'rgb(255,236,206)';\n    for (const r of ripples) {\n      const k = r.age / r.life;\n      const rr = r.rmax * (1 - (1 - k) * (1 - k)) * BROTH_R;\n      ctx.globalAlpha = r.a * (1 - k) * (1 - k);\n      ctx.beginPath();\n      ctx.ellipse(bx + r.u * BROTH_R, by + r.v * BROTH_R * K, rr, rr * K, 0, 0, TAU);\n      ctx.stroke();\n    }",
+        "new_string": "    for (const r of ripples) {\n      const k = r.age / r.life;\n      const rr = r.rmax * (1 - (1 - k) * (1 - k)) * BROTH_R;\n      const a = r.a * (1 - k) * (1 - k);\n      ctx.beginPath();\n      ctx.ellipse(bx + r.u * BROTH_R, by + r.v * BROTH_R * K, rr, rr * K, 0, 0, TAU);\n      // A dark groove and a bright crest, so each ring reads on light and dark broth alike.\n      ctx.globalAlpha = a * 0.6;\n      ctx.strokeStyle = 'rgb(70,30,10)';\n      ctx.lineWidth = 3;\n      ctx.stroke();\n      ctx.globalAlpha = a;\n      ctx.strokeStyle = 'rgb(255,236,206)';\n      ctx.lineWidth = 1.6;\n      ctx.stroke();\n    }"
+      },
+      "timestamp": "2026-10-08T21:40:07.872Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_018uqDN8aVj343F26Qo8Jc9T",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:40:07.888Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01Y3ymS9fQfe9y8YL7CaaDXz",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/app/index.html",
+        "old_string": "rmax: span(0.14, 0.2), a: 0.6 });",
+        "new_string": "rmax: span(0.14, 0.2), a: 0.8 });"
+      },
+      "timestamp": "2026-10-08T21:40:08.279Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01Y3ymS9fQfe9y8YL7CaaDXz",
+      "status": "success",
+      "output": "The file /app/index.html has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "timestamp": "2026-10-08T21:40:08.296Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01PNyxgjCqWVdPEuJtmSXG4C",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && timeout 200 node ripple.js && echo \"captured\" && node -e \"console.log('ok')\"",
+        "description": "Re-capture ripple crops after ring styling change",
+        "timeout": 220000
+      },
+      "timestamp": "2026-10-08T21:40:09.391Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01PNyxgjCqWVdPEuJtmSXG4C",
+      "status": "success",
+      "output": "captured\nok\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:40:18.015Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01585mTt1v26Qr1FyqDz3yxq",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/ripple-click.png"
+      },
+      "timestamp": "2026-10-08T21:40:18.685Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01585mTt1v26Qr1FyqDz3yxq",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"217024\">",
+            "media_type": "image/png"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:40:18.700Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The click ripple now reads as a ring on the broth. Since I changed the ripple drawing, I'll re-run the interaction and reduced-motion checks and take a final desktop capture to confirm nothing regressed.",
+      "timestamp": "2026-10-08T21:40:21.891Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01XhtVDEQdsudNQtjNTrgfP6",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && timeout 280 node interact.js 2>&1 | tail -8; ONLY=desktop WAIT=8000 timeout 150 node shoot.js 2>&1 | grep -E '\"(errors|text|externalRequests)\"' ; echo \"done\"",
+        "description": "Final interaction, reduced-motion, and desktop error checks",
+        "timeout": 450000
+      },
+      "timestamp": "2026-10-08T21:40:22.514Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01XhtVDEQdsudNQtjNTrgfP6",
+      "status": "success",
+      "output": "animated hash A: 3e77867918\nanimated hash B (should differ): 56339764cb\nerrors (interactive): []\nreduced-motion hashes: 80795b9e6a 80795b9e6a 80795b9e6a => static (OK)\nerrors (reduced): []\nafter switching back to motion, frames change: true\n    \"text\": \"\",\n    \"errors\": [],\n    \"externalRequests\": []\ndone\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:41:05.348Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01SHJgu8XGA5NEoBguUWPbR2",
+      "tool": "Read",
+      "input": {
+        "file_path": "<TMP>/ramen-check/shots/desktop.png"
+      },
+      "timestamp": "2026-10-08T21:41:06.085Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01SHJgu8XGA5NEoBguUWPbR2",
+      "status": "success",
+      "output": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "data": "<OMITTED_BINARY_PAYLOAD media-type=\"unknown\" encoding=\"base64\" original-characters=\"134804\">",
+            "media_type": "image/jpeg"
+          }
+        }
+      ],
+      "timestamp": "2026-10-08T21:41:06.123Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The final desktop capture is clean and nothing has regressed. One path I haven't tested is switching from motion to reduced motion while the page is open. The loop should stop and the frame should freeze, so I'll check that.",
+      "timestamp": "2026-10-08T21:41:24.952Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01HvRMGXvpBPVCqoups8rPQW",
+      "tool": "Bash",
+      "input": {
+        "command": "cd <TMP>/ramen-check && cat > switch.js <<'EOF'\nconst puppeteer = require('puppeteer');\nconst crypto = require('crypto');\nconst sleep = (ms) => new Promise((r) => setTimeout(r, ms));\n(async () => {\n  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });\n  const page = await browser.newPage();\n  const errors = [];\n  page.on('pageerror', (e) => errors.push(e.message));\n  await page.setViewport({ width: 900, height: 700, deviceScaleFactor: 1 });\n  await page.goto('file:///app/index.html', { waitUntil: 'load' });\n  const hash = () => page.evaluate(() => document.getElementById('scene').toDataURL('image/png')).then((u) => crypto.createHash('md5').update(u).digest('hex').slice(0, 8));\n  await sleep(2000);\n  const m1 = await hash(); await sleep(600); const m2 = await hash();\n  console.log('motion on  -> changing:', m1 !== m2);\n  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);\n  await sleep(1500);\n  const s1 = await hash(); await sleep(1500); const s2 = await hash();\n  console.log('switched to reduce -> frozen:', s1 === s2);\n  await page.setViewport({ width: 700, height: 900, deviceScaleFactor: 1 });\n  await sleep(800);\n  const s3 = await hash(); await sleep(800); const s4 = await hash();\n  console.log('resize while reduced -> still frozen:', s3 === s4, '(resized frame differs from before:', s3 !== s1 + '', ')');\n  console.log('errors:', JSON.stringify(errors));\n  await browser.close();\n})().catch((e) => { console.error('FAILED', e); process.exit(1); });\nEOF\ntimeout 200 node switch.js 2>&1 | tail -6",
+        "description": "Test switching to reduced motion at runtime and resizing",
+        "timeout": 220000
+      },
+      "timestamp": "2026-10-08T21:41:27.397Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01HvRMGXvpBPVCqoups8rPQW",
+      "status": "success",
+      "output": "motion on  -> changing: true\nswitched to reduce -> frozen: true\nresize while reduced -> still frozen: true (resized frame differs from before: true )\nerrors: []\nShell cwd was reset to /app",
+      "timestamp": "2026-10-08T21:41:36.447Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The runtime switch works: motion stops, the frame freezes, and resizing in reduced mode redraws a still frame without errors. Last, I'll confirm `/app` contains only the deliverable.",
+      "timestamp": "2026-10-08T21:41:37.974Z"
+    },
+    {
+      "type": "tool_call",
+      "id": "toolu_01YJm7SucsXFexLLrV5MMFU1",
+      "tool": "Bash",
+      "input": {
+        "command": "ls -la /app; echo \"---\"; head -c 300 /app/index.html | head -5",
+        "description": "Confirm /app holds only the deliverable"
+      },
+      "timestamp": "2026-10-08T21:41:38.232Z"
+    },
+    {
+      "type": "tool_result",
+      "callId": "toolu_01YJm7SucsXFexLLrV5MMFU1",
+      "status": "success",
+      "output": "total 32\ndrwxr-xr-x. 1 root root    20 Oct  8 21:40 .\ndrwxr-xr-x. 1 root root    90 Oct  8 21:20 ..\n-rw-r--r--. 1 root root 29495 Oct  8 21:40 index.html\n---\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">",
+      "timestamp": "2026-10-08T21:41:38.272Z"
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": "The page is at `/app/index.html`: one file, about 29 KB, with inline CSS and JavaScript. It draws a dark scene with a steaming vegan ramen bowl in a Canvas 2D context, with no external files, no raster images, and no visible text or UI.\n\n**What's in the scene**\n- A lacquer-black bowl with broth, wavy noodles, and toppings: shiitake, golden and silken tofu, nori, bok choy, menma, corn, scallion, sesame, and chilli oil. Chopsticks rest on the rim.\n- Motion: steam rises in plumes that sway together, noodles shift slightly, oil droplets drift, small bubbles break the surface, and the warm glow breathes.\n- Mouse: the bowl shifts with depth and tilts a little; a warm light follows the cursor; moving through the steam pushes it; dragging over the broth leaves ripples; a click makes a ripple and a puff of steam. Touch works through pointer events.\n- Responsive: the scene scales to fit any viewport, and canvas resolution is capped at 2× device pixel ratio.\n- Reduced motion: the page draws a single still frame with the steam already built up, stops the animation loop, and turns off pointer effects. If the preference changes while the page is open, it switches live.\n\n**Verification** (headless Chromium 131 in the sandbox)\n- Screenshots at 1440×900, 390×844 @2x, 844×390 @2x, and 2560×1080 all fit, with no scroll overflow.\n- No console errors, no network requests, and no rendered text.\n- Motion on: frames change over time. Reduced motion: frames are identical before and after pointer movement, and the frame stays frozen after switching the preference at runtime and resizing.\n\n**Limits**\n- Only Chromium was tested. Safari and Firefox are unverified, and I didn't check on real GPU hardware.\n- Headless Chrome here uses software rendering and ran at about 11–17 fps, which doesn't predict real performance. The steam is the heaviest part. If it stutters on a low-end machine, lower the `rate` values in `build()`.\n- The art is procedural and stylized, not photoreal.\n\n**Choices you may want to change**\n- Canvas 2D rather than WebGL, since it was simpler and enough for this scene.\n- The composition uses a fixed seed, so it looks the same on every load.\n- Reduced motion means a still frame with pointer effects off, not slowed-down motion.\n- The canvas has `role=\"img\"` and an `aria-label`. That label is for screen readers and isn't visible.\n- The soft steam, bokeh, and glow sprites are radial gradients painted by code when the page loads, so there's no embedded raster data.\n\nThe test scripts and screenshots are in `<TMP>/ramen-check`, outside `/app`. To run the browser tests, I installed Puppeteer, Chromium, and some system libraries in the sandbox.",
+      "timestamp": "2026-10-08T21:41:42.967Z"
+    }
+  ],
+  "metadata": {
+    "sourceRecord": "04b5ce31-3a61-4095-9393-5bd2b1b14934.jsonl",
+    "normalization": {
+      "excluded": [
+        "system and developer prompts",
+        "hidden thinking and reasoning",
+        "credentials and private agent-mail calls",
+        "large base64 and embedded image data (event retained with size marker)"
+      ],
+      "omittedPrivateToolCalls": 0
+    },
+    "eventCounts": {
+      "message": 35,
+      "tool_call": 66,
+      "tool_result": 66
+    }
+  }
+}

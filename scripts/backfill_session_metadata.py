@@ -58,6 +58,7 @@ DISPLAY_NAMES = {
     "fable-5.1": "Fable 5.1",
     "opus-5.5": "Opus 5.5",
     "sonnet-5.5": "Sonnet 5.5",
+    "haiku-5.5": "Haiku 5.5",
     "opus-5": "Opus 5",
     "glm-5.3": "GLM-5.3",
 }
@@ -627,7 +628,9 @@ def benchmark_claude_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     raise ValueError("Claude Code session does not contain the benchmark prompt")
 
 
-def verify_claude_result(rows: list[dict[str, Any]], run_id: str) -> str:
+def verify_claude_result(
+    rows: list[dict[str, Any]], run_id: str, artifact: Path | None = None
+) -> str:
     """Replay recorded file operations and require the final artifact to match."""
     if run_id in CLAUDE_COMPONENT_BUILDS:
         return verify_claude_component_result(rows, run_id)
@@ -676,14 +679,14 @@ def verify_claude_result(rows: list[dict[str, Any]], run_id: str) -> str:
                     operation_count += count
     if content is None:
         raise ValueError(f"{run_id}: no recorded index.html Write found")
-    artifact = (ROOT / run_id / "index.html").read_text()
-    if content != artifact:
+    artifact_bytes = (artifact or ROOT / run_id / "index.html").read_bytes()
+    if content.encode("utf-8") != artifact_bytes:
         raise ValueError(f"{run_id}: index.html differs from the final recorded write")
     return f"recorded file-operation replay ({operation_count} operations)"
 
 
 def normalize_claude_events(
-    rows: list[dict[str, Any]],
+    rows: list[dict[str, Any]], *, preserve_task: bool = False,
 ) -> tuple[list[dict[str, Any]], int]:
     emitted_blocks: set[tuple[str, str, str]] = set()
     published_calls: set[str] = set()
@@ -747,7 +750,7 @@ def normalize_claude_events(
                 if not isinstance(block, dict):
                     continue
                 if block.get("type") == "text":
-                    text = public_user_text(block.get("text", ""))
+                    text = public_user_text(block.get("text", ""), preserve_task=preserve_task)
                     if text:
                         event = {"type": "message", "role": "user", "content": text}
                         if timestamp:
@@ -2162,13 +2165,13 @@ def main(argv: list[str] | None = None) -> None:
         TERRA_LOW_ID
     }
     all_run_ids = tracked_run_ids()
-    native_runs = set()
+    native_runs = {}
     for run_id in set(all_run_ids) | set(args.run_ids or []):
         manifest = ROOT / run_id / "run.json"
         if manifest.is_file():
             run = json.loads(manifest.read_text())
-            if run.get("harness", {}).get("runtime") == "Harbor" and run.get("harness", {}).get("name") == "Codex":
-                native_runs.add(run_id)
+            if run.get("harness", {}).get("runtime") == "Harbor" and run.get("harness", {}).get("name") in {"Codex", "Claude Code"}:
+                native_runs[run_id] = run["harness"]["name"]
     expected.update(native_runs)
     if not args.run_ids and set(all_run_ids) != expected:
         missing_sources = sorted(set(all_run_ids) - expected)
@@ -2182,7 +2185,7 @@ def main(argv: list[str] | None = None) -> None:
         raise ValueError(f"no source mapping for requested runs: {unknown}")
     run_ids = []
     for run_id in requested:
-        run_harness = "claude-code" if run_id in CLAUDE_SOURCES else "codex"
+        run_harness = "claude-code" if run_id in CLAUDE_SOURCES or native_runs.get(run_id) == "Claude Code" else "codex"
         if args.harness != "all" and args.harness != run_harness:
             raise ValueError(f"{run_id} is not a {args.harness} run")
         run_ids.append(run_id)
@@ -2195,6 +2198,7 @@ def main(argv: list[str] | None = None) -> None:
         "openaiLiteLLMCost": 0,
         "openaiTotalOnlyEstimatedCost": 0,
         "openaiHarborNative": 0,
+        "claudeHarborNative": 0,
         "events": 0,
         "base64Omissions": 0,
         "base64CharactersOmitted": 0,
@@ -2211,10 +2215,15 @@ def main(argv: list[str] | None = None) -> None:
             }[cost_kind]
             coverage[coverage_key] += 1
         elif run_id in native_runs:
-            from import_harbor_codex import build_registered_trial
+            if native_runs[run_id] == "Claude Code":
+                from import_harbor_claude import build_registered_trial
 
+                coverage["claudeHarborNative"] += 1
+            else:
+                from import_harbor_codex import build_registered_trial
+
+                coverage["openaiHarborNative"] += 1
             run, transcript, _ = build_registered_trial(run_id)
-            coverage["openaiHarborNative"] += 1
         elif run_id in CODEX_SESSION_SOURCES:
             run, transcript, _ = build_codex_session(run_id)
             coverage["openaiLiteLLMCost"] += 1
@@ -2241,6 +2250,7 @@ def main(argv: list[str] | None = None) -> None:
         f"Claude Code LiteLLM cost={coverage['claudeLiteLLMCost']}, "
         f"Claude Code official list-price cost={coverage['claudeListPriceCost']}, "
         f"Claude Code unknown cost={coverage['claudeUnknownCost']}, "
+        f"Claude Code Harbor native={coverage['claudeHarborNative']}, "
         f"OpenAI LiteLLM cost={coverage['openaiLiteLLMCost']}, "
         "OpenAI total-only estimated cost="
         f"{coverage['openaiTotalOnlyEstimatedCost']}."

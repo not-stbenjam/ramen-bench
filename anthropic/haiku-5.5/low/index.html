@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ramen</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #060509; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const TAU = Math.PI * 2;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  // Geometry in units of S (bowl radius in px). Broth/rim are ellipses.
+  const BROTH = { cy: -0.23, rx: 0.9, ry: 0.24 };
+  const RIM = { cy: -0.25, rx: 1.0, ry: 0.3 };
+
+  let W, H, DPR, S, cx, cy, t = 0, last = 0, running = false;
+  const mouse = { x: 0.5, y: 0.5, sx: 0.5, sy: 0.5 };
+  const ripples = [];
+  const steam = [];
+
+  // Noodles: polar placement inside the broth, random heading and wave phase.
+  const noodles = Array.from({ length: 70 }, () => ({
+    a: rnd(0, TAU), d: Math.sqrt(Math.random()) * 0.92,
+    ang: rnd(0, TAU), len: rnd(0.35, 0.75), ph: rnd(0, TAU),
+    amp: rnd(0.02, 0.06), w: rnd(0.8, 1.4)
+  }));
+
+  // Vegan toppings: tofu, menma, corn, scallion, sesame, chili oil, plus one nori sheet.
+  const toppings = [{ kind: 'nori', a: -2.2, d: 0.42, rot: 0.35, size: 0.42, ph: 0 }];
+  for (const [kind, n] of [['tofu', 7], ['menma', 5], ['corn', 10], ['scallion', 16], ['sesame', 30], ['chili', 6]]) {
+    for (let i = 0; i < n; i++) {
+      toppings.push({
+        kind, a: rnd(0, TAU), d: Math.sqrt(Math.random()) * 0.8, rot: rnd(0, TAU), ph: rnd(0, TAU),
+        size: kind === 'tofu' ? rnd(0.11, 0.16) : kind === 'menma' ? rnd(0.16, 0.22)
+            : kind === 'chili' ? rnd(0.05, 0.09) : rnd(0.02, 0.04)
+      });
+    }
+  }
+
+  function brothPoint(a, d) {
+    return [Math.cos(a) * d * BROTH.rx * S, (BROTH.cy + Math.sin(a) * d * BROTH.ry) * S];
+  }
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    S = Math.max(60, Math.min(W * 0.36, H * 0.3));
+    cx = W / 2;
+    cy = H * 0.56;
+    if (reduce.matches) render(0);
+  }
+
+  function spawnSteam(n) {
+    for (let i = 0; i < n && steam.length < 180; i++) {
+      const [x, y] = brothPoint(rnd(0, TAU), Math.sqrt(Math.random()) * 0.55);
+      steam.push({
+        x, y: y - rnd(0, 0.1) * S, age: 0, life: rnd(3, 5.5),
+        sp: rnd(0.1, 0.25), ph: rnd(0, TAU), size: rnd(0.8, 1.2)
+      });
+    }
+  }
+
+  function updateSteam(dt) {
+    for (const p of steam) {
+      p.age += dt;
+      const k = p.age / p.life;
+      p.y -= S * (0.16 + p.sp) * dt;
+      p.x += (Math.sin(t * 0.9 + p.ph) * 0.12 * S + (mouse.sx - 0.5) * 0.5 * S * k) * dt;
+    }
+    for (let i = steam.length - 1; i >= 0; i--) if (steam[i].age > steam[i].life) steam.splice(i, 1);
+    spawnSteam(dt * 34);
+  }
+
+  function updateRipples(dt) {
+    for (const r of ripples) r.age += dt;
+    for (let i = ripples.length - 1; i >= 0; i--) if (ripples[i].age > 2.2) ripples.splice(i, 1);
+  }
+
+  function bodyPath() {
+    ctx.beginPath();
+    ctx.moveTo(-S, -0.25 * S);
+    ctx.bezierCurveTo(-S, 0.55 * S, -0.55 * S, 0.9 * S, 0, 0.9 * S);
+    ctx.bezierCurveTo(0.55 * S, 0.9 * S, S, 0.55 * S, S, -0.25 * S);
+    ctx.closePath();
+  }
+
+  function drawNoodles() {
+    ctx.lineCap = 'round';
+    for (const n of noodles) {
+      const x = Math.cos(n.a) * n.d * BROTH.rx * S;
+      const y = (BROTH.cy + Math.sin(n.a) * n.d * BROTH.ry) * S;
+      const dx = Math.cos(n.ang) * n.len * S * 0.5;
+      const dy = Math.sin(n.ang) * n.len * S * 0.5;
+      const off = Math.sin(t * 1.1 + n.ph) * n.amp * S;
+      const mx = x - Math.sin(n.ang) * off;
+      const my = y + Math.cos(n.ang) * off;
+      ctx.beginPath();
+      ctx.moveTo(x - dx, y - dy);
+      ctx.quadraticCurveTo(mx, my, x + dx, y + dy);
+      ctx.lineWidth = S * 0.024 * n.w;
+      ctx.strokeStyle = '#e9c77c';
+      ctx.stroke();
+      ctx.lineWidth = S * 0.008 * n.w;
+      ctx.strokeStyle = 'rgba(255,248,220,0.55)';
+      ctx.stroke();
+    }
+  }
+
+  function drawTopping(tp) {
+    const [x, y0] = brothPoint(tp.a, tp.d);
+    const y = y0 + Math.sin(t * 0.8 + tp.ph) * 0.004 * S;
+    const rot = tp.rot + Math.sin(t * 0.3 + tp.ph) * 0.05;
+    const s = tp.size * S;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    switch (tp.kind) {
+      case 'nori':
+        ctx.fillStyle = 'rgba(24,46,30,0.92)';
+        ctx.beginPath(); ctx.roundRect(-s * 0.6, -s * 0.45, s * 1.2, s * 0.9, s * 0.05); ctx.fill();
+        break;
+      case 'tofu':
+        ctx.fillStyle = '#f4e0a8';
+        ctx.beginPath(); ctx.roundRect(-s, -s * 0.8, s * 2, s * 1.6, s * 0.18); ctx.fill();
+        ctx.fillStyle = 'rgba(160,100,30,0.18)';
+        ctx.beginPath(); ctx.roundRect(-s * 0.9, s * 0.2, s * 1.8, s * 0.6, s * 0.15); ctx.fill();
+        break;
+      case 'menma':
+        ctx.fillStyle = '#d9a95e';
+        ctx.beginPath(); ctx.ellipse(0, 0, s, s * 0.22, 0, 0, TAU); ctx.fill();
+        ctx.fillStyle = 'rgba(255,240,200,0.3)';
+        ctx.beginPath(); ctx.ellipse(0, -s * 0.06, s * 0.7, s * 0.06, 0, 0, TAU); ctx.fill();
+        break;
+      case 'corn':
+        ctx.fillStyle = '#ffd23f';
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, TAU); ctx.fill();
+        break;
+      case 'scallion':
+        ctx.strokeStyle = '#8fd17a';
+        ctx.lineWidth = S * 0.008;
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, TAU); ctx.stroke();
+        ctx.fillStyle = '#e9f7c9';
+        ctx.beginPath(); ctx.arc(0, 0, s * 0.4, 0, TAU); ctx.fill();
+        break;
+      case 'sesame':
+        ctx.fillStyle = '#f5efe1';
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, TAU); ctx.fill();
+        break;
+      case 'chili': {
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 1.6);
+        g.addColorStop(0, 'rgba(255,90,40,0.8)');
+        g.addColorStop(1, 'rgba(255,60,20,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0, 0, s * 1.6, 0, TAU); ctx.fill();
+        break;
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawRipples() {
+    for (const r of ripples) {
+      const k = r.age / 2.2;
+      const rad = (0.04 + k * 0.35) * S;
+      ctx.beginPath();
+      ctx.ellipse(r.x, r.y, rad, rad * 0.27, 0, 0, TAU);
+      ctx.strokeStyle = `rgba(255,236,200,${0.5 * (1 - k)})`;
+      ctx.lineWidth = S * 0.01 * (1 - k) + 0.5;
+      ctx.stroke();
+    }
+  }
+
+  function drawSteam() {
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of steam) {
+      const k = p.age / p.life;
+      const alpha = Math.sin(Math.PI * k) * 0.16;
+      const size = S * (0.12 + 0.4 * k) * p.size;
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
+      g.addColorStop(0, `rgba(255,226,190,${alpha})`);
+      g.addColorStop(1, 'rgba(255,226,190,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x, p.y, size, 0, TAU); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function render(dt) {
+    if (dt > 0) {
+      t += dt;
+      mouse.sx += (mouse.x - mouse.sx) * Math.min(1, dt * 3);
+      mouse.sy += (mouse.y - mouse.sy) * Math.min(1, dt * 3);
+      updateSteam(dt);
+      updateRipples(dt);
+    }
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.9);
+    const idle = dt > 0 ? Math.sin(t * 0.8) * S * 0.012 : 0;
+
+    // Background: dark room, warm glow that leans toward the pointer, vignette.
+    ctx.fillStyle = '#060509';
+    ctx.fillRect(0, 0, W, H);
+    const gx = cx + (mouse.sx - 0.5) * S * 0.3;
+    const gy = cy - S * 0.25 + (mouse.sy - 0.5) * S * 0.2;
+    let g = ctx.createRadialGradient(gx, gy, 0, gx, gy, S * (2.6 + 0.1 * pulse));
+    g.addColorStop(0, `rgba(255,150,70,${0.26 + 0.05 * pulse})`);
+    g.addColorStop(0.45, 'rgba(180,70,30,0.10)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.75);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,0.75)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.translate(cx + (mouse.sx - 0.5) * S * 0.12, cy + (mouse.sy - 0.5) * S * 0.04 + idle);
+    ctx.rotate((mouse.sx - 0.5) * 0.06);
+
+    // Contact shadow
+    ctx.save();
+    ctx.translate(0, S * 0.95);
+    ctx.scale(1, 0.14);
+    g = ctx.createRadialGradient(0, 0, 0, 0, 0, S * 1.2);
+    g.addColorStop(0, 'rgba(0,0,0,0.75)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(0, 0, S * 1.2, 0, TAU); ctx.fill();
+    ctx.restore();
+
+    // Bowl body (glossy dark ceramic)
+    g = ctx.createLinearGradient(0, -0.3 * S, 0, 0.9 * S);
+    g.addColorStop(0, '#2a3d3e');
+    g.addColorStop(0.5, '#14201f');
+    g.addColorStop(1, '#080e0f');
+    bodyPath();
+    ctx.fillStyle = g;
+    ctx.fill();
+    g = ctx.createLinearGradient(-S, 0, -0.2 * S, 0);
+    g.addColorStop(0, 'rgba(255,255,255,0)');
+    g.addColorStop(0.5, 'rgba(255,255,255,0.08)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    // Rim and inner wall
+    ctx.beginPath(); ctx.ellipse(0, RIM.cy * S, RIM.rx * S, RIM.ry * S, 0, 0, TAU);
+    ctx.fillStyle = '#2b4345'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, RIM.cy * S, 0.93 * S, 0.27 * S, 0, 0, TAU);
+    ctx.fillStyle = '#0a1213'; ctx.fill();
+
+    // Broth, clipped to its surface
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(0, BROTH.cy * S, BROTH.rx * S, BROTH.ry * S, 0, 0, TAU); ctx.clip();
+    g = ctx.createRadialGradient(-0.2 * S, BROTH.cy * S, 0, 0, BROTH.cy * S, BROTH.rx * S);
+    g.addColorStop(0, '#ffd37a');
+    g.addColorStop(0.55, '#d98a35');
+    g.addColorStop(1, '#6b3412');
+    ctx.fillStyle = g;
+    ctx.fillRect(-S * 1.2, -S * 0.6, S * 2.4, S * 1.2);
+
+    drawNoodles();
+    for (const tp of toppings) drawTopping(tp);
+
+    // Drifting sheen across the broth
+    const sheenX = Math.sin(t * 0.4) * 0.4 * S;
+    g = ctx.createRadialGradient(sheenX, BROTH.cy * S, 0, sheenX, BROTH.cy * S, 0.5 * S);
+    g.addColorStop(0, 'rgba(255,255,240,0.14)');
+    g.addColorStop(1, 'rgba(255,255,240,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(-S, -S, 2 * S, 2 * S);
+    drawRipples();
+    ctx.restore();
+
+    // Front lip of the rim
+    ctx.beginPath(); ctx.ellipse(0, RIM.cy * S, RIM.rx * S, RIM.ry * S, 0, 0, TAU);
+    ctx.strokeStyle = 'rgba(190,235,225,0.22)'; ctx.lineWidth = S * 0.012; ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(0, RIM.cy * S, RIM.rx * S, RIM.ry * S, 0, 0, Math.PI);
+    ctx.strokeStyle = 'rgba(190,235,225,0.35)'; ctx.lineWidth = S * 0.025; ctx.stroke();
+
+    // Chopsticks resting across the rim
+    ctx.lineCap = 'round';
+    for (const off of [0, 0.07]) {
+      ctx.beginPath();
+      ctx.moveTo(1.9 * S + off * S, -1.4 * S);
+      ctx.lineTo(0.35 * S + off * S, -0.53 * S);
+      ctx.strokeStyle = '#b98a55';
+      ctx.lineWidth = S * 0.03;
+      ctx.stroke();
+    }
+
+    drawSteam();
+    ctx.restore();
+  }
+
+  function loop(now) {
+    const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+    last = now;
+    render(dt);
+    if (running) requestAnimationFrame(loop);
+  }
+
+  function start() {
+    if (running || reduce.matches) return;
+    running = true;
+    last = performance.now();
+    requestAnimationFrame(loop);
+  }
+
+  function stop() {
+    running = false;
+  }
+
+  // Pointer: the bowl leans toward the cursor, steam follows, and passing over the broth ripples it.
+  window.addEventListener('pointermove', (e) => {
+    if (reduce.matches) return;
+    mouse.x = e.clientX / W;
+    mouse.y = e.clientY / H;
+    const lx = (e.clientX - cx) / S;
+    const ly = (e.clientY - cy) / S;
+    const inside = (lx / BROTH.rx) ** 2 + ((ly - BROTH.cy) / BROTH.ry) ** 2 < 1;
+    if (inside && Math.random() < 0.35 && ripples.length < 30) {
+      ripples.push({ x: lx * S, y: ly * S, age: 0 });
+    }
+  });
+
+  window.addEventListener('pointerdown', (e) => {
+    if (reduce.matches) return;
+    const lx = (e.clientX - cx) / S;
+    const ly = (e.clientY - cy) / S;
+    if ((lx / BROTH.rx) ** 2 + ((ly - BROTH.cy) / BROTH.ry) ** 2 < 1) {
+      ripples.push({ x: lx * S, y: ly * S, age: 0 });
+      ripples.push({ x: lx * S, y: ly * S, age: -0.25 });
+    }
+  });
+
+  window.addEventListener('resize', resize);
+
+  reduce.addEventListener('change', () => {
+    if (reduce.matches) {
+      stop();
+      mouse.x = mouse.sx = 0.5;
+      mouse.y = mouse.sy = 0.5;
+      ripples.length = 0;
+      render(0);
+    } else {
+      start();
+    }
+  });
+
+  // Seed steam so the first frame already looks lived-in.
+  resize();
+  spawnSteam(60);
+  for (const p of steam) p.age = rnd(0, p.life * 0.9);
+
+  if (reduce.matches) {
+    render(0);
+  } else {
+    start();
+  }
+})();
+</script>
+</body>
+</html>

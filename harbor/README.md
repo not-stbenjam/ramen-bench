@@ -117,6 +117,53 @@ result is missing, retain the trajectory's native accounting, and use the record
 Codex session start and completion for generation timing. Incomplete generations
 and incomplete judging cannot be recovered this way.
 
+### Claude Code subscription authentication
+
+Claude Code's native Harbor agent stores sessions under `/logs/agent/sessions`.
+Mount the local Claude credentials into that directory read-only; mounting only
+`~/.claude` at the container's home does not authenticate Harbor's separate
+Claude configuration directory. For example:
+
+```sh
+.harbor/venv/bin/harbor run \
+  -p harbor/ramen -a claude-code -m anthropic/claude-haiku-5-5 \
+  --ak reasoning_effort=high --ak version=2.1.295 \
+  --mounts '[{"type":"bind","source":"/home/your-user/.claude/.credentials.json","target":"/logs/agent/sessions/.credentials.json","read_only":true}]' \
+  --env-file .harbor/judge.env --jobs-dir "$PWD/.harbor/jobs"
+```
+
+Haiku 5.5 supports `low`, `medium`, `high`, `xhigh`, and `max`. Set the effort
+explicitly for each trial. Refresh revoked subscription credentials with
+`claude auth login` before starting another job. Credentials and native jobs
+remain private; the verifier receives only the separately configured judge key.
+
+Import completed trials through the Claude entry point:
+
+```sh
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_claude_code.py \
+  --harbor-job .harbor/jobs/<job-name> --dry-run
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_claude_code.py \
+  --harbor-job .harbor/jobs/<job-name> --publish-scores
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_claude_code.py \
+  --harbor-job .harbor/jobs/<job-name> --check-sources
+```
+
+Use the pinned historical importer dependencies in `requirements-backfill.txt`
+for `.harbor/import-venv`, separately from Harbor's environment. The importer
+requires successful native completion, checks the model and recorded effort,
+matches the exact task instruction, and compares every HTML byte to recorded
+file operations. It checks native main-session tokens against Harbor accounting
+and retains the CLI's auxiliary accounting separately. Unknown or unverified
+costs remain unknown. Source checks regenerate both public JSON documents and
+require them to match the censored import. Retain the native job for these checks.
+
+If generation succeeded but its verifier failed, regrade the saved trial with
+Harbor and pass `--grade-job .harbor/jobs/<regrade-directory>` to both import and
+source-check commands. The importer joins successful native regrades by their
+recorded source trial identity and unchanged artifact bytes. It retains original
+generation timing and accounting, records the failed verifier, and publishes only
+the successful regrade's native reward.
+
 ### Pi and OpenRouter
 
 Harbor's native Pi agent can generate bowls using OpenRouter credentials in the

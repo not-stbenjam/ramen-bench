@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vegan Ramen</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: #050302;
+    background-image: radial-gradient(ellipse 80% 65% at 50% 56%, #2a1607 0%, #120a05 48%, #040201 100%);
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 72% 68% at 50% 54%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.8) 100%);
+  }
+  canvas {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" role="img" aria-label="A steaming bowl of vegan ramen in a dark, warmly lit scene"></canvas>
+<script>
+(() => {
+  'use strict';
+
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const TAU = Math.PI * 2;
+  const STILL_TIME = 12;                                  // the moment frozen for reduced motion
+
+  // The composition is authored in scene units and scaled to fit any viewport.
+  const FOCUS  = { x: 500, y: 430 };
+  const RIM    = { x: 500, y: 420, rx: 335, ry: 136 };    // outer lip of the bowl
+  const OPEN   = { x: 500, y: 420, rx: 318, ry: 126 };    // inside edge of the lip
+  const BROTH  = { x: 500, y: 430, rx: 296, ry: 112 };    // surface of the broth
+  const SQUASH = BROTH.ry / BROTH.rx;                     // foreshortening of anything lying flat
+  const POKE_R = 64, POKE_PUSH = 16;                      // how far the cursor parts the noodles
+  const FIT_W = 700, FIT_H = 660;                         // scene area the bowl needs, fitted to the viewport
+
+  // Deterministic randomness, so the bowl is composed the same way on every visit.
+  const rand = (() => {
+    let seed = 20261008;
+    return () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  })();
+  const range = (a, b) => a + (b - a) * rand();
+  const pick = (list) => list[Math.floor(rand() * list.length)];
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const toBroth = (u, v) => ({ x: BROTH.x + u * BROTH.rx, y: BROTH.y + v * BROTH.ry });
+  const scatter = (cu, cv, radius, count) => Array.from({ length: count }, () => {
+    const a = range(0, TAU);
+    const r = Math.sqrt(rand()) * radius;
+    return { u: cu + Math.cos(a) * r, v: cv + Math.sin(a) * r };
+  });
+
+  // Runs `draw` on a plane lying flat on the broth. Local units are screen pixels
+  // across the plane; the plane is then foreshortened to match the bowl's angle.
+  function onPlane(x, y, rot, draw) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(1, SQUASH);
+    ctx.rotate(rot);
+    draw();
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // Soft radial sprites painted once in code; used for steam, bokeh and glow.
+  function makePuff(stops) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    for (const [offset, color] of stops) grad.addColorStop(offset, color);
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    return c;
+  }
+  const steamPuff = makePuff([
+    [0, 'rgba(255, 238, 214, 0.85)'], [0.4, 'rgba(255, 226, 190, 0.35)'], [1, 'rgba(255, 220, 180, 0)']
+  ]);
+  const bokehPuff = makePuff([
+    [0, 'rgba(255, 196, 120, 0.7)'], [0.55, 'rgba(255, 150, 70, 0.22)'], [1, 'rgba(255, 140, 60, 0)']
+  ]);
+
+  // Film grain: neutral speckle tile, drawn as a repeating pattern.
+  const grainTile = document.createElement('canvas');
+  grainTile.width = grainTile.height = 160;
+  {
+    const g = grainTile.getContext('2d');
+    const img = g.createImageData(160, 160);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = rand() < 0.5 ? 0 : 255;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+      img.data[i + 3] = rand() * 40;
+    }
+    g.putImageData(img, 0, 0);
+  }
+
+  // ---------- Noodles: random-walk strands in broth space, smoothed with Catmull-Rom ----------
+  function catmull(ctrl, steps) {
+    const out = [];
+    for (let i = 0; i < ctrl.length - 1; i++) {
+      const p0 = ctrl[Math.max(i - 1, 0)], p1 = ctrl[i], p2 = ctrl[i + 1];
+      const p3 = ctrl[Math.min(i + 2, ctrl.length - 1)];
+      for (let k = 0; k < steps; k++) {
+        const t = k / steps, t2 = t * t, t3 = t2 * t;
+        out.push([0, 1].map((c) => 0.5 * (
+          2 * p1[c] +
+          (p2[c] - p0[c]) * t +
+          (2 * p0[c] - 5 * p1[c] + 4 * p2[c] - p3[c]) * t2 +
+          (3 * p1[c] - p0[c] - 3 * p2[c] + p3[c]) * t3
+        )));
+      }
+    }
+    out.push(ctrl[ctrl.length - 1]);
+    return out;
+  }
+
+  const NOODLE_TONES = ['#f7d98c', '#eec46f', '#fbe6ad', '#e9b25a'];
+  const noodles = [];
+  for (let n = 0; n < 72; n++) {
+    // Strands gather into a mound toward the centre of the bowl
+    const a = range(0, TAU), r = Math.pow(rand(), 0.8) * 0.5;
+    let u = Math.cos(a) * r, v = Math.sin(a) * r;
+    let heading = range(0, TAU);
+    const ctrl = [[u, v]];
+    const segments = 5 + Math.floor(rand() * 3);
+    for (let k = 0; k < segments; k++) {
+      heading += Math.sin(k * 2.1 + n) * 0.9 + range(-0.3, 0.3);   // crimped, wavy strands
+      u += Math.cos(heading) * range(0.08, 0.12);
+      v += Math.sin(heading) * range(0.08, 0.12);
+      const d = Math.hypot(u, v);
+      if (d > 0.86) { u *= 0.86 / d; v *= 0.86 / d; }
+      ctrl.push([u, v]);
+    }
+    const centre = 1 - r / 0.5;                                    // strands in the middle rise highest
+    noodles.push({
+      pts: Float32Array.from(catmull(ctrl, 5).flat()),
+      tone: pick(NOODLE_TONES),
+      width: range(3.6, 5),
+      submerged: rand() < 0.3,
+      lift: rand() < 0.5 ? range(2, 6) * centre : 0,
+      phase: range(0, TAU)
+    });
+  }
+  // Paint back to front: submerged strands, then surface strands, then those piled highest.
+  noodles.sort((p, q) => (p.submerged !== q.submerged ? (p.submerged ? -1 : 1) : p.lift - q.lift));
+  const MAX_POINTS = Math.max(...noodles.map((nd) => nd.pts.length / 2));
+  const bufX = new Float32Array(MAX_POINTS), bufY = new Float32Array(MAX_POINTS);
+
+  // ---------- Toppings (all vegan) ----------
+  const menma = [
+    { u: 0.02, v: -0.1, w: 60, h: 10, r: 0.5 },
+    { u: -0.27, v: 0.3, w: 50, h: 9, r: -0.35 }
+  ];
+  const shiitake = [
+    { u: 0.7, v: 0.05, s: 15, r: 0.2 },
+    { u: -0.66, v: -0.08, s: 13, r: 0.9 }
+  ];
+  const tofu = [
+    { u: -0.5, v: 0.14, s: 42, r: 0.35 },
+    { u: 0.44, v: 0.26, s: 40, r: -0.25 },
+    { u: 0.63, v: -0.16, s: 34, r: 0.6 },
+    { u: -0.1, v: 0.55, s: 30, r: -0.1 }
+  ];
+  const nori = { u: -0.3, v: -0.5, w: 56, h: 30, r: -0.22 };
+  const bokChoy = { u: 0.2, v: 0.36, r: 0.9 };
+  const scallions = [
+    ...scatter(0.3, -0.18, 0.16, 9),
+    ...scatter(-0.3, 0.2, 0.14, 7),
+    ...scatter(0.52, 0.3, 0.1, 4)
+  ].map((p) => ({ ...p, r: range(4.5, 6.5) }));
+  const corn = scatter(0, 0.1, 0.8, 9).map((p) => ({ ...p, rot: range(0, TAU) }));
+  const sesame = scatter(0, 0, 0.92, 90).map((p) => ({ ...p, r: range(1.3, 2.1) }));
+  const chili = scatter(0, 0.1, 0.7, 8).map((p) => ({ ...p, r: range(2.4, 4.2) }));
+  const glints = scatter(0, 0, 0.85, 26).map((p) => ({
+    ...p, len: range(4, 9), ph: range(0, TAU), sp: range(0.5, 1.6)
+  }));
+
+  // ---------- Atmosphere: steam wisps, embers and bokeh ----------
+  const wisps = Array.from({ length: 4 }, (_, i) => ({
+    x: 390 + i * 73 + range(-18, 18),
+    ph: range(0, TAU), f: range(0.45, 0.8), amp: range(9, 16), w: range(0.7, 1.15)
+  }));
+  const motes = Array.from({ length: 70 }, () => ({
+    x: rand(), y: rand(), z: range(0.3, 1), size: range(0.6, 1.6), vy: range(0.006, 0.02), ph: range(0, TAU)
+  }));
+  const bokeh = Array.from({ length: 7 }, () => ({
+    x: rand(), y: rand(), z: range(0.8, 1.4), r: range(50, 120),
+    vx: range(-0.002, 0.002), vy: range(0.004, 0.012), ph: range(0, TAU), a: range(0.05, 0.12)
+  }));
+
+  // ---------- State ----------
+  const view = { w: 1, h: 1, dpr: 1, s: 1, ox: 0, oy: 0 };
+  const pointer = { active: false, tx: FOCUS.x, ty: FOCUS.y, sx: FOCUS.x, sy: FOCUS.y, nx: 0, ny: 0 };
+  const lean = { x: 0, y: 0 };
+  let reduced = motionQuery.matches;
+  let grain = null;
+  let clock = 0;
+  let influence = 0;          // 0..1, how strongly the cursor is affecting the scene
+  let wind = 0;
+  let steam = [];
+  let steamAcc = 0;
+  let ripples = [];
+  let bubbles = [];
+  let lastStir = -1;
+  let rafId = 0, lastTs = 0;
+
+  // ---------- Pointer ----------
+  function track(e) {
+    pointer.tx = (e.clientX - view.ox) / view.s;
+    pointer.ty = (e.clientY - view.oy) / view.s;
+    pointer.nx = (e.clientX / view.w) * 2 - 1;
+    pointer.ny = (e.clientY / view.h) * 2 - 1;
+    pointer.active = true;
+  }
+  function overBroth(x, y) {
+    const du = (x - BROTH.x) / BROTH.rx, dv = (y - BROTH.y) / BROTH.ry;
+    return du * du + dv * dv < 0.8;
+  }
+  function spawnRipple(x, y, size, dur, power) {
+    ripples.push({ x, y, size, dur, power, born: clock });
+  }
+
+  window.addEventListener('pointermove', (e) => {
+    if (reduced) return;
+    track(e);
+    if (overBroth(pointer.tx, pointer.ty) && clock - lastStir > 0.12) {
+      lastStir = clock;
+      spawnRipple(pointer.tx, pointer.ty, 50, 1.5, 0.75);
+    }
+  }, { passive: true });
+
+  window.addEventListener('pointerdown', (e) => {
+    if (reduced) return;
+    track(e);
+    if (!overBroth(pointer.tx, pointer.ty)) return;
+    spawnRipple(pointer.tx, pointer.ty, 120, 2.2, 1);
+    for (let i = 0; i < 12; i++) {
+      emitSteam(pointer.tx + range(-30, 30), pointer.ty + range(-8, 8), 26);
+    }
+  }, { passive: true });
+
+  window.addEventListener('pointerout', (e) => {
+    if (!e.relatedTarget) pointer.active = false;
+  });
+
+  // ---------- Steam ----------
+  function emitSteam(x, y, boost) {
+    steam.push({
+      x, y,
+      vx: range(-3, 3),
+      vy: -(22 + rand() * 14) - boost,
+      age: 0,
+      life: range(3.4, 5.2),
+      seed: range(0, TAU),
+      a: range(0.1, 0.18)
+    });
+  }
+
+  function drawWisp(wp, t, breeze) {
+    for (let i = 0; i < 30; i++) {
+      const k = i / 30;
+      const y = BROTH.y - 22 - i * 9.5;
+      const x = wp.x + Math.sin(i * 0.23 + t * wp.f + wp.ph) * wp.amp * (0.3 + k * 1.4) + breeze * k * k * 2.4;
+      const r = 12 + i * 1.6;
+      ctx.globalAlpha = 0.12 * wp.w * (1 - k) * (0.7 + 0.3 * Math.sin(t * 0.4 + wp.ph));
+      ctx.drawImage(steamPuff, x - r, y - r, r * 2, r * 2);
+    }
+  }
+
+  function drawSteam(t) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (const wp of wisps) drawWisp(wp, t, wind);
+    for (const p of steam) {
+      const k = p.age / p.life;
+      const fade = Math.min(1, k * 4) * (1 - k);
+      const r = 12 + p.age * 14;
+      ctx.globalAlpha = p.a * fade;
+      ctx.drawImage(steamPuff, p.x - r, p.y - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // ---------- Bowl ----------
+  function drawGlow(t) {
+    const breathe = 1 + 0.07 * Math.sin(t * 0.6) + 0.03 * Math.sin(t * 2.3 + 1.1);
+    const cx = FOCUS.x - lean.x * 12, cy = FOCUS.y - 20 - lean.y * 8;
+    const g = ctx.createRadialGradient(cx, cy, 40, cx, cy, 560);
+    g.addColorStop(0, `rgba(255, 150, 64, ${0.26 * breathe})`);
+    g.addColorStop(0.4, `rgba(200, 84, 26, ${0.12 * breathe})`);
+    g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(-1000, -1000, 3000, 3000);
+  }
+
+  function drawVessel() {
+    // Warm bounce light and contact shadow on the table
+    let g = ctx.createRadialGradient(FOCUS.x, 712, 20, FOCUS.x, 712, 340);
+    g.addColorStop(0, 'rgba(255, 150, 70, 0.2)');
+    g.addColorStop(1, 'rgba(255, 150, 70, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(FOCUS.x - 340, 372, 680, 680);
+
+    ctx.save();
+    ctx.translate(FOCUS.x, 712);
+    ctx.scale(1, 0.16);
+    g = ctx.createRadialGradient(0, 0, 0, 0, 0, 250);
+    g.addColorStop(0, 'rgba(0, 0, 0, 0.85)');
+    g.addColorStop(0.5, 'rgba(0, 0, 0, 0.45)');
+    g.addColorStop(0.85, 'rgba(0, 0, 0, 0.08)');
+    g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, 250, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
+    // Foot ring
+    ctx.beginPath();
+    ctx.ellipse(FOCUS.x, 694, 150, 26, 0, 0, TAU);
+    ctx.fillStyle = '#100d0b';
+    ctx.fill();
+
+    // Body: a glossy charcoal glaze with warm light caught on its edges
+    const body = new Path2D();
+    body.moveTo(RIM.x - RIM.rx, RIM.y);
+    body.bezierCurveTo(165, 590, 330, 704, 500, 706);
+    body.bezierCurveTo(670, 704, 835, 590, 835, RIM.y);
+    body.ellipse(RIM.x, RIM.y, RIM.rx, RIM.ry, 0, 0, Math.PI, false);
+    body.closePath();
+
+    g = ctx.createLinearGradient(165, 0, 835, 0);
+    g.addColorStop(0, '#040303');
+    g.addColorStop(0.2, '#110e0c');
+    g.addColorStop(0.36, '#241d19');
+    g.addColorStop(0.46, '#15110f');
+    g.addColorStop(0.8, '#0a0808');
+    g.addColorStop(1, '#030202');
+    ctx.fillStyle = g;
+    ctx.fill(body);
+
+    g = ctx.createRadialGradient(RIM.x, RIM.y + 10, 240, RIM.x, RIM.y + 10, 420);
+    g.addColorStop(0, 'rgba(255, 140, 60, 0)');
+    g.addColorStop(1, 'rgba(255, 140, 60, 0.22)');
+    ctx.fillStyle = g;
+    ctx.fill(body);
+
+    // Rim lip
+    ctx.beginPath();
+    ctx.ellipse(RIM.x, RIM.y, RIM.rx, RIM.ry, 0, 0, TAU);
+    g = ctx.createLinearGradient(0, RIM.y - RIM.ry, 0, RIM.y + RIM.ry);
+    g.addColorStop(0, '#3d342e');
+    g.addColorStop(0.5, '#1d1916');
+    g.addColorStop(1, '#2a2420');
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    // Inside of the bowl: the back wall catches the glow from the broth
+    ctx.beginPath();
+    ctx.ellipse(OPEN.x, OPEN.y, OPEN.rx, OPEN.ry, 0, 0, TAU);
+    g = ctx.createLinearGradient(0, OPEN.y - OPEN.ry, 0, OPEN.y + OPEN.ry * 0.3);
+    g.addColorStop(0, '#100805');
+    g.addColorStop(0.15, '#6b3e1d');
+    g.addColorStop(0.6, '#3a2010');
+    g.addColorStop(1, '#2a1409');
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    // Specular highlights along the lip
+    ctx.beginPath();
+    ctx.ellipse(RIM.x, RIM.y, RIM.rx - 1.5, RIM.ry - 1.5, 0, Math.PI * 1.08, Math.PI * 1.9);
+    ctx.strokeStyle = 'rgba(255, 214, 160, 0.32)';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(RIM.x, RIM.y, RIM.rx - 1.5, RIM.ry - 1.5, 0, Math.PI * 0.12, Math.PI * 0.85);
+    ctx.strokeStyle = 'rgba(255, 190, 130, 0.18)';
+    ctx.stroke();
+  }
+
+  function drawBroth(t) {
+    // Amber broth, lit from its centre
+    onPlane(BROTH.x, BROTH.y, 0, () => {
+      const g = ctx.createRadialGradient(-50, -22, 6, 0, 0, BROTH.rx);
+      g.addColorStop(0, '#f6c466');
+      g.addColorStop(0.3, '#d4852f');
+      g.addColorStop(0.72, '#7c3b15');
+      g.addColorStop(1, '#3f1d0a');
+      ctx.beginPath();
+      ctx.arc(0, 0, BROTH.rx, 0, TAU);
+      ctx.fillStyle = g;
+      ctx.fill();
+    });
+
+    // Shadowed edge where the broth meets the wall
+    onPlane(BROTH.x, BROTH.y, 0, () => {
+      ctx.beginPath();
+      ctx.arc(0, 0, BROTH.rx - 2, 0, TAU);
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = 'rgba(38, 14, 4, 0.5)';
+      ctx.stroke();
+    });
+
+    // A slow, drifting sheen of lamplight across the surface
+    const sx = BROTH.x - 40 + Math.sin(t * 0.17) * 34;
+    const sy = BROTH.y - 20 + Math.sin(t * 0.23) * 4;
+    ctx.globalCompositeOperation = 'lighter';
+    onPlane(sx, sy, -0.12, () => {
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 160);
+      g.addColorStop(0, 'rgba(255, 214, 150, 0.32)');
+      g.addColorStop(1, 'rgba(255, 214, 150, 0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, 160, 0, TAU);
+      ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawNoodles(t, px, py, pk) {
+    for (const nd of noodles) {
+      const count = nd.pts.length >> 1;
+      for (let i = 0; i < count; i++) {
+        // a slow undulation travelling along each strand
+        let x = BROTH.x + nd.pts[2 * i] * BROTH.rx + Math.cos(i * 0.45 + nd.phase + t * 0.7) * 1.2;
+        let y = BROTH.y + nd.pts[2 * i + 1] * BROTH.ry + Math.sin(i * 0.6 + nd.phase + t * 0.9) * 1.1 - nd.lift;
+        // the cursor parts the strands as it moves through the broth
+        if (pk > 0) {
+          const dx = x - px, dy = y - py, d = Math.hypot(dx, dy);
+          if (d < POKE_R && d > 0.01) {
+            const f = (1 - d / POKE_R) * POKE_PUSH * pk;
+            x += (dx / d) * f;
+            y += (dy / d) * f * 0.7;
+          }
+        }
+        bufX[i] = x;
+        bufY[i] = y;
+      }
+      const path = new Path2D();
+      path.moveTo(bufX[0], bufY[0]);
+      for (let i = 1; i < count; i++) path.lineTo(bufX[i], bufY[i]);
+
+      if (nd.submerged) {
+        ctx.globalAlpha = 0.55;
+        ctx.strokeStyle = '#c9893e';
+        ctx.lineWidth = nd.width;
+        ctx.stroke(path);
+        ctx.globalAlpha = 1;
+        continue;
+      }
+
+      ctx.save();
+      ctx.translate(1.2, 2 + nd.lift * 0.6);
+      ctx.strokeStyle = 'rgba(40, 14, 4, 0.45)';
+      ctx.lineWidth = nd.width + 1.4;
+      ctx.stroke(path);
+      ctx.restore();
+
+      ctx.strokeStyle = nd.tone;
+      ctx.lineWidth = nd.width;
+      ctx.stroke(path);
+
+      ctx.save();
+      ctx.translate(-0.4, -0.9);
+      ctx.strokeStyle = 'rgba(255, 252, 238, 0.6)';
+      ctx.lineWidth = nd.width * 0.3;
+      ctx.stroke(path);
+      ctx.restore();
+    }
+  }
+
+  function drawMenma(m) {
+    const q = toBroth(m.u, m.v);
+    onPlane(q.x, q.y, m.r, () => {
+      roundRect(-m.w / 2, -m.h / 2, m.w, m.h, m.h / 2);
+      ctx.fillStyle = '#e6d195';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(140, 100, 45, 0.5)';
+      ctx.lineWidth = 0.8;
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.moveTo(-m.w / 2 + 5, i * 2.4);
+        ctx.lineTo(m.w / 2 - 5, i * 2.4 + 1);
+        ctx.stroke();
+      }
+    });
+  }
+
+  function drawShiitake(m) {
+    const q = toBroth(m.u, m.v);
+    onPlane(q.x, q.y, m.r, () => {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, m.s, m.s * 0.8, 0, 0, TAU);
+      ctx.fillStyle = '#5a321e';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(-m.s * 0.1, -m.s * 0.08, m.s * 0.74, m.s * 0.58, 0, 0, TAU);
+      ctx.fillStyle = '#8c5534';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(40, 20, 10, 0.5)';
+      ctx.lineWidth = 0.9;
+      for (let i = 0; i < 7; i++) {
+        const a = (i / 7) * TAU;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * m.s * 0.3, Math.sin(a) * m.s * 0.24);
+        ctx.lineTo(Math.cos(a) * m.s * 0.7, Math.sin(a) * m.s * 0.56);
+        ctx.stroke();
+      }
+    });
+  }
+
+  function drawTofu(p, bob) {
+    const q = toBroth(p.u, p.v);
+    const h = p.s / 2, r = p.s * 0.14;
+    // Side face, so each cube reads as having thickness
+    onPlane(q.x, q.y + 4, p.r, () => {
+      roundRect(-h, -h, p.s, p.s, r);
+      ctx.fillStyle = '#8c4f1d';
+      ctx.fill();
+    });
+    onPlane(q.x, q.y + bob, p.r, () => {
+      roundRect(-h, -h, p.s, p.s, r);
+      const g = ctx.createLinearGradient(-h, -h, h, h);
+      g.addColorStop(0, '#fbe9c2');
+      g.addColorStop(1, '#e0ad63');
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(150, 82, 28, 0.6)';
+      ctx.stroke();
+    });
+  }
+
+  function drawNori(n) {
+    const q = toBroth(n.u, n.v);
+    const hw = n.w / 2, hh = n.h / 2;
+    onPlane(q.x, q.y + 5, n.r, () => {
+      roundRect(-hw, -hh, n.w, n.h, 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+      ctx.fill();
+    });
+    onPlane(q.x, q.y, n.r, () => {
+      roundRect(-hw, -hh, n.w, n.h, 2);
+      ctx.fillStyle = '#17241a';
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(150, 200, 160, 0.3)';
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(190, 230, 200, 0.14)';
+      ctx.fillRect(-hw + 5, -hh + 4, n.w * 0.35, n.h * 0.2);
+    });
+  }
+
+  function drawBokChoy(b, t) {
+    const q = toBroth(b.u, b.v);
+    onPlane(q.x, q.y + Math.sin(t * 0.7) * 0.6, b.r, () => {
+      ctx.beginPath();
+      ctx.moveTo(-24, 3);
+      ctx.lineTo(-4, -1);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#e4f2bf';
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(10, 0, 21, 11, 0, 0, TAU);
+      ctx.fillStyle = '#4c8a32';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(12, -3, 15, 7, 0, 0, TAU);
+      ctx.fillStyle = '#7fb653';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-4, 0);
+      ctx.lineTo(26, -1);
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = 'rgba(225, 245, 180, 0.6)';
+      ctx.stroke();
+    });
+  }
+
+  function drawScallion(p) {
+    const q = toBroth(p.u, p.v);
+    onPlane(q.x, q.y, 0, () => {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r, 0, TAU);
+      ctx.fillStyle = '#7aa947';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r * 0.6, 0, TAU);
+      ctx.fillStyle = '#f2f8da';
+      ctx.fill();
+    });
+  }
+
+  function drawCorn(p) {
+    const q = toBroth(p.u, p.v);
+    onPlane(q.x, q.y, p.rot, () => {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 4.2, 3.2, 0, 0, TAU);
+      ctx.fillStyle = '#f2bf3c';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(-1, -1, 1.8, 1.2, 0, 0, TAU);
+      ctx.fillStyle = '#fff0a0';
+      ctx.fill();
+    });
+  }
+
+  function drawChili(p) {
+    const q = toBroth(p.u, p.v);
+    onPlane(q.x, q.y, 0, () => {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r, 0, TAU);
+      ctx.fillStyle = 'rgba(200, 52, 24, 0.9)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-p.r * 0.3, -p.r * 0.3, p.r * 0.35, 0, TAU);
+      ctx.fillStyle = 'rgba(255, 170, 130, 0.7)';
+      ctx.fill();
+    });
+  }
+
+  function drawSesame(p) {
+    const q = toBroth(p.u, p.v);
+    onPlane(q.x, q.y, 0, () => {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r, 0, TAU);
+      ctx.fillStyle = '#f5ecd2';
+      ctx.fill();
+    });
+  }
+
+  function drawGlints(t) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (const g of glints) {
+      const k = Math.pow(Math.max(0, Math.sin(t * g.sp + g.ph)), 12);
+      if (k < 0.03) continue;
+      const q = toBroth(g.u, g.v);
+      ctx.globalAlpha = k * 0.8;
+      onPlane(q.x, q.y, 0, () => {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, g.len, 3.2, 0, 0, TAU);
+        ctx.fillStyle = '#fff0c8';
+        ctx.fill();
+      });
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawRipples() {
+    for (const r of ripples) {
+      const age = (clock - r.born) / r.dur;
+      if (age < 0 || age >= 1) continue;
+      const rad = 6 + age * r.size;
+      ctx.globalAlpha = (1 - age) * (1 - age) * r.power;
+      onPlane(r.x, r.y, 0, () => {
+        ctx.beginPath();
+        ctx.arc(0, 0, rad, 0, TAU);
+        ctx.lineWidth = 1.4;
+        ctx.strokeStyle = '#ffeccc';
+        ctx.stroke();
+      });
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function reseedBubble(b) {
+    const a = range(0, TAU), r = Math.sqrt(rand()) * 0.82;
+    b.u = Math.cos(a) * r;
+    b.v = Math.sin(a) * r;
+    b.life = range(1.4, 2.6);
+    b.r = range(2.2, 3.6);
+    b.born = clock;
+  }
+
+  function makeBubble() {
+    const b = {};
+    reseedBubble(b);
+    b.born -= rand() * b.life;   // start each bubble at a random point in its life
+    return b;
+  }
+
+  function drawBubbles() {
+    for (const b of bubbles) {
+      const age = clamp((clock - b.born) / b.life, 0, 1);
+      const q = toBroth(b.u, b.v);
+      ctx.globalAlpha = 0.6 * Math.sin(Math.PI * age);
+      ctx.beginPath();
+      ctx.arc(q.x, q.y, b.r * (0.7 + 0.3 * age), 0, TAU);
+      ctx.fillStyle = 'rgba(255, 236, 200, 0.3)';
+      ctx.fill();
+      ctx.lineWidth = 0.9;
+      ctx.strokeStyle = '#fff4dc';
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawBowl(t, gx, gy) {
+    drawVessel();
+    drawBroth(t);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(OPEN.x, OPEN.y, OPEN.rx - 3, OPEN.ry - 3, 0, 0, TAU);
+    ctx.clip();
+
+    menma.forEach(drawMenma);
+    shiitake.forEach(drawShiitake);
+    drawNoodles(t, pointer.sx - gx, pointer.sy - gy, influence);
+    tofu.forEach((p, i) => drawTofu(p, Math.sin(t * 0.8 + i * 1.7) * 0.6));
+    drawNori(nori);
+    drawBokChoy(bokChoy, t);
+    scallions.forEach(drawScallion);
+    corn.forEach(drawCorn);
+    chili.forEach(drawChili);
+    sesame.forEach(drawSesame);
+    drawGlints(t);
+    drawRipples();
+    drawBubbles();
+    ctx.restore();
+  }
+
+  // ---------- Background atmosphere (screen space) ----------
+  function drawBokeh(t) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (const b of bokeh) {
+      const x = b.x * view.w - lean.x * 22 * b.z;
+      const y = b.y * view.h - lean.y * 14 * b.z;
+      const r = b.r * view.s * b.z;
+      ctx.globalAlpha = b.a * (0.75 + 0.25 * Math.sin(t * 0.5 + b.ph));
+      ctx.drawImage(bokehPuff, x - r, y - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawMotes(t) {
+    ctx.fillStyle = '#ffd7a0';
+    for (const m of motes) {
+      const x = m.x * view.w - lean.x * 16 * m.z;
+      const y = m.y * view.h - lean.y * 10 * m.z;
+      ctx.globalAlpha = clamp((0.25 + 0.25 * Math.sin(t * 1.3 + m.ph)) * m.z, 0, 1);
+      ctx.beginPath();
+      ctx.arc(x, y, m.size * m.z, 0, TAU);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawGrain(t) {
+    const shift = Math.floor(t * 24);
+    grain.setTransform(new DOMMatrix().translate((shift * 37) % 160, (shift * 53) % 160));
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = grain;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------- Frame ----------
+  function render(t) {
+    const { dpr, s, ox, oy } = view;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawBokeh(t);
+    drawMotes(t);
+
+    ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * ox, dpr * oy);
+    drawGlow(t);
+
+    const gx = lean.x * 6, gy = lean.y * 4;     // the bowl drifts a touch toward the cursor
+    ctx.save();
+    ctx.translate(gx, gy);
+    drawBowl(t, gx, gy);
+    ctx.restore();
+
+    drawSteam(t);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    drawGrain(t);
+  }
+
+  function update(dt) {
+    const ease = 1 - Math.pow(0.0008, dt);
+    const fade = 1 - Math.pow(0.02, dt);
+
+    influence += ((pointer.active ? 1 : 0) - influence) * fade;
+    pointer.sx += (pointer.tx - pointer.sx) * ease;
+    pointer.sy += (pointer.ty - pointer.sy) * ease;
+    lean.x += ((pointer.active ? pointer.nx : 0) - lean.x) * ease;
+    lean.y += ((pointer.active ? pointer.ny : 0) - lean.y) * ease;
+    wind = clamp((pointer.sx - FOCUS.x) / 260, -1, 1) * 18 * influence;
+
+    // Steam rises from the broth, pulled sideways by the breeze and pushed by the cursor
+    steamAcc += dt * 12;
+    while (steamAcc >= 1) {
+      steamAcc -= 1;
+      const g = (rand() + rand() + rand() - 1.5) / 1.5;
+      emitSteam(BROTH.x + g * 0.7 * BROTH.rx, BROTH.y - 14 + range(-0.2, 0.2) * BROTH.ry, 0);
+    }
+    for (const p of steam) {
+      p.age += dt;
+      p.vx += (wind * 0.9 - p.vx) * Math.min(1, dt * 0.9) + Math.sin(p.age * 1.1 + p.seed) * 6 * dt;
+      if (influence > 0.01) {
+        const dx = p.x - pointer.sx, dy = p.y - pointer.sy, d = Math.hypot(dx, dy);
+        if (d < 140 && d > 0.001) {
+          const f = (1 - d / 140) * 260 * dt * influence;
+          p.vx += (dx / d) * f;
+          p.vy += (dy / d) * f * 0.4;
+        }
+      }
+      p.vy *= 1 - dt * 0.12;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+    }
+    steam = steam.filter((p) => p.age < p.life && p.y > 30);
+
+    for (const m of motes) {
+      m.y -= m.vy * dt;
+      m.x += Math.sin(clock * 0.3 + m.ph) * 0.004 * dt;
+      if (m.y < -0.03) { m.y = 1.03; m.x = rand(); }
+    }
+    for (const b of bokeh) {
+      b.y -= b.vy * dt;
+      b.x += (b.vx + Math.sin(clock * 0.15 + b.ph) * 0.002) * dt;
+      if (b.y < -0.2) { b.y = 1.2; b.x = rand(); }
+    }
+
+    ripples = ripples.filter((r) => clock - r.born < r.dur);
+    for (const b of bubbles) {
+      if (clock - b.born > b.life) reseedBubble(b);
+    }
+  }
+
+  function resetScene() {
+    clock = 0;
+    steam = [];
+    steamAcc = 0;
+    ripples = [];
+    influence = 0;
+    wind = 0;
+    bubbles = Array.from({ length: 9 }, makeBubble);
+  }
+
+  // Reduced motion: simulate the scene up to a pleasing moment and paint it once.
+  function renderStill() {
+    resetScene();
+    const dt = 1 / 30;
+    for (let i = 0; i < STILL_TIME / dt; i++) {
+      clock += dt;
+      update(dt);
+    }
+    render(clock);
+  }
+
+  function frame(ts) {
+    const dt = clamp((ts - lastTs) / 1000, 0, 0.05);
+    lastTs = ts;
+    clock += dt;
+    update(dt);
+    render(clock);
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function startLoop() {
+    if (rafId) return;
+    lastTs = performance.now();
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function stopLoop() {
+    cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+
+  function resize() {
+    view.w = window.innerWidth;
+    view.h = window.innerHeight;
+    view.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(view.w * view.dpr);
+    canvas.height = Math.round(view.h * view.dpr);
+    // Fit the composition to the viewport, keeping the bowl just below centre
+    view.s = Math.min((view.w * 0.94) / FIT_W, (view.h * 0.84) / FIT_H);
+    view.ox = view.w / 2 - FOCUS.x * view.s;
+    view.oy = view.h * 0.54 - FOCUS.y * view.s;
+    grain = ctx.createPattern(grainTile, 'repeat');
+    if (reduced) renderStill();
+  }
+
+  const onMotionChange = () => {
+    reduced = motionQuery.matches;
+    if (reduced) {
+      stopLoop();
+      renderStill();
+    } else {
+      startLoop();
+    }
+  };
+  if (motionQuery.addEventListener) motionQuery.addEventListener('change', onMotionChange);
+  else motionQuery.addListener(onMotionChange);
+
+  window.addEventListener('resize', resize);
+
+  resetScene();
+  resize();
+  if (!reduced) startLoop();
+})();
+</script>
+</body>
+</html>

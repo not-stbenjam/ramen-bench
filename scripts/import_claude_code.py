@@ -14,6 +14,10 @@ CLAUDE_VENDOR_ROOTS = (ROOT / "anthropic", ROOT / "z.ai")
 
 
 def main() -> int:
+    if "--harbor-job" in sys.argv[1:]:
+        from import_harbor_claude import main as import_harbor
+
+        return import_harbor(sys.argv[1:])
     import_sessions(["--harness", "claude-code", *sys.argv[1:]])
     if "--dry-run" not in sys.argv[1:]:
         censor_transcripts(["--write", *(str(path) for path in CLAUDE_VENDOR_ROOTS)])
