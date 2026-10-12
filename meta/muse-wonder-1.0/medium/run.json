@@ -40,11 +40,18 @@
       "input": 51355,
       "cachedInput": 332284,
       "cacheCreationInput": 0,
-      "output": 10245,
+      "output": 8458,
       "reasoning": 1787,
-      "total": 395671
+      "total": 393884
     },
-    "cost": null,
+    "cost": {
+      "currency": "USD",
+      "input": 0.20542,
+      "cachedInput": 0.0664568,
+      "output": 0.2049,
+      "total": 0.4767768,
+      "estimated": true
+    },
     "requests": 12,
     "turns": 1,
     "toolCalls": 10,
@@ -110,6 +117,21 @@
         "unknown_payload_kinds": 0,
         "unparseable_lines": 0
       },
+      "pricing": {
+        "source": "https://dev.meta.ai/docs/pricing-rate-limits",
+        "reasoningSource": "https://dev.meta.ai/docs/reasoning",
+        "asOf": "2026-10-12",
+        "model": "muse-wonder-1.0",
+        "mode": "Standard",
+        "usdPerMillionTokens": {
+          "input": 4,
+          "cachedInput": 0.2,
+          "output": 20
+        },
+        "reasoningIncludedInOutput": true,
+        "includesAuxiliarySessions": true,
+        "pricedRequests": 12
+      },
       "harborGradeTrial": "muse-task__XkmsnjC"
     }
   },
@@ -117,5 +139,8 @@
     "bytes": 16834,
     "lines": 339
   },
-  "notes": "HTML is unchanged and verified against recorded Muse writes. Generation timing excludes setup and grading. Tokens sum native model_completed events once per retained main and auxiliary session; input excludes cache hits and reasoning is separate from output. Auxiliary session content, hidden reasoning, system/developer prompts and private activity are excluded from the public transcript. Muse supplies no recorded cost, and the pinned LiteLLM catalog has no Wonder rate; cost remains unknown. Effort is the explicitly requested setting recorded in Harbor and its Muse invocation. Scores come from a native Harbor regrade of the saved artifact; generation was not repeated."
+  "provenance": {
+    "pricingSource": "Meta Standard published list prices, pinned 2026-10-12; https://dev.meta.ai/docs/pricing-rate-limits"
+  },
+  "notes": "HTML is unchanged and verified against recorded Muse writes. Generation timing excludes setup and grading. Tokens sum native model_completed events once per retained main and auxiliary session. Input excludes cache hits; reasoning is a subset of native output, split out of usage.tokens.output and counted once in the total. Auxiliary session content, hidden reasoning, system/developer prompts and private activity are excluded from the public transcript. Cost is an API-equivalent Standard list-price estimate at Meta's published rates, including auxiliary sessions and reasoning once; it is not a recorded charge. Effort is the explicitly requested setting recorded in Harbor and its Muse invocation. Scores come from a native Harbor regrade of the saved artifact; generation was not repeated."
 }

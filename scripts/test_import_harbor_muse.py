@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from import_harbor_muse import normalize_session, sum_usage, verify_artifact
+from muse_list_prices import wonder_list_cost
 
 
 def record(kind, **values):
@@ -27,6 +28,69 @@ def call(name, **args):
 
 
 class MuseImportTests(unittest.TestCase):
+    def test_list_price_counts_cache_discount_reasoning_once_and_auxiliary_requests(
+        self,
+    ):
+        usage = {
+            "input_tokens": 1_200_000,
+            "cached_tokens": 200_000,
+            "cache_read_tokens": 200_000,
+            "cache_write_tokens": 0,
+            "output_tokens": 100_000,
+            "reasoning_tokens": 60_000,
+        }
+        main = {
+            "events": [record("model_completed", model="muse-wonder-1.0", usage=usage)]
+        }
+        cost, evidence = wonder_list_cost([main])
+        # One million uncached tokens ($4), 200k cache hits ($.04),
+        # and 100k inclusive output tokens ($2), with no extra reasoning charge.
+        self.assertEqual(cost["total"], 6.04)
+        self.assertEqual(cost["output"], 2)
+        self.assertTrue(cost["estimated"])
+        self.assertEqual(evidence["asOf"], "2026-10-12")
+        child_usage = {
+            **usage,
+            "input_tokens": 50_000,
+            "cached_tokens": 20_000,
+            "cache_read_tokens": 20_000,
+            "output_tokens": 1_000,
+            "reasoning_tokens": 500,
+        }
+        child = {
+            "events": [
+                record("model_completed", model="muse-wonder-1.0", usage=child_usage)
+            ]
+        }
+        cost, evidence = wonder_list_cost([main, child])
+        self.assertEqual(cost["total"], 6.184)
+        self.assertEqual(evidence["pricedRequests"], 2)
+
+    def test_pricing_stays_unknown_for_missing_categories_models_or_tool_charges(self):
+        usage = {
+            "input_tokens": 100,
+            "cached_tokens": 80,
+            "cache_read_tokens": 80,
+            "cache_write_tokens": 0,
+            "output_tokens": 20,
+            "reasoning_tokens": 10,
+        }
+        request = record("model_completed", model="muse-wonder-1.0", usage=usage)
+        export = {"events": [request]}
+        request["envelope"]["payload"]["event"]["model"] = "unpriced-model"
+        self.assertIsNone(wonder_list_cost([export]))
+        request["envelope"]["payload"]["event"]["model"] = "muse-wonder-1.0"
+        del usage["cache_read_tokens"]
+        self.assertIsNone(wonder_list_cost([export]))
+        usage["cache_read_tokens"] = 80
+        export["events"].append(
+            record(
+                "assistant_tool_calls_committed",
+                tool_calls=[call("web_search", query="fixture")],
+            )
+        )
+        self.assertIsNone(wonder_list_cost([export]))
+
     def test_exact_write_and_edit_replay_rejects_tampered_artifact(self):
         export = {
             "events": [
