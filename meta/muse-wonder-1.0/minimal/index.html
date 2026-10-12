@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title></title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#070504}
+  body{cursor:crosshair}
+  #scene{position:fixed;inset:0;width:100%;height:100%;display:block}
+  @media (prefers-reduced-motion: reduce){
+    body{cursor:default}
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<script>
+(function(){
+"use strict";
+const canvas=document.getElementById('scene');
+const ctx=canvas.getContext('2d');
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let W=0,H=0,DPR=1,CX=0,CY=0,S=1; // S = scene scale
+function resize(){
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  W=window.innerWidth; H=window.innerHeight;
+  canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  CX=W/2; CY=H*0.54;
+  S=Math.min(W,H)/620; // bowl radius ~190*S
+  initEmbers();
+}
+window.addEventListener('resize',resize,{passive:true});
+
+/* ---------- mouse ---------- */
+const mouse={x:-9999,y:-9999,tx:-9999,ty:-9999,inside:false,down:false};
+let ripples=[];
+function onMove(x,y){mouse.tx=x;mouse.ty=y;mouse.inside=true;}
+window.addEventListener('pointermove',e=>onMove(e.clientX,e.clientY),{passive:true});
+window.addEventListener('touchmove',e=>{if(e.touches[0])onMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+window.addEventListener('pointerleave',()=>{mouse.inside=false;});
+window.addEventListener('pointerdown',e=>{
+  mouse.down=true; onMove(e.clientX,e.clientY);
+  // tap / click sends a ripple through the broth
+  const dx=e.clientX-CX, dy=(e.clientY-(CY-58*S))/(0.32);
+  const d=Math.hypot(dx,dy);
+  if(d<185*S && !reduced) ripples.push({r:Math.max(6,d*0.35),a:0.55});
+  stir=Math.min(1,stir+0.6);
+});
+window.addEventListener('pointerup',()=>{mouse.down=false;});
+
+/* ---------- seeded random ---------- */
+let seed=1234567;
+function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
+function rr(a,b){return a+rnd()*(b-a);}
+
+/* ---------- noodles (pre-generated paths inside broth ellipse) ---------- */
+const BR=176; // broth half-width in scene units
+const noodles=[];
+for(let i=0;i<46;i++){
+  const pts=[], cx=rr(-120,120), cy=rr(-34,30), n=5+(rnd()*4|0);
+  const ph=rr(0,Math.PI*2), amp=rr(5,15), len=rr(50,120);
+  for(let j=0;j<n;j++){
+    const t=j/(n-1);
+    pts.push({x:cx+(t-0.5)*len, y:cy+Math.sin(t*Math.PI*2.2+ph)*amp*(1-Math.abs(t-0.5))});
+  }
+  noodles.push({pts,ph,w:rr(3,5.5),tone:rnd()});
+}
+/* toppings placed on broth */
+function onBroth(x,y){return (x*x)/(BR*BR)+(y*y)/(52*52)<0.92;}
+const toppings=[];
+const kinds=['mushroom','mushroom','greens','greens','corn','corn','carrot','chili','tofu','nori','scallion','scallion','scallion','sesame'];
+for(const k of kinds){
+  let x=0,y=0,tries=0;
+  do{x=rr(-150,150);y=rr(-42,40);tries++;}while(!onBroth(x,y)&&tries<40);
+  toppings.push({k,x,y,rot:rr(0,Math.PI*2),s:rr(0.8,1.2),ph:rr(0,6.28)});
+}
+const sesame=[];
+for(let i=0;i<60;i++){let x,y,t=0;do{x=rr(-160,160);y=rr(-46,44);t++;}while(!onBroth(x,y)&&t<30);sesame.push({x,y,r:rr(0,6.28)});}
+
+/* ---------- steam particles ---------- */
+const steam=[];
+function spawnSteam(p){
+  p.x=CX+rr(-70,70)*S; p.y=CY-95*S+rr(-8,8)*S;
+  p.vy=rr(0.28,0.62); p.vx=rr(-0.06,0.06);
+  p.life=0; p.max=rr(260,520); p.size=rr(9,22)*S; p.ph=rr(0,6.28); p.drift=rr(0.4,1.1);
+}
+for(let i=0;i<(reduced?0:42);i++){const p={};spawnSteam(p);p.life=rnd()*p.max;steam.push(p);}
+
+/* ---------- ambient embers / dust ---------- */
+let embers=[];
+function initEmbers(){
+  embers=[];
+  const n=reduced?0:Math.round(Math.min(34,W/36));
+  for(let i=0;i<n;i++)embers.push({x:rnd()*W,y:rnd()*H,r:rr(0.6,1.9),vy:rr(-0.14,-0.04),vx:rr(-0.05,0.05),ph:rr(0,6.28),a:rr(0.08,0.3)});
+}
+
+/* ---------- chopstick-held noodle lift ---------- */
+let stir=0; // extra broth swirl energy from interaction
+
+let t0=performance.now();
+function frame(now){
+  const t=(now-t0)/1000;
+  mouse.x+= (mouse.tx-mouse.x)*0.06;
+  mouse.y+= (mouse.ty-mouse.y)*0.06;
+  const mActive=mouse.inside && !reduced;
+  // parallax: scene leans slightly toward cursor
+  const px=mActive?((mouse.x/W)-0.5):0;
+  const py=mActive?((mouse.y/H)-0.5):0;
+  stir*=0.985;
+
+  draw(t,px,py);
+  requestAnimationFrame(frame);
+}
+
+function draw(t,px,py){
+  ctx.clearRect(0,0,W,H);
+  const cx=CX+px*14, cy=CY+py*10;
+
+  /* ===== background: deep warm darkness ===== */
+  const bg=ctx.createRadialGradient(cx,cy-40*S,10,cx,cy,Math.max(W,H)*0.75);
+  bg.addColorStop(0,'#2a1710'); bg.addColorStop(0.28,'#1a0f0a');
+  bg.addColorStop(0.6,'#0d0705'); bg.addColorStop(1,'#050302');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // faint wooden table sheen
+  const tableY=cy+108*S;
+  const tg=ctx.createLinearGradient(0,tableY-30*S,0,H);
+  tg.addColorStop(0,'rgba(80,44,22,0.20)'); tg.addColorStop(0.4,'rgba(40,22,12,0.10)'); tg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=tg; ctx.fillRect(0,tableY-30*S,W,H);
+  // table grain lines
+  ctx.save(); ctx.globalAlpha=0.05; ctx.strokeStyle='#c98a4a'; ctx.lineWidth=1;
+  for(let i=0;i<7;i++){const y=tableY+(i*22+8)*S;ctx.beginPath();ctx.moveTo(0,y);ctx.bezierCurveTo(W*0.3,y+4*S,W*0.7,y-4*S,W,y+2*S);ctx.stroke();}
+  ctx.restore();
+
+  // warm halo behind bowl (breathing glow)
+  const breathe=reduced?1:1+Math.sin(t*0.7)*0.05;
+  const halo=ctx.createRadialGradient(cx,cy-10*S,10,cx,cy-10*S,320*S*breathe);
+  halo.addColorStop(0,'rgba(255,150,60,0.20)'); halo.addColorStop(0.5,'rgba(200,90,30,0.07)'); halo.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=halo; ctx.fillRect(cx-340*S,cy-340*S,680*S,680*S);
+
+  /* embers */
+  for(const e of embers){
+    e.x+=e.vx+Math.sin(t*0.5+e.ph)*0.08; e.y+=e.vy;
+    if(e.y<-4){e.y=H+4;e.x=Math.random()*W;}
+    if(e.x<-4)e.x=W+4; if(e.x>W+4)e.x=-4;
+    const fl=0.6+0.4*Math.sin(t*1.7+e.ph);
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,6.283);
+    ctx.fillStyle=`rgba(255,${150+((fl*60)|0)},70,${(e.a*fl).toFixed(3)})`; ctx.fill();
+  }
+
+  /* ===== shadow under bowl ===== */
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(cx,cy+112*S,205*S,30*S,0,0,6.283);
+  const sh=ctx.createRadialGradient(cx,cy+112*S,10,cx,cy+112*S,205*S);
+  sh.addColorStop(0,'rgba(0,0,0,0.65)'); sh.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=sh; ctx.fill(); ctx.restore();
+
+  /* ===== back steam (behind bowl rim) ===== */
+  drawSteam(t,cx,cy,0);
+
+  /* ===== bowl body ===== */
+  const rimY=cy-58*S, rimRx=192*S, rimRy=62*S;
+  // outer bowl: ceramic curve down to foot
+  const bowlGrad=ctx.createLinearGradient(cx-rimRx,0,cx+rimRx,0);
+  bowlGrad.addColorStop(0,'#141a22'); bowlGrad.addColorStop(0.22,'#2e3d4e');
+  bowlGrad.addColorStop(0.5,'#46586e'); bowlGrad.addColorStop(0.78,'#232f3e'); bowlGrad.addColorStop(1,'#0e1319');
+  ctx.beginPath();
+  ctx.moveTo(cx-rimRx,rimY);
+  ctx.bezierCurveTo(cx-rimRx*0.98,cy+40*S,cx-rimRx*0.62,cy+92*S,cx-58*S,cy+100*S);
+  ctx.lineTo(cx-52*S,cy+112*S); ctx.lineTo(cx+52*S,cy+112*S); ctx.lineTo(cx+58*S,cy+100*S);
+  ctx.bezierCurveTo(cx+rimRx*0.62,cy+92*S,cx+rimRx*0.98,cy+40*S,cx+rimRx,rimY);
+  ctx.closePath(); ctx.fillStyle=bowlGrad; ctx.fill();
+  // foot ring
+  ctx.beginPath(); ctx.ellipse(cx,cy+112*S,54*S,9*S,0,0,6.283); ctx.fillStyle='#0a0e13'; ctx.fill();
+  // decorative stripe on bowl
+  ctx.save(); ctx.clip();
+  ctx.beginPath();
+  ctx.moveTo(cx-rimRx,cy+18*S);
+  ctx.bezierCurveTo(cx-100*S,cy+44*S,cx+100*S,cy+44*S,cx+rimRx,cy+18*S);
+  ctx.bezierCurveTo(cx+100*S,cy+58*S,cx-100*S,cy+58*S,cx-rimRx,cy+18*S);
+  ctx.closePath(); ctx.fillStyle='rgba(196,60,42,0.85)'; ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(cx-rimRx,cy+34*S);
+  ctx.bezierCurveTo(cx-100*S,cy+58*S,cx+100*S,cy+58*S,cx+rimRx,cy+34*S);
+  ctx.bezierCurveTo(cx+100*S,cy+64*S,cx-100*S,cy+64*S,cx-rimRx,cy+34*S);
+  ctx.closePath(); ctx.fillStyle='rgba(230,170,80,0.5)'; ctx.fill();
+  // ceramic sheen sweeping with mouse
+  const sheenX=cx+px*160*S;
+  const sheen=ctx.createLinearGradient(sheenX-120*S,0,sheenX+120*S,0);
+  sheen.addColorStop(0,'rgba(255,255,255,0)'); sheen.addColorStop(0.5,'rgba(255,230,200,0.10)'); sheen.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=sheen; ctx.fillRect(cx-rimRx,rimY,rimRx*2,190*S);
+  ctx.restore();
+  // rim edge
+  ctx.beginPath(); ctx.ellipse(cx,rimY,rimRx,rimRy,0,0,6.283);
+  ctx.fillStyle='#1b2531'; ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx,rimY,rimRx-10*S,rimRy-8*S,0,0,6.283);
+  ctx.fillStyle='#0f151d'; ctx.fill();
+
+  /* ===== broth ===== */
+  const brothY=rimY+6*S;
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(cx,brothY,BR*S,52*S,0,0,6.283); ctx.clip();
+  const swirl=reduced?0:t*0.12+stir*2.2;
+  const broth=ctx.createRadialGradient(cx-30*S,brothY-10*S,10,cx,brothY,BR*S);
+  broth.addColorStop(0,'#e8a34c'); broth.addColorStop(0.45,'#c97a2e');
+  broth.addColorStop(0.8,'#9e5518'); broth.addColorStop(1,'#7a3f10');
+  ctx.fillStyle=broth; ctx.fillRect(cx-BR*S,brothY-60*S,BR*2*S,120*S);
+
+  // broth oil sheen blobs
+  for(let i=0;i<9;i++){
+    const a=swirl*(0.4+i*0.05)+i*2.4, rad=(30+i*13)*S;
+    const x=cx+Math.cos(a)*rad*1.9, y=brothY+Math.sin(a)*rad*0.42;
+    ctx.beginPath(); ctx.ellipse(x,y,(14-i)*S*1.4,(5-i*0.3)*S,0,0,6.283);
+    ctx.fillStyle='rgba(255,205,110,0.13)'; ctx.fill();
+  }
+  // noodles (gently undulating)
+  ctx.lineCap='round';
+  for(const nd of noodles){
+    ctx.beginPath();
+    nd.pts.forEach((p,j)=>{
+      const wob=reduced?0:Math.sin(t*1.3+nd.ph+j*0.9)*1.6;
+      const x=cx+p.x*S, y=brothY+(p.y+wob)*S*0.9;
+      j===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle=nd.tone>0.5?'rgba(246,205,130,0.9)':'rgba(238,185,100,0.85)';
+    ctx.lineWidth=nd.w*S; ctx.stroke();
+  }
+  // click ripples
+  ripples=ripples.filter(r=>r.a>0.01);
+  for(const r of ripples){
+    r.r+=2.4; r.a*=0.94;
+    ctx.beginPath(); ctx.ellipse(cx,brothY,r.r*S,r.r*0.30*S,0,0,6.283);
+    ctx.strokeStyle=`rgba(255,220,150,${r.a.toFixed(3)})`; ctx.lineWidth=2*S; ctx.stroke();
+  }
+  // toppings
+  for(const tp of toppings) drawTopping(tp,cx,brothY,t);
+  // sesame
+  ctx.fillStyle='rgba(255,240,210,0.9)';
+  for(const s of sesame){ctx.save();ctx.translate(cx+s.x*S,brothY+s.y*S);ctx.rotate(s.r);ctx.beginPath();ctx.ellipse(0,0,2.6*S,1.3*S,0,0,6.283);ctx.fill();ctx.restore();}
+
+  // broth specular highlight following mouse
+  if(mouse.inside){
+    const hx=cx+((mouse.x-cx)*0.35), hy=brothY+((mouse.y-brothY)*0.18);
+    const hg=ctx.createRadialGradient(hx,hy,2,hx,hy,90*S);
+    hg.addColorStop(0,'rgba(255,240,200,0.20)'); hg.addColorStop(1,'rgba(255,240,200,0)');
+    ctx.fillStyle=hg; ctx.fillRect(cx-BR*S,brothY-60*S,BR*2*S,120*S);
+  }
+  ctx.restore();
+
+  /* ===== lifted noodles on chopsticks (upper right) ===== */
+  drawLifted(t,cx,rimY,px,py);
+
+  /* ===== front steam ===== */
+  drawSteam(t,cx,cy,1);
+
+  /* ===== vignette ===== */
+  const vg=ctx.createRadialGradient(cx,cy,Math.min(W,H)*0.34,cx,cy,Math.max(W,H)*0.78);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.72)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+
+  // subtle film grain warmth at edges
+  ctx.fillStyle='rgba(255,140,60,0.02)'; ctx.fillRect(0,0,W,H);
+}
+
+function drawTopping(tp,cx,brothY,t){
+  const bob=reduced?0:Math.sin(t*1.1+tp.ph)*1.4;
+  ctx.save(); ctx.translate(cx+tp.x*S,brothY+(tp.y+bob)*S); ctx.rotate(tp.rot); ctx.scale(tp.s*S,tp.s*S);
+  switch(tp.k){
+    case 'mushroom':
+      ctx.fillStyle='#e8d9bd'; ctx.beginPath(); ctx.ellipse(0,2,7,4.5,0,0,6.283); ctx.fill();
+      ctx.fillStyle='#8a6844'; ctx.beginPath(); ctx.ellipse(0,-1,10,6,0,Math.PI,6.283); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.beginPath(); ctx.ellipse(-3,-3.5,3.4,1.6,-0.4,0,6.283); ctx.fill(); break;
+    case 'greens':
+      ctx.fillStyle='#3f7d2c';
+      for(let i=0;i<3;i++){ctx.save();ctx.rotate(i*1.1-1);ctx.beginPath();ctx.ellipse(0,-6,4,8,0,0,6.283);ctx.fill();ctx.restore();}
+      ctx.fillStyle='#5da344'; ctx.beginPath(); ctx.ellipse(0,-4,3,6,0.3,0,6.283); ctx.fill(); break;
+    case 'corn':
+      ctx.fillStyle='#f5c33b';
+      [[-4,-2],[3,-3],[-1,3],[5,2]].forEach(p=>{ctx.beginPath();ctx.ellipse(p[0],p[1],3,4,0.4,0,6.283);ctx.fill();});
+      ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.ellipse(-4,-3.4,1.4,2,0.4,0,6.283); ctx.fill(); break;
+    case 'carrot':
+      ctx.fillStyle='#e8762a';
+      for(let i=0;i<3;i++){ctx.save();ctx.rotate(i*0.9);ctx.fillRect(-9,-1.4,18,2.8);ctx.restore();} break;
+    case 'chili':
+      ctx.strokeStyle='#c22e1f'; ctx.lineWidth=2.6; ctx.beginPath(); ctx.arc(0,0,5,0.4,5.4); ctx.stroke();
+      ctx.fillStyle='#f0d060'; ctx.beginPath(); ctx.arc(-3,-3,1.1,0,6.283); ctx.arc(3,2,1.1,0,6.283); ctx.fill(); break;
+    case 'tofu':
+      ctx.fillStyle='#f2e6cf'; roundRect(-7,-6,14,12,3); ctx.fill();
+      ctx.fillStyle='#dcb96a'; roundRect(-7,-6,14,5,3); ctx.fill(); break;
+    case 'nori':
+      ctx.fillStyle='#16281c'; roundRect(-6,-10,12,18,2); ctx.fill();
+      ctx.fillStyle='rgba(120,200,140,0.18)'; roundRect(-4,-8,3,14,1); ctx.fill(); break;
+    case 'scallion':
+      ctx.strokeStyle='#57a83e'; ctx.lineWidth=2.4;
+      [[-4,0],[3,-2],[0,4]].forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],2.8,0,6.283);ctx.stroke();}); break;
+  }
+  ctx.restore();
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+function drawLifted(t,cx,rimY,px,py){
+  const sway=reduced?0:Math.sin(t*0.9)*4;
+  const lift=reduced?0:Math.sin(t*0.55)*5;
+  const ax=cx+118*S+sway*S+px*10, ay=rimY-118*S+lift*S+py*6;
+  // hanging noodle strands from chopstick tips to broth
+  ctx.lineCap='round';
+  for(let i=0;i<7;i++){
+    const off=(i-3)*5*S;
+    const hang=(52+((i*17)%26))*S;
+    ctx.beginPath(); ctx.moveTo(ax+off,ay+6*S);
+    ctx.bezierCurveTo(ax+off+Math.sin(t*1.4+i)*3*S,ay+hang*0.5,cx+90*S+off,rimY-hang*0.25,cx+88*S+off*1.4,rimY+2*S);
+    ctx.strokeStyle=i%2?'rgba(246,205,130,0.95)':'rgba(238,185,100,0.9)'; ctx.lineWidth=3.4*S; ctx.stroke();
+  }
+  // noodle bundle wrapped at tips
+  ctx.strokeStyle='rgba(248,210,140,0.98)'; ctx.lineWidth=5*S;
+  for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(ax,ay+4*S,(13-i*2.5)*S,(6-i)*S,0.15,0,6.283);ctx.stroke();}
+  // chopsticks
+  ctx.lineCap='round';
+  const grad=ctx.createLinearGradient(ax-160*S,ay-120*S,ax+10*S,ay+10*S);
+  grad.addColorStop(0,'#6b4423'); grad.addColorStop(1,'#3d2513');
+  ctx.strokeStyle=grad; ctx.lineWidth=6*S;
+  ctx.beginPath(); ctx.moveTo(ax-158*S,ay-118*S); ctx.lineTo(ax+2*S,ay+4*S); ctx.stroke();
+  ctx.lineWidth=5.4*S;
+  ctx.beginPath(); ctx.moveTo(ax-138*S,ay-132*S); ctx.lineTo(ax+14*S,ay+2*S); ctx.stroke();
+  // a greens leaf + mushroom riding the lift
+  ctx.save(); ctx.translate(ax-8*S,ay+12*S); ctx.rotate(0.4+sway*0.01); ctx.scale(S,S);
+  ctx.fillStyle='#4c8a34'; ctx.beginPath(); ctx.ellipse(0,0,5,9,0.5,0,6.283); ctx.fill();
+  ctx.fillStyle='#8a6844'; ctx.beginPath(); ctx.ellipse(10,4,8,5,0.3,Math.PI,6.283); ctx.fill();
+  ctx.fillStyle='#e8d9bd'; ctx.beginPath(); ctx.ellipse(10,5,5.5,3.4,0,0,6.283); ctx.fill();
+  ctx.restore();
+}
+
+function drawSteam(t,cx,cy,front){
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  for(const p of steam){
+    if((front===0) !== (p.ph>3.14)) { /* split back/front by phase */ }
+    const isFront=p.ph>3.14;
+    if((front===1)!==isFront) continue;
+    if(!reduced){
+      p.life++;
+      p.x+=p.vx*S+Math.sin(t*0.9*p.drift+p.ph)*(0.35+ (mouse.inside? windFromMouse(p):0))*S;
+      p.y-=p.vy*S*(1+ (mouse.down?0.4:0));
+      // mouse gently pushes steam away
+      if(mouse.inside){
+        const dx=p.x-mouse.x, dy=p.y-mouse.y, d=Math.hypot(dx,dy);
+        if(d<130&&d>1){p.x+=dx/d*0.9; p.y+=dy/d*0.5;}
+      }
+      if(p.life>p.max||p.y<cy-360*S) spawnSteam(p);
+    }
+    const k=p.life/p.max;
+    const a=Math.sin(Math.min(k,1)*Math.PI)*0.13;
+    const r=p.size*(0.6+k*2.4);
+    const g=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,r);
+    g.addColorStop(0,`rgba(255,244,230,${a.toFixed(3)})`);
+    g.addColorStop(0.6,`rgba(240,220,200,${(a*0.45).toFixed(3)})`);
+    g.addColorStop(1,'rgba(240,220,200,0)');
+    ctx.fillStyle=g; ctx.beginPath();
+    ctx.ellipse(p.x,p.y,r*1.15,r*1.7,Math.sin(p.ph)*0.2,0,6.283); ctx.fill();
+  }
+  ctx.restore();
+}
+function windFromMouse(p){
+  if(!mouse.inside)return 0;
+  const d=Math.hypot(p.x-mouse.x,p.y-mouse.y);
+  return d<160? (1-d/160)*1.6 : 0;
+}
+
+resize();
+if(reduced){
+  // single static, serene frame
+  draw(1.2,0,0);
+}else{
+  requestAnimationFrame(frame);
+}
+window.addEventListener('resize',()=>{ if(reduced) draw(1.2,0,0); },{passive:true});
+})();
+</script>
+</body>
+</html>

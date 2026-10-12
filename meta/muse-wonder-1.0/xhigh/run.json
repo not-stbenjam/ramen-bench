@@ -1,0 +1,121 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "meta/muse-wonder-1.0/xhigh",
+  "vendor": {
+    "slug": "meta",
+    "displayName": "Meta"
+  },
+  "model": {
+    "slug": "muse-wonder-1.0",
+    "displayName": "Muse Wonder",
+    "providerModelId": "muse-wonder-1.0"
+  },
+  "variation": {
+    "slug": "xhigh",
+    "displayName": "XHigh",
+    "reasoningEffort": "xhigh",
+    "parameters": {
+      "effortSource": "Native Harbor kwargs and recorded Muse CLI invocation"
+    }
+  },
+  "harness": {
+    "name": "Muse Code",
+    "version": "1.4.6",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor Muse Code with pinned executable; muse-wonder-1.0 @ xhigh"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-12T19:56:16.437242Z",
+    "completedAt": "2026-10-12T19:57:42.908139Z",
+    "wallDurationMs": 86471,
+    "apiDurationMs": 86946
+  },
+  "usage": {
+    "tokens": {
+      "input": 60294,
+      "cachedInput": 306452,
+      "cacheCreationInput": 0,
+      "output": 13059,
+      "reasoning": 2267,
+      "total": 382072
+    },
+    "cost": null,
+    "requests": 11,
+    "turns": 1,
+    "toolCalls": 9,
+    "providerReported": true,
+    "raw": {
+      "mainSessionTokens": {
+        "input_tokens": 348131,
+        "cached_tokens": 302496,
+        "cache_read_tokens": 302496,
+        "cache_write_tokens": 0,
+        "output_tokens": 11988,
+        "reasoning_tokens": 1527
+      },
+      "auxiliarySessions": [
+        {
+          "sessionId": "42241fd5-cf23-4332-83a6-a7807e5b9595",
+          "modelCompletedTotals": {
+            "input_tokens": 11015,
+            "cached_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "output_tokens": 413,
+            "reasoning_tokens": 265
+          },
+          "requests": 1
+        },
+        {
+          "sessionId": "b28bde37-eb71-448f-8e6e-a20367b9331c",
+          "modelCompletedTotals": {
+            "input_tokens": 7600,
+            "cached_tokens": 3956,
+            "cache_read_tokens": 3956,
+            "cache_write_tokens": 0,
+            "output_tokens": 658,
+            "reasoning_tokens": 475
+          },
+          "requests": 1
+        }
+      ],
+      "modelCompletedTotals": {
+        "input_tokens": 366746,
+        "cached_tokens": 306452,
+        "cache_read_tokens": 306452,
+        "cache_write_tokens": 0,
+        "output_tokens": 13059,
+        "reasoning_tokens": 2267
+      },
+      "terminal": {
+        "eot_gate_ms": 4872,
+        "kind": "terminal",
+        "reason": null,
+        "terminal": "completed",
+        "time_to_first_token_ms": 6435,
+        "turn_duration_ms": 84966
+      },
+      "harborTrial": "muse-task__3yueRdG",
+      "harborTaskChecksum": "27d7e1ec9b16b2569900f0cf4558f1351f0de6b3f39af360b3371ec229987f6c",
+      "artifactVerification": "Recorded Muse file-operation replay (1 operations)",
+      "nativeExportDiagnostics": {
+        "duplicate_records": 0,
+        "gaps": 12,
+        "omitted_live_only": 12,
+        "unknown_payload_kinds": 0,
+        "unparseable_lines": 0
+      },
+      "harborGradeTrial": "muse-task__eWdR8ms"
+    }
+  },
+  "resultStats": {
+    "bytes": 24309,
+    "lines": 463
+  },
+  "notes": "HTML is unchanged and verified against recorded Muse writes. Generation timing excludes setup and grading. Tokens sum native model_completed events once per retained main and auxiliary session; input excludes cache hits and reasoning is separate from output. Auxiliary session content, hidden reasoning, system/developer prompts and private activity are excluded from the public transcript. Muse supplies no recorded cost, and the pinned LiteLLM catalog has no Wonder rate; cost remains unknown. Effort is the explicitly requested setting recorded in Harbor and its Muse invocation. Scores come from a native Harbor regrade of the saved artifact; generation was not repeated."
+}

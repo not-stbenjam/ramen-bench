@@ -1,4 +1,4 @@
-export const effortOrder = ["low", "medium", "high", "xhigh", "max", "ultra"];
+export const effortOrder = ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"];
 export const criteria = ["noodles", "toppings", "bowl", "broth", "steam", "composition"];
 export const weights = { noodles: .20, toppings: .25, bowl: .20, broth: .10, steam: .15, composition: .10 };
 

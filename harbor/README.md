@@ -164,6 +164,63 @@ recorded source trial identity and unchanged artifact bytes. It retains original
 generation timing and accounting, records the failed verifier, and publishes only
 the successful regrade's native reward.
 
+### Muse Code and Muse Wonder
+
+Muse Wonder (`muse-wonder-1.0`) advertises `minimal`, `low`, `medium`, `high`,
+`xhigh`, and `max` in Muse Code's provider catalog. Generate a separate trial
+for each explicitly requested effort. The repository adapter extends Harbor
+0.23.0's Muse effort schema to include Max and uploads an already installed
+native executable to pin the harness version. It retains Harbor's native
+execution command and session collection.
+
+```sh
+PYTHONPATH="$PWD" harbor run \
+  -p harbor/ramen -a scripts.harbor_muse:PinnedMuseCode \
+  -m meta/muse-wonder-1.0 --ak reasoning_effort=max \
+  --ak binary_path=/path/to/native/muse-executable \
+  --env-file .harbor/judge.env --jobs-dir "$PWD/.harbor/jobs"
+```
+
+Use the native executable downloaded by the Muse launcher, rather than the
+launcher script, and set `META_API_KEY` in the host process environment from
+your local Muse authentication. Never place credentials in the image or
+publish the private job directory. Keep all three judge settings shown in
+Setup in `.harbor/judge.env`, including an explicit `RAMEN_JUDGE_EFFORTS` map.
+
+Import completed generations through the Muse entry point:
+
+```sh
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_muse.py \
+  --harbor-job .harbor/jobs/<generation-job> --muse-binary /path/to/native/muse-executable \
+  --dry-run
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_muse.py \
+  --harbor-job .harbor/jobs/<generation-job> --muse-binary /path/to/native/muse-executable \
+  --grade-job .harbor/jobs/<native-regrade-job> --publish-scores
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_muse.py \
+  --harbor-job .harbor/jobs/<generation-job> --muse-binary /path/to/native/muse-executable \
+  --grade-job .harbor/jobs/<native-regrade-job> --check-sources
+```
+
+Use repeatable `--effort` filters to import completed grades incrementally.
+Omit `--grade-job` when generation and scoring completed together. A native
+regrade is matched by its recorded source trial identity and unchanged
+artifact bytes. The importer uses Muse's own offline exporter on the retained
+sessions; raw exports stay private. It verifies the exact benchmark prompt,
+model, requested effort, native completion and final file operations. Public
+transcripts contain the recorded main-session user/assistant messages and
+tools, with factual markers for native export gaps. Structured reasoning,
+system/developer instructions, private inter-session messages and auxiliary
+session content are excluded, then the shared censor runs over the result.
+
+Tokens are exact sums of native `model_completed` events, with main and
+auxiliary session totals retained separately. Cache hits are removed from
+uncached input, and reasoning is separate from output. Generation duration
+excludes setup and grading. Wonder's native sessions do not report cost and
+the pinned historical LiteLLM catalog does not contain this model, so its
+cost remains unknown. No price is inferred from another model or invented.
+The historical Spark export workflow remains available through the same
+Muse entry point.
+
 ### Pi and OpenRouter
 
 Harbor's native Pi agent can generate bowls using OpenRouter credentials in the

@@ -56,8 +56,8 @@ test("unknown axes stay unknown; only USD costs are plotted", () => {
 
 test("lines follow effort order even when cost order differs", () => {
   const row = effort => ({ run: { variation: { reasoningEffort: effort } } });
-  const rows = [row("ultra"), row("high"), row("low"), row("max"), row("medium"), row("xhigh")];
-  assert.deepEqual(rows.sort(byEffort).map(r => r.run.variation.reasoningEffort), ["low", "medium", "high", "xhigh", "max", "ultra"]);
+  const rows = [row("ultra"), row("high"), row("low"), row("max"), row("medium"), row("xhigh"), row("minimal")];
+  assert.deepEqual(rows.sort(byEffort).map(r => r.run.variation.reasoningEffort), ["minimal", "low", "medium", "high", "xhigh", "max", "ultra"]);
 });
 
 test("zero gate is distinct from missing or invalid visual scores", () => {

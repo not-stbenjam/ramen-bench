@@ -375,6 +375,30 @@
     {
       "runId": "anthropic/haiku-5.5/max",
       "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-1.0/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-1.0/high",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-1.0/minimal",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-1.0/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-1.0/max",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-1.0/low",
+      "humanScore": null
     }
   ]
 }
