@@ -9,11 +9,16 @@ from pathlib import Path
 
 from censor_transcripts import main as censor_transcripts
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> int:
+    if any(
+        arg == "--harbor-job" or arg.startswith("--harbor-job=") for arg in sys.argv[1:]
+    ):
+        from import_harbor_muse import main as import_native
+
+        return import_native(sys.argv[1:])
     subprocess.run(
         [
             sys.executable,

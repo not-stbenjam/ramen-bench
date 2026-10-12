@@ -363,7 +363,7 @@
   }
 
   function compareEffort(a, b) {
-    const effortOrder = ["ultra", "max", "xhigh", "high", "medium", "low"];
+    const effortOrder = ["ultra", "max", "xhigh", "high", "medium", "low", "minimal", "none"];
     const rank = (entry) => {
       const index = effortOrder.indexOf(String(entry.badge || "").toLocaleLowerCase());
       return index === -1 ? effortOrder.length : index;

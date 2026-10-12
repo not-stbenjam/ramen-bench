@@ -1,0 +1,121 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "meta/muse-wonder-1.0/low",
+  "vendor": {
+    "slug": "meta",
+    "displayName": "Meta"
+  },
+  "model": {
+    "slug": "muse-wonder-1.0",
+    "displayName": "Muse Wonder",
+    "providerModelId": "muse-wonder-1.0"
+  },
+  "variation": {
+    "slug": "low",
+    "displayName": "Low",
+    "reasoningEffort": "low",
+    "parameters": {
+      "effortSource": "Native Harbor kwargs and recorded Muse CLI invocation"
+    }
+  },
+  "harness": {
+    "name": "Muse Code",
+    "version": "1.4.6",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor Muse Code with pinned executable; muse-wonder-1.0 @ low"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-12T19:53:24.170743Z",
+    "completedAt": "2026-10-12T19:54:27.237234Z",
+    "wallDurationMs": 63066,
+    "apiDurationMs": 63201
+  },
+  "usage": {
+    "tokens": {
+      "input": 50633,
+      "cachedInput": 181804,
+      "cacheCreationInput": 0,
+      "output": 10279,
+      "reasoning": 1579,
+      "total": 244295
+    },
+    "cost": null,
+    "requests": 8,
+    "turns": 1,
+    "toolCalls": 6,
+    "providerReported": true,
+    "raw": {
+      "mainSessionTokens": {
+        "input_tokens": 216545,
+        "cached_tokens": 175300,
+        "cache_read_tokens": 175300,
+        "cache_write_tokens": 0,
+        "output_tokens": 8985,
+        "reasoning_tokens": 592
+      },
+      "auxiliarySessions": [
+        {
+          "sessionId": "3f86e229-4738-4403-862b-412de5789c82",
+          "modelCompletedTotals": {
+            "input_tokens": 6554,
+            "cached_tokens": 3316,
+            "cache_read_tokens": 3316,
+            "cache_write_tokens": 0,
+            "output_tokens": 960,
+            "reasoning_tokens": 788
+          },
+          "requests": 1
+        },
+        {
+          "sessionId": "f1d641a5-9b1e-4f48-9a9b-249cb927bd42",
+          "modelCompletedTotals": {
+            "input_tokens": 9338,
+            "cached_tokens": 3188,
+            "cache_read_tokens": 3188,
+            "cache_write_tokens": 0,
+            "output_tokens": 334,
+            "reasoning_tokens": 199
+          },
+          "requests": 1
+        }
+      ],
+      "modelCompletedTotals": {
+        "input_tokens": 232437,
+        "cached_tokens": 181804,
+        "cache_read_tokens": 181804,
+        "cache_write_tokens": 0,
+        "output_tokens": 10279,
+        "reasoning_tokens": 1579
+      },
+      "terminal": {
+        "eot_gate_ms": 5924,
+        "kind": "terminal",
+        "reason": null,
+        "terminal": "completed",
+        "time_to_first_token_ms": 8433,
+        "turn_duration_ms": 61207
+      },
+      "harborTrial": "muse-task__g58ZemT",
+      "harborTaskChecksum": "27d7e1ec9b16b2569900f0cf4558f1351f0de6b3f39af360b3371ec229987f6c",
+      "artifactVerification": "Recorded Muse file-operation replay (1 operations)",
+      "nativeExportDiagnostics": {
+        "duplicate_records": 0,
+        "gaps": 6,
+        "omitted_live_only": 6,
+        "unknown_payload_kinds": 0,
+        "unparseable_lines": 0
+      },
+      "harborGradeTrial": "muse-task__S5ZhhpP"
+    }
+  },
+  "resultStats": {
+    "bytes": 18571,
+    "lines": 383
+  },
+  "notes": "HTML is unchanged and verified against recorded Muse writes. Generation timing excludes setup and grading. Tokens sum native model_completed events once per retained main and auxiliary session; input excludes cache hits and reasoning is separate from output. Auxiliary session content, hidden reasoning, system/developer prompts and private activity are excluded from the public transcript. Muse supplies no recorded cost, and the pinned LiteLLM catalog has no Wonder rate; cost remains unknown. Effort is the explicitly requested setting recorded in Harbor and its Muse invocation. Scores come from a native Harbor regrade of the saved artifact; generation was not repeated."
+}
