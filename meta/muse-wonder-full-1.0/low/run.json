@@ -1,0 +1,121 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "meta/muse-wonder-full-1.0/low",
+  "vendor": {
+    "slug": "meta",
+    "displayName": "Meta"
+  },
+  "model": {
+    "slug": "muse-wonder-full-1.0",
+    "displayName": "Muse Wonder Full",
+    "providerModelId": "muse-wonder-full-1.0"
+  },
+  "variation": {
+    "slug": "low",
+    "displayName": "Low",
+    "reasoningEffort": "low",
+    "parameters": {
+      "effortSource": "Native Harbor kwargs and recorded Muse CLI invocation"
+    }
+  },
+  "harness": {
+    "name": "Muse Code",
+    "version": "1.4.7",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor Muse Code with pinned executable; muse-wonder-full-1.0 @ low"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-13T04:20:33.743406Z",
+    "completedAt": "2026-10-13T04:24:07.600078Z",
+    "wallDurationMs": 213857,
+    "apiDurationMs": 215607
+  },
+  "usage": {
+    "tokens": {
+      "input": 73160,
+      "cachedInput": 435952,
+      "cacheCreationInput": 0,
+      "output": 11657,
+      "reasoning": 2434,
+      "total": 523203
+    },
+    "cost": null,
+    "requests": 13,
+    "turns": 1,
+    "toolCalls": 11,
+    "providerReported": true,
+    "raw": {
+      "mainSessionTokens": {
+        "input_tokens": 482615,
+        "cached_tokens": 429448,
+        "cache_read_tokens": 429448,
+        "cache_write_tokens": 0,
+        "output_tokens": 12961,
+        "reasoning_tokens": 1626
+      },
+      "auxiliarySessions": [
+        {
+          "sessionId": "4fb48132-5ca9-4e69-8bb3-9e7fa8b052bb",
+          "modelCompletedTotals": {
+            "input_tokens": 9370,
+            "cached_tokens": 3316,
+            "cache_read_tokens": 3316,
+            "cache_write_tokens": 0,
+            "output_tokens": 840,
+            "reasoning_tokens": 656
+          },
+          "requests": 1
+        },
+        {
+          "sessionId": "99b172cb-f6bf-43c5-bfc6-b24c552bf6de",
+          "modelCompletedTotals": {
+            "input_tokens": 17127,
+            "cached_tokens": 3188,
+            "cache_read_tokens": 3188,
+            "cache_write_tokens": 0,
+            "output_tokens": 290,
+            "reasoning_tokens": 152
+          },
+          "requests": 1
+        }
+      ],
+      "modelCompletedTotals": {
+        "input_tokens": 509112,
+        "cached_tokens": 435952,
+        "cache_read_tokens": 435952,
+        "cache_write_tokens": 0,
+        "output_tokens": 14091,
+        "reasoning_tokens": 2434
+      },
+      "terminal": {
+        "eot_gate_ms": 10346,
+        "kind": "terminal",
+        "reason": null,
+        "terminal": "completed",
+        "time_to_first_token_ms": 20749,
+        "turn_duration_ms": 211748
+      },
+      "harborTrial": "muse-task__E2ixDZo",
+      "harborTaskChecksum": "27d7e1ec9b16b2569900f0cf4558f1351f0de6b3f39af360b3371ec229987f6c",
+      "artifactVerification": "Recorded Muse file-operation replay (4 operations)",
+      "nativeExportDiagnostics": {
+        "duplicate_records": 0,
+        "gaps": 7,
+        "omitted_live_only": 7,
+        "unknown_payload_kinds": 0,
+        "unparseable_lines": 0
+      }
+    }
+  },
+  "resultStats": {
+    "bytes": 23123,
+    "lines": 393
+  },
+  "provenance": {},
+  "notes": "HTML is unchanged and verified against recorded Muse writes. Generation timing excludes setup and grading. Tokens sum native model_completed events once per retained main and auxiliary session. Input excludes cache hits; reasoning is a subset of native output, split out of usage.tokens.output and counted once in the total. Auxiliary session content, hidden reasoning, system/developer prompts and private activity are excluded from the public transcript. Wonder Full is subscription-only and has no published per-token rate; cost is unknown. Effort is the explicitly requested setting recorded in Harbor and its Muse invocation."
+}

@@ -164,10 +164,11 @@ recorded source trial identity and unchanged artifact bytes. It retains original
 generation timing and accounting, records the failed verifier, and publishes only
 the successful regrade's native reward.
 
-### Muse Code and Muse Wonder
+### Muse Code and Muse Wonder models
 
-Muse Wonder (`muse-wonder-1.0`) advertises `minimal`, `low`, `medium`, `high`,
-`xhigh`, and `max` in Muse Code's provider catalog. Generate a separate trial
+Muse Wonder (`muse-wonder-1.0`) and Muse Wonder Full (`muse-wonder-full-1.0`)
+advertise `minimal`, `low`, `medium`, `high`, `xhigh`, and `max` in Muse Code's
+provider catalog. Generate a separate trial
 for each explicitly requested effort. The repository adapter extends Harbor
 0.23.0's Muse effort schema to include Max and uploads an already installed
 native executable to pin the harness version. It retains Harbor's native
@@ -186,6 +187,20 @@ launcher script, and set `META_API_KEY` in the host process environment from
 your local Muse authentication. Never place credentials in the image or
 publish the private job directory. Keep all three judge settings shown in
 Setup in `.harbor/judge.env`, including an explicit `RAMEN_JUDGE_EFFORTS` map.
+
+Wonder Full requires a Muse Code subscription with model access. Set
+`--ak auth_path=/path/to/muse/auth.json` to copy that login into the ephemeral
+agent container with private file permissions, and `--ak contributor_mode=off`
+to request the exact Standard model rather than a Contributor variant. The
+original login is not modified. The importer checks the returned model identity
+and keeps regular Wonder and Full in separate registry entries. Full has no
+published per-token rate, so its cost remains unknown; regular Wonder's rates
+are never substituted. Its recorded generation time remains usable in the chart.
+If auxiliary Muse model work times out and is cancelled before reporting usage,
+the importer retains that recorded terminal status and marks accounting incomplete.
+Published token totals then cover only completed requests, with no fabricated usage
+for the cancelled work. Total request count, API duration, and estimated cost remain
+unknown; available recorded subtotals stay in `usage.raw`.
 
 Import completed generations through the Muse entry point:
 

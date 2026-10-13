@@ -26,6 +26,7 @@ from muse_list_prices import SOURCE as PRICE_SOURCE
 from muse_list_prices import wonder_list_cost
 
 MODEL = "muse-wonder-1.0"
+MODEL_NAMES = {MODEL: "Muse Wonder", "muse-wonder-full-1.0": "Muse Wonder Full"}
 EFFORTS = ("minimal", "low", "medium", "high", "xhigh", "max")
 PRIVATE_TOOLS = re.compile(
     r"agent[_-]?mail|session[_-]?message|dawnmark", re.IGNORECASE
@@ -170,7 +171,7 @@ def normalize_session(export: dict) -> tuple[list[dict], int]:
     return events, omitted
 
 
-def verify_artifact(export: dict, artifact: Path) -> str:
+def verify_artifact(export: dict, artifact: Path, model: str = MODEL) -> str:
     content, mutations = None, 0
     for call in recorded_calls(export):
         name, args = call["name"], arguments(call)
@@ -183,12 +184,12 @@ def verify_artifact(export: dict, artifact: Path) -> str:
         elif name == "apply_patch":
             patch = args.get("patch", args.get("input"))
             lines, count = replay_codex_patch(
-                content.splitlines() if content is not None else None, patch, MODEL
+                content.splitlines() if content is not None else None, patch, model
             )
             content = "\n".join(lines) + "\n" if lines is not None else None
             mutations += count
         elif name == "bash":
-            content, count = replay_codex_command(content, args["command"], MODEL)
+            content, count = replay_codex_command(content, args["command"], model)
             mutations += count
         elif name == "edit_file" and args.get("path") in (
             "index.html",
@@ -210,7 +211,9 @@ def verify_artifact(export: dict, artifact: Path) -> str:
     return f"Recorded Muse file-operation replay ({mutations} operations)"
 
 
-def sum_usage(export: dict) -> tuple[dict, int, int]:
+def sum_usage(
+    export: dict, *, allow_cancelled_empty: bool = False
+) -> tuple[dict, int, int]:
     session_id = export["sessions"][0]["session_id"]
     totals = dict.fromkeys(TOKEN_KEYS, 0)
     seen, requests, duration = set(), 0, 0
@@ -248,7 +251,16 @@ def sum_usage(export: dict) -> tuple[dict, int, int]:
         duration += millis
         requests += 1
     if not requests:
-        raise ValueError("Muse export has no recorded provider usage")
+        terminals = [
+            event(r) for r in export["events"] if event(r).get("kind") == "terminal"
+        ]
+        if not (
+            allow_cancelled_empty
+            and len(terminals) == 1
+            and terminals[0].get("terminal") == "cancelled"
+            and any(event(r).get("kind") == "timed_out" for r in export["events"])
+        ):
+            raise ValueError("Muse export has no recorded provider usage")
     return totals, requests, duration
 
 
@@ -276,15 +288,17 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
         read_json(trial / "config.json")["agent"],
     )
     effort = config.get("kwargs", {}).get("reasoning_effort")
+    model = config["model_name"].removeprefix("meta/")
     if (
         result.get("exception_info")
-        or config["model_name"] != f"meta/{MODEL}"
+        or model not in MODEL_NAMES
+        or config["model_name"] != f"meta/{model}"
         or effort not in EFFORTS
     ):
         raise ValueError("Unsuccessful or unsupported native Muse trial")
     if result["agent_info"]["name"] != "muse-code" or result["agent_info"][
         "model_info"
-    ] != {"name": MODEL, "provider": "meta"}:
+    ] != {"name": model, "provider": "meta"}:
         raise ValueError("Harbor recorded a different generation model")
     sources = sorted((trial / "agent/sessions").rglob("session.jsonl"))
     main = [
@@ -303,7 +317,7 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
     if (
         len(metadata) != 1
         or metadata[0].get("workspace_root") != "/app"
-        or metadata[0].get("model_id") != MODEL
+        or metadata[0].get("model_id") != model
         or metadata[0].get("provider_id") != "meta"
     ):
         raise ValueError(
@@ -320,10 +334,10 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
     completed = [
         event(r) for r in export["events"] if event(r).get("kind") == "model_completed"
     ]
-    if not completed or any(r.get("model") != MODEL for r in completed):
+    if not completed or any(r.get("model") != model for r in completed):
         raise ValueError("Muse responses came from a different model")
     log = (trial / "trial.log").read_text()
-    if f"--model {MODEL} --reasoning-effort {effort} " not in log:
+    if f"--model {model} --reasoning-effort {effort} " not in log:
         raise ValueError("Recorded Muse invocation differs from the requested effort")
     events, omitted = normalize_session(export)
     users = [e["content"].strip() for e in events if e.get("role") == "user"]
@@ -332,21 +346,34 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
             "Muse session does not contain the exact benchmark instruction"
         )
     artifact = native_artifact(trial)
-    verification = verify_artifact(export, artifact)
+    verification = verify_artifact(export, artifact, model)
     totals, requests, api_duration = sum_usage(export)
     exports = [export]
-    main_totals, auxiliary = totals.copy(), []
+    main_totals, auxiliary, incomplete_auxiliary = totals.copy(), [], []
     for source in sources:
         if source == main[0]:
             continue
         child = export_session(source, binary)
         exports.append(child)
-        child_totals, child_requests, child_duration = sum_usage(child)
+        child_totals, child_requests, child_duration = sum_usage(
+            child, allow_cancelled_empty=True
+        )
+        child_terminal = [
+            event(r) for r in child["events"] if event(r).get("kind") == "terminal"
+        ]
+        incomplete = any(t.get("terminal") == "cancelled" for t in child_terminal)
+        if incomplete:
+            incomplete_auxiliary.append(child["sessions"][0]["session_id"])
         auxiliary.append(
             {
                 "sessionId": child["sessions"][0]["session_id"],
-                "modelCompletedTotals": child_totals,
+                "modelCompletedTotals": child_totals if child_requests else None,
                 "requests": child_requests,
+                **(
+                    {"accountingIncomplete": True, "terminal": child_terminal[0]}
+                    if incomplete
+                    else {}
+                ),
             }
         )
         for key in totals:
@@ -359,7 +386,7 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
     )
     if start.tzinfo is None or finish.tzinfo is None or finish < start:
         raise ValueError("Invalid native Harbor generation timestamps")
-    run_id = f"meta/{MODEL}/{effort}"
+    run_id = f"meta/{model}/{effort}"
     cached, output, reasoning = (
         totals["cache_read_tokens"],
         totals["output_tokens"],
@@ -368,16 +395,16 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
     version = export["session_build"]["semver"]
     if result["agent_info"]["version"] != version:
         raise ValueError("Harbor and Muse's recorded build versions disagree")
-    priced = wonder_list_cost(exports)
+    priced = wonder_list_cost(exports) if not incomplete_auxiliary else None
     run = {
         "$schema": "../../../schemas/run.schema.json",
         "schemaVersion": 1,
         "id": run_id,
         "vendor": {"slug": "meta", "displayName": "Meta"},
         "model": {
-            "slug": MODEL,
-            "displayName": "Muse Wonder",
-            "providerModelId": MODEL,
+            "slug": model,
+            "displayName": MODEL_NAMES[model],
+            "providerModelId": model,
         },
         "variation": {
             "slug": effort,
@@ -391,14 +418,14 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
             "name": "Muse Code",
             "version": version,
             "runtime": "Harbor",
-            "invocation": f"Native Harbor Muse Code with pinned executable; {MODEL} @ {effort}",
+            "invocation": f"Native Harbor Muse Code with pinned executable; {model} @ {effort}",
         },
         "artifacts": {"result": "index.html", "transcript": "transcript.json"},
         "timing": {
             "startedAt": execution["started_at"],
             "completedAt": execution["finished_at"],
             "wallDurationMs": round((finish - start).total_seconds() * 1000),
-            "apiDurationMs": api_duration,
+            **({"apiDurationMs": api_duration} if not incomplete_auxiliary else {}),
         },
         "usage": {
             "tokens": {
@@ -410,7 +437,7 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
                 "total": totals["input_tokens"] + output,
             },
             "cost": priced[0] if priced else None,
-            "requests": requests,
+            **({"requests": requests} if not incomplete_auxiliary else {}),
             "turns": 1,
             "toolCalls": sum(1 for _ in recorded_calls(export)),
             "providerReported": True,
@@ -423,6 +450,16 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
                 "harborTaskChecksum": result["task_checksum"],
                 "artifactVerification": verification,
                 "nativeExportDiagnostics": export["diagnostics"],
+                **(
+                    {
+                        "accountingIncomplete": True,
+                        "unaccountedAuxiliarySessions": incomplete_auxiliary,
+                        "recordedCompletedRequests": requests,
+                        "recordedApiDurationMs": api_duration,
+                    }
+                    if incomplete_auxiliary
+                    else {}
+                ),
                 **({"pricing": priced[1]} if priced else {}),
             },
         },
@@ -436,9 +473,16 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
         + (
             "Cost is an API-equivalent Standard list-price estimate at Meta's published rates, including auxiliary sessions and reasoning once; it is not a recorded charge. "
             if priced
+            else "Wonder Full is subscription-only and has no published per-token rate; cost is unknown. "
+            if model == "muse-wonder-full-1.0"
             else "Cost remains unknown when recorded usage or model/tool pricing is insufficient. "
         )
-        + "Effort is the explicitly requested setting recorded in Harbor and its Muse invocation.",
+        + "Effort is the explicitly requested setting recorded in Harbor and its Muse invocation."
+        + (
+            " Auxiliary model work was cancelled with no complete usage accounting; token totals include only recorded completed requests and are a lower bound. Full request counts and API duration are unknown; recorded subtotals remain in usage.raw."
+            if incomplete_auxiliary
+            else ""
+        ),
     }
     transcript = {
         "$schema": "../../../schemas/transcript.schema.json",
@@ -448,7 +492,7 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
         "sourceFormat": "Native Muse Code export_schema_version 1, filtered by shared public censor",
         "events": events,
         "metadata": {
-            "providerModelId": MODEL,
+            "providerModelId": model,
             "reasoningEffort": effort,
             "harnessVersion": export["session_build"]["display"],
             "omittedPrivateToolCalls": omitted,
@@ -460,18 +504,30 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
 def register(runs: list[dict]) -> None:
     path = ROOT / "registry.json"
     registry = read_json(path)
+    models = {r["model"]["slug"] for r in runs}
+    if len(models) != 1:
+        raise ValueError("Import one native Muse model per job")
+    model = next(iter(models))
+    added = registry.setdefault("modelAddedAt", {})
+    added.setdefault(f"meta/{model}", max(r["timing"]["completedAt"] for r in runs))
     fresh = {f"{r['id']}/run.json" for r in runs}
     all_paths = set(registry["runs"]) | fresh
     fresh = sorted(
-        (p for p in all_paths if p.startswith(f"meta/{MODEL}/")),
+        (p for p in all_paths if p.startswith(f"meta/{model}/")),
         key=lambda p: -EFFORTS.index(p.split("/")[2]),
     )
     other = [p for p in registry["runs"] if p not in fresh]
-    index = next((i for i, p in enumerate(other) if p.startswith("meta/")), len(other))
-    registry["runs"] = other[:index] + fresh + other[index:]
-    registry.setdefault("modelAddedAt", {}).setdefault(
-        f"meta/{MODEL}", max(r["timing"]["completedAt"] for r in runs)
+    meta_indexes = [i for i, p in enumerate(other) if p.startswith("meta/")]
+    index = next(
+        (
+            i
+            for i in meta_indexes
+            if added.get("/".join(other[i].split("/")[:2]), "")
+            <= added[f"meta/{model}"]
+        ),
+        meta_indexes[-1] + 1 if meta_indexes else len(other),
     )
+    registry["runs"] = other[:index] + fresh + other[index:]
     path.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + "\n")
     path = ROOT / "harbor/human-scores.json"
     human = read_json(path)

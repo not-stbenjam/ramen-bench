@@ -16,7 +16,7 @@ import re
 import shlex
 import subprocess
 from collections.abc import Iterable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from importlib.metadata import version as package_version
 from pathlib import Path
 from typing import Any
@@ -305,11 +305,11 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def parse_timestamp(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return datetime.fromisoformat(value)
 
 
 def format_timestamp(value: datetime) -> str:
-    return value.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace(
+    return value.astimezone(UTC).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
 
@@ -1223,8 +1223,15 @@ def replay_path_python_write(content: str, script: str, run_id: str) -> tuple[st
             return variables[node.id]
         if isinstance(node, ast.Call) and not node.keywords:
             if (
-                isinstance(node.func, ast.Name)
-                and node.func.id == "Path"
+                (
+                    (isinstance(node.func, ast.Name) and node.func.id == "Path")
+                    or (
+                        isinstance(node.func, ast.Attribute)
+                        and isinstance(node.func.value, ast.Name)
+                        and node.func.value.id == "pathlib"
+                        and node.func.attr == "Path"
+                    )
+                )
                 and len(node.args) == 1
                 and evaluate(node.args[0]) in {"index.html", "/app/index.html"}
             ):
@@ -1286,6 +1293,7 @@ def replay_recorded_shell_mutation(
     """Replay narrowly supported shell mutations without executing recorded code."""
     for marker, terminator in (
         ("python3 - <<'PY'\n", "PY"),
+        ("python3 - << 'PY'\n", "PY"),
         ("python3 - <<'EOF'\n", "EOF"),
         ("python - <<'PY'\n", "PY"),
     ):
@@ -2008,7 +2016,7 @@ def build_codex_log(run_id: str) -> tuple[dict[str, Any], dict[str, Any], str]:
         text = source.read_text(errors="strict")
         started_at = LOG_STARTS[run_id]
         completed_at = format_timestamp(
-            datetime.fromtimestamp(source.stat().st_mtime, timezone.utc)
+            datetime.fromtimestamp(source.stat().st_mtime, UTC)
         )
         source_format = "codex-exec-terminal-log"
     header = parse_log_header(text)

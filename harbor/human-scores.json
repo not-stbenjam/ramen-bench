@@ -399,6 +399,30 @@
     {
       "runId": "meta/muse-wonder-1.0/low",
       "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-full-1.0/low",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-full-1.0/minimal",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-full-1.0/medium",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-full-1.0/high",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-full-1.0/xhigh",
+      "humanScore": null
+    },
+    {
+      "runId": "meta/muse-wonder-full-1.0/max",
+      "humanScore": null
     }
   ]
 }

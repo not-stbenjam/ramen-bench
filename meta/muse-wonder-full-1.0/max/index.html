@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramen</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 50% 42%, #241610 0%, #140d08 46%, #0a0605 74%, #050303 100%);
+    background-color: #070403;
+  }
+  .scene {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    --px: 0;
+    --py: 0;
+    --warm: 0.35;
+    --flicker: 1;
+  }
+  .glow {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    width: min(120vmin, 900px);
+    height: min(120vmin, 900px);
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle,
+      rgba(255, 176, 92, 0.34) 0%,
+      rgba(255, 140, 58, 0.18) 34%,
+      rgba(190, 84, 24, 0.07) 58%,
+      rgba(0, 0, 0, 0) 72%);
+    opacity: calc((0.55 + var(--warm) * 0.45) * var(--flicker));
+    transform: translate(calc(-50% + var(--px) * 22px), calc(-50% + var(--py) * 14px)) scale(calc(1 + var(--warm) * 0.06));
+    animation: breathe 7s ease-in-out infinite;
+  }
+  .pool {
+    position: absolute;
+    left: 50%;
+    top: 68%;
+    width: min(84vmin, 640px);
+    height: min(22vmin, 170px);
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(ellipse, rgba(255, 150, 66, 0.20) 0%, rgba(255, 120, 40, 0.06) 55%, rgba(0,0,0,0) 72%);
+    filter: blur(6px);
+    opacity: calc((0.6 + var(--warm) * 0.4) * var(--flicker));
+    transform: translate(calc(-50% + var(--px) * 10px), -50%);
+  }
+  .bowl-wrap {
+    position: relative;
+    width: min(96vw, 128vh, 980px);
+    aspect-ratio: 4 / 3;
+    flex: none;
+  }
+  .bowl-wrap svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  #steam {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(115% 100% at 50% 46%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.42) 82%, rgba(0,0,0,0.78) 100%);
+  }
+  #contents {
+    transform: translate(calc(var(--px) * 3px), calc(var(--py) * 1.5px));
+  }
+  #sheen {
+    transform: translate(calc(var(--px) * 10px), calc(var(--py) * 3px));
+    animation: shimmer 5.5s ease-in-out infinite;
+  }
+  #lift {
+    transform-box: view-box;
+    transform-origin: 478px 232px;
+    animation: sway 5.2s ease-in-out infinite;
+  }
+  #noodles { animation: noodle-drift 6s ease-in-out infinite; }
+  .bob-a { animation: bob 4.6s ease-in-out infinite; }
+  .bob-b { animation: bob 5.4s ease-in-out -1.4s infinite; }
+  .bob-c { animation: bob 4.1s ease-in-out -2.2s infinite; }
+  .oil { transform-box: fill-box; transform-origin: center; animation: oil-pulse 4.8s ease-in-out infinite; }
+  .oil.d1 { animation-delay: -1.2s; }
+  .oil.d2 { animation-delay: -2.6s; }
+  .oil.d3 { animation-delay: -3.4s; }
+  .ripple { opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .ripple.go { animation: ripple 1.4s ease-out; }
+  @keyframes breathe {
+    0%, 100% { scale: 1; }
+    50% { scale: 1.035; }
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.10; }
+    50% { opacity: 0.20; }
+  }
+  @keyframes sway {
+    0%, 100% { rotate: -0.9deg; }
+    50% { rotate: 1.1deg; }
+  }
+  @keyframes noodle-drift {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1.6px); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2.2px); }
+  }
+  @keyframes oil-pulse {
+    0%, 100% { scale: 1; opacity: 0.85; }
+    50% { scale: 1.18; opacity: 1; }
+  }
+  @keyframes ripple {
+    0% { opacity: 0.55; scale: 0.35; }
+    100% { opacity: 0; scale: 1.25; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    #contents, #sheen { transform: none; }
+    .glow, .pool { transform: translate(-50%, -50%); }
+    .pool { transform: translate(-50%, -50%); }
+  }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="glow"></div>
+  <div class="pool"></div>
+  <div class="bowl-wrap" id="bowlWrap">
+    <svg id="ramen" viewBox="0 0 800 600" role="img" aria-label="A steaming bowl of vegan ramen with noodles, bok choy, mushrooms, corn, tofu and scallions in warm light">
+      <defs>
+        <radialGradient id="brothGrad" cx="42%" cy="38%" r="75%">
+          <stop offset="0%" stop-color="#f2b85e"/>
+          <stop offset="42%" stop-color="#dd8f35"/>
+          <stop offset="78%" stop-color="#a85f18"/>
+          <stop offset="100%" stop-color="#7c420e"/>
+        </radialGradient>
+        <linearGradient id="bowlGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a3b2f"/>
+          <stop offset="22%" stop-color="#33281e"/>
+          <stop offset="62%" stop-color="#211913"/>
+          <stop offset="100%" stop-color="#120d09"/>
+        </linearGradient>
+        <linearGradient id="rimGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#5c4734"/>
+          <stop offset="55%" stop-color="#3c2d1f"/>
+          <stop offset="100%" stop-color="#241a11"/>
+        </linearGradient>
+        <linearGradient id="woodGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6e451f"/>
+          <stop offset="55%" stop-color="#9a652e"/>
+          <stop offset="100%" stop-color="#7a4e22"/>
+        </linearGradient>
+        <linearGradient id="leafGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7fc45e"/>
+          <stop offset="100%" stop-color="#3d6e2c"/>
+        </linearGradient>
+        <radialGradient id="moundGrad" cx="45%" cy="35%" r="80%">
+          <stop offset="0%" stop-color="#f6cf7d"/>
+          <stop offset="70%" stop-color="#e3a94b"/>
+          <stop offset="100%" stop-color="#c07f26"/>
+        </radialGradient>
+        <filter id="soft6" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="6"/>
+        </filter>
+        <filter id="soft3" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3"/>
+        </filter>
+        <filter id="soft12" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="12"/>
+        </filter>
+        <clipPath id="brothClip">
+          <ellipse cx="400" cy="308" rx="238" ry="54"/>
+        </clipPath>
+        <clipPath id="bowlClip">
+          <path d="M140 308 L660 308 C650 392 580 456 470 467 L330 467 C220 456 150 392 140 308 Z"/>
+        </clipPath>
+      </defs>
+      <ellipse cx="400" cy="482" rx="252" ry="26" fill="#000000" opacity="0.58" filter="url(#soft12)"/>
+      <ellipse cx="400" cy="474" rx="190" ry="16" fill="#ff9648" opacity="0.13" filter="url(#soft12)"/>
+      <path d="M338 452 L462 452 L454 474 Q400 483 346 474 Z" fill="#171009"/>
+      <ellipse cx="400" cy="452" rx="62" ry="7" fill="#2e2115"/>
+      <path d="M140 308 L660 308 C650 392 580 456 470 467 L330 467 C220 456 150 392 140 308 Z" fill="url(#bowlGrad)"/>
+      <g clip-path="url(#bowlClip)">
+        <path d="M140 308 L660 308 L656 336 Q400 356 144 336 Z" fill="#ffffff" opacity="0.05"/>
+        <path d="M196 352 Q228 426 318 448" fill="none" stroke="#ffffff" stroke-width="17" stroke-linecap="round" opacity="0.07" filter="url(#soft6)"/>
+        <path d="M596 368 Q572 424 502 448" fill="none" stroke="#000000" stroke-width="22" stroke-linecap="round" opacity="0.28" filter="url(#soft6)"/>
+        <g fill="#ffffff" opacity="0.10">
+          <circle cx="238" cy="386" r="1.7"/><circle cx="286" cy="422" r="1.3"/><circle cx="342" cy="398" r="1.6"/>
+          <circle cx="414" cy="432" r="1.4"/><circle cx="488" cy="394" r="1.7"/><circle cx="544" cy="420" r="1.3"/>
+          <circle cx="302" cy="360" r="1.2"/><circle cx="452" cy="362" r="1.2"/><circle cx="378" cy="442" r="1.5"/>
+          <circle cx="520" cy="444" r="1.4"/><circle cx="262" cy="438" r="1.2"/><circle cx="574" cy="382" r="1.5"/>
+        </g>
+        <g fill="#000000" opacity="0.22">
+          <circle cx="258" cy="404" r="1.6"/><circle cx="368" cy="416" r="1.4"/><circle cx="472" cy="414" r="1.6"/>
+          <circle cx="326" cy="378" r="1.3"/><circle cx="506" cy="376" r="1.3"/><circle cx="424" cy="392" r="1.4"/>
+        </g>
+      </g>
+      <ellipse cx="400" cy="308" rx="260" ry="64" fill="url(#rimGrad)"/>
+      <ellipse cx="400" cy="305" rx="260" ry="64" fill="none" stroke="#ffc98a" stroke-width="1.6" opacity="0.28"/>
+      <g>
+        <path d="M268 292 L282 196 Q284 186 294 188 L332 196 Q340 198 338 208 L326 290 Q296 300 268 292 Z" fill="#182218"/>
+        <path d="M268 292 L282 196 Q284 186 294 188 L332 196 Q340 198 338 208 L326 290 Q296 300 268 292 Z" fill="none" stroke="#3a5232" stroke-width="1.4" opacity="0.7"/>
+        <path d="M322 288 L334 204 Q336 194 346 196 L376 204 Q383 206 381 216 L370 286 Q346 294 322 288 Z" fill="#1e2c1c"/>
+        <path d="M322 288 L334 204 Q336 194 346 196 L376 204 Q383 206 381 216 L370 286 Q346 294 322 288 Z" fill="none" stroke="#47663c" stroke-width="1.2" opacity="0.6"/>
+        <path d="M292 272 L300 210" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.05"/>
+      </g>
+      <ellipse cx="400" cy="308" rx="238" ry="54" fill="url(#brothGrad)"/>
+      <g id="contents">
+        <g clip-path="url(#brothClip)">
+          <ellipse cx="400" cy="308" rx="238" ry="54" fill="none" stroke="#000000" stroke-width="10" opacity="0.18" filter="url(#soft6)"/>
+          <ellipse class="ripple" id="ripple1" cx="400" cy="308" rx="150" ry="34" fill="none" stroke="#ffe3b0" stroke-width="2.4"/>
+          <ellipse class="ripple" id="ripple2" cx="400" cy="308" rx="190" ry="43" fill="none" stroke="#ffe3b0" stroke-width="1.8"/>
+          <g id="noodles" fill="none" stroke-linecap="round">
+            <ellipse cx="398" cy="304" rx="128" ry="30" fill="url(#moundGrad)" stroke="none"/>
+            <path d="M196 306 Q250 290 316 302 T470 298 T606 304" stroke="#efbd5f" stroke-width="8"/>
+            <path d="M208 320 Q268 334 340 320 T500 322 T596 318" stroke="#e3a94b" stroke-width="7"/>
+            <path d="M236 292 Q296 280 362 292 T540 288" stroke="#f6cf7d" stroke-width="6.5"/>
+            <path d="M250 328 Q320 342 402 330 T556 330" stroke="#d9953a" stroke-width="6.5"/>
+            <path d="M300 302 Q336 288 376 300 Q412 312 452 300 Q486 290 518 300" stroke="#f6cf7d" stroke-width="6"/>
+            <path d="M312 316 Q356 328 404 316 Q448 306 494 316" stroke="#efbd5f" stroke-width="6"/>
+            <path d="M338 294 Q398 282 462 294" stroke="#ffe1a0" stroke-width="5" opacity="0.9"/>
+            <path d="M330 324 Q398 336 472 324" stroke="#ffe1a0" stroke-width="4.5" opacity="0.75"/>
+          </g>
+          <ellipse id="sheen" cx="336" cy="290" rx="138" ry="17" fill="#ffffff" opacity="0.14" filter="url(#soft6)"/>
+          <g class="bob-a">
+            <path d="M212 302 Q204 282 228 274 Q252 268 260 284 Q254 304 232 306 Q218 307 212 302 Z" fill="url(#leafGrad)"/>
+            <path d="M232 304 Q236 290 234 276" fill="none" stroke="#d7edb8" stroke-width="3.4" stroke-linecap="round"/>
+            <path d="M240 310 Q236 292 258 286 Q278 282 284 296 Q278 312 258 314 Q246 314 240 310 Z" fill="#4f8438"/>
+            <path d="M258 312 Q262 300 260 288" fill="none" stroke="#cdeba8" stroke-width="3" stroke-linecap="round"/>
+            <path d="M224 316 Q218 302 236 296 Q252 292 256 304 Q250 318 234 319 Q227 319 224 316 Z" fill="#5f9a44"/>
+            <path d="M556 318 Q550 302 568 296 Q586 292 592 304 Q586 320 568 321 Q559 321 556 318 Z" fill="url(#leafGrad)" opacity="0.95"/>
+            <path d="M570 319 Q574 308 572 298" fill="none" stroke="#d7edb8" stroke-width="2.8" stroke-linecap="round"/>
+          </g>
+          <g class="bob-b">
+            <g>
+              <path d="M502 296 Q506 276 532 274 Q556 274 560 294 Q532 304 502 296 Z" fill="#c9a87a"/>
+              <path d="M504 295 Q532 302 558 293" fill="none" stroke="#8a6a48" stroke-width="2"/>
+              <path d="M516 296 L520 284 M532 298 L534 283 M546 296 L544 284" stroke="#8a6a48" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M512 282 Q530 276 548 281" fill="none" stroke="#e8d0a8" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+            </g>
+            <g>
+              <path d="M536 312 Q540 296 560 295 Q578 295 580 310 Q558 318 536 312 Z" fill="#b89468"/>
+              <path d="M550 312 L553 302 M564 311 L565 302" stroke="#7a5a36" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+            <g>
+              <rect x="292" y="318" width="34" height="24" rx="6" transform="rotate(-8 309 330)" fill="#f5e6c8"/>
+              <rect x="292" y="318" width="34" height="10" rx="5" transform="rotate(-8 309 330)" fill="#d99a3f"/>
+              <rect x="326" y="326" width="30" height="21" rx="6" transform="rotate(10 341 336)" fill="#f0dcb8"/>
+              <rect x="326" y="326" width="30" height="9" rx="4" transform="rotate(10 341 336)" fill="#c9822e"/>
+            </g>
+          </g>
+          <g class="bob-c" fill="#ffd94d" stroke="#d9a41e" stroke-width="1">
+            <circle cx="416" cy="272" r="7"/><circle cx="432" cy="268" r="7.5"/><circle cx="448" cy="272" r="7"/>
+            <circle cx="424" cy="280" r="7"/><circle cx="440" cy="281" r="7.5"/><circle cx="408" cy="281" r="6"/>
+            <circle cx="456" cy="281" r="6"/><circle cx="432" cy="289" r="6"/>
+          </g>
+          <g class="bob-c" fill="#ffffff" opacity="0.55">
+            <circle cx="430" cy="266" r="1.8"/><circle cx="446" cy="270" r="1.6"/><circle cx="422" cy="278" r="1.6"/><circle cx="438" cy="279" r="1.8"/>
+          </g>
+          <g fill="none" stroke="#e86a2a" stroke-width="4" stroke-linecap="round">
+            <path d="M462 328 Q478 320 494 327"/><path d="M466 336 Q484 329 500 335"/><path d="M472 321 Q486 315 498 320"/>
+          </g>
+          <g fill="#d63a1a">
+            <ellipse class="oil" cx="270" cy="330" rx="9" ry="4.6"/>
+            <ellipse class="oil d1" cx="368" cy="282" rx="7" ry="3.8"/>
+            <ellipse class="oil d2" cx="486" cy="338" rx="10" ry="5"/>
+            <ellipse class="oil d3" cx="552" cy="284" rx="6.5" ry="3.4"/>
+            <ellipse class="oil d1" cx="330" cy="344" rx="6" ry="3.2"/>
+            <ellipse class="oil d2" cx="592" cy="326" rx="7" ry="3.6"/>
+            <circle class="oil d3" cx="398" cy="348" r="3.4"/>
+            <circle class="oil" cx="228" cy="290" r="3"/>
+          </g>
+          <g fill="#ffb59a" opacity="0.75">
+            <ellipse cx="267" cy="328" rx="2.6" ry="1.2"/><ellipse cx="483" cy="336" rx="3" ry="1.3"/><ellipse cx="366" cy="280" rx="2" ry="1"/>
+          </g>
+          <g fill="#eaf7d8" stroke="#4f9a44" stroke-width="2.2">
+            <circle cx="288" cy="288" r="5.2"/><circle cx="356" cy="306" r="5.6"/><circle cx="412" cy="322" r="5.2"/>
+            <circle cx="474" cy="306" r="5.6"/><circle cx="522" cy="326" r="5.2"/><circle cx="318" cy="330" r="4.8"/>
+            <circle cx="438" cy="296" r="4.8"/><circle cx="262" cy="318" r="4.6"/><circle cx="566" cy="302" r="4.8"/>
+            <circle cx="388" cy="336" r="4.6"/><circle cx="500" cy="286" r="4.4"/><circle cx="344" cy="284" r="4.4"/>
+          </g>
+          <g fill="#fff3d6">
+            <ellipse cx="304" cy="300" rx="4.4" ry="1.9" transform="rotate(24 304 300)"/>
+            <ellipse cx="382" cy="290" rx="4.4" ry="1.9" transform="rotate(-18 382 290)"/>
+            <ellipse cx="452" cy="314" rx="4.4" ry="1.9" transform="rotate(36 452 314)"/>
+            <ellipse cx="512" cy="300" rx="4.2" ry="1.8" transform="rotate(-28 512 300)"/>
+            <ellipse cx="352" cy="332" rx="4.2" ry="1.8" transform="rotate(12 352 332)"/>
+            <ellipse cx="428" cy="334" rx="4.2" ry="1.8" transform="rotate(-34 428 334)"/>
+            <ellipse cx="276" cy="306" rx="4" ry="1.7" transform="rotate(-12 276 306)"/>
+            <ellipse cx="540" cy="332" rx="4" ry="1.7" transform="rotate(20 540 332)"/>
+          </g>
+        </g>
+      </g>
+      <g fill="none" opacity="0.12" filter="url(#soft6)" stroke="#fff6e8" stroke-linecap="round">
+        <path d="M330 252 C318 222 342 200 330 170 C320 144 336 124 330 100" stroke-width="15"/>
+        <path d="M400 246 C390 212 414 190 402 156 C392 128 410 106 402 80" stroke-width="18"/>
+        <path d="M470 252 C460 224 482 202 470 172 C461 148 476 128 470 106" stroke-width="13"/>
+      </g>
+      <g id="lift" fill="none" stroke-linecap="round">
+        <path d="M472 236 C460 262 486 286 468 314" stroke="#efbd5f" stroke-width="6"/>
+        <path d="M480 234 C476 264 494 290 483 312" stroke="#f6cf7d" stroke-width="6"/>
+        <path d="M487 232 C491 260 479 284 493 308" stroke="#e3a94b" stroke-width="5.5"/>
+        <path d="M466 240 C448 268 454 296 470 310" stroke="#f6cf7d" stroke-width="5"/>
+        <path d="M492 236 C500 262 494 286 502 304" stroke="#efbd5f" stroke-width="4.6"/>
+        <path d="M464 232 Q480 242 496 230" stroke="#ffe1a0" stroke-width="5"/>
+        <path d="M466 240 Q481 249 494 238" stroke="#e3a94b" stroke-width="4.4"/>
+      </g>
+      <g>
+        <path d="M468 242 L700 96 L706 104 L478 248 Q470 250 468 242 Z" fill="url(#woodGrad)"/>
+        <path d="M484 222 L718 112 L722 121 L492 230 Q486 231 484 222 Z" fill="url(#woodGrad)"/>
+        <path d="M480 240 L694 102" stroke="#e8b878" stroke-width="1.6" opacity="0.55" stroke-linecap="round"/>
+        <path d="M494 222 L710 116" stroke="#e8b878" stroke-width="1.4" opacity="0.45" stroke-linecap="round"/>
+        <path d="M468 242 L478 248 L486 238 L476 232 Z" fill="#4a2c10" opacity="0.85"/>
+      </g>
+      <path d="M166 322 Q400 386 634 322" fill="none" stroke="#ffc98a" stroke-width="2.2" opacity="0.22" stroke-linecap="round"/>
+      <path d="M196 268 Q400 226 604 268" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.10" stroke-linecap="round"/>
+      <ellipse cx="400" cy="308" rx="238" ry="54" fill="none" stroke="#2a1503" stroke-width="1.6" opacity="0.45"/>
+    </svg>
+    <canvas id="steam" aria-hidden="true"></canvas>
+  </div>
+  <div class="vignette"></div>
+</div>
+<script>
+(function () {
+  var scene = document.getElementById('scene');
+  var wrap = document.getElementById('bowlWrap');
+  var svg = document.getElementById('ramen');
+  var canvas = document.getElementById('steam');
+  if (!scene || !wrap || !canvas) return;
+  var ctx = null;
+  try { ctx = canvas.getContext('2d'); } catch (e) { ctx = null; }
+  var motionQuery = null;
+  try { motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)'); } catch (e) { motionQuery = null; }
+  function prefersReduced() { return !!(motionQuery && motionQuery.matches); }
+
+  var dpr = 1, cw = 0, ch = 0, unit = 1;
+  var bowl = { x: 0, y: 0, rx: 0, ry: 0, gripX: 0, gripY: 0 };
+  function measure() {
+    var rect = wrap.getBoundingClientRect();
+    var w = Math.max(1, Math.round(rect.width));
+    var h = Math.max(1, Math.round(rect.height));
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    cw = w; ch = h;
+    unit = Math.max(0.45, Math.min(1.3, w / 800));
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    if (ctx && ctx.setTransform) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bowl.x = (400 / 800) * w;
+    bowl.y = (308 / 600) * h;
+    bowl.rx = (238 / 800) * w;
+    bowl.ry = (54 / 600) * h;
+    bowl.gripX = (478 / 800) * w;
+    bowl.gripY = (250 / 600) * h;
+  }
+  measure();
+
+  var target = { x: 0, y: 0, warm: 0.35 };
+  var current = { x: 0, y: 0, warm: 0.35 };
+  var pointer = { x: -9999, y: -9999, lx: -9999, ly: -9999, vx: 0, inside: false };
+  var burst = 0;
+
+  function onPointer(clientX, clientY) {
+    var srect = scene.getBoundingClientRect();
+    var nx = ((clientX - srect.left) / Math.max(1, srect.width)) * 2 - 1;
+    var ny = ((clientY - srect.top) / Math.max(1, srect.height)) * 2 - 1;
+    target.x = Math.max(-1, Math.min(1, nx));
+    target.y = Math.max(-1, Math.min(1, ny));
+    var wrect = wrap.getBoundingClientRect();
+    var px = clientX - wrect.left;
+    var py = clientY - wrect.top;
+    pointer.vx = pointer.lx < -9000 ? 0 : px - pointer.lx;
+    pointer.lx = px; pointer.ly = py;
+    pointer.x = px; pointer.y = py; pointer.inside = true;
+    var dx = (px - bowl.x) / Math.max(1, bowl.rx);
+    var dy = (py - bowl.y) / Math.max(1, bowl.rx * 0.8);
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    target.warm = Math.max(0.18, Math.min(1, 1.15 - dist * 0.55));
+  }
+  function onLeave() {
+    target.x = 0; target.y = 0; target.warm = 0.35;
+    pointer.inside = false; pointer.x = -9999; pointer.y = -9999; pointer.vx = 0;
+  }
+  window.addEventListener('pointermove', function (e) { onPointer(e.clientX, e.clientY); }, { passive: true });
+  window.addEventListener('pointerdown', function (e) {
+    onPointer(e.clientX, e.clientY);
+    if (prefersReduced()) return;
+    burst = 1;
+    stir();
+  }, { passive: true });
+  window.addEventListener('pointerleave', onLeave);
+  document.addEventListener('mouseleave', onLeave);
+  window.addEventListener('resize', function () { measure(); if (prefersReduced()) drawStatic(); });
+
+  var ripples = [document.getElementById('ripple1'), document.getElementById('ripple2')];
+  var rippleFlip = false;
+  function stir() {
+    rippleFlip = !rippleFlip;
+    for (var i = 0; i < ripples.length; i++) {
+      var el = ripples[i];
+      if (!el || !el.classList) continue;
+      el.classList.remove('go');
+      if (el.getBoundingClientRect) void el.getBoundingClientRect().width;
+      el.classList.add('go');
+    }
+    setTimeout(function () {
+      for (var j = 0; j < ripples.length; j++) {
+        if (ripples[j] && ripples[j].classList) ripples[j].classList.remove('go');
+      }
+    }, 1500);
+  }
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  var steam = [];
+  var motes = [];
+  function spawnSteam(boost) {
+    var fromGrip = Math.random() < 0.22;
+    var sx = fromGrip ? bowl.gripX + rand(-14, 14) : bowl.x + rand(-0.72, 0.72) * bowl.rx;
+    var sy = fromGrip ? bowl.gripY + rand(-4, 10) : bowl.y + rand(-0.35, 0.35) * bowl.ry - 4;
+    steam.push({
+      x: sx, y: sy,
+      vx: rand(-4, 4) * unit, vy: rand(-30, -18) * unit * (boost ? 1.25 : 1),
+      life: 0, max: rand(3.2, 5.6),
+      r: rand(9, 18) * unit, grow: rand(7, 13) * unit,
+      phase: rand(0, Math.PI * 2), wob: rand(0.5, 1.1)
+    });
+  }
+  function spawnMote(anywhere) {
+    motes.push({
+      x: bowl.x + rand(-1.4, 1.4) * bowl.rx,
+      y: anywhere ? rand(0, ch) : bowl.y + rand(-1.2, 0.6) * bowl.rx,
+      vx: rand(-3, 3), vy: rand(-5, -1),
+      r: rand(0.7, 1.9), tw: rand(0, Math.PI * 2), ts: rand(0.4, 1.2)
+    });
+  }
+  for (var s = 0; s < 34; s++) { spawnSteam(false); steam[s].life = rand(0, steam[s].max); steam[s].y -= rand(0, 130); }
+  for (var m = 0; m < 22; m++) spawnMote(true);
+
+  function drawStatic() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    var wisps = [
+      { x: bowl.x - bowl.rx * 0.30, y: bowl.y - bowl.rx * 0.42, r: bowl.rx * 0.20, a: 0.10 },
+      { x: bowl.x, y: bowl.y - bowl.rx * 0.55, r: bowl.rx * 0.26, a: 0.12 },
+      { x: bowl.x + bowl.rx * 0.30, y: bowl.y - bowl.rx * 0.40, r: bowl.rx * 0.18, a: 0.09 },
+      { x: bowl.x - bowl.rx * 0.10, y: bowl.y - bowl.rx * 0.85, r: bowl.rx * 0.30, a: 0.07 },
+      { x: bowl.x + bowl.rx * 0.14, y: bowl.y - bowl.rx * 0.95, r: bowl.rx * 0.34, a: 0.06 }
+    ];
+    for (var i = 0; i < wisps.length; i++) {
+      var w = wisps[i];
+      var g = ctx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.r);
+      g.addColorStop(0, 'rgba(255,244,226,' + w.a + ')');
+      g.addColorStop(1, 'rgba(255,244,226,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    scene.style.setProperty('--px', '0');
+    scene.style.setProperty('--py', '0');
+    scene.style.setProperty('--warm', '0.35');
+    scene.style.setProperty('--flicker', '1');
+  }
+
+  var rafId = 0, last = 0, spawnAcc = 0, flick = 1, running = false;
+  function frame(now) {
+    rafId = requestAnimationFrame(frame);
+    if (!last) last = now;
+    var dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if (dt <= 0) dt = 0.016;
+    current.x += (target.x - current.x) * (1 - Math.pow(0.0015, dt));
+    current.y += (target.y - current.y) * (1 - Math.pow(0.0015, dt));
+    current.warm += (target.warm - current.warm) * (1 - Math.pow(0.01, dt));
+    burst = Math.max(0, burst - dt * 0.55);
+    pointer.vx *= Math.pow(0.001, dt);
+    var flickTarget = 0.97 + Math.random() * 0.05;
+    flick += (flickTarget - flick) * Math.min(1, dt * 3);
+    scene.style.setProperty('--px', current.x.toFixed(3));
+    scene.style.setProperty('--py', current.y.toFixed(3));
+    scene.style.setProperty('--warm', current.warm.toFixed(3));
+    scene.style.setProperty('--flicker', flick.toFixed(3));
+    if (!ctx) return;
+    var wind = (current.x * 14 + Math.max(-26, Math.min(26, pointer.vx * 0.55))) * unit;
+    var rate = 7 + current.warm * 9 + burst * 22;
+    spawnAcc += rate * dt;
+    while (spawnAcc >= 1 && steam.length < 90) { spawnAcc -= 1; spawnSteam(burst > 0.2); }
+    if (spawnAcc > 3) spawnAcc = 3;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    for (var i = steam.length - 1; i >= 0; i--) {
+      var p = steam[i];
+      p.life += dt;
+      if (p.life >= p.max || p.y < -90) { steam.splice(i, 1); continue; }
+      var t = p.life / p.max;
+      p.phase += dt * p.wob * 2.1;
+      p.vx += (Math.sin(p.phase) * 9 * unit + wind * (0.25 + t * 0.9)) * dt;
+      p.vx *= Math.pow(0.35, dt);
+      p.vy -= 3.2 * unit * dt;
+      if (pointer.inside) {
+        var pdx = p.x - pointer.x, pdy = p.y - pointer.y;
+        var pd2 = pdx * pdx + pdy * pdy;
+        var pr = 120 * Math.max(unit, 0.75);
+        if (pd2 < pr * pr && pd2 > 0.01) {
+          var pd = Math.sqrt(pd2);
+          var push = (1 - pd / pr) * 90 * unit * dt;
+          p.vx += (pdx / pd) * push + (-pdy / pd) * push * 0.45;
+          p.vy += (pdy / pd) * push * 0.6;
+        }
+      }
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      var rad = p.r + p.grow * p.life * 2.2;
+      var fadeIn = Math.min(1, t / 0.16);
+      var fadeOut = Math.min(1, (1 - t) / 0.42);
+      var alpha = 0.16 * fadeIn * fadeOut * (0.75 + current.warm * 0.45 + burst * 0.35);
+      var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad);
+      g.addColorStop(0, 'rgba(255,246,232,' + alpha.toFixed(3) + ')');
+      g.addColorStop(0.55, 'rgba(255,238,218,' + (alpha * 0.45).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(255,238,218,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, Math.PI * 2); ctx.fill();
+    }
+    for (var k = 0; k < motes.length; k++) {
+      var d = motes[k];
+      d.tw += dt * d.ts * 2;
+      d.x += (d.vx + wind * 0.06) * dt; d.y += d.vy * dt;
+      if (d.y < -6 || d.x < -6 || d.x > cw + 6) { motes[k] = { x: bowl.x + rand(-1.4, 1.4) * bowl.rx, y: ch + 4, vx: rand(-3, 3), vy: rand(-5, -1), r: rand(0.7, 1.9), tw: rand(0, 6.28), ts: rand(0.4, 1.2) }; d = motes[k]; }
+      var a = 0.10 + 0.10 * (0.5 + 0.5 * Math.sin(d.tw));
+      ctx.fillStyle = 'rgba(255,206,150,' + (a * (0.6 + current.warm * 0.6)).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+  function startLoop() {
+    if (running) return;
+    running = true; last = 0;
+    rafId = requestAnimationFrame(frame);
+  }
+  function stopLoop() {
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+  function applyMotionMode() {
+    if (prefersReduced()) { stopLoop(); drawStatic(); }
+    else { startLoop(); }
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stopLoop();
+    else applyMotionMode();
+  });
+  if (motionQuery && motionQuery.addEventListener) motionQuery.addEventListener('change', applyMotionMode);
+  else if (motionQuery && motionQuery.addListener) motionQuery.addListener(applyMotionMode);
+  applyMotionMode();
+})();
+</script>
+</body>
+</html>

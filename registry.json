@@ -77,6 +77,12 @@
     "google/gemini-3.7-flash/high/run.json",
     "google/gemini-3.7-flash/medium/run.json",
     "google/gemini-3.7-flash/low/run.json",
+    "meta/muse-wonder-full-1.0/max/run.json",
+    "meta/muse-wonder-full-1.0/xhigh/run.json",
+    "meta/muse-wonder-full-1.0/high/run.json",
+    "meta/muse-wonder-full-1.0/medium/run.json",
+    "meta/muse-wonder-full-1.0/low/run.json",
+    "meta/muse-wonder-full-1.0/minimal/run.json",
     "meta/muse-wonder-1.0/max/run.json",
     "meta/muse-wonder-1.0/xhigh/run.json",
     "meta/muse-wonder-1.0/high/run.json",
@@ -124,6 +130,7 @@
     "openai/gpt-6.1-sol": "2026-10-01T00:09:25.308784Z",
     "mistralai/mistral-large-4-0": "2026-10-06T15:56:15.512371Z",
     "anthropic/haiku-5.5": "2026-10-08T21:21:50.929650Z",
-    "meta/muse-wonder-1.0": "2026-10-12T19:58:06.304563Z"
+    "meta/muse-wonder-1.0": "2026-10-12T19:58:06.304563Z",
+    "meta/muse-wonder-full-1.0": "2026-10-13T04:24:07.600078Z"
   }
 }

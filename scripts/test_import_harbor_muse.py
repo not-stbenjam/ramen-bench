@@ -5,9 +5,10 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from import_harbor_muse import normalize_session, sum_usage, verify_artifact
+from import_harbor_muse import normalize_session, register, sum_usage, verify_artifact
 from muse_list_prices import wonder_list_cost
 
 
@@ -28,6 +29,133 @@ def call(name, **args):
 
 
 class MuseImportTests(unittest.TestCase):
+    def test_replays_recorded_pathlib_edit_with_spaced_python_heredoc(self):
+        initial = '<svg xmlns="http://www.w3.org/2000/svg"></svg>\n'
+        command = (
+            "python3 - << 'PY'\n"
+            "import pathlib\n"
+            'p=pathlib.Path("/app/index.html"); s=p.read_text()\n'
+            "s=s.replace(' xmlns=\"http://www.w3.org/2000/svg\"','')\n"
+            "p.write_text(s)\n"
+            "print('done')\n"
+            "PY"
+        )
+        export = {
+            "events": [
+                record(
+                    "assistant_tool_calls_committed",
+                    tool_calls=[
+                        call("write_file", path="/app/index.html", content=initial),
+                        call("bash", command=command),
+                    ],
+                )
+            ]
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            artifact = Path(directory) / "index.html"
+            artifact.write_text('<svg></svg>\n')
+            self.assertIn("2 operations", verify_artifact(export, artifact))
+
+    def test_cancelled_auxiliary_without_usage_is_explicitly_allowed_only(self):
+        export = {
+            "sessions": [{"session_id": "fixture-session"}],
+            "events": [
+                record("timed_out"),
+                record("terminal", terminal="cancelled"),
+            ],
+        }
+        with self.assertRaisesRegex(ValueError, "no recorded provider usage"):
+            sum_usage(export)
+        totals, requests, duration = sum_usage(export, allow_cancelled_empty=True)
+        self.assertTrue(all(value == 0 for value in totals.values()))
+        self.assertEqual((requests, duration), (0, 0))
+        for events in (
+            [record("terminal", terminal="completed")],
+            [record("terminal", terminal="cancelled")],
+            [record("timed_out")],
+        ):
+            with (
+                self.subTest(events=events),
+                self.assertRaisesRegex(ValueError, "no recorded provider usage"),
+            ):
+                sum_usage({**export, "events": events}, allow_cancelled_empty=True)
+
+    def test_full_has_no_regular_wonder_price_even_with_priced_auxiliary_requests(self):
+        usage = {
+            "input_tokens": 100,
+            "cached_tokens": 80,
+            "cache_read_tokens": 80,
+            "cache_write_tokens": 0,
+            "output_tokens": 20,
+            "reasoning_tokens": 10,
+        }
+        full = {
+            "events": [
+                record("model_completed", model="muse-wonder-full-1.0", usage=usage)
+            ]
+        }
+        regular = {
+            "events": [record("model_completed", model="muse-wonder-1.0", usage=usage)]
+        }
+        self.assertIsNone(wonder_list_cost([full, regular]))
+
+    def test_register_orders_full_and_preserves_prior_runs_and_human_ratings(self):
+        regular = "meta/muse-wonder-1.0/max"
+        spark = "meta/muse-spark-1.3/high"
+        existing = [
+            regular + "/run.json",
+            spark + "/run.json",
+            "xai/fixture/high/run.json",
+        ]
+        rating = {"runId": regular, "humanScore": 0.9}
+
+        def run(model, effort, date):
+            return {
+                "id": f"meta/{model}/{effort}",
+                "model": {"slug": model},
+                "timing": {"completedAt": date},
+            }
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "harbor").mkdir()
+            (root / "registry.json").write_text(
+                json.dumps(
+                    {
+                        "runs": existing,
+                        "modelAddedAt": {
+                            "meta/muse-wonder-1.0": "2026-10-12T00:00:00Z",
+                            "meta/muse-spark-1.3": "2026-09-01T00:00:00Z",
+                        },
+                    }
+                )
+            )
+            (root / "harbor/human-scores.json").write_text(
+                json.dumps({"ratings": [rating]})
+            )
+            with patch("import_harbor_muse.ROOT", root):
+                register(
+                    [
+                        run("muse-wonder-full-1.0", "low", "2026-10-13T00:00:00Z"),
+                        run("muse-wonder-full-1.0", "max", "2026-10-13T00:00:00Z"),
+                    ]
+                )
+                register([run("muse-wonder-1.0", "max", "2026-10-12T00:00:00Z")])
+            self.assertEqual(
+                json.loads((root / "registry.json").read_text())["runs"],
+                [
+                    "meta/muse-wonder-full-1.0/max/run.json",
+                    "meta/muse-wonder-full-1.0/low/run.json",
+                    *existing,
+                ],
+            )
+            self.assertEqual(
+                json.loads((root / "harbor/human-scores.json").read_text())["ratings"][
+                    0
+                ],
+                rating,
+            )
+
     def test_list_price_counts_cache_discount_reasoning_once_and_auxiliary_requests(
         self,
     ):

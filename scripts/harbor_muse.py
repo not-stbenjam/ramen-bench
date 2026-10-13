@@ -1,4 +1,4 @@
-"""Small native Harbor Muse adapter for a pinned local CLI and Max effort."""
+"""Native Harbor Muse adapter for a pinned CLI, all efforts, and subscription auth."""
 
 from pathlib import Path
 from typing import Annotated, Literal
@@ -14,6 +14,13 @@ class PinnedMuseOptions(MuseCodeOptions):
         Cli("--reasoning-effort", fallback="MUSE_CODE_REASONING_EFFORT"),
     ] = Field(default=None, description="Wonder's provider-advertised effort tiers.")
     binary_path: Path = Field(description="Local native Muse Code executable.")
+    auth_path: Path | None = Field(
+        default=None, description="Local Muse login for subscription access."
+    )
+    contributor_mode: Annotated[
+        Literal["on", "off"] | None,
+        Cli("--contributor-mode"),
+    ] = Field(default=None, description="Explicit native per-run contributor setting.")
 
 
 class PinnedMuseCode(MuseCode):
@@ -31,3 +38,11 @@ class PinnedMuseCode(MuseCode):
             environment, self.options.binary_path, "/root/.local/bin/muse"
         )
         await self.exec_as_agent(environment, command="chmod 755 /root/.local/bin/muse")
+        if self.options.auth_path is not None:
+            await self.exec_as_agent(environment, command="mkdir -p /root/.config/muse")
+            await self._upload_agent_owned_file(
+                environment, self.options.auth_path, "/root/.config/muse/auth.json"
+            )
+            await self.exec_as_agent(
+                environment, command="chmod 600 /root/.config/muse/auth.json"
+            )
