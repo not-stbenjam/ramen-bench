@@ -215,9 +215,16 @@ session content are excluded, then the shared censor runs over the result.
 Tokens are exact sums of native `model_completed` events, with main and
 auxiliary session totals retained separately. Cache hits are removed from
 uncached input, and reasoning is separate from output. Generation duration
-excludes setup and grading. Wonder's native sessions do not report cost and
-the pinned historical LiteLLM catalog does not contain this model, so its
-cost remains unknown. No price is inferred from another model or invented.
+excludes setup and grading. Wonder costs are estimated
+using [Meta's published Standard prices](https://dev.meta.ai/docs/pricing-rate-limits),
+pinned on October 12, 2026: $4 per million uncached input tokens, $0.20 for
+cached input, and $20 for output. Native output already includes reasoning;
+the public output category excludes reasoning, and total tokens and costs
+count it once. Estimates include the main session and its recorded auxiliary
+requests, retain source URLs and rates, and are marked `estimated: true`.
+They are API-equivalent list prices, not recorded subscription/API charges.
+Unknown model rates, missing token categories or unaccounted search/image
+charges leave cost unknown. No price is inferred from another model.
 The historical Spark export workflow remains available through the same
 Muse entry point.
 

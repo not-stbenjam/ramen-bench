@@ -21,6 +21,9 @@ from censor_transcripts import censor_value
 from censor_transcripts import main as censor_transcripts
 from import_harbor_claude import select_grade
 from import_harbor_codex import native_artifact, publish_grades, read_json
+from muse_list_prices import AS_OF as PRICE_DATE
+from muse_list_prices import SOURCE as PRICE_SOURCE
+from muse_list_prices import wonder_list_cost
 
 MODEL = "muse-wonder-1.0"
 EFFORTS = ("minimal", "low", "medium", "high", "xhigh", "max")
@@ -237,6 +240,8 @@ def sum_usage(export: dict) -> tuple[dict, int, int]:
             raise ValueError(
                 "Muse cache-write semantics require verification before import"
             )
+        if usage["reasoning_tokens"] > usage["output_tokens"]:
+            raise ValueError("Muse reasoning exceeds its inclusive output total")
         millis = current.get("duration_ms")
         if isinstance(millis, bool) or not isinstance(millis, int) or millis < 0:
             raise ValueError("Invalid native Muse request duration")
@@ -329,11 +334,13 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
     artifact = native_artifact(trial)
     verification = verify_artifact(export, artifact)
     totals, requests, api_duration = sum_usage(export)
+    exports = [export]
     main_totals, auxiliary = totals.copy(), []
     for source in sources:
         if source == main[0]:
             continue
         child = export_session(source, binary)
+        exports.append(child)
         child_totals, child_requests, child_duration = sum_usage(child)
         auxiliary.append(
             {
@@ -361,6 +368,7 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
     version = export["session_build"]["semver"]
     if result["agent_info"]["version"] != version:
         raise ValueError("Harbor and Muse's recorded build versions disagree")
+    priced = wonder_list_cost(exports)
     run = {
         "$schema": "../../../schemas/run.schema.json",
         "schemaVersion": 1,
@@ -397,11 +405,11 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
                 "input": totals["input_tokens"] - cached,
                 "cachedInput": cached,
                 "cacheCreationInput": 0,
-                "output": output,
+                "output": output - reasoning,
                 "reasoning": reasoning,
-                "total": totals["input_tokens"] + output + reasoning,
+                "total": totals["input_tokens"] + output,
             },
-            "cost": None,
+            "cost": priced[0] if priced else None,
             "requests": requests,
             "turns": 1,
             "toolCalls": sum(1 for _ in recorded_calls(export)),
@@ -415,10 +423,22 @@ def build_trial(trial: Path, binary: str) -> tuple[dict, dict, Path]:
                 "harborTaskChecksum": result["task_checksum"],
                 "artifactVerification": verification,
                 "nativeExportDiagnostics": export["diagnostics"],
+                **({"pricing": priced[1]} if priced else {}),
             },
         },
         "resultStats": result_stats(run_id, artifact),
-        "notes": "HTML is unchanged and verified against recorded Muse writes. Generation timing excludes setup and grading. Tokens sum native model_completed events once per retained main and auxiliary session; input excludes cache hits and reasoning is separate from output. Auxiliary session content, hidden reasoning, system/developer prompts and private activity are excluded from the public transcript. Muse supplies no recorded cost, and the pinned LiteLLM catalog has no Wonder rate; cost remains unknown. Effort is the explicitly requested setting recorded in Harbor and its Muse invocation.",
+        "provenance": {
+            "pricingSource": f"Meta Standard published list prices, pinned {PRICE_DATE}; {PRICE_SOURCE}"
+        }
+        if priced
+        else {},
+        "notes": "HTML is unchanged and verified against recorded Muse writes. Generation timing excludes setup and grading. Tokens sum native model_completed events once per retained main and auxiliary session. Input excludes cache hits; reasoning is a subset of native output, split out of usage.tokens.output and counted once in the total. Auxiliary session content, hidden reasoning, system/developer prompts and private activity are excluded from the public transcript. "
+        + (
+            "Cost is an API-equivalent Standard list-price estimate at Meta's published rates, including auxiliary sessions and reasoning once; it is not a recorded charge. "
+            if priced
+            else "Cost remains unknown when recorded usage or model/tool pricing is insufficient. "
+        )
+        + "Effort is the explicitly requested setting recorded in Harbor and its Muse invocation.",
     }
     transcript = {
         "$schema": "../../../schemas/transcript.schema.json",
