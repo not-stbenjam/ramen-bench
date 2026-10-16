@@ -185,8 +185,13 @@ PYTHONPATH=. harbor run --yes --env-file .harbor/judge.env \
   --model google/gemini-4-argon-low --ak reasoning_effort=low \
   --ak binary_path=/path/to/pinned/agy \
   --ak auth_path=/path/to/antigravity-oauth-token \
+  --ae AGY_CLI_DISABLE_AUTO_UPDATE=true \
   --job-name argon-low --jobs-dir .harbor/jobs
 ```
+
+Disable auto-updates in the agent environment to keep the uploaded version
+pinned. In JSON job configuration this is
+`agents[].env.AGY_CLI_DISABLE_AUTO_UPDATE = "true"`.
 
 Import and source-check only native Harbor results:
 

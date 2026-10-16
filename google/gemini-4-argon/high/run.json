@@ -1,0 +1,100 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "google/gemini-4-argon/high",
+  "vendor": {
+    "slug": "google",
+    "displayName": "Google"
+  },
+  "model": {
+    "slug": "gemini-4-argon",
+    "displayName": "Gemini 4 Argon",
+    "providerModelId": "gemini-4-argon-high"
+  },
+  "variation": {
+    "slug": "high",
+    "displayName": "High",
+    "reasoningEffort": "high",
+    "parameters": {
+      "modelSelection": "Gemini 4 Argon (High)"
+    }
+  },
+  "harness": {
+    "name": "Antigravity CLI",
+    "version": "1.3.5",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor agy with pinned executable and subscription login; gemini-4-argon-high --effort high"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-16T00:27:43.598774Z",
+    "completedAt": "2026-10-16T00:44:22.096688Z",
+    "wallDurationMs": 998498
+  },
+  "usage": {
+    "tokens": {
+      "input": 359191,
+      "cachedInput": 2573808,
+      "output": 56710,
+      "reasoning": 16141,
+      "total": 3005850
+    },
+    "cost": {
+      "currency": "USD",
+      "input": 0.718382,
+      "cachedInput": 0.2573808,
+      "output": 0.72851,
+      "cacheCreationInput": 0,
+      "other": 0,
+      "total": 1.7042728,
+      "estimated": true
+    },
+    "requests": 25,
+    "turns": 1,
+    "toolCalls": 24,
+    "providerReported": true,
+    "raw": {
+      "nativeStreamUsage": {
+        "input_tokens": 359191,
+        "output_tokens": 72851,
+        "thinking_tokens": 16141,
+        "cache_read_tokens": 2573808,
+        "total_tokens": 432042
+      },
+      "nativeCompletionStatus": "SUCCESS",
+      "pricing": {
+        "source": "https://ai.google.dev/gemini-api/docs/pricing#gemini-4-argon",
+        "pinnedAt": "2026-10-15",
+        "model": "gemini-4-argon",
+        "tier": "Standard",
+        "basis": "API-equivalent published list prices; not a subscription charge",
+        "introductory": true,
+        "effectiveThrough": "2026-11-30",
+        "inputUsdPerMillion": 2.0,
+        "cachedInputUsdPerMillion": 0.1,
+        "outputUsdPerMillion": 10.0,
+        "outputIncludesThinking": true,
+        "cacheType": "implicit"
+      },
+      "harborAgentTokens": {
+        "n_input_tokens": 2932999,
+        "n_cache_tokens": 2573808,
+        "n_output_tokens": 72851
+      },
+      "harborTrial": "argon-high-retry-task__PBtUBJB",
+      "harborTaskChecksum": "73c0ab78c03836bd352ae157016cad85a66397c26695d9f76c4ef9cc24b32cb9",
+      "artifactVerification": "Recorded agy file-operation replay (6 operations)"
+    }
+  },
+  "resultStats": {
+    "bytes": 102415,
+    "lines": 2798
+  },
+  "provenance": {
+    "pricingSource": "Google Standard published list prices, pinned 2026-10-15; https://ai.google.dev/gemini-api/docs/pricing#gemini-4-argon"
+  },
+  "notes": "Generated entirely by native agy inside Harbor. HTML is unchanged and matches recorded successful file operations. Generation time comes from Harbor and excludes setup and grading. Token counters come from the native completion aggregate, checked against individual steps; input and cache reads are disjoint, and thinking is included once in output then split into reasoning. Native total_tokens excludes cache reads; the public total includes them once. Pricing uses pinned Google Standard API-equivalent list prices, with cache hits discounted and thinking included once; it is not a recorded subscription charge. Hidden reasoning, system/developer prompts, credentials, private agent activity, opaque payloads and personal paths are excluded from the public transcript."
+}

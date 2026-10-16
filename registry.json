@@ -71,6 +71,7 @@
     "openai/gpt-5.5/high/run.json",
     "openai/gpt-5.5/medium/run.json",
     "openai/gpt-5.5/low/run.json",
+    "google/gemini-4-argon/high/run.json",
     "google/gemini-4-argon/medium/run.json",
     "google/gemini-4-argon/low/run.json",
     "google/gemini-3.8-flash/high/run.json",
