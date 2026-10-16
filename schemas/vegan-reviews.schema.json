@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Native Harbor trajectory-aware vegan reviews",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reviews"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/review"
+      }
+    }
+  },
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestSha256",
+        "judgment",
+        "usage",
+        "invalidAttempts"
+      ],
+      "properties": {
+        "requestSha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "usage": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "judgment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "decision",
+            "reason",
+            "evidence"
+          ],
+          "properties": {
+            "decision": {
+              "enum": [
+                "plant_based_substitutes",
+                "animal_ingredients",
+                "insufficient_evidence"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidence": {
+              "type": "array",
+              "maxItems": 8,
+              "items": {
+                "$ref": "#/$defs/citation"
+              }
+            }
+          }
+        },
+        "invalidAttempts": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/invalidAttempt"
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "runId",
+        "artifactSha256",
+        "transcriptSha256",
+        "sourceScoreSha256",
+        "sourceReward",
+        "policySha256",
+        "policyVersion",
+        "judge",
+        "omittedEvidenceChunks",
+        "inputSha256",
+        "reviewedAt",
+        "judgeResults",
+        "restoreVeganGate",
+        "harborTrial",
+        "evidenceSources"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactSha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "transcriptSha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "sourceScoreSha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "sourceReward": {
+          "const": 0
+        },
+        "policySha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "policyVersion": {
+          "const": "vegan-trajectory-v1"
+        },
+        "inputSha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "omittedEvidenceChunks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "restoreVeganGate": {
+          "type": "boolean"
+        },
+        "harborTrial": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "judge": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "models",
+            "efforts",
+            "samples"
+          ],
+          "properties": {
+            "models": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "efforts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "samples": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "judgeResults": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "model",
+              "effort",
+              "judgments"
+            ],
+            "properties": {
+              "model": {
+                "type": "string",
+                "minLength": 1
+              },
+              "effort": {
+                "type": "string",
+                "minLength": 1
+              },
+              "judgments": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/sample"
+                }
+              }
+            }
+          }
+        },
+        "evidenceSources": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^E[0-9]{4,}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "location",
+              "text"
+            ],
+            "properties": {
+              "source": {
+                "enum": [
+                  "artifact",
+                  "trajectory"
+                ]
+              },
+              "location": {
+                "type": "string",
+                "minLength": 1
+              },
+              "eventIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "invalidAttempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestSha256",
+        "error",
+        "usage"
+      ],
+      "properties": {
+        "requestSha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "error": {
+          "const": "invalid_format_or_citation"
+        },
+        "usage": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

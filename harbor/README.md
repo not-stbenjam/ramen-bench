@@ -38,7 +38,49 @@ Top-level standard deviation measures disagreement between judges' visual reward
 
 The score page also supports post-scoring weights and human ratings without new API calls. `weights.json` controls the displayed LLM composite: noodles 10%, toppings 10%, bowl 20%, broth 10%, steam 25%, and composition 25%. These are view weights; the native Harbor rewards and `scores.json` retain their original weighting and provenance. Per-judge means and sample spread are recomputed for the view from the recorded criterion scores.
 
-`human-scores.json` contains an editable `humanScore` field for every currently registered bowl. Enter a number from 0 to 1, such as `0.85`, or leave it `null` when unrated. The panel is labeled **Expert panel of ramen eaters**; its initial ratings come from the user's feedback, not additional panel members. The current human weight is `0.8`: rated bowls display `0.8 × humanScore + 0.2 × LLM composite`. Unrated bowls use their LLM composite until a human rating is supplied. Compliance failures remain zero regardless of the human rating. The human file is separate from generated scores so scoring and collection cannot overwrite later human entries. Change its `weight` to adjust human influence; these preferences are never sent to the LLM judges.
+`human-scores.json` contains an editable `humanScore` field for every currently registered bowl. Enter a number from 0 to 1, such as `0.85`, or leave it `null` when unrated. The panel is labeled **Expert panel of ramen eaters**; its initial ratings come from the user's feedback, not additional panel members. The current human weight is `0.8`: rated bowls display `0.8 × humanScore + 0.2 × LLM composite`. Unrated bowls use their LLM composite until a human rating is supplied. Human ratings cannot clear compliance failures. A separate trajectory-aware judge review can clear the vegan gate as described below; standalone and procedural gates remain binding. The human file is separate from generated scores so scoring and collection cannot overwrite later human entries. Change its `weight` to adjust human influence; these preferences are never sent to the LLM judges.
+
+### Trajectory-aware vegan reviews
+
+An image-only judge can mistake an intended vegan imitation egg for an animal
+egg. After native visual scoring and transcript import, run the separate Harbor
+review for every unreviewed vegan-gated result. It uses the original ensemble's
+models, efforts, and sample count. Each judge analyzes visible recorded assistant
+messages and verbatim ingredient contexts from the artifact and tool activity.
+Hidden reasoning and user instructions are excluded as evidence. Context
+selection is deterministic, exact excerpts are retained, and omissions are
+counted; the request is bounded to 100,000 characters of generation evidence.
+
+Reviewers must cite recorded source IDs and identify ingredient-specific
+plant-based substitutes. Generic vegan titles are insufficient. Ambiguous or
+contradictory evidence retains the gate. A majority of samples must clear it for
+each judge, followed by a majority of judges; every configured sample must finish.
+Malformed JSON or unknown source IDs receive at most two additional attempts.
+Valid negative or uncertain decisions are never retried. Failed response text
+stays private; public records retain its actual usage and format-failure status.
+`vegan-reviews.json` records the actual native ingredient review responses,
+usage, Harbor trial, consensus, and hashes of the artifact, transcript, original
+score, request, and review implementation. The displayed ranking applies a
+verified positive review before its usual weighting. Notes show the current
+ingredient decisions and the cited source excerpts.
+
+```sh
+python3 scripts/review_vegan.py export --output .harbor/vegan-review
+harbor run --yes --env-file .harbor/judge.env \
+  --path .harbor/vegan-review --agent oracle --n-concurrent 1 --max-retries 0 \
+  --jobs-dir "$PWD/.harbor/jobs" --job-name vegan-review
+python3 scripts/review_vegan.py collect --job .harbor/jobs/vegan-review \
+  --mapping .harbor/vegan-review/review-map.json
+python3 scripts/review_vegan.py audit
+```
+
+The oracle copies only the sanitized evidence bundle; generation models are not
+called. Reviewers run in a separate verifier image with credentials confined to
+the verifier. Collection checks native rewards and exact source hashes. Repeated
+collection is deterministic; completed reviews are excluded from new exports.
+Changing source records, the policy, dependencies, or reviewer implementation
+invalidates existing reviews. Original visual evaluations remain valid because
+their image-only verifier and recorded requests are unchanged.
 
 ## Setup
 
@@ -414,7 +456,7 @@ python3 scripts/censor_transcripts.py scores.json --write
 python3 scripts/censor_transcripts.py
 python3 scripts/censor_transcripts.py scores.json
 python3 scripts/validate_registry.py
-python3 -m unittest scripts/test_ramen_harbor.py scripts/test_ramen_reliability.py scripts/test_censor_transcripts.py
+python3 -m unittest scripts/test_ramen_harbor.py scripts/test_ramen_reliability.py scripts/test_censor_transcripts.py scripts/test_review_vegan.py
 node --test scripts/test_scores.mjs
 ```
 

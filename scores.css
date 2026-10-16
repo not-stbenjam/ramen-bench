@@ -76,3 +76,5 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16
 :focus-visible { outline: 2px solid #e9b987; outline-offset: 4px; }
 @media (max-width: 600px) { main { padding: 24px 16px; } .chart-panel, .results-panel { padding: 18px; border-radius: 14px; } .panel-heading { align-items: start; } .controls { gap: 14px; } .controls > label:not(.check) { width: 100%; } .download { font-size: .7rem; } .notes dl { grid-template-columns: 1fr; gap: 2px; } .notes dd { margin-bottom: 14px; } }
 @media (max-width: 600px) { .model-filter { width: 100%; } }
+/* Recorded ingredient excerpts in the judge notes. */
+.judge-review pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; }

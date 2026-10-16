@@ -366,6 +366,9 @@ def audit_display_config(runs: list[tuple[dict, Path]]) -> None:
             raise ValueError("Human scores must be finite or null")
         seen.add(rating["runId"])
     print(f"Validated display weights and {len(seen)} editable human rating slots")
+    from scripts.review_vegan import audit_reviews
+
+    audit_reviews(ROOT)
 
 
 def main() -> int:

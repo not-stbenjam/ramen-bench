@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { contrastingModelColors, descendingScale, rewardExtent, axisValue, byEffort, generationTimestamp, newestGeneratedFirst, modelLabelAnchor, validScore, validWeights, reweightScore, withHumanScore, criteria } from "../scores-data.mjs";
+import { contrastingModelColors, descendingScale, rewardExtent, axisValue, byEffort, generationTimestamp, newestGeneratedFirst, modelLabelAnchor, validScore, validWeights, reweightScore, withHumanScore, withVeganReview, criteria, weights } from "../scores-data.mjs";
 
 test("generation order uses recorded completion, with unknown dates last", () => {
   const row = (id, timing) => ({ run: { id, timing } });
@@ -103,4 +103,55 @@ test("missing human ratings use the LLM score; zero is a real rating and gates r
   assert.equal(withHumanScore({ ...row, diagnostics: { veganFailed: true } }, 1, .8).reward, 0);
   assert.throws(() => withHumanScore(row, 85, .8));
   assert.throws(() => withHumanScore(row, true, .8));
+});
+
+function reviewFixture() {
+  const score = { runId: "fixture/model/high", artifactSha256: "a".repeat(64), reward: 0,
+    scores: { standalone: 1, procedural: 1, ...Object.fromEntries(criteria.map(key => [key, .7])) },
+    diagnostics: { veganFailed: true }, judgeResults: ["a", "b", "c"].map(model => ({ model, effort: "default", reward: .7,
+      scores: Object.fromEntries(criteria.map(key => [key, .7])), judgments: criteria.slice(0, 3).map(() => Object.fromEntries(criteria.map(key => [key, { score: .7 }]))),
+    })),
+  };
+  const review = { runId: score.runId, sourceReward: 0, artifactSha256: score.artifactSha256,
+    ...Object.fromEntries(["transcriptSha256", "sourceScoreSha256", "policySha256", "inputSha256"].map(key => [key, "b".repeat(64)])),
+    policyVersion: "vegan-trajectory-v1", restoreVeganGate: true,
+    evidenceSources: { E0001: { source: "artifact", location: "artifact:0-100", text: "vegan egg with pumpkin yolk" } },
+    judge: { models: ["a", "b", "c"], efforts: { a: "default", b: "default", c: "default" }, samples: 3 },
+    judgeResults: ["a", "b", "c"].map(model => ({ model, effort: "default", judgments: [1, 2, 3].map(() => ({
+      judgment: { decision: "plant_based_substitutes", reason: "Explicit plant-based ajitama in recorded code.", evidence: [{ id: "E0001" }] },
+    })) })),
+  };
+  return { score, review };
+}
+
+test("trajectory consensus clears only the vegan display gate and preserves native records", () => {
+  const { score, review } = reviewFixture(), original = JSON.stringify(score);
+  assert.equal(validScore(score), true);
+  assert.equal(reweightScore(withVeganReview(score, null), weights).reward, 0);
+  const displayed = withHumanScore(reweightScore(withVeganReview(score, review), weights), null, .8);
+  assert.ok(Math.abs(displayed.reward - .7) < 1e-10);
+  assert.equal(displayed.sourceReward, 0);
+  assert.equal(displayed.diagnostics.veganFailed, true);
+  assert.equal(displayed.veganReview, review);
+  assert.equal(JSON.stringify(score), original);
+  for (const gate of ["standalone", "procedural"]) {
+    assert.throws(() => withVeganReview({ ...score, scores: { ...score.scores, [gate]: 0 } }, review));
+  }
+});
+
+test("stale, incomplete, evidence-free, or misreported trajectory reviews cannot rescue zero", () => {
+  const { score, review } = reviewFixture();
+  assert.throws(() => withVeganReview(score, { ...review, artifactSha256: "c".repeat(64) }));
+  assert.throws(() => withVeganReview(score, { ...review, runId: "another/model/high" }));
+  assert.throws(() => withVeganReview(score, { ...review, judgeResults: review.judgeResults.slice(0, 2) }));
+  const incomplete = structuredClone(review); incomplete.judgeResults[0].judgments.pop();
+  assert.throws(() => withVeganReview(score, incomplete));
+  const unsupported = structuredClone(review); unsupported.judgeResults[0].judgments[0].judgment.evidence = [];
+  assert.throws(() => withVeganReview(score, unsupported));
+  assert.throws(() => withVeganReview(score, { ...review, evidenceSources: {} }));
+  const ambiguous = structuredClone(review);
+  for (const judge of ambiguous.judgeResults.slice(0, 2)) for (const sample of judge.judgments) sample.judgment.decision = "insufficient_evidence";
+  assert.throws(() => withVeganReview(score, ambiguous));
+  ambiguous.restoreVeganGate = false;
+  assert.equal(reweightScore(withVeganReview(score, ambiguous), weights).reward, 0);
 });
