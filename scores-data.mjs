@@ -125,6 +125,46 @@ function sampleSpread(values) {
   return Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (values.length - 1));
 }
 
+export function withVeganReview(row, review) {
+  if (!review) return { ...row, veganReview: null };
+  const invalid = () => { throw new Error("Invalid or stale trajectory-aware vegan review"); };
+  if (review.runId !== row.runId || review.artifactSha256 !== row.artifactSha256
+      || review.sourceReward !== row.reward || !row.diagnostics?.veganFailed
+      || row.scores.standalone !== 1 || row.scores.procedural !== 1
+      || review.policyVersion !== "vegan-trajectory-v1"
+      || !["artifactSha256", "transcriptSha256", "sourceScoreSha256", "policySha256", "inputSha256"].every(key => /^[a-f0-9]{64}$/.test(review[key]))
+      || !Array.isArray(review.judgeResults) || !Array.isArray(review.judge?.models)
+      || !review.evidenceSources || typeof review.evidenceSources !== "object"
+      || !Number.isInteger(review.judge.samples) || review.judge.samples < 1) invalid();
+  const expected = new Map((row.judgeResults || []).map(judge => [judge.model, judge.effort || "default"]));
+  if (!expected.size || review.judgeResults.length !== expected.size
+      || review.judge.models.length !== expected.size || new Set(review.judge.models).size !== expected.size
+      || !review.judge.models.every(model => expected.has(model))) invalid();
+  const seen = new Set();
+  let votes = 0;
+  for (const judge of review.judgeResults) {
+    if (!expected.has(judge.model) || seen.has(judge.model) || judge.effort !== expected.get(judge.model)
+        || review.judge.efforts?.[judge.model] !== judge.effort
+        || !Array.isArray(judge.judgments) || judge.judgments.length !== review.judge.samples) invalid();
+    seen.add(judge.model);
+    let samples = 0;
+    for (const { judgment } of judge.judgments) {
+      if (!judgment || !["plant_based_substitutes", "animal_ingredients", "insufficient_evidence"].includes(judgment.decision)
+          || typeof judgment.reason !== "string" || !judgment.reason.trim() || !Array.isArray(judgment.evidence)
+          || judgment.evidence.some(citation => !citation || typeof citation.id !== "string" || !Object.hasOwn(review.evidenceSources, citation.id) || typeof review.evidenceSources[citation.id]?.location !== "string" || typeof review.evidenceSources[citation.id]?.text !== "string")) invalid();
+      if (judgment.decision === "plant_based_substitutes") {
+        if (!judgment.evidence.length) invalid();
+        samples++;
+      }
+    }
+    if (samples > review.judge.samples / 2) votes++;
+  }
+  if (typeof review.restoreVeganGate !== "boolean" || review.restoreVeganGate !== (votes > expected.size / 2)) invalid();
+  return { ...row, veganReview: review };
+}
+
+const veganGateFailed = row => row.diagnostics?.veganFailed && !row.veganReview?.restoreVeganGate;
+
 export function reweightScore(row, criterionWeights, keys = criteria) {
   if (!validWeights(criterionWeights, keys)) throw new Error("Invalid display weights");
   const weighted = scores => keys.reduce((sum, key) => sum + criterionWeights[key] * scores[key], 0);
@@ -137,7 +177,7 @@ export function reweightScore(row, criterionWeights, keys = criteria) {
   return {
     ...row,
     sourceReward: row.reward,
-    reward: row.scores.standalone === 0 || row.scores.procedural === 0 || row.diagnostics?.veganFailed ? 0 : weighted(row.scores),
+    reward: row.scores.standalone === 0 || row.scores.procedural === 0 || veganGateFailed(row) ? 0 : weighted(row.scores),
     rewardStdDev: sampleSpread(judgeResults.map(judge => judge.reward)),
     judgeResults,
   };
@@ -154,7 +194,7 @@ export function withHumanScore(row, humanScore, humanWeight) {
     llmReward: row.reward,
     humanScore,
     humanWeight: weight,
-    reward: row.scores.standalone === 0 || row.scores.procedural === 0 || row.diagnostics?.veganFailed
+    reward: row.scores.standalone === 0 || row.scores.procedural === 0 || veganGateFailed(row)
       ? 0 : (weight ? weight * humanScore + (1 - weight) * row.reward : row.reward),
   };
 }

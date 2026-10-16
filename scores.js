@@ -1,4 +1,4 @@
-import { contrastingModelColors, descendingScale, rewardExtent, axisValue, byEffort, generationTimestamp, newestGeneratedFirst, modelLabelAnchor, validScore, validWeights, reweightScore, withHumanScore, criteria as defaultCriteria, weights as defaultWeights } from "./scores-data.mjs";
+import { contrastingModelColors, descendingScale, rewardExtent, axisValue, byEffort, generationTimestamp, newestGeneratedFirst, modelLabelAnchor, validScore, validWeights, reweightScore, withHumanScore, withVeganReview, criteria as defaultCriteria, weights as defaultWeights } from "./scores-data.mjs";
 
 const $ = id => document.getElementById(id);
 let rows = [];
@@ -82,8 +82,8 @@ function showNotes(row, toggle = false) {
   const spread = row.rewardStdDev === null ? "No between-judge spread estimate." : `Standard deviation between judge means: ${number(row.rewardStdDev)}. This measures judge disagreement, not variation across model runs.`;
   const content = element("div", undefined, "judge-review");
   content.append(element("p", row.humanScore === null
-    ? `No human rating yet. Current LLM score: ${number(row.llmReward)}. Original LLM weighting: ${number(row.sourceReward)}.`
-    : `Human score: ${number(row.humanScore)} (${Math.round(row.humanWeight * 100)}%). LLM score: ${number(row.llmReward)} (${Math.round((1 - row.humanWeight) * 100)}%). Combined: ${number(row.reward)}. Original LLM weighting: ${number(row.sourceReward)}.`));
+    ? `No human rating yet. Current LLM score: ${number(row.llmReward)}.`
+    : `Human score: ${number(row.humanScore)} (${Math.round(row.humanWeight * 100)}%). LLM score: ${number(row.llmReward)} (${Math.round((1 - row.humanWeight) * 100)}%). Combined: ${number(row.reward)}.`));
   if (row.scores.standalone === 0 || row.scores.procedural === 0) {
     content.append(element("p", `Compliance failed: ${[...row.standaloneViolations, ...(row.complianceViolations || [])].join("; ")}`));
   } else {
@@ -112,7 +112,7 @@ function showNotes(row, toggle = false) {
         judge.judgments.forEach((sample, index) => explanation.append(element("p", `Sample ${index + 1}: ${sample[key].reason}`)));
         dl.append(element("dt", `${labels[key]} · ${number(judge.scores[key])}`), explanation);
       }
-      if (judge.diagnostics) {
+      if (judge.diagnostics && !row.veganReview) {
         const explanation = element("dd");
         judge.judgments.forEach((sample, index) => explanation.append(element("p", `Sample ${index + 1}: ${sample.vegan.reason}`)));
         dl.append(element("dt", `Vegan compliance · ${number(judge.diagnostics.vegan)}`), explanation);
@@ -120,7 +120,30 @@ function showNotes(row, toggle = false) {
       details.append(dl); content.append(details);
     }
   }
-  if (row.diagnostics?.veganFailed) content.prepend(element("p", "Vegan compliance failed: a majority of judges identify clear animal-derived ingredients. Composite reward is zero."));
+  if (row.veganReview) {
+    const reviewed = element("details");
+    reviewed.append(element("summary", `Vegan ingredients · ${row.veganReview.restoreVeganGate ? "confirmed plant-based" : "compliance failed"}`));
+    const trajectory = element("a", "Read recorded trajectory ↗");
+    trajectory.href = `${row.runId}/${row.run.artifacts.transcript}`;
+    trajectory.target = "_blank"; trajectory.rel = "noopener";
+    reviewed.append(trajectory);
+    for (const judge of row.veganReview.judgeResults) {
+      const judgeNotes = element("details");
+      judgeNotes.append(element("summary", judgeName(judge)));
+      judge.judgments.forEach(({ judgment }, index) => {
+        judgeNotes.append(element("p", `Sample ${index + 1}: ${judgment.decision.replaceAll("_", " ")} — ${judgment.reason}`));
+        for (const citation of judgment.evidence) {
+          const source = row.veganReview.evidenceSources[citation.id];
+          judgeNotes.append(element("pre", source.text), element("small", `Recorded source: ${source.location}`));
+        }
+      });
+      reviewed.append(judgeNotes);
+    }
+    content.prepend(reviewed);
+  }
+  if (row.diagnostics?.veganFailed) content.prepend(element("p", row.veganReview?.restoreVeganGate
+    ? "Vegan ingredients confirmed from the recorded trajectory."
+    : "Vegan compliance failed: a majority of judges identify clear animal-derived ingredients. Composite reward is zero."));
   panel.querySelector(".notes").replaceChildren(heading, bowl, element("p", spread), content);
 }
 
@@ -150,7 +173,7 @@ function renderTable(filtered) {
     const cost = axisValue(row.run, "cost");
     tr.append(identity, reward, element("td", reference), element("td", number(row.llmReward)), element("td", cost === null ? "—" : `$${cost.toFixed(3)}${row.run.usage.cost.estimated ? " ≈" : ""}`), element("td", number(axisValue(row.run, "time"))));
     tr.append(element("td", number(row.scores.standalone)));
-    if (procedural) tr.append(element("td", number(row.scores.procedural)), element("td", number(row.diagnostics?.vegan)));
+    if (procedural) tr.append(element("td", number(row.scores.procedural)), element("td", row.veganReview?.restoreVeganGate ? "Plant-based" : number(row.diagnostics?.vegan)));
     for (const key of criteria) tr.append(element("td", number(row.scores[key])));
     const detail = element("tr", undefined, "notes-row");
     detail.id = `notes-${row.runId}`;
@@ -264,11 +287,17 @@ async function readJSON(path) {
 }
 
 async function start() {
-  const [registry, scores, display, panel] = await Promise.all([readJSON("registry.json"), readJSON("scores.json"), readJSON("harbor/weights.json"), readJSON("harbor/human-scores.json")]);
+  const [registry, scores, display, panel, reviews] = await Promise.all([readJSON("registry.json"), readJSON("scores.json"), readJSON("harbor/weights.json"), readJSON("harbor/human-scores.json"), readJSON("harbor/vegan-reviews.json")]);
   if (scores.schemaVersion !== 1 || !Array.isArray(scores.results)) throw new Error("Unsupported score format");
   const runs = await Promise.all(registry.runs.map(readJSON));
   const manifests = new Map(runs.map(run => [run.id, run]));
   const humanRatings = new Map();
+  const veganReviews = new Map();
+  if (reviews.schemaVersion !== 1 || !Array.isArray(reviews.reviews)) throw new Error("Invalid trajectory review data");
+  for (const review of reviews.reviews) {
+    if (!manifests.has(review.runId) || veganReviews.has(review.runId)) throw new Error("Unknown or duplicate trajectory review");
+    veganReviews.set(review.runId, review);
+  }
   if (panel.schemaVersion !== 1 || !Number.isFinite(panel.weight) || panel.weight < 0 || panel.weight > 1 || typeof panel.panelName !== "string" || !panel.panelName.trim() || !Array.isArray(panel.ratings)) throw new Error("Invalid human panel configuration");
   for (const rating of panel.ratings) {
     if (!manifests.has(rating.runId) || humanRatings.has(rating.runId) || (rating.humanScore !== null && (!Number.isFinite(rating.humanScore) || rating.humanScore < 0 || rating.humanScore > 1))) throw new Error("Invalid or duplicate human rating");
@@ -283,12 +312,12 @@ async function start() {
   rows = scores.results.map(row => {
     if (!manifests.has(row.runId) || !validScore(row, criteria, sourceWeights) || seen.has(row.runId)) throw new Error("Invalid or duplicate evaluation");
     seen.add(row.runId);
-    return { ...withHumanScore(reweightScore(row, weights, criteria), humanRatings.get(row.runId) ?? null, panel.weight), run: manifests.get(row.runId) };
+    return { ...withHumanScore(reweightScore(withVeganReview(row, veganReviews.get(row.runId)), weights, criteria), humanRatings.get(row.runId) ?? null, panel.weight), run: manifests.get(row.runId) };
   });
   $("coverage").textContent = `${rows.length} of ${runs.length} bowls evaluated · higher quality, lower cost`;
   if (scores.evaluation) $("judge-note").textContent = `${scores.evaluation.rubricVersion} · ${scores.evaluation.judge.models.map(model => `${model}${scores.evaluation.judge.efforts ? ` @ ${scores.evaluation.judge.efforts[model]}` : ""}`).join(" + ")} · ${scores.evaluation.judge.samples} samples per judge. Judges have equal weight. Click a row to expand its notes.`;
   const weightDescription = criteria.map(key => `${labels[key].toLowerCase()} ${Math.round(weights[key] * 100)}%`).join(", ");
-  $("scoring-method").textContent = `${panel.panelName}: ${Math.round(panel.weight * 100)}% human, ${Math.round((1 - panel.weight) * 100)}% LLM when rated; unrated bowls use their LLM score. ${panel.panelNote} Within the LLM score: ${weightDescription}. Compliance failures remain zero. Each LLM judge has equal weight. These weights can change without rejudging; raw downloads retain the original LLM weighting.`;
+  $("scoring-method").textContent = `${panel.panelName}: ${Math.round(panel.weight * 100)}% human, ${Math.round((1 - panel.weight) * 100)}% LLM when rated; unrated bowls use their LLM score. ${panel.panelNote} Within the LLM score: ${weightDescription}. Judges use screenshots for visual quality and recorded trajectories to resolve vegan ingredient ambiguity. Compliance failures remain zero. Each LLM judge has equal weight.`;
   const vendors = new Map(rows.map(row => [row.run.vendor.slug, row.run.vendor.displayName]));
   for (const [key, name] of [...vendors].sort((a, b) => a[1].localeCompare(b[1]))) {
     const option = element("option", name); option.value = key; $("vendor").append(option);

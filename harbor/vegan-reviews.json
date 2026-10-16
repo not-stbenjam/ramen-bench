@@ -1,0 +1,2097 @@
+{
+  "$schema": "../schemas/vegan-reviews.schema.json",
+  "schemaVersion": 1,
+  "reviews": [
+    {
+      "schemaVersion": 1,
+      "runId": "google/gemini-3.7-flash/medium",
+      "artifactSha256": "035ba53b9d39f1671e92211a2af533f878a1c85f634f0f25a06176e6167f8d64",
+      "transcriptSha256": "abb4682f9e4b519666192e0c50c4145b84892eabb710f3fc66a0344b54658de0",
+      "sourceScoreSha256": "11629ef3e45cc063be38d5fd07ca97dba9cb2b79b69193be8f05498801a10d24",
+      "sourceReward": 0.0,
+      "policySha256": "785d873fd2e973b83f00205670fd00bdf8f80670206d383ac82c9adb20b4ab39",
+      "policyVersion": "vegan-trajectory-v1",
+      "judge": {
+        "models": [
+          "openrouter/openai/gpt-6.1-sol",
+          "openrouter/anthropic/claude-sonnet-5.5",
+          "openrouter/z-ai/glm-5.3-flash"
+        ],
+        "efforts": {
+          "openrouter/openai/gpt-6.1-sol": "low",
+          "openrouter/anthropic/claude-sonnet-5.5": "low",
+          "openrouter/z-ai/glm-5.3-flash": "default"
+        },
+        "samples": 3
+      },
+      "omittedEvidenceChunks": 0,
+      "inputSha256": "115a17ea97e399a11dab5375dc06fda362d5123774d296176aaa174f595a9392",
+      "reviewedAt": "2026-10-16T01:22:44.413211+00:00",
+      "judgeResults": [
+        {
+          "model": "openrouter/openai/gpt-6.1-sol",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "f02ae5434e36591d8d8cea684ba317e2775101a2db2a040201bf508a20bd043b",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator specifically identifies the egg-shaped topping as a vegan seasoned imitation with a saffron core, and the chashu as tofu or tempeh. The broth is also explicitly vegan. References to egg white and yolk describe parts of the declared imitation, not contradictory animal ingredients; appearance alone does not establish animal origin.",
+                "evidence": [
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0010"
+                  },
+                  {
+                    "id": "E0008"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 114,
+                "prompt_tokens": 5151,
+                "total_tokens": 5265,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 5148,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 5148
+                },
+                "cost": 0.014016,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.014016,
+                  "upstream_inference_prompt_cost": 0.012876,
+                  "upstream_inference_completions_cost": 0.00114
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "f02ae5434e36591d8d8cea684ba317e2775101a2db2a040201bf508a20bd043b",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator specifically identifies the egg-shaped topping as a vegan seasoned imitation with a saffron core, and the chashu as tofu or tempeh. The broth is also explicitly vegan. References to egg white and yolk describe parts of the declared imitation, not contradictory animal ingredients; visual resemblance alone does not establish animal-derived intent.",
+                "evidence": [
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0010"
+                  },
+                  {
+                    "id": "E0008"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 116,
+                "prompt_tokens": 5151,
+                "total_tokens": 5267,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 5148,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0016808,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0016808,
+                  "upstream_inference_prompt_cost": 0.0005208,
+                  "upstream_inference_completions_cost": 0.00116
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "f02ae5434e36591d8d8cea684ba317e2775101a2db2a040201bf508a20bd043b",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator specifically declares the egg-shaped topping a vegan seasoned imitation with a saffron core, and identifies the chashu as tofu or tempeh. The broth is also explicitly vegan. References to egg white and yolk describe the imitation's appearance, not contradictory animal ingredients; no explicit animal ingredient is recorded.",
+                "evidence": [
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0010"
+                  },
+                  {
+                    "id": "E0008"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 112,
+                "prompt_tokens": 5151,
+                "total_tokens": 5263,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 5148,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0016408,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0016408,
+                  "upstream_inference_prompt_cost": 0.0005208,
+                  "upstream_inference_completions_cost": 0.00112
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/anthropic/claude-sonnet-5.5",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "9f1775a20b5edc50b1abb1db239c4cd0ffba9127151951fd94e64737a57a12d1",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's own recorded code and final message explicitly label the egg-looking topping as a vegan imitation: 'Artisanal Vegan Ajitsuke Seasoned \"Egg\"', 'Artisanal Jammy Vegan Egg', and 'Jammy artisanal vegan seasoned egg'. The chashu is described as seared tofu/tempeh, and the other toppings are mushrooms, lotus root, and vegetables. No contradictory animal ingredient appears in the evidence. The visual judges only saw an egg-shaped rendering, which is a vegan imitation here. The declarations do not name the specific plant material for the egg, but they clearly mark it as vegan.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0010"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 308,
+                "prompt_tokens": 8475,
+                "total_tokens": 8783,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.02003,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.02003,
+                  "upstream_inference_prompt_cost": 0.01695,
+                  "upstream_inference_completions_cost": 0.00308
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "9f1775a20b5edc50b1abb1db239c4cd0ffba9127151951fd94e64737a57a12d1",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's recorded code and final message explicitly describe the egg-looking topping as a vegan imitation (\"Artisanal Vegan Ajitsuke Seasoned 'Egg'\", \"Jammy Vegan 'Egg'\", \"jammy artisanal vegan seasoned egg\"). The chashu is explained as tofu/tempeh and mushrooms, and no animal ingredient contradicts this. The judges only reacted to the egg's visual appearance. The generator does not name the specific plant material used for the egg, but it clearly declares it vegan.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0010"
+                  },
+                  {
+                    "id": "E0015"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 279,
+                "prompt_tokens": 8475,
+                "total_tokens": 8754,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.01974,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.01974,
+                  "upstream_inference_prompt_cost": 0.01695,
+                  "upstream_inference_completions_cost": 0.00279
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "9f1775a20b5edc50b1abb1db239c4cd0ffba9127151951fd94e64737a57a12d1",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's recorded code comment and final message explicitly call the egg-shaped topping a vegan imitation ('Artisanal Vegan Ajitsuke Seasoned \"Egg\"', 'Jammy Vegan Egg', 'artisanal vegan seasoned egg'). The chashu is described as tofu or tempeh and the other toppings as mushrooms and vegetables. No animal ingredient is declared. The code does not name the specific plant material used for the egg, but it does label it a vegan imitation, and the other toppings are explicitly plant-based. The visual judges only saw the egg shape.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0010"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 280,
+                "prompt_tokens": 8475,
+                "total_tokens": 8755,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.01975,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.01975,
+                  "upstream_inference_prompt_cost": 0.01695,
+                  "upstream_inference_completions_cost": 0.0028
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/z-ai/glm-5.3-flash",
+          "effort": "default",
+          "judgments": [
+            {
+              "requestSha256": "dfec6c4393da434822baff20432cb2f81be174ec93555ce725b749b16e292d2f",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "Although the judges flagged the egg half as animal-derived based on appearance, the generator's recorded code comments and assistant message contain ingredient-specific declarations establishing it as a plant-based imitation: the artifact code labels the topping 'Artisanal Vegan Ajitsuke Seasoned Egg' with a 'Soy marinated white' and 'jammy saffron core' (E0005) and again 'Artisanal Jammy Vegan Egg' at render time (E0012), and the assistant's summary describes a 'Jammy artisanal vegan seasoned egg' among 'Gourmet Plant-Based Toppings' (E0001). The chashu is explicitly tofu/tempeh (E0003, E0010), the broth is declared vegan despite its tonkotsu-style appearance (E0008), and the orange bead cluster is explained as roasted corn kernels and chili/sesame oil droplets (E0001), leaving no unaddressed animal ingredient. A generic vegan title alone would be insufficient, but these specific generator declarations about the animal-looking toppings meet the standard for intended plant-based substitutes.",
+                "evidence": [
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0010"
+                  },
+                  {
+                    "id": "E0003"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 2182,
+                "prompt_tokens": 5073,
+                "total_tokens": 7255,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 1877,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00185195,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00185195,
+                  "upstream_inference_prompt_cost": 0.00076095,
+                  "upstream_inference_completions_cost": 0.001091
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "dfec6c4393da434822baff20432cb2f81be174ec93555ce725b749b16e292d2f",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's code and assistant message specifically identify the egg-shaped topping as a plant-based imitation: the canvas code declares 'Artisanal Vegan Ajitsuke Seasoned Egg (Soy marinated white, vibrant jammy saffron core)' with a soy-marinated egg white, and the assistant summary lists a 'Jammy artisanal vegan seasoned egg' among gourmet plant-based toppings alongside tofu chashu and mushroom substitutes. No contradictory animal ingredients appear in the recorded evidence, so the visually egg-like topping is an intended vegan substitute.",
+                "evidence": [
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0003"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 192,
+                "prompt_tokens": 5074,
+                "total_tokens": 5266,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 43,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0008571,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0008571,
+                  "upstream_inference_prompt_cost": 0.0007611,
+                  "upstream_inference_completions_cost": 9.6e-05
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "dfec6c4393da434822baff20432cb2f81be174ec93555ce725b749b16e292d2f",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The recorded generator code and assistant messages explicitly declare the animal-looking egg topping as a vegan imitation: the artifact labels the rendered egg as 'Artisanal Vegan Ajitsuke Seasoned Egg' with a soy-marinated white and jammy saffron core, and the egg-white shape is described as soy-marinated, confirming intended plant-based substitution rather than a real egg. The chashu topping is likewise declared as tofu/tempeh. No contradictory animal ingredient is declared anywhere in the recorded evidence, so the visual judge's failure on the egg's appearance misclassified the intended ingredients.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0006"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0010"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 649,
+                "prompt_tokens": 5073,
+                "total_tokens": 5722,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 484,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 192,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00106049,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00106049,
+                  "upstream_inference_prompt_cost": 0.00073599,
+                  "upstream_inference_completions_cost": 0.0003245
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        }
+      ],
+      "restoreVeganGate": true,
+      "evidenceSources": {
+        "E0001": {
+          "source": "trajectory",
+          "location": "trajectory.events.24.content:0",
+          "eventIndex": 24,
+          "text": "The single-file atmospheric hero scene has been created in [`index.html`](file://<WORKSPACE>/google/gemini-3.7-flash/medium/index.html).\n\n### Highlights of the Implementation\n\n* **Atmospheric Visuals**: Deep, inky ambient aesthetic featuring a charred wood and slate surface under warm overhead lantern light with subtle floating heat motes and cinematic vignette.\n* **Artisanal Vegan Ramen Dish**:\n  * **Tenmoku Ceramic Bowl**: Handcrafted stoneware with earth-toned speckled glaze and dynamic specular rim gleam that shifts with the light angle.\n  * **Rich Broth**: Silky, golden miso-tonkotsu style soup with subtle convection heat currents and submerged wavy ramen noodles.\n  * **Gourmet Plant-Based Toppings**:\n    * Seared braised chashu tofu medallion with caramelized grill marks and soy glaze\n    * Diamond-scored glazed king oyster / shiitake mushrooms\n    * Marinated lotus root (*renkon*) with delicate lace pattern\n    * Jammy artisanal vegan seasoned egg with chili oil drizzle and glossy highlight\n    * Vibrant jade baby bok choy with dewdrop water beads\n    * Crisp sheets of toasted dark nori\n    * Sweet roasted corn kernels, braised menma shoots, wood ear mushrooms (*kikurage*)\n    * Bias-cut fresh scallions (*negi*), toasted sesame seeds, and wispy crimson chili threads (*ito togarashi*)\n* **Dynamic Motion & Interactivity**:\n  * **Volumetric Rising Steam**: Multi-layered organic thermal steam curls that rise, drift, and part naturally around cursor movements.\n  * **Fluid Broth & Oil Dynamics**: Floating chili and toasted sesame oil droplets that wobble, drift, and repel when nudged with the mouse.\n  * **Interactive Wave Ripples**: Clicking or stirring the soup casts refractive circular ripples across the broth surface.\n  * **3D Parallax & Dynamic Lighting**: Responsive perspective tilt and shifting specular reflections following cursor position.\n* **Purity & Accessibility**:\n  * Zero UI elements, text, or menus for complete visual immersion.\n  * Zero external assets, libraries, or network calls — 100% self-contained HTML5 Canvas.\n  * Fully responsive across mobile, tablet, and widescreen displays with Retina/high-DPI pixel scaling.\n  * Honors `prefers-reduced-motion` by transitioning to a tranquil, static ambient warmth."
+        },
+        "E0003": {
+          "source": "artifact",
+          "location": "artifact:10223-10636",
+          "text": " 90, 60, 0)');\n          sheen.addColorStop(1, 'rgba(255, 255, 255, 0.04)');\n          nCtx.fillStyle = sheen;\n          nCtx.fill();\n          nCtx.restore();\n        }\n\n        // 2. Seared Braised Tofu / Chashu Medallion (Golden seared exterior, juicy soy glaze)\n        {\n          tofuCanvas = createSubCanvas(baseR * 0.8, baseR * 0.8);\n          const tCtx = tofuCanvas.getContext('2d');\n          const tw "
+        },
+        "E0005": {
+          "source": "artifact",
+          "location": "artifact:13860-14632",
+          "text": "'rgba(240, 180, 110, 0.15)');\n          mSheen.addColorStop(1, 'rgba(0,0,0,0)');\n          mCtx.fillStyle = mSheen;\n          mCtx.fill();\n          mCtx.restore();\n        }\n\n        // 4. Artisanal Vegan Ajitsuke Seasoned \"Egg\" (Soy marinated white, vibrant jammy saffron core)\n        {\n          eggCanvas = createSubCanvas(baseR * 0.65, baseR * 0.85);\n          const eCtx = eggCanvas.getContext('2d');\n          const ew = eggCanvas.width;\n          const eh = eggCanvas.height;\n\n          eCtx.save();\n          eCtx.translate(ew * 0.5, eh * 0.5);\n\n          // Egg white half (soy-marinated perimeter gradient)\n          eCtx.beginPath();\n          eCtx.ellipse(0, 0, ew * 0.44, eh * 0.46, 0, 0, Math.PI * 2);\n          const whiteGrad = eCtx.createRadialGradient("
+        },
+        "E0006": {
+          "source": "artifact",
+          "location": "artifact:14864-15268",
+          "text": "          eCtx.fillStyle = whiteGrad;\n          eCtx.fill();\n          eCtx.lineWidth = 1.5;\n          eCtx.strokeStyle = '#48240a';\n          eCtx.stroke();\n\n          // Luscious golden-amber jammy yolk\n          eCtx.beginPath();\n          eCtx.ellipse(ew * 0.02, eh * 0.05, ew * 0.26, eh * 0.28, 0, 0, Math.PI * 2);\n          const yolkGrad = eCtx.createRadialGradient(-ew * 0.04, -eh * 0.02, 3, 0, 0"
+        },
+        "E0008": {
+          "source": "artifact",
+          "location": "artifact:24761-25166",
+          "text": "addColorStop(1, 'rgba(255, 200, 140, 0)');\n        ctx.strokeStyle = rimGleam;\n        ctx.lineWidth = 3.5;\n        ctx.stroke();\n        ctx.restore();\n\n        ctx.restore();\n      }\n\n      // Rich Vegan Broth Base & Convection Currents\n      function renderBroth(time) {\n        ctx.save();\n        ctx.translate(centerX + mouse.tiltX * 5, centerY + mouse.tiltY * 5);\n\n        const r = bowlRadius * 0."
+        },
+        "E0010": {
+          "source": "artifact",
+          "location": "artifact:32698-33109",
+          "text": "vas.width * 0.5 * scale, \n          -noriCanvas.height * 0.5 * scale, \n          noriCanvas.width * scale, \n          noriCanvas.height * scale\n        );\n        ctx.restore();\n\n        // 2. Seared Chashu Tofu / Tempeh Medallion (left quadrant)\n        ctx.save();\n        ctx.translate(-bowlRadius * 0.38, bowlRadius * 0.05);\n        ctx.rotate(-Math.PI * 0.06);\n        ctx.drawImage(\n          tofuCanvas, "
+        },
+        "E0012": {
+          "source": "artifact",
+          "location": "artifact:34880-35290",
+          "text": "0.5 * scale, \n          -lotusCanvas.height * 0.5 * scale, \n          lotusCanvas.width * scale, \n          lotusCanvas.height * scale\n        );\n        ctx.restore();\n\n        // 6. Artisanal Jammy Vegan 'Egg' (right center)\n        ctx.save();\n        ctx.translate(bowlRadius * 0.34, -bowlRadius * 0.02);\n        ctx.rotate(-Math.PI * 0.08);\n        ctx.drawImage(\n          eggCanvas, \n          -eggCanva"
+        },
+        "E0015": {
+          "source": "artifact",
+          "location": "artifact:48321-48858",
+          "text": " Countertop & Ambient Lantern Glow\n        renderAtmosphericBackground(time);\n\n        // 2. Tenmoku Ceramic Stoneware Bowl & Rim Lighting\n        renderCeramicBowl(time);\n\n        // 3. Silky Creamy Vegan Broth, Ripples & Floating Oil Beads\n        renderBroth(time);\n\n        // 4. Handcrafted Vegan Ramen Toppings (Tofu, Shiitake, Egg, Bok Choy, Nori, etc.)\n        renderToppings(time);\n\n        // 5. Volumetric Rising Steam & Heat Dispersion\n        renderSteam(time);\n\n        // 6. Ambient Floating Warm Light Dust Motes\n        "
+        }
+      },
+      "harborTrial": "vegan--google--gemini-3.7-flash__U92t6zz"
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "google/gemini-3.8-flash/high",
+      "artifactSha256": "3708dc4132c4cf332c07d585215e5971c36735187fdb5039d8d864a08581b7d8",
+      "transcriptSha256": "f23bf6a8830431c167cc68c35807bc1aec5f9bc3e7faa2dee83f31471c3bbb71",
+      "sourceScoreSha256": "493e45f0a52cb56d490de9a2c466c7574cd9927c6f4b9157191cd117583ab083",
+      "sourceReward": 0.0,
+      "policySha256": "785d873fd2e973b83f00205670fd00bdf8f80670206d383ac82c9adb20b4ab39",
+      "policyVersion": "vegan-trajectory-v1",
+      "judge": {
+        "models": [
+          "openrouter/openai/gpt-6.1-sol",
+          "openrouter/anthropic/claude-sonnet-5.5",
+          "openrouter/z-ai/glm-5.3-flash"
+        ],
+        "efforts": {
+          "openrouter/openai/gpt-6.1-sol": "low",
+          "openrouter/anthropic/claude-sonnet-5.5": "low",
+          "openrouter/z-ai/glm-5.3-flash": "default"
+        },
+        "samples": 3
+      },
+      "omittedEvidenceChunks": 0,
+      "inputSha256": "17745daa4997a84fdd343926eedcdf4db9a8e2fcf172287cf6962a95b303ddc6",
+      "reviewedAt": "2026-10-16T01:23:45.689949+00:00",
+      "judgeResults": [
+        {
+          "model": "openrouter/openai/gpt-6.1-sol",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "88007d60f6d907845b24ac70616ee3efa0b95ff0f0b11ade3f699421ce60fdc0",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "Recorded generator code specifically identifies the egg-shaped topping as vegan soy-marinated ajitsuke tamago with a kabocha pumpkin–miso yolk, and the chashu as king oyster mushroom. The broth is also explicitly described as vegan. References to egg white and yolk describe the imitation’s appearance within that declared vegan topping, not a contradictory animal ingredient.",
+                "evidence": [
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0020"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 123,
+                "prompt_tokens": 11750,
+                "total_tokens": 11873,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 11747,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 11747
+                },
+                "cost": 0.0306035,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0306035,
+                  "upstream_inference_prompt_cost": 0.0293735,
+                  "upstream_inference_completions_cost": 0.00123
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "88007d60f6d907845b24ac70616ee3efa0b95ff0f0b11ade3f699421ce60fdc0",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator explicitly identifies the egg-shaped topping as vegan soy-marinated ajitsuke tamago with a kabocha pumpkin–miso yolk, and the chashu as king oyster mushroom. The broth is also identified as vegan. References to egg white and yolk describe the imitation's appearance in this context, not contradictory animal ingredients.",
+                "evidence": [
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0020"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 118,
+                "prompt_tokens": 11750,
+                "total_tokens": 11868,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 11747,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0023607,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0023607,
+                  "upstream_inference_prompt_cost": 0.0011807,
+                  "upstream_inference_completions_cost": 0.00118
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "88007d60f6d907845b24ac70616ee3efa0b95ff0f0b11ade3f699421ce60fdc0",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator explicitly identifies the egg-like topping as vegan soy-marinated ajitsuke tamago with a kabocha pumpkin–miso yolk, and the chashu as king oyster mushroom. The broth is also explicitly described as vegan. References to egg white describe the imitation's appearance in this context, not a contradictory animal ingredient.",
+                "evidence": [
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0020"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 117,
+                "prompt_tokens": 11750,
+                "total_tokens": 11867,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 11747,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0023507,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0023507,
+                  "upstream_inference_prompt_cost": 0.0011807,
+                  "upstream_inference_completions_cost": 0.00117
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/anthropic/claude-sonnet-5.5",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "6f68081224a236b3d00f987c3087d44052e63255cea68eef10ac3449ebc50829",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's recorded code and final message explicitly describe the egg-like topping as a vegan imitation: a function named drawVeganAjitsukeEgg, a 'Vegan Soy-Marinated Ajitsuke Tamago' comment, and a yolk made from kabocha pumpkin and miso. The final message also lists a 'Vegan Ajitsuke Egg' with a kabocha-miso yolk. The chashu is explicitly king oyster mushroom and the other toppings are mushroom and vegetables. The 'egg white' comments only describe the color of the rendering. No real animal ingredient is declared. The visual judges only saw an egg shape, which is consistent with a vegan imitation.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0026"
+                  },
+                  {
+                    "id": "E0027"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 322,
+                "prompt_tokens": 18947,
+                "total_tokens": 19269,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.041114,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.041114,
+                  "upstream_inference_prompt_cost": 0.037894,
+                  "upstream_inference_completions_cost": 0.00322
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "6f68081224a236b3d00f987c3087d44052e63255cea68eef10ac3449ebc50829",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's code and final message label the egg as a 'Vegan Soy-Marinated Ajitsuke Tamago' and describe its yolk as made of kabocha pumpkin and miso. The chashu is explicitly king oyster mushroom, and the other toppings are mushrooms and bok choy. These statements specifically explain the egg-looking topping as a plant-based imitation. No contradictory animal ingredient was recorded; the 'egg white' wording appears only in color comments for the rendering. The judges' complaints concern only the egg's appearance.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0003"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 251,
+                "prompt_tokens": 18947,
+                "total_tokens": 19198,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.040404,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.040404,
+                  "upstream_inference_prompt_cost": 0.037894,
+                  "upstream_inference_completions_cost": 0.00251
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "6f68081224a236b3d00f987c3087d44052e63255cea68eef10ac3449ebc50829",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's recorded code and final message explicitly describe the egg-looking topping as a vegan imitation: the function is named drawVeganAjitsukeEgg, labeled \"Vegan Soy-Marinated Ajitsuke Tamago (Molten Pumpkin-Miso Yolk)\", with the yolk made from kabocha pumpkin and miso. The final summary also says \"Vegan Ajitsuke Egg\" with a \"kabocha-miso yolk\". The chashu is king oyster mushroom and the other toppings are mushroom or vegetable. The egg white is only described by color (\"egg white\" gradient comments), with no real animal ingredient. The judges' complaints were based on how it looks, not on what it is made of.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0026"
+                  },
+                  {
+                    "id": "E0027"
+                  },
+                  {
+                    "id": "E0003"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 338,
+                "prompt_tokens": 18947,
+                "total_tokens": 19285,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.041274,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.041274,
+                  "upstream_inference_prompt_cost": 0.037894,
+                  "upstream_inference_completions_cost": 0.00338
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/z-ai/glm-5.3-flash",
+          "effort": "default",
+          "judgments": [
+            {
+              "requestSha256": "42f5e8a0080b48daa22ca0d5de6ac75c5dc498c7565a70bbee5857d097f0340a",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's code and recorded assistant message explicitly declare the animal-looking toppings as plant-based substitutes: the egg-shaped topping is defined as 'Vegan Soy-Marinated Ajitsuke Tamago' with a molten kabocha pumpkin-miso yolk (not a real egg), and the chashu is explicitly King Oyster mushroom. No unaddressed animal ingredients appear in the recorded evidence.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0017"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 388,
+                "prompt_tokens": 11627,
+                "total_tokens": 12015,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 263,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 192,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00191309,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00191309,
+                  "upstream_inference_prompt_cost": 0.00171909,
+                  "upstream_inference_completions_cost": 0.000194
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "42f5e8a0080b48daa22ca0d5de6ac75c5dc498c7565a70bbee5857d097f0340a",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The recorded generator code and assistant messages explicitly declare the egg-shaped topping as a vegan imitation: the draw function is commented 'Vegan Soy-Marinated Ajitsuke Tamago (Molten Pumpkin-Miso Yolk)' and the yolk is implemented as kabocha pumpkin and miso, not animal egg. The chashu is explicitly king oyster mushroom and the broth is labeled vegan, with no contradictory animal ingredient in the recorded evidence. The visual judges' animal-egg reading is overridden by these specific ingredient-intent declarations.",
+                "evidence": [
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0017"
+                  },
+                  {
+                    "id": "E0018"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 429,
+                "prompt_tokens": 11627,
+                "total_tokens": 12056,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 276,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 11584,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00045263,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00045263,
+                  "upstream_inference_prompt_cost": 0.00023813,
+                  "upstream_inference_completions_cost": 0.0002145
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "42f5e8a0080b48daa22ca0d5de6ac75c5dc498c7565a70bbee5857d097f0340a",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's recorded code explicitly declares the egg-shaped topping as a vegan imitation: 'TOPPING: Vegan Soy-Marinated Ajitsuke Tamago (Molten Pumpkin-Miso Yolk)', with the yolk rendered from kabocha pumpkin and miso, and the white as a soy-marinated plant-based surface. The assistant's summary likewise describes a 'Vegan Ajitsuke Egg' with a jammy kabocha-miso yolk. The chashu is explicitly king oyster mushroom and the broth is labeled vegan, with no unaddressed animal ingredients anywhere in the recorded evidence.",
+                "evidence": [
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0003"
+                  },
+                  {
+                    "id": "E0011"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 590,
+                "prompt_tokens": 11627,
+                "total_tokens": 12217,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 424,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 11584,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00053313,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00053313,
+                  "upstream_inference_prompt_cost": 0.00023813,
+                  "upstream_inference_completions_cost": 0.000295
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        }
+      ],
+      "restoreVeganGate": true,
+      "evidenceSources": {
+        "E0001": {
+          "source": "trajectory",
+          "location": "trajectory.events.136.content:0",
+          "eventIndex": 136,
+          "text": "The artisanal vegan ramen hero scene has been completed in [index.html](file://<WORKSPACE>/google/gemini-3.8-flash/high/index.html).\n\n### Highlights of the Implementation\n\n1. **Pure Single-File Experience**:\n   - Zero external dependencies: no external CSS, fonts, CDNs, or image assets.\n   - Zero UI, HUD, or text overlays—the living bowl of ramen is the sole focal point.\n\n2. **Handcrafted Culinary Realism**:\n   - **Broth**: Rich, emulsified golden Tonkotsu-Shoyu/sesame broth with simmer caustics and radial depth.\n   - **Noodles**: Continuous springy, wavy strands with wet specular highlights sweeping across the bowl and nestled beneath toppings.\n   - **King Oyster Chashu**: Thick seared medallions with cross-hatched, caramelized puffed diamond pillows, tare glaze, and cracked black pepper.\n   - **Hanagiri Shiitake**: Plump braised Donko cap carved with authentic 6-point star V-grooves exposing tender ivory interior flesh.\n   - **Vegan Ajitsuke Egg**: Marinated egg half with a molten, jammy kabocha-miso yolk and liquid glisten.\n   - **Baby Bok Choy**: Pale jade stalk with translucent fibrous striations and dark emerald ruffled leaves hugging the inner bowl wall.\n   - **Aromatics & Garnish**: Floating ruby Rayu chili droplets, green scallion oil, sesame rings, fresh negi rounds and curls, toasted sesame seeds, and a crown of spun chili silk (*ito togarashi*).\n   - **Donburi Vessel**: Hand-thrown Tenmoku stoneware with earthy reactive rim glaze, specular light glint, and cast contact shadow onto charred cypress wood (*yakisugi*).\n\n3. **Motion & Interactive Dynamics**:\n   - **Volumetric Steam**: Soft curling particles rendered with screen blending that catch the overhead light, drift upward, and swirl with mouse/touch wake forces.\n   - **Surface Ripples & Physics**: Fluid interactive ripples generated on hover, drag, and click/tap.\n   - **Dynamic Lighting & Parallax**: 3D parallax tilt and responsive specular glint tracking the pointer across broth, egg, and ceramic surfaces.\n   - **Accessibility**: Full support for `prefers-reduced-motion`, disabling turbulent motion, camera tilt, and interactive ripples in favor of a serene, calm presentation."
+        },
+        "E0003": {
+          "source": "artifact",
+          "location": "artifact:27119-27534",
+          "text": "* scale, -72.8 * scale, 0.7 * scale, 0, Math.PI * 2);\n      ctx.fillStyle = '#ffffff';\n      ctx.fill();\n\n      ctx.restore();\n      ctx.restore();\n    }\n\n    // TOPPING: Braised & Seared King Oyster Mushroom Chashu (2 Thick Medallions with Puffed Diamond Pillows)\n    function drawKingOysterChashu(scale, tX, tY, lightVec) {\n      ctx.save();\n      ctx.translate(bowlCenterX + tX * 32, bowlCenterY + 4 * scale + tY"
+        },
+        "E0007": {
+          "source": "artifact",
+          "location": "artifact:34894-35355",
+          "text": "cuts meet\n      ctx.beginPath();\n      ctx.arc(0, 0, 2.8 * scale, 0, Math.PI * 2);\n      ctx.fillStyle = '#220a02';\n      ctx.fill();\n\n      ctx.restore();\n      ctx.restore();\n    }\n\n    // TOPPING: Vegan Soy-Marinated Ajitsuke Tamago (Molten Pumpkin-Miso Yolk)\n    function drawVeganAjitsukeEgg(scale, tX, tY, lightVec) {\n      ctx.save();\n      ctx.translate(bowlCenterX + tX * 36, bowlCenterY + 4 * scale + tY * 24);\n\n      ctx.save();\n      ctx.translate(7"
+        },
+        "E0008": {
+          "source": "artifact",
+          "location": "artifact:35989-36410",
+          "text": "Stop(0.88, '#caa076');\n      whiteGrad.addColorStop(0.98, '#855630');\n      whiteGrad.addColorStop(1, '#502f16');\n\n      ctx.fillStyle = whiteGrad;\n      ctx.fill();\n\n      // 2. Molten Jammy Glowing Yolk (Kabocha Pumpkin & Miso)\n      const YOLK_RX = 26 * scale;\n      const YOLK_RY = 29 * scale;\n      const yolkCenterY = 4 * scale;\n\n      ctx.beginPath();\n      ctx.ellipse(0, yolkCenterY, YOLK_RX, YOLK_RY, 0, 0, Math"
+        },
+        "E0011": {
+          "source": "trajectory",
+          "location": "trajectory.events.7.input.CodeContent:13919-14324",
+          "eventIndex": 7,
+          "text": " 236 * scale;\n      const R_BROTH_Y = 192 * scale;\n\n      // Broth clipping mask\n      ctx.beginPath();\n      ctx.ellipse(0, 0, R_BROTH_X, R_BROTH_Y, 0, 0, Math.PI * 2);\n\n      // Deep Tonkotsu-Shoyu Vegan Broth Gradient\n      const simmer = Math.sin(time * 1.6) * 0.025;\n      const brothGrad = ctx.createRadialGradient(\n        lightVec.x * 50 * scale, -25 * scale + lightVec.y * 35 * scale, 25 * scale,"
+        },
+        "E0017": {
+          "source": "trajectory",
+          "location": "trajectory.events.7.input.CodeContent:35242-36112",
+          "eventIndex": 7,
+          "text": "     }\n      ctx.closePath();\n\n      // Cream-colored interior flesh\n      const cutGrad = ctx.createRadialGradient(0, 0, 2 * scale, 0, 0, outerR);\n      cutGrad.addColorStop(0, '#f7efe4');   // Pure mushroom meat\n      cutGrad.addColorStop(0.65, '#ebdcc8');\n      cutGrad.addColorStop(0.92, '#c4ad93');\n      cutGrad.addColorStop(1, '#5a301a');   // Cut incision groove\n\n      ctx.fillStyle = cutGrad;\n      ctx.fill();\n\n      // Incision depth shadow\n      ctx.strokeStyle = '#321406';\n      ctx.lineWidth = 1.6 * scale;\n      ctx.stroke();\n\n      ctx.restore();\n      ctx.restore();\n    }\n\n    // TOPPING: Vegan Soy-Marinated Ajitsuke Tamago (Molten Pumpkin-Miso Yolk)\n    function drawVeganAjitsukeEgg(scale, tX, tY, lightVec) {\n      ctx.save();\n      ctx.translate(bowlCenterX + tX * 38, bowlCenterY + tY * 26);\n\n      ctx.save();\n      ctx.translate(88 * scale, 2"
+        },
+        "E0018": {
+          "source": "trajectory",
+          "location": "trajectory.events.7.input.CodeContent:36567-37293",
+          "eventIndex": 7,
+          "text": "radient from soy marinade border to pristine silky white\n      const whiteGrad = ctx.createRadialGradient(0, 0, EGG_RX * 0.65, 0, 0, EGG_RX);\n      whiteGrad.addColorStop(0, '#fcfaf6');   // Pristine egg white\n      whiteGrad.addColorStop(0.72, '#f6edd9');\n      whiteGrad.addColorStop(0.88, '#c99e74'); // Marinated soy edge\n      whiteGrad.addColorStop(0.98, '#82542e'); // Deep shoyu cure\n      whiteGrad.addColorStop(1, '#4e2d14');\n\n      ctx.fillStyle = whiteGrad;\n      ctx.fill();\n\n      // 2. Molten Jammy Glowing Yolk (Kabocha & Miso)\n      const YOLK_RX = 25 * scale;\n      const YOLK_RY = 28 * scale;\n      const yolkCenterY = 4 * scale;\n\n      ctx.beginPath();\n      ctx.ellipse(0, yolkCenterY, YOLK_RX, YOLK_RY, 0"
+        },
+        "E0020": {
+          "source": "trajectory",
+          "location": "trajectory.events.16.input.CodeContent:14441-14846",
+          "eventIndex": 16,
+          "text": "11);\n\n      const R_BROTH_X = 240 * scale;\n      const R_BROTH_Y = 196 * scale;\n\n      ctx.beginPath();\n      ctx.ellipse(0, 0, R_BROTH_X, R_BROTH_Y, 0, 0, Math.PI * 2);\n\n      // Deep Tonkotsu-Shoyu Vegan Broth\n      const simmer = Math.sin(time * 1.5) * 0.02;\n      const brothGrad = ctx.createRadialGradient(\n        lightVec.x * 50 * scale, -25 * scale + lightVec.y * 35 * scale, 20 * scale,\n        0"
+        },
+        "E0026": {
+          "source": "trajectory",
+          "location": "trajectory.events.16.input.CodeContent:34024-34485",
+          "eventIndex": 16,
+          "text": "l();\n\n      // Knife incision depth shadows\n      ctx.strokeStyle = '#341507';\n      ctx.lineWidth = 1.8 * scale;\n      ctx.stroke();\n\n      ctx.restore();\n      ctx.restore();\n    }\n\n    // TOPPING: Vegan Soy-Marinated Ajitsuke Tamago (Molten Pumpkin-Miso Yolk)\n    function drawVeganAjitsukeEgg(scale, tX, tY, lightVec) {\n      ctx.save();\n      ctx.translate(bowlCenterX + tX * 36, bowlCenterY + tY * 24);\n\n      ctx.save();\n      ctx.translate(86 * scale, 2"
+        },
+        "E0027": {
+          "source": "trajectory",
+          "location": "trajectory.events.16.input.CodeContent:34856-35599",
+          "eventIndex": 16,
+          "text": "ellipse(0, 0, EGG_RX, EGG_RY, 0, 0, Math.PI * 2);\n\n      const whiteGrad = ctx.createRadialGradient(0, 0, EGG_RX * 0.65, 0, 0, EGG_RX);\n      whiteGrad.addColorStop(0, '#fcfaf6');   // Pristine silky egg white\n      whiteGrad.addColorStop(0.72, '#f6edd8');\n      whiteGrad.addColorStop(0.88, '#caa076'); // Marinated soy edge\n      whiteGrad.addColorStop(0.98, '#855630'); // Deep shoyu cure\n      whiteGrad.addColorStop(1, '#502f16');\n\n      ctx.fillStyle = whiteGrad;\n      ctx.fill();\n\n      // 2. Molten Jammy Glowing Yolk (Kabocha Pumpkin & Miso)\n      const YOLK_RX = 26 * scale;\n      const YOLK_RY = 29 * scale;\n      const yolkCenterY = 4 * scale;\n\n      ctx.beginPath();\n      ctx.ellipse(0, yolkCenterY, YOLK_RX, YOLK_RY, 0, 0, Math"
+        }
+      },
+      "harborTrial": "vegan--google--gemini-3.8-flash__nS6hP6s"
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "google/gemini-4-argon/high",
+      "artifactSha256": "704cd34268c9d801f4ec5811b4172a2c0b7549db8485531ce8a2957875f476b5",
+      "transcriptSha256": "eea9fb22163bafdb996aaab8744e69a0bc041b27f9873ec1176e3d6f311885c1",
+      "sourceScoreSha256": "12a86e4ea1ee2c676f4d0c106c5338394725ea89e9629ae9879de2be11f2ce10",
+      "sourceReward": 0.0,
+      "policySha256": "785d873fd2e973b83f00205670fd00bdf8f80670206d383ac82c9adb20b4ab39",
+      "policyVersion": "vegan-trajectory-v1",
+      "judge": {
+        "models": [
+          "openrouter/openai/gpt-6.1-sol",
+          "openrouter/anthropic/claude-sonnet-5.5",
+          "openrouter/z-ai/glm-5.3-flash"
+        ],
+        "efforts": {
+          "openrouter/openai/gpt-6.1-sol": "low",
+          "openrouter/anthropic/claude-sonnet-5.5": "low",
+          "openrouter/z-ai/glm-5.3-flash": "default"
+        },
+        "samples": 3
+      },
+      "omittedEvidenceChunks": 0,
+      "inputSha256": "0263cef95d019b47a6baafcfd043d760a1929f0536bb44e1a4615d15a0ddf72e",
+      "reviewedAt": "2026-10-16T01:25:52.883813+00:00",
+      "judgeResults": [
+        {
+          "model": "openrouter/openai/gpt-6.1-sol",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "3d2af5d058195f24d1ead87cbb2c3170b4e12db325accb26f1b2cc7adc3a3cd1",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator specifically identifies the egg-like halves as vegan ajitama with plant-curd whites and saffron-persimmon yolk centers, and the chashu-like slices as king oyster mushrooms. These ingredient declarations explain the animal-looking toppings; no explicit contradictory animal ingredient is recorded.",
+                "evidence": [
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0001"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 112,
+                "prompt_tokens": 11742,
+                "total_tokens": 11854,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 11739,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 11739
+                },
+                "cost": 0.0304735,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0304735,
+                  "upstream_inference_prompt_cost": 0.0293535,
+                  "upstream_inference_completions_cost": 0.00112
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "3d2af5d058195f24d1ead87cbb2c3170b4e12db325accb26f1b2cc7adc3a3cd1",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator specifically identifies the egg-like halves as vegan ajitama with plant-curd whites and saffron-persimmon centers, and the meat-like chashu as king oyster mushroom medallions. These ingredient-specific declarations establish plant-based intent; no explicit contradictory animal ingredient is recorded. Egg silhouettes and yolk-rendering terminology describe the imitation rather than actual eggs.",
+                "evidence": [
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0001"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 129,
+                "prompt_tokens": 11742,
+                "total_tokens": 11871,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 11739,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0024699,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0024699,
+                  "upstream_inference_prompt_cost": 0.0011799,
+                  "upstream_inference_completions_cost": 0.00129
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "3d2af5d058195f24d1ead87cbb2c3170b4e12db325accb26f1b2cc7adc3a3cd1",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator specifically identifies the egg-like halves as vegan ajitama with plant-curd whites and saffron-persimmon yolk centers, and the chashu-like slices as king oyster mushrooms. Its final message also explicitly describes plant-based ajitama and oat-tahini broth. References to egg silhouettes and yolk gloss describe imitation appearance, not contradictory animal ingredients; no explicit animal ingredient is recorded.",
+                "evidence": [
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0001"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 137,
+                "prompt_tokens": 11742,
+                "total_tokens": 11879,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 11739,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0025499,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0025499,
+                  "upstream_inference_prompt_cost": 0.0011799,
+                  "upstream_inference_completions_cost": 0.00137
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/anthropic/claude-sonnet-5.5",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "6a65fe61375410982fca142b8c2a329f3c49eb58b3fcbccc6bbc2bc301a3466b",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's own recorded statements explain the animal-looking toppings as plant-based. The final message describes the chashu as seared king oyster mushroom medallions plus a shiitake cap, and the eggs as soy-marinated jammy plant-based ajitama halves. The code comments label the chashu as king oyster mushroom and the ajitama as vegan, with a cut face of plant-curd white. No animal ingredient is declared anywhere in the evidence. The visual judges' claims about narutomaki or meat are not supported by any generator declaration.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0018"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 267,
+                "prompt_tokens": 17540,
+                "total_tokens": 17807,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.03775,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.03775,
+                  "upstream_inference_prompt_cost": 0.03508,
+                  "upstream_inference_completions_cost": 0.00267
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "6a65fe61375410982fca142b8c2a329f3c49eb58b3fcbccc6bbc2bc301a3466b",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's own final message and code comments explain the animal-looking toppings as plant-based. The egg halves are described as 'plant-based ajitama', and the cut face is described as 'silky ivory plant-curd white'. The chashu-like slices are described as seared king oyster mushroom 'chashu' medallions, plus a shiitake cap. The broth is a sesame-miso/oat-tahini vegan broth. No animal ingredient is recorded that contradicts this. The judge's mention of narutomaki is not supported by anything in the generator evidence.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0018"
+                  },
+                  {
+                    "id": "E0020"
+                  },
+                  {
+                    "id": "E0044"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 290,
+                "prompt_tokens": 17540,
+                "total_tokens": 17830,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.03798,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.03798,
+                  "upstream_inference_prompt_cost": 0.03508,
+                  "upstream_inference_completions_cost": 0.0029
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "6a65fe61375410982fca142b8c2a329f3c49eb58b3fcbccc6bbc2bc301a3466b",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's final message and code comments explain the animal-looking toppings as plant-based. The egg halves are described as \"plant-based ajitama\" with \"silky ivory plant-curd white\" and a soy-tare stained edge. The meat-like slices are described as seared king oyster mushroom \"chashu\", with a shiitake cap alongside. The broth is described as vegan sesame-miso with oat-tahini. No contradictory animal ingredient is recorded. The narutomaki fish cake that one judge mentioned has no support in the recorded evidence.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0018"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 273,
+                "prompt_tokens": 17540,
+                "total_tokens": 17813,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.03781,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.03781,
+                  "upstream_inference_prompt_cost": 0.03508,
+                  "upstream_inference_completions_cost": 0.00273
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/z-ai/glm-5.3-flash",
+          "effort": "default",
+          "judgments": [
+            {
+              "requestSha256": "1849b01d681e9a141bcd1e75016944b9bf9e4ce02aee8d572112fa7013cb41e9",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The recorded generator evidence specifically explains the animal-looking toppings as plant-based: the egg-shaped halves are explicitly declared a soy-marinated vegan imitation ajitama with 'silky ivory plant-curd white' and a saffron-persimmon yolk, and the meat-like scored slices are explicitly declared seared king oyster (eringi) mushroom chashu medallions. The assistant message and code comments name these substitutes ingredient-by-ingredient, and no unaddressed contradictory animal ingredient appears anywhere in the recorded code or messages; the judges' narutomaki/meat readings are contradicted by these specific mushroom-chashu and vegan-ajitama declarations.",
+                "evidence": [
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0004"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0018"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 2067,
+                "prompt_tokens": 11740,
+                "total_tokens": 13807,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 1866,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0027945,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0027945,
+                  "upstream_inference_prompt_cost": 0.001761,
+                  "upstream_inference_completions_cost": 0.0010335
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "1849b01d681e9a141bcd1e75016944b9bf9e4ce02aee8d572112fa7013cb41e9",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The recorded generator code and assistant message specifically declare the animal-looking toppings as plant-based substitutes: the egg-shaped halves are explicitly built as 'Soy-Marinated Vegan Jammy Ajitama' with a 'silky ivory plant-curd white' cut face, and the meat-looking scored slices are explicitly King Oyster Mushroom 'chashu' medallions. The yolk is rendered only as a saffron-persimmon gradient imitation with no animal ingredient named anywhere in the recorded evidence, and no contradictory animal ingredient appears.",
+                "evidence": [
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0001"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0018"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 1046,
+                "prompt_tokens": 11740,
+                "total_tokens": 12786,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 891,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 9216,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00117808,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00117808,
+                  "upstream_inference_prompt_cost": 0.00065508,
+                  "upstream_inference_completions_cost": 0.000523
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "1849b01d681e9a141bcd1e75016944b9bf9e4ce02aee8d572112fa7013cb41e9",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The egg-shaped toppings the visual judges flagged are explicitly declared in the generator's recorded code as plant-based imitations: buildAjitamaLayer is defined as 'Soy-Marinated Vegan Jammy Ajitama Halves', with the cut face described as 'silky ivory plant-curd white' and the yolk as 'Jammy, molten saffron-persimmon yolk center' — specific plant-curd and persimmon substitute declarations. The meat-looking grilled slices the judges cited are explicitly 'Seared King Oyster Mushroom (Chashu) medallions' with diamond scoring characteristic of seared eringi. The assistant message likewise states 'plant-based ajitama halves' and mushroom chashu. No recorded evidence contains explicit animal ingredients; the judges' narutomaki/fish-cake claim has no corresponding ingredient declaration in the artifact or trajectory.",
+                "evidence": [
+                  {
+                    "id": "E0009"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0012"
+                  },
+                  {
+                    "id": "E0005"
+                  },
+                  {
+                    "id": "E0007"
+                  },
+                  {
+                    "id": "E0001"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 1853,
+                "prompt_tokens": 11740,
+                "total_tokens": 13593,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 1620,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 11520,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0013051,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0013051,
+                  "upstream_inference_prompt_cost": 0.0003786,
+                  "upstream_inference_completions_cost": 0.0009265
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        }
+      ],
+      "restoreVeganGate": true,
+      "evidenceSources": {
+        "E0001": {
+          "source": "trajectory",
+          "location": "trajectory.events.49.content:0",
+          "eventIndex": 49,
+          "text": "I have created the single-file interactive hero scene in [index.html](file:///app/index.html) with all CSS and JavaScript inline and zero external or embedded raster assets.\n\n### Key Highlights\n- **Atmospheric Setting & Handcrafted Donburi** ([`buildWoodBackgroundLayer`](file:///app/index.html#L1394-L1520), [`renderBowlBackAndBodyToCache`](file:///app/index.html#L510-L709), [`renderBowlFrontLipToCache`](file:///app/index.html#L711-L762)): A nocturnal izakaya-inspired dark cedar countertop with procedural wood grain, a woven bamboo trivet, smoked-bamboo chopsticks resting on a river-stone *hashioki* ([`drawChopsticks`](file:///app/index.html#L1523-L1620)), and a wheel-thrown *tenmoku* stoneware ceramic bowl with iron-speckle glaze and an inner gold-ochre geometric fret motif.\n- **Rich Vegan Broth & Appetizing Toppings** ([`drawBrothBase`](file:///app/index.html#L1623-L1694), [`drawNoodles`](file:///app/index.html#L1697-L1798)):\n  - Creamy golden-amber sesame-miso broth with swirling oat-tahini emulsion clouds, aromatic black garlic oil (*mayu*) wisps, and physics-driven ruby chili oil (*rayu*) pearls ([`drawBrothSurfaceDetails`](file:///app/index.html#L1949-L2050)).\n  - Folded bundles of wavy golden alkaline noodles (*chijire-men*) with wet specular highlights, diamond-scored seared king oyster mushroom \"chashu\" medallions and a star-cut *hana-donko* shiitake cap ([`buildMushroomsLayer`](file:///app/index.html#L873-L1059)), char-kissed baby bok choy ([`buildBokChoyLayer`](file:///app/index.html#L1062-L1203)), braised *menma* bamboo shoots ([`buildMenmaLayer`](file:///app/index.html#L1206-L1284)), sweet corn ([`drawCornCluster`](file:///app/index.html#L1801-L1843)), soy-marinated jammy plant-based *ajitama* halves ([`buildAjitamaLayer`](file:///app/index.html#L1287-L1391)), crispy roasted *nori* sheets ([`buildNoriLayer`](file:///app/index.html#L765-L870)), a ceramic *renge* soup spoon ([`drawRengeSpoon`](file:///app/index.html#L1846-L1946)), and a central crown of sliced *negi* scallions, toasted sesame seeds, and crimson *ito-togarashi* chili threads ([`drawCrownGarnish`](file:///app/index.html#L2053-L2168)).\n- **Natural Motion, Mouse Interactivity & Accessibility** ([`updateSimulation`](file:///app/index.html#L2171-L2361), [`drawSteamAndAtmosphere`](file:///app/index.html#L2364-L2467), [`drawDynamicLighting`](file:///app/index.html#L2470-L2527)):\n  - Moving the pointer parts and swirls the rising variable-width volumetric steam ribbons and vapor puffs, stirs the floating chili oil droplets and ripples across the broth surface, and shifts the overhead warm lantern specular highlights and 3D depth parallax.\n  - Clicking or tapping the bowl sends a warm ripple wave through the broth and gently bobs the floating toppings.\n  - Dynamically respects `prefers-reduced-motion: reduce` and scales responsively across all screen sizes and pixel densities."
+        },
+        "E0004": {
+          "source": "artifact",
+          "location": "artifact:16508-17186",
+          "text": "Ctx = bowlFrontLipLayer.getContext('2d');\n        fCtx.translate(half, half);\n        renderBowlFrontLipToCache(fCtx);\n\n        // 3. Detailed Toppings Sprite Cache (Mushrooms, Nori, Bok Choy, Menma, Vegan Ajitama)\n        toppingsCache = {};\n        toppingsCache.nori = buildNoriLayer();\n        toppingsCache.mushrooms = buildMushroomsLayer();\n        toppingsCache.bokChoy = buildBokChoyLayer();\n        toppingsCache.menma = buildMenmaLayer();\n        toppingsCache.ajitama = buildAjitamaLayer();\n      }\n\n      function renderBowlBackAndBodyToCache(c) {\n        const rand = createPRNG(101);\n        const rx = R;\n        const ry = R * ASPECT;\n        const footRx = R * "
+        },
+        "E0005": {
+          "source": "artifact",
+          "location": "artifact:30550-31319",
+          "text": "tyle = fadeGrad;\n          c.fillRect(-s.w, -4, s.w * 2, 28);\n          c.restore();\n\n          c.restore();\n        });\n\n        return can;\n      }\n\n      // Build Seared Diamond-Scored King Oyster Mushroom Medallions & Star-Cut Shiitake Cap\n      function buildMushroomsLayer() {\n        const can = document.createElement('canvas');\n        can.width = 560;\n        can.height = 420;\n        const c = can.getContext('2d');\n        const rand = createPRNG(505);\n        c.translate(280, 220);\n\n        // Three overlapping thick seared King Oyster Mushroom (\"Chashu\") medallions\n        const medallions = [\n          { x: -135, y: 12, rx: 58, ry: 40, rot: -0.32 },\n          { x: -86, y: -24, rx: 62, ry: 43, rot: -0.16 },\n          { x: -30, y: -44, rx: 56, ry: 3"
+        },
+        "E0007": {
+          "source": "artifact",
+          "location": "artifact:33383-33789",
+          "text": "illStyle = pGrad;\n            c.beginPath();\n            c.arc(px, py, pr, 0, Math.PI * 2);\n            c.fill();\n          }\n\n          // Diamond Crosshatch Scoring (characteristic of seared Eringi Chashu)\n          c.strokeStyle = 'rgba(62, 18, 4, 0.68)';\n          c.lineWidth = 2.1;\n          const step = 13;\n          for (let d = -m.rx * 1.5; d <= m.rx * 1.5; d += step) {\n            c.beginPath()"
+        },
+        "E0009": {
+          "source": "artifact",
+          "location": "artifact:45509-45929",
+          "text": "w * 0.22);\n          c.quadraticCurveTo(0, -s.w * 0.3, s.len * 0.32, -s.w * 0.16);\n          c.stroke();\n\n          c.restore();\n        });\n\n        return can;\n      }\n\n      // Build Soy-Marinated Vegan Jammy \"Ajitama\" Halves Layer\n      function buildAjitamaLayer() {\n        const can = document.createElement('canvas');\n        can.width = 460;\n        can.height = 340;\n        const c = can.getContext('2d');\n   "
+        },
+        "E0011": {
+          "source": "artifact",
+          "location": "artifact:47392-47802",
+          "text": "p(1, '#421b06');\n          c.fillStyle = domeGrad;\n          traceOvateEgg(c, 8.5, rx * 1.01, ry * 1.03);\n          c.fill();\n\n          // Cut top face: Soy-tare stained edge fading into silky ivory plant-curd white\n          const whiteGrad = c.createRadialGradient(-2, -2, rx * 0.34, 0, 0, rx * 1.02);\n          whiteGrad.addColorStop(0, '#fff9ee');\n          whiteGrad.addColorStop(0.56, '#f7ebd4');\n      "
+        },
+        "E0012": {
+          "source": "artifact",
+          "location": "artifact:47868-48290",
+          "text": "ddColorStop(0.94, '#9c5623');\n          whiteGrad.addColorStop(1, '#66310e');\n          c.fillStyle = whiteGrad;\n          traceOvateEgg(c, 0, rx, ry);\n          c.fill();\n\n          // Jammy, molten saffron-persimmon yolk center (shifted slightly toward fuller end)\n          const yRx = rx * 0.56;\n          const yRy = ry * 0.58;\n          const yolkGrad = c.createRadialGradient(-2, -4, 2, 4, 1, yRx * 1.06);\n         "
+        },
+        "E0018": {
+          "source": "artifact",
+          "location": "artifact:95817-96389",
+          "text": "rn Cluster (Lower-center right)\n        ctx.save();\n        ctx.translate(px * 2.4, py * 1.8 + bobY * 0.65);\n        drawCornCluster(ctx, px, py);\n        ctx.restore();\n\n        // 8e. Soy-Marinated Vegan Jammy \"Ajitama\" Halves\n        ctx.save();\n        ctx.translate(-R * 0.02 + px * 3.4, R * 0.06 + py * 2.5 + bobY * 0.85);\n        ctx.drawImage(toppingsCache.ajitama, -230, -170);\n        ctx.restore();\n\n        // 9. Draw Interactive Broth Ripples, Floating Chili Oil (Rayu) & Micro-Garnish\n        drawBrothSurfaceDetails(ctx, time, px, py);\n\n        // 10. Draw "
+        },
+        "E0020": {
+          "source": "trajectory",
+          "location": "trajectory.events.3.input.CodeContent:45947-46357",
+          "eventIndex": 3,
+          "text": "       c.lineTo(-rx, 0);\n          c.ellipse(0, 0, rx, ry, 0, Math.PI, 0, true);\n          c.closePath();\n          c.fill();\n\n          // Cut top face: Soy-tare stained edge fading into silky ivory plant-curd white\n          const whiteGrad = c.createRadialGradient(-4, -3, rx * 0.35, 0, 0, rx);\n          whiteGrad.addColorStop(0, '#fff9ee');\n          whiteGrad.addColorStop(0.58, '#f7ebd4');\n          whi"
+        },
+        "E0044": {
+          "source": "trajectory",
+          "location": "trajectory.events.28.output:5164-5574",
+          "eventIndex": 28,
+          "text": "           c.ellipse(0, 0, rx, ry, 0, Math.PI, 0, true);\n1326:           c.closePath();\n1327:           c.fill();\n1328: \n1329:           // Cut top face: Soy-tare stained edge fading into silky ivory plant-curd white\n1330:           const whiteGrad = c.createRadialGradient(-4, -3, rx * 0.35, 0, 0, rx);\n1331:           whiteGrad.addColorStop(0, '#fff9ee');\n1332:           whiteGrad.addColorStop(0.58, '#f7ebd"
+        }
+      },
+      "harborTrial": "vegan--google--gemini-4-argon--h__i2TZWcR"
+    },
+    {
+      "schemaVersion": 1,
+      "runId": "xai/grok-4.5/low",
+      "artifactSha256": "abb06d6ec55b501234a4c409ef29e853a9eed3e1cd165a0d6ae76abeabd91875",
+      "transcriptSha256": "6acd2cb90a936658c05da74e715dbec23abe337de0c7fcc0ff2f6b575d6a303c",
+      "sourceScoreSha256": "1cdace6da46ecfd6fce2056a3b0ba474699e225de7a02eeb77fa1e9d7590e8c3",
+      "sourceReward": 0.0,
+      "policySha256": "785d873fd2e973b83f00205670fd00bdf8f80670206d383ac82c9adb20b4ab39",
+      "policyVersion": "vegan-trajectory-v1",
+      "judge": {
+        "models": [
+          "openrouter/openai/gpt-6.1-sol",
+          "openrouter/anthropic/claude-sonnet-5.5",
+          "openrouter/z-ai/glm-5.3-flash"
+        ],
+        "efforts": {
+          "openrouter/openai/gpt-6.1-sol": "low",
+          "openrouter/anthropic/claude-sonnet-5.5": "low",
+          "openrouter/z-ai/glm-5.3-flash": "default"
+        },
+        "samples": 3
+      },
+      "omittedEvidenceChunks": 0,
+      "inputSha256": "04c4d46be7ee0617027de7d60d907a6749bceaa74765413e518af9527115a2ae",
+      "reviewedAt": "2026-10-16T01:24:43.778114+00:00",
+      "judgeResults": [
+        {
+          "model": "openrouter/openai/gpt-6.1-sol",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "6676fe8e14052c45b79ac2d1348dff96373f921d82d005b3a0bbecf4562e8df0",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator’s code specifically identifies the egg-shaped topping as a vegan aquafaba egg half. It also identifies vegan broth and marinated tofu, and the recorded evidence contains no contradictory animal ingredient.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0013"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 82,
+                "prompt_tokens": 3129,
+                "total_tokens": 3211,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 3126,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 3126
+                },
+                "cost": 0.008641,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.008641,
+                  "upstream_inference_prompt_cost": 0.007821,
+                  "upstream_inference_completions_cost": 0.00082
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "6676fe8e14052c45b79ac2d1348dff96373f921d82d005b3a0bbecf4562e8df0",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator’s code specifically identifies the egg-shaped topping as a vegan aquafaba egg half. It also identifies vegan broth and marinated tofu, with no contradictory animal ingredient in the recorded evidence. The visual appearance of an egg does not override this explicit substitute declaration.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0013"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 96,
+                "prompt_tokens": 3129,
+                "total_tokens": 3225,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 3126,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0012786,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0012786,
+                  "upstream_inference_prompt_cost": 0.0003186,
+                  "upstream_inference_completions_cost": 0.00096
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "6676fe8e14052c45b79ac2d1348dff96373f921d82d005b3a0bbecf4562e8df0",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator’s code explicitly identifies the egg-shaped topping as a vegan aquafaba egg half. It also specifies vegan broth and marinated tofu, with no contradictory animal ingredient in the recorded evidence. The topping’s egg-like appearance does not establish animal-derived intent.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0011"
+                  },
+                  {
+                    "id": "E0013"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 95,
+                "prompt_tokens": 3129,
+                "total_tokens": 3224,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 3126,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0012686,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0012686,
+                  "upstream_inference_prompt_cost": 0.0003186,
+                  "upstream_inference_completions_cost": 0.00095
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/anthropic/claude-sonnet-5.5",
+          "effort": "low",
+          "judgments": [
+            {
+              "requestSha256": "9b284953d82b5e822bfd929fc799fe55148711f0b16bacb74217181e41a7be41",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's own recorded code comment labels the egg half as an aquafaba egg and states it is vegan. Its final message also describes a soft vegan \"egg\" in a vegan ramen bowl with marinated tofu and shiitake. No animal ingredient is declared anywhere in the evidence, and the judges' objections concern only the egg's appearance, which the generator explicitly addressed as a plant-based imitation.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0013"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 196,
+                "prompt_tokens": 5438,
+                "total_tokens": 5634,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.012836,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.012836,
+                  "upstream_inference_prompt_cost": 0.010876,
+                  "upstream_inference_completions_cost": 0.00196
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "9b284953d82b5e822bfd929fc799fe55148711f0b16bacb74217181e41a7be41",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's recorded artifact comment explicitly labels the egg-shaped topping as a soft-boiled style aquafaba egg half and marks it vegan. The final assistant message also describes a soft vegan egg alongside marinated tofu and shiitake. Nothing in the evidence points to an actual animal ingredient. The judges' complaints only describe how the egg looks, not what it is meant to be.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0011"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 191,
+                "prompt_tokens": 5438,
+                "total_tokens": 5629,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.012786,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.012786,
+                  "upstream_inference_prompt_cost": 0.010876,
+                  "upstream_inference_completions_cost": 0.00191
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "9b284953d82b5e822bfd929fc799fe55148711f0b16bacb74217181e41a7be41",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The generator's own recorded code comment labels the egg half as an aquafaba egg and states it is vegan. Its final message describes a soft vegan \"egg\" among plant-based toppings such as marinated tofu and shiitake. No contradictory animal ingredient is recorded. The judges' complaints only describe the egg's appearance, which is an imitation here.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0011"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 176,
+                "prompt_tokens": 5438,
+                "total_tokens": 5614,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.012636,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.012636,
+                  "upstream_inference_prompt_cost": 0.010876,
+                  "upstream_inference_completions_cost": 0.00176
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        },
+        {
+          "model": "openrouter/z-ai/glm-5.3-flash",
+          "effort": "default",
+          "judgments": [
+            {
+              "requestSha256": "99e4a7a99ce09fe87431700fcbaa04b3fc55c7781cdf31bb2451ac7f780e1aca",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The artifact's SVG code explicitly labels the egg-shaped topping as a vegan aquafaba egg ('Soft-boiled style (aquafaba) egg half — vegan'), and the assistant's summary describes a 'soft vegan egg' with plant-based toppings (tofu, shiitake, corn, nori). The egg-like appearance is an intentional plant-based imitation, so the judges' visual-only animal-ingredient verdicts are overridden by the recorded ingredient-specific declarations, with no contradictory animal ingredients present.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0008"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 182,
+                "prompt_tokens": 3012,
+                "total_tokens": 3194,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 52,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.0005428,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.0005428,
+                  "upstream_inference_prompt_cost": 0.0004518,
+                  "upstream_inference_completions_cost": 9.1e-05
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "99e4a7a99ce09fe87431700fcbaa04b3fc55c7781cdf31bb2451ac7f780e1aca",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The egg-shaped topping is explicitly declared by the generator in the artifact code as a 'Soft-boiled style (aquafaba) egg half — vegan', a specific plant-based substitute declaration, and the assistant message likewise describes a soft vegan 'egg'. The remaining toppings (tofu, shiitake, corn, nori) and the broth are also labeled vegan, with no unaddressed animal ingredients, so the visual judges' animal-egg reading is contradicted by the recorded ingredient intent.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0008"
+                  },
+                  {
+                    "id": "E0011"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 508,
+                "prompt_tokens": 3011,
+                "total_tokens": 3519,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 373,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 320,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00066405,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00066405,
+                  "upstream_inference_prompt_cost": 0.00041005,
+                  "upstream_inference_completions_cost": 0.000254
+                }
+              },
+              "invalidAttempts": []
+            },
+            {
+              "requestSha256": "99e4a7a99ce09fe87431700fcbaa04b3fc55c7781cdf31bb2451ac7f780e1aca",
+              "judgment": {
+                "decision": "plant_based_substitutes",
+                "reason": "The recorded SVG code explicitly labels the egg-shaped topping as a 'Soft-boiled style (aquafaba) egg half — vegan', directly on the element that renders the white-and-yolk ellipses the visual judges flagged, and the assistant's summary separately lists 'a soft vegan egg' among the toppings (tofu, shiitake, corn, nori). Aquafaba is a plant-based egg substitute, so the animal-looking egg is an intended vegan imitation. The broth is likewise declared vegan, and no unaddressed explicit animal ingredient appears in the recorded evidence.",
+                "evidence": [
+                  {
+                    "id": "E0015"
+                  },
+                  {
+                    "id": "E0008"
+                  }
+                ]
+              },
+              "usage": {
+                "completion_tokens": 1051,
+                "prompt_tokens": 3011,
+                "total_tokens": 4062,
+                "completion_tokens_details": {
+                  "audio_tokens": 0,
+                  "reasoning_tokens": 884,
+                  "image_tokens": 0
+                },
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 3008,
+                  "video_tokens": 0,
+                  "cache_creation_tokens": 0
+                },
+                "cost": 0.00058611,
+                "is_byok": false,
+                "cost_details": {
+                  "upstream_inference_cost": 0.00058611,
+                  "upstream_inference_prompt_cost": 6.061e-05,
+                  "upstream_inference_completions_cost": 0.0005255
+                }
+              },
+              "invalidAttempts": []
+            }
+          ]
+        }
+      ],
+      "restoreVeganGate": true,
+      "evidenceSources": {
+        "E0008": {
+          "source": "trajectory",
+          "location": "trajectory.events.50.content:0",
+          "eventIndex": 50,
+          "text": "Created **`index.html`** — a single self-contained page with all CSS and JavaScript inline and no external assets.\n\n### What’s in the scene\n- **Dark hero canvas** with warm radial ambience, vignette, and a soft heat haze\n- **SVG vegan ramen bowl**: rich broth, chili oil, noodles, nori, marinated tofu, shiitake, corn, scallions, sesame, and a soft vegan “egg”\n- **Living motion**: rising steam plumes, broth shimmer, bowl breathe, ambient pulse, chopstick glint\n- **Mouse / touch response**: parallax tilt on the bowl, warm light that follows the pointer, and a soft glowing cursor orb\n- **Responsive**: scales with `min(100vw, 100vh)` so it stays centered on desktop and mobile\n- **`prefers-reduced-motion`**: animations stop; steam stays as a soft static veil; parallax is dampened\n\nOpen it directly in a browser:\n\n```bash\nopen index.html\n# or: python3 -m http.server 8765\n```\n\nVerified with headless Chromium (desktop + mobile viewports, pointer parallax, and reduced-motion). No interactive browser MCP was available in this session, so live click-through wasn’t possible here — open the file locally to feel the steam and mouse warmth."
+        },
+        "E0011": {
+          "source": "artifact",
+          "location": "artifact:7718-8123",
+          "text": " y1=\"0%\" x2=\"0%\" y2=\"100%\">\n            <stop offset=\"0%\" stop-color=\"#1f120e\"/>\n            <stop offset=\"100%\" stop-color=\"#0a0604\"/>\n          </linearGradient>\n\n          <!-- Rich tonkotsu-style vegan broth -->\n          <radialGradient id=\"broth\" cx=\"48%\" cy=\"42%\" r=\"55%\">\n            <stop offset=\"0%\" stop-color=\"#e8a854\"/>\n            <stop offset=\"35%\" stop-color=\"#c47830\"/>\n            <stop "
+        },
+        "E0013": {
+          "source": "artifact",
+          "location": "artifact:13646-14050",
+          "text": "  <rect x=\"4\" y=\"36\" width=\"30\" height=\"3\" rx=\"1\" fill=\"#2a4a2c\" opacity=\"0.5\"/>\n          <rect x=\"0\" y=\"0\" width=\"38\" height=\"8\" fill=\"#243828\" opacity=\"0.35\"/>\n        </g>\n\n        <!-- Marinated tofu cubes -->\n        <g transform=\"translate(155, 168)\">\n          <rect x=\"0\" y=\"8\" width=\"26\" height=\"22\" rx=\"2\" fill=\"url(#tofuGrad)\"\n                transform=\"rotate(-8 13 19)\"/>\n          <rect x="
+        },
+        "E0015": {
+          "source": "artifact",
+          "location": "artifact:15356-15782",
+          "text": "=\"6\" r=\"4.8\" fill=\"url(#cornGrad)\"/>\n          <circle cx=\"-6\" cy=\"7\" r=\"4.5\" fill=\"#f5d850\"/>\n          <circle cx=\"20\" cy=\"-2\" r=\"4.2\" fill=\"#e0a820\"/>\n        </g>\n\n        <!-- Soft-boiled style (aquafaba) egg half — vegan -->\n        <g transform=\"translate(255, 185)\">\n          <ellipse cx=\"0\" cy=\"8\" rx=\"22\" ry=\"18\" fill=\"#f2e8d0\" transform=\"rotate(25)\"/>\n          <ellipse cx=\"-2\" cy=\"8\" rx=\"14\" ry=\"12\" fill=\"#f5c84"
+        }
+      },
+      "harborTrial": "vegan--xai--grok-4.5--low__aHuEppz"
+    }
+  ]
+}
