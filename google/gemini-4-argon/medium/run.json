@@ -1,0 +1,100 @@
+{
+  "$schema": "../../../schemas/run.schema.json",
+  "schemaVersion": 1,
+  "id": "google/gemini-4-argon/medium",
+  "vendor": {
+    "slug": "google",
+    "displayName": "Google"
+  },
+  "model": {
+    "slug": "gemini-4-argon",
+    "displayName": "Gemini 4 Argon",
+    "providerModelId": "gemini-4-argon-medium"
+  },
+  "variation": {
+    "slug": "medium",
+    "displayName": "Medium",
+    "reasoningEffort": "medium",
+    "parameters": {
+      "modelSelection": "Gemini 4 Argon (Medium)"
+    }
+  },
+  "harness": {
+    "name": "Antigravity CLI",
+    "version": "1.3.6",
+    "runtime": "Harbor",
+    "invocation": "Native Harbor agy with pinned executable and subscription login; gemini-4-argon-medium --effort medium"
+  },
+  "artifacts": {
+    "result": "index.html",
+    "transcript": "transcript.json"
+  },
+  "timing": {
+    "startedAt": "2026-10-15T23:34:20.923214Z",
+    "completedAt": "2026-10-15T23:44:23.117608Z",
+    "wallDurationMs": 602194
+  },
+  "usage": {
+    "tokens": {
+      "input": 42533,
+      "cachedInput": 58382,
+      "output": 26878,
+      "reasoning": 0,
+      "total": 127793
+    },
+    "cost": null,
+    "turns": 1,
+    "toolCalls": 3,
+    "providerReported": true,
+    "raw": {
+      "nativeStreamUsage": {
+        "input_tokens": 42533,
+        "output_tokens": 26878,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 58382,
+        "total_tokens": 69411
+      },
+      "nativeCompletionStatus": "ERROR",
+      "pricing": {
+        "source": "https://ai.google.dev/gemini-api/docs/pricing#gemini-4-argon",
+        "pinnedAt": "2026-10-15",
+        "model": "gemini-4-argon",
+        "tier": "Standard",
+        "basis": "API-equivalent published list prices; not a subscription charge",
+        "introductory": true,
+        "effectiveThrough": "2026-11-30",
+        "inputUsdPerMillion": 2.0,
+        "cachedInputUsdPerMillion": 0.1,
+        "outputUsdPerMillion": 10.0,
+        "outputIncludesThinking": true,
+        "cacheType": "implicit",
+        "recordedUsageSubtotalUsd": 0.3596842,
+        "fullRunCostUnknown": true,
+        "reason": "Failed generation-stream requests have no recorded usage"
+      },
+      "recoveredAfterAPIErrors": true,
+      "harborAgentTokens": {
+        "n_input_tokens": 100915,
+        "n_cache_tokens": 58382,
+        "n_output_tokens": 26878
+      },
+      "harborTrial": "argon-task__KJWxUMJ",
+      "harborTaskChecksum": "27d7e1ec9b16b2569900f0cf4558f1351f0de6b3f39af360b3371ec229987f6c",
+      "artifactVerification": "Recorded agy file-operation replay (1 operations)",
+      "accountingIncomplete": true,
+      "nativeAPIErrors": [
+        "API error (attempt 1): request failed: stream idle timeout (5m0s): context deadline exceeded"
+      ],
+      "recordedCompletedRequests": 4,
+      "harborGradeTrial": "argon-task__U6fXF48"
+    }
+  },
+  "resultStats": {
+    "bytes": 64468,
+    "lines": 1325
+  },
+  "provenance": {
+    "pricingSource": "Google Standard published list prices, pinned 2026-10-15; https://ai.google.dev/gemini-api/docs/pricing#gemini-4-argon"
+  },
+  "notes": "Generated entirely by native agy inside Harbor. HTML is unchanged and matches recorded successful file operations. Generation time comes from Harbor and excludes setup and grading. Token counters come from the native completion aggregate, checked against individual steps; input and cache reads are disjoint, and thinking is included once in output then split into reasoning. Native total_tokens excludes cache reads; the public total includes them once. Pricing uses pinned Google Standard API-equivalent list prices, with cache hits discounted and thinking included once; it is not a recorded subscription charge. Hidden reasoning, system/developer prompts, credentials, private agent activity, opaque payloads and personal paths are excluded from the public transcript. Native API errors occurred before recovery; recorded usage covers completed requests and is a lower bound. Usage for failed requests and a full request count remain unknown. The priced recorded-usage subtotal is $0.3596842; the full run cost remains unknown because failed requests have no usage counters. The native final status remains ERROR following an earlier API timeout. Harbor exited normally; a recorded successful file write and the final assistant response followed the timeout. Scores come from a native Harbor regrade of the saved artifact; original generation timing, usage, and native completion status are retained."
+}

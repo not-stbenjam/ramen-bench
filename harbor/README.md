@@ -164,6 +164,76 @@ recorded source trial identity and unchanged artifact bytes. It retains original
 generation timing and accounting, records the failed verifier, and publishes only
 the successful regrade's native reward.
 
+### Antigravity CLI and Gemini 4 Argon
+
+Use native Harbor trials for every Argon effort, including Low. The provider's
+`agy models` catalog lists `gemini-4-argon-low`, `gemini-4-argon-medium`, and
+`gemini-4-argon-high`. Select the exact catalog model and its matching `--effort`.
+The repository adapter accepts Medium for Argon, pins an existing local `agy`
+executable, and copies the existing consumer OAuth login into the ephemeral
+container with private permissions. It retains Harbor's native run command,
+session collection, accounting, and separate verifier. It does not select an
+API-key billing path or change the host login.
+
+Run one effort per job, with one concurrent trial and no retries. Wait for its
+completion before starting the next effort, and stop on subscription exhaustion:
+
+```sh
+PYTHONPATH=. harbor run --yes --env-file .harbor/judge.env \
+  --path harbor/ramen --n-concurrent 1 --max-retries 0 \
+  --agent scripts.harbor_agy:SubscriptionAgy \
+  --model google/gemini-4-argon-low --ak reasoning_effort=low \
+  --ak binary_path=/path/to/pinned/agy \
+  --ak auth_path=/path/to/antigravity-oauth-token \
+  --ae AGY_CLI_DISABLE_AUTO_UPDATE=true \
+  --job-name argon-low --jobs-dir .harbor/jobs
+```
+
+Disable auto-updates in the agent environment to keep the uploaded version
+pinned. In JSON job configuration this is
+`agents[].env.AGY_CLI_DISABLE_AUTO_UPDATE = "true"`.
+
+Import and source-check only native Harbor results:
+
+```sh
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_antigravity.py \
+  --harbor-job .harbor/jobs/argon-low --publish-scores
+LITELLM_LOCAL_MODEL_COST_MAP=True .harbor/import-venv/bin/python scripts/import_antigravity.py \
+  --harbor-job .harbor/jobs/argon-low --check-sources
+```
+
+Repeat `--harbor-job` to import the separately completed Medium and High jobs.
+For native regrades, add repeatable `--grade-job .harbor/jobs/argon-low-grades`
+arguments to both import and source-check commands. The importer joins each
+successful regrade by recorded source trial identity and unchanged artifact bytes.
+The importer requires the exact prompt, native model identity and effort,
+successful native generation, and unchanged recorded final writes. Tokens come
+from native stream usage, checked against individual steps. Costs remain unknown
+without verified pricing. The public transcript excludes structured hidden
+reasoning, system/developer prompts, private agent activity, credentials, and
+opaque payloads using the shared censor. Direct host runs cannot be imported
+through this path.
+
+`scripts/agy_list_prices.py` pins Google's published Standard rates on October
+15, 2026: $2/M uncached input, $0.10/M implicit cache reads, and $10/M output
+including thinking through November 30; $4/$0.20/$20 from December 1. These are
+API-equivalent estimates, not recorded subscription charges. The source is
+[Google's pricing page](https://ai.google.dev/gemini-api/docs/pricing#gemini-4-argon).
+When stream failures leave unknown usage, retain the priced recorded-token
+subtotal as a lower bound and keep the full run cost unknown.
+
+A successful native generation whose verifier failed can still be imported;
+the original verifier failure stays recorded. It receives no fabricated score.
+Publish grades only after successful verification of the saved artifact.
+
+agy 1.3.6 can retain `ERROR` after an internal API retry produces a completed
+artifact and final response. The importer accepts that recovery only when Harbor
+exited normally, completed file writes follow the recorded API error, exact file
+replay succeeds, and the final native response matches the last completed
+assistant message. It preserves `ERROR` and the runtime error in public metadata
+and transcript. Usage for timed-out requests remains unknown; completed-request
+token totals are marked as a lower bound, and the full request count is omitted.
+
 ### Muse Code and Muse Wonder
 
 Muse Wonder (`muse-wonder-1.0`) advertises `minimal`, `low`, `medium`, `high`,

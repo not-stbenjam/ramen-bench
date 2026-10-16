@@ -35166,6 +35166,1092 @@
         "mobileHorizontalOverflow": false,
         "reducedHorizontalOverflow": false
       }
+    },
+    {
+      "artifactSha256": "14632858ff30eb15ce36140a27ebe5c6a3a3cacb2fcf44e432e0dbc5125857b1",
+      "gradedAt": "2026-10-15T23:52:44.496677+00:00",
+      "scores": {
+        "standalone": 1.0,
+        "procedural": 1.0,
+        "noodles": 0.3155555555555556,
+        "toppings": 0.5744444444444444,
+        "bowl": 0.46777777777777774,
+        "broth": 0.5377777777777778,
+        "steam": 0.39111111111111113,
+        "composition": 0.68
+      },
+      "reward": 0.4807222222222222,
+      "runId": "google/gemini-4-argon/low",
+      "rewardStdDev": 0.13745366222570884,
+      "judgeResults": [
+        {
+          "model": "openrouter/openai/gpt-6.1-sol",
+          "effort": "low",
+          "scores": {
+            "noodles": 0.37333333333333335,
+            "toppings": 0.5066666666666667,
+            "bowl": 0.37,
+            "broth": 0.4633333333333333,
+            "steam": 0.24,
+            "composition": 0.7066666666666667
+          },
+          "reward": 0.42833333333333334,
+          "sampleStdDev": 0.00929157324317761,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.38,
+                "reason": "A few pale curved strands are visible beneath the toppings, but they form faint parallel loops with little readable overlap or noodle volume."
+              },
+              "toppings": {
+                "score": 0.52,
+                "reason": "Scored mushroom caps, crosshatched tofu and green vegetables are recognizable. However, the nori resembles rigid rectangular cards, and the leaves and tofu have simplified, hard-edged shapes."
+              },
+              "bowl": {
+                "score": 0.38,
+                "reason": "Speckled ceramic shading and a grounded base provide material detail, but the tall rear opening meets a straight horizontal front cutoff, creating conspicuously incompatible rim and body geometry."
+              },
+              "broth": {
+                "score": 0.46,
+                "reason": "The warm orange surface is readable as soup, but its broad uniform gradient lacks liquid sheen and depth; toppings have little convincing immersion or surface contact."
+              },
+              "steam": {
+                "score": 0.24,
+                "reason": "A translucent haze rises above the soup without fully hiding it, but its broad column shapes remain essentially unchanged across normal frames; shifting specks do not establish rising, fading wisps."
+              },
+              "composition": {
+                "score": 0.72,
+                "reason": "Warm food colors, dark surroundings and restrained utensils create a clear central focal dish without text or clutter. The oversized front wall dominates the presentation, and the mobile dish is rather small amid extensive empty space."
+              },
+              "vegan": {
+                "score": 1,
+                "reason": "Visible mushrooms, tofu-like grilled pieces, greens, seaweed and noodles plausibly form vegan ramen. The spoon contains orange liquid with small garnishes, with no clearly animal-derived topping observed."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.38,
+                "reason": "A few thin golden curves are visible beneath the toppings, but they form faint, nearly parallel loops rather than a readable, volumetric tangle of supple strands."
+              },
+              "toppings": {
+                "score": 0.5,
+                "reason": "Scored mushroom caps, grilled tofu and greens are recognizable, but the mushrooms resemble smooth disks, the greens lack leaf detail, and the nori resembles rigid rectangular cards."
+              },
+              "bowl": {
+                "score": 0.38,
+                "reason": "Speckled shading and a grounded base suggest ceramic, but the tall rear opening meets a conspicuous straight horizontal front edge, creating incompatible cavity and body perspective."
+              },
+              "broth": {
+                "score": 0.46,
+                "reason": "Warm orange shading and scattered garnish suggest soup, but the surface is largely a smooth solid-looking fill with little liquid sheen or convincing immersion around toppings."
+              },
+              "steam": {
+                "score": 0.24,
+                "reason": "Translucent haze rises above the dish, but its broad column-like silhouette stays essentially unchanged across normal frames; shifting specks do not establish rising, spreading wisps."
+              },
+              "composition": {
+                "score": 0.72,
+                "reason": "The centered dish, warm restrained palette and dark tabletop create a clear focal scene without text or clutter. The oversized bowl frontage dominates the food, and the mobile presentation leaves substantial empty space."
+              },
+              "vegan": {
+                "score": 1,
+                "reason": "Visible mushroom caps, tofu, greens, seaweed and noodles plausibly form vegan ramen. The cream-colored oval is a spoon holding orange liquid and garnish, not an egg; no animal-derived topping is apparent."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.36,
+                "reason": "Only a narrow patch of faint, nearly parallel looping strands is visible beneath the toppings; thickness and overlapping noodle volume are poorly resolved."
+              },
+              "toppings": {
+                "score": 0.5,
+                "reason": "Scored mushroom caps, crosshatched tofu and green vegetables are recognizable, but remain simplified symbols. Nori resembles rigid rectangular cards, and leaves lack organic detail."
+              },
+              "bowl": {
+                "score": 0.35,
+                "reason": "Speckling and curved highlights suggest ceramic, but the tall rear opening joins a straight horizontal front edge with incompatible perspective, making the bowl look cut apart rather than coherently hollow."
+              },
+              "broth": {
+                "score": 0.47,
+                "reason": "Warm orange shading suggests soup, but the surface is largely a flat gradient with little liquid sheen or depth. Toppings lack convincing immersion and contact."
+              },
+              "steam": {
+                "score": 0.24,
+                "reason": "A translucent haze rises above the soup without fully obscuring it, but its broad column shapes appear essentially unchanged across normal frames; drifting specks do not establish evolving steam wisps."
+              },
+              "composition": {
+                "score": 0.68,
+                "reason": "Warm colors, a dark restrained background and a single centered dish create a clear focal point without text or clutter. The large foreground wall dominates the food, and the mobile dish occupies relatively little of the frame."
+              },
+              "vegan": {
+                "score": 1,
+                "reason": "Visible mushroom caps, tofu-like grilled pieces, greens, seaweed and noodles plausibly form vegan ramen. The spoon appears to contain orange broth with garnish; no clearly animal-derived ingredient is visible."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 1
+          },
+          "veganFailed": false
+        },
+        {
+          "model": "openrouter/anthropic/claude-sonnet-5.5",
+          "effort": "low",
+          "scores": {
+            "noodles": 0.13999999999999999,
+            "toppings": 0.5166666666666667,
+            "bowl": 0.3,
+            "broth": 0.48333333333333334,
+            "steam": 0.4,
+            "composition": 0.5166666666666667
+          },
+          "reward": 0.3771666666666667,
+          "sampleStdDev": 0.009169696468985954,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.15,
+                "reason": "Noodles are almost invisible; only faint thin golden lines show near the mushrooms. No readable strands or volume."
+              },
+              "toppings": {
+                "score": 0.55,
+                "reason": "Shiitake with white scoring, a grid-textured tofu, nori sheets and greens are recognizable and vegan-appropriate. The nori reads as stiff rectangular cards, and the lower halves of the toppings are cut off by the bowl."
+              },
+              "bowl": {
+                "score": 0.3,
+                "reason": "The bowl is split by a hard horizontal line that cuts through the soup. The rim, front wall and base have incompatible perspective, so the bowl looks broken. The speckled glaze and the base are decent."
+              },
+              "broth": {
+                "score": 0.5,
+                "reason": "The orange broth has a warm glow and some depth, but it is abruptly truncated by the flat bowl wall. Ingredients are cut off rather than sitting in the liquid."
+              },
+              "steam": {
+                "score": 0.4,
+                "reason": "A soft translucent haze rises above the bowl and drifts slightly between frames. It is a fairly uniform column with little wisp detail."
+              },
+              "composition": {
+                "score": 0.5,
+                "reason": "The dark moody scene, centered bowl and warm focal color are good. The hard horizontal cut and the awkward spoon placement hurt the presentation."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "Mushrooms, tofu, nori, greens and an orange broth are visible. No animal products are seen."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.15,
+                "reason": "Noodles are almost invisible: only faint thin golden lines near the mushrooms. The lower half of the bowl is cut off by a hard opaque horizontal band that hides the main noodle mass, so there is no readable volume."
+              },
+              "toppings": {
+                "score": 0.5,
+                "reason": "Shiitake with split-star cuts, a grid-patterned tofu, nori sheets and bok choy are recognizable and varied. The nori reads as stiff rectangles and the tofu as a waffle-like card. The toppings are cut off by the hard horizontal band across the bowl."
+              },
+              "bowl": {
+                "score": 0.3,
+                "reason": "A flat horizontal cut slices through the bowl at mid-height, so the front wall looks like an opaque slab detached from the rim. Perspective is incompatible between the top ellipse and the lower body. The speckled glaze and the base ring are decent, but the construction is conspicuously broken."
+              },
+              "broth": {
+                "score": 0.45,
+                "reason": "The warm orange broth has a pleasant gradient and glow, with small sesame flecks. It is clipped by the hard band, so the liquid depth and immersion contact are unreadable, and the toppings partly look pasted on."
+              },
+              "steam": {
+                "score": 0.4,
+                "reason": "A soft translucent glow plume rises above the bowl and shifts slightly between frames. It is a diffuse vertical fog column rather than distinct wisps, and the motion is subtle."
+              },
+              "composition": {
+                "score": 0.5,
+                "reason": "The dark moody scene is centered with a clear focal bowl, and the warm orange against the dark background is attractive. The spoon and chopsticks add context. The sliced bowl band is a glaring flaw in the overall presentation."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "Mushrooms, tofu, nori, greens and an orange broth are all plant-based, with no visible meat, egg or fish."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.12,
+                "reason": "Noodles are almost entirely hidden: only faint thin lines are visible near the mushrooms. Ramen noodles are essentially unreadable."
+              },
+              "toppings": {
+                "score": 0.5,
+                "reason": "The shiitake with white scoring, grid-textured nori, fried tofu and bok choy are recognizable and varied. But the lower halves are cut off by a flat horizontal slice, and the nori reads as stiff cards."
+              },
+              "bowl": {
+                "score": 0.3,
+                "reason": "The bowl is cut by a hard horizontal line where the dark front wall starts, and the rim is not coherent with the body. The speckled glaze and the base are decent, but the geometry looks broken and the cavity does not read."
+              },
+              "broth": {
+                "score": 0.5,
+                "reason": "The warm orange broth has a pleasing gradient and glow. It is cut off flatly by the bowl wall, and the toppings look clipped rather than immersed."
+              },
+              "steam": {
+                "score": 0.4,
+                "reason": "A soft vertical haze rises above the bowl and shifts slightly between frames. It is a diffuse column with no distinct wisps, and it looks mostly static."
+              },
+              "composition": {
+                "score": 0.55,
+                "reason": "The dark moody scene is centered, with warm broth as the focal point and a spoon and chopsticks for context. The cropped bowl makes the dish feel unbalanced, and the lower half is a large empty dark area."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "The toppings are mushrooms, tofu, nori, greens and scallion, with no visible animal products."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 0.9
+          },
+          "veganFailed": false
+        },
+        {
+          "model": "openrouter/z-ai/glm-5.3-flash",
+          "effort": "default",
+          "scores": {
+            "noodles": 0.43333333333333335,
+            "toppings": 0.7,
+            "bowl": 0.7333333333333333,
+            "broth": 0.6666666666666666,
+            "steam": 0.5333333333333333,
+            "composition": 0.8166666666666667
+          },
+          "reward": 0.6366666666666667,
+          "sampleStdDev": 0.030138568866708567,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.45,
+                "reason": "Only a few sparse wavy yellow strands peek out between the mushrooms and tofu; the large open broth areas show no coherent noodle bed, so the noodle presence reads as isolated squiggles rather than a believable ramen mass."
+              },
+              "toppings": {
+                "score": 0.7,
+                "reason": "Good variety with readable details: two mushroom slices with star-cut cross-sections, grid-textured nori sheets, lattice-patterned fried tofu, leafy greens, scallion, and scattered sesame seeds. Minor flaws: the mushroom discs are flat and near-identical, and the nori squares read slightly as rigid standing cards."
+              },
+              "bowl": {
+                "score": 0.75,
+                "reason": "Coherent dark speckled ceramic bowl with rim band, accent line, curved glaze strokes, pedestal foot, mat and shadow; spoon and chopsticks rest plausibly on the rim. The straight horizontal seam where the interior meets the front wall and the slightly blob-like foot are noticeable but read as intentional stylization."
+              },
+              "broth": {
+                "score": 0.65,
+                "reason": "Warm orange miso-toned surface with restrained sheen, a subtle ripple ellipse around the mushrooms, floating sesame, and proper occlusion of topping bases behind the front rim. The strong central glow reads a bit like backlighting rather than liquid depth, and the surface is otherwise fairly flat."
+              },
+              "steam": {
+                "score": 0.7,
+                "reason": "Translucent wisps above the bowl change shape across desktop-1/2/3 (curling plume shifts and reshapes, particles drift), rising and spreading without obscuring the food; it is somewhat diffuse and glow-like rather than crisply wisped, hence not higher."
+              },
+              "composition": {
+                "score": 0.8,
+                "reason": "Well-centered focal bowl in a moody dark scene with warm broth against cool darkness, balanced accents from chopsticks, spoon and drifting specks, no text or clutter; mobile framing leaves generous empty space but keeps the dish readable."
+              },
+              "vegan": {
+                "score": 1.0,
+                "reason": "Visible toppings are mushrooms, nori, tofu, leafy greens, scallion and sesame in plant broth; no meat, fish, egg or dairy is discernible, and the brown star-cut discs read as mushroom slices rather than naruto."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.45,
+                "reason": "Noodles are barely represented: only a few thin wavy yellow strands peek out between the mushrooms and tofu pieces; there is no coherent noodle mass, volume, or believable nesting in the broth, reading as sparse decorative squiggles."
+              },
+              "toppings": {
+                "score": 0.75,
+                "reason": "Good variety and readability: two brown shiitake caps with white cross-cut scores, stacked nori sheets with a grid texture, crosshatched tofu-like pieces, a scallion segment, leafy greens and scattered sesame specks. Greens look slightly glossy/faceted and the tofu lattice pattern is schematic, but nothing reads as a generic plastic stand-in."
+              },
+              "bowl": {
+                "score": 0.7,
+                "reason": "Coherent dark lacquer bowl with a rim pinstripe, speckled body, curved lower wall, pedestal foot and woven trivet; the spoon and chopsticks rest plausibly on the rim. Main flaw: the broth is terminated by a perfectly straight horizontal front-wall seam across a round opening, which reads as a clipped cutaway rather than a natural near rim."
+              },
+              "broth": {
+                "score": 0.7,
+                "reason": "Warm orange broth with a soft backlit gradient, sesame specks on the surface and toppings seated with contact shadows. Appetizing and integrated, but the surface is mostly a smooth airbrushed glow with little ripple or liquid texture, and the bright center haze is somewhat artificial."
+              },
+              "steam": {
+                "score": 0.25,
+                "reason": "A pale translucent plume rises above the bowl without hiding the food, but its silhouette is effectively identical across desktop frames 1-3 (1077/3428/5628 ms), indicating a static glow rather than wisps that rise, spread and fade."
+              },
+              "composition": {
+                "score": 0.8,
+                "reason": "Centered focal bowl on a restrained dark backdrop with warm rim light, floating particles and no text, UI or competing elements; mobile keeps the dish legible. The large featureless dark front wall occupies much of the lower frame and slightly deadens the presentation."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "Visible ingredients are nori, scored mushrooms, leafy greens, scallion, sesame and tofu-like lattice pieces in an orange plant-broth-colored soup; no egg, meat, fish or dairy is depicted. Lattice pieces are tofu-like rather than fish-cake-like, so only mild ambiguity."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.4,
+                "reason": "Noodles are barely depicted: only a few thin yellow squiggle strands peek between the mushrooms and tofu at the broth edge; no coherent strand volume or overlap is visible, most of the noodle bed is hidden behind the tall front wall."
+              },
+              "toppings": {
+                "score": 0.65,
+                "reason": "Good variety: two grid-textured nori sheets, scored shiitake-style caps, crosshatch fried-tofu pieces, green leaves with a scallion stick, sesame seeds and a chili-oil spoon. Shapes are clean but flat and graphic; the greens read slightly glossy/blobby and the nori leans oddly over the rim."
+              },
+              "bowl": {
+                "score": 0.75,
+                "reason": "Coherent dark ceramic bowl with speckled glaze, ridge lines, red rim accent, footed base on a woven tray with contact shadow; spoon and chopsticks rest plausibly. Minor issues: the broth-to-wall boundary is a nearly straight horizontal edge rather than a rim arc, and the pedestal looks slightly thin."
+              },
+              "broth": {
+                "score": 0.65,
+                "reason": "Warm amber surface with radial glow and subtle ripple arcs; mushrooms and tofu sit with faint contact shadows. It reads somewhat flat and backlit-glowy rather than liquid, and the bright even gradient limits depth."
+              },
+              "steam": {
+                "score": 0.65,
+                "reason": "Steam is clearly animated across the normal frames: the plume grows, shifts and splits into two wisps by the pointer-left frame, and stays translucent without hiding the food. However it reads as a soft uniform haze rather than defined irregular wisps."
+              },
+              "composition": {
+                "score": 0.85,
+                "reason": "Balanced dark atmospheric scene: centered dish with warm glow, red chopstick accent, scattered sesame and vignette; no clutter or text. Mobile framing leaves the bowl small with large empty margins, and the steam haze occupies much of the upper third."
+              },
+              "vegan": {
+                "score": 0.85,
+                "reason": "Visible ingredients (nori, mushrooms, leafy greens, scallion, sesame, tofu-like crosshatch pieces, plant-toned broth) plausibly form vegan ramen; the crosshatch pieces are ambiguous but read more as fried tofu than fish cake, with no unmistakable animal ingredients."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 0.9166666666666666
+          },
+          "veganFailed": false
+        }
+      ],
+      "standaloneViolations": [],
+      "complianceViolations": [],
+      "diagnostics": {
+        "vegan": 0.9388888888888889,
+        "veganFailed": false
+      },
+      "performance": {
+        "frameIntervalMedianMs": 133.29999999999927,
+        "frameIntervalP95Ms": 133.39999999999964,
+        "desktopHorizontalOverflow": false,
+        "mobileHorizontalOverflow": false,
+        "reducedHorizontalOverflow": false
+      }
+    },
+    {
+      "artifactSha256": "5996b1bc49c75a52b96bf89fefd239f53f5beac3d36d83dc0652def110dcdd61",
+      "gradedAt": "2026-10-15T23:56:58.642171+00:00",
+      "scores": {
+        "standalone": 1.0,
+        "procedural": 1.0,
+        "noodles": 0.6666666666666666,
+        "toppings": 0.65,
+        "bowl": 0.7611111111111111,
+        "broth": 0.63,
+        "steam": 0.5988888888888889,
+        "composition": 0.8055555555555556
+      },
+      "reward": 0.6814444444444445,
+      "runId": "google/gemini-4-argon/medium",
+      "rewardStdDev": 0.037801503987324424,
+      "judgeResults": [
+        {
+          "model": "openrouter/openai/gpt-6.1-sol",
+          "effort": "low",
+          "scores": {
+            "noodles": 0.6466666666666667,
+            "toppings": 0.5866666666666667,
+            "bowl": 0.7933333333333333,
+            "broth": 0.5666666666666667,
+            "steam": 0.5133333333333333,
+            "composition": 0.84
+          },
+          "reward": 0.6523333333333334,
+          "sampleStdDev": 0.012770408502993666,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.66,
+                "reason": "Lifted strands have continuous bends, warm highlights and readable separation. Those in the soup are flatter, uniformly thick strokes with limited tangled volume and immersion."
+              },
+              "toppings": {
+                "score": 0.6,
+                "reason": "Scored mushroom caps, porous tofu, scallion rings and veined greens provide recognizable variety. Leaves are overly smooth and paddle-shaped, while nori resembles rigid gridded cards rather than irregular thin seaweed."
+              },
+              "bowl": {
+                "score": 0.81,
+                "reason": "The elliptical gold-edged rim, shaded red cavity and dark exterior form a coherent supported vessel. Layered highlights suggest lacquer, although the lower body is very dark and shallow, weakening its volume."
+              },
+              "broth": {
+                "score": 0.58,
+                "reason": "Warm reddish shading and scattered surface flecks suggest seasoned broth. The surface lacks convincing liquid reflections and menisci, leaving several ingredients looking arranged on top rather than immersed."
+              },
+              "steam": {
+                "score": 0.53,
+                "reason": "Translucent plumes change subtly across normal frames and leave the food visible. Their broad, nearly straight ribbon shapes and abrupt upper haze look more like light shafts than irregular rising and dissipating wisps."
+              },
+              "composition": {
+                "score": 0.84,
+                "reason": "Warm gold and red food contrasts clearly against the restrained dark background; diagonal chopsticks guide attention toward the lifted noodles, with no distracting text or UI. Mobile framing leaves substantial empty space and makes food details small."
+              },
+              "vegan": {
+                "score": 1,
+                "reason": "Visible tofu, mushrooms, leafy greens, seaweed, corn and noodles plausibly form vegan ramen; no visibly animal-derived ingredient is apparent."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.64,
+                "reason": "Lifted strands have continuous rounded bends and warm highlights, but hang in an overly parallel bundle; noodles in the soup look like flat strokes with limited volumetric overlap."
+              },
+              "toppings": {
+                "score": 0.58,
+                "reason": "Scored mushroom caps, tofu pores, scallion rings and leaf veins provide readable variety. However, leaves are smooth paddle shapes, nori resembles rigid gridded cards, and several vegetables have a plastic-like finish."
+              },
+              "bowl": {
+                "score": 0.78,
+                "reason": "The elliptical rim, nested inner wall and dark supported base form a coherent vessel with restrained gold highlights. The exterior is very shallow and dark, limiting the sense of ceramic wall volume."
+              },
+              "broth": {
+                "score": 0.55,
+                "reason": "Warm reddish shading and small surface highlights suggest soup, but the surface is unusually smooth and solid-looking, with most ingredients appearing placed on top rather than visibly immersed."
+              },
+              "steam": {
+                "score": 0.48,
+                "reason": "Translucent columns change subtly across the normal frames and leave the food readable. Their broad, straight-sided ribbon shapes and similar spacing feel mechanical rather than irregular rising wisps."
+              },
+              "composition": {
+                "score": 0.84,
+                "reason": "A clear central dish, diagonal chopsticks, warm gold-red palette and restrained dark background create a balanced focal arrangement without text or clutter. The mobile dish is somewhat small amid extensive empty space."
+              },
+              "vegan": {
+                "score": 1,
+                "reason": "Visible tofu, mushrooms, leafy greens, seaweed, corn and noodles plausibly form vegan ramen; no visibly animal-derived ingredient is apparent."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.64,
+                "reason": "Lifted strands have continuous curves, warm highlights and readable separation. Strands in the soup are flatter, similarly thick strokes with limited submerged volume and somewhat repetitive bends."
+              },
+              "toppings": {
+                "score": 0.58,
+                "reason": "Scored mushroom caps, seeded tofu, scallion rings and veined greens provide readable variety. However, greens are overly smooth oval forms, nori resembles rigid gridded cards, and corn and red vegetables look glossy and plastic."
+              },
+              "bowl": {
+                "score": 0.79,
+                "reason": "The elliptical rim, inner wall, gold edging and shaded exterior form a coherent supported vessel. The shallow exterior and very dark lower body leave its depth and foot less clearly resolved."
+              },
+              "broth": {
+                "score": 0.57,
+                "reason": "Warm reddish shading and small highlights suggest rich soup, but the surface lacks convincing liquid sheen and depth; many toppings and horizontal noodles appear laid on top rather than immersed."
+              },
+              "steam": {
+                "score": 0.53,
+                "reason": "Translucent rising bands shift subtly across normal frames and leave the food visible. Their broad, nearly straight ribbon shapes and blunt upper haze feel more like light shafts than irregular spreading, fading vapor."
+              },
+              "composition": {
+                "score": 0.84,
+                "reason": "The centered warm dish stands clearly against a restrained dark background, with diagonal chopsticks balancing the upright greens and nori. No text or clutter competes with the food; mobile presentation leaves somewhat excessive empty space."
+              },
+              "vegan": {
+                "score": 1,
+                "reason": "Visible tofu, mushrooms, greens, seaweed, corn and noodles plausibly form vegan ramen; no visibly animal-derived ingredient is present."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 1
+          },
+          "veganFailed": false
+        },
+        {
+          "model": "openrouter/anthropic/claude-sonnet-5.5",
+          "effort": "low",
+          "scores": {
+            "noodles": 0.6866666666666666,
+            "toppings": 0.7133333333333333,
+            "bowl": 0.69,
+            "broth": 0.6066666666666667,
+            "steam": 0.5166666666666667,
+            "composition": 0.76
+          },
+          "reward": 0.6678333333333333,
+          "sampleStdDev": 0.021096998206695965,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.7,
+                "reason": "Lifted strands on chopsticks are supple, with a believable drape and curled tops. Submerged noodles twist and overlap with some volume. The lower noodles are somewhat flat and repetitive, and the strands are uniformly thin."
+              },
+              "toppings": {
+                "score": 0.74,
+                "reason": "Tofu cubes with sesame, shiitake with a cut pattern, a bok choy with veins, corn, bamboo strips, scallion rings and a nori sheet are all readable. The nori is a rigid, grid-patterned card and the bok choy is somewhat blobby. The variety and detail are good."
+              },
+              "bowl": {
+                "score": 0.72,
+                "reason": "The bowl has a coherent elliptical rim with a gold edge, an inner wall and a dark base with a shadow. The perspective is consistent. The outer body is barely visible and the base is dark and vague, so the lacquer material reads thinly."
+              },
+              "broth": {
+                "score": 0.62,
+                "reason": "The red-brown broth has depth and sheen, and the ingredients sit in it. The large red glossy blobs look like paint or chili oil patches and are a bit artificial. Concentric ring lines make the surface slightly flat."
+              },
+              "steam": {
+                "score": 0.55,
+                "reason": "Faint translucent vertical wisps rise above the bowl and shift between frames. They are subtle and streaky, with a somewhat mechanical look. They do not hide the food."
+              },
+              "composition": {
+                "score": 0.78,
+                "reason": "The bowl is centered as a clear focal point on a dark, restrained background. The warm colors are cohesive, the chopsticks add a diagonal, and the nori balances the bok choy. There is no clutter or text."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "Tofu, mushrooms, bok choy, corn, bamboo, nori and noodles are all plant-based. No egg, meat or fish is visible."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.68,
+                "reason": "Lifted noodle strands on chopsticks look supple and have natural bends and a convincing hanging volume. The noodles in the broth are thin, somewhat flat loops and a braided twist, a little repetitive and sparse. Overall competent but not fully convincing."
+              },
+              "toppings": {
+                "score": 0.7,
+                "reason": "Variety is good and readable: tofu cubes with sesame, bok choy with veins, shiitake with a scored cap, bamboo shoots, corn kernels, scallion rings and nori. The nori looks like stiff gridded cards floating off the rim. The red blobs are ambiguous. Tofu and corn are a little glossy and generic."
+              },
+              "bowl": {
+                "score": 0.7,
+                "reason": "The elliptical rim has a gold edge, an inner ring and a dark base with a shadow. The perspective is consistent. The bowl wall and foot are barely visible and dark, so the contact with the surface is vague and the material reads somewhat flat."
+              },
+              "broth": {
+                "score": 0.6,
+                "reason": "The deep red-brown broth has a gradient and ring highlights, so it reads as liquid. The glossy red blobs look like pasted-on spots, and the surface is somewhat murky and flat. Ingredient immersion is only moderately convincing."
+              },
+              "steam": {
+                "score": 0.5,
+                "reason": "Faint vertical wisps rise above the bowl and shift between frames, so they are translucent and not overpowering. They are subtle and streaky, with a somewhat mechanical, columnar look, and they barely spread."
+              },
+              "composition": {
+                "score": 0.75,
+                "reason": "The bowl is centered and is a clear focal point against a dark, restrained background. The warm and green colors balance well. The chopsticks add a diagonal. The nori and chopsticks are cropped slightly awkwardly, and there is no clutter."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "Tofu, mushrooms, bok choy, corn, bamboo, nori and noodles are all plant-based. No meat or egg is visible. The red blobs are slightly ambiguous but read as chili oil."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.68,
+                "reason": "Lifted strands on chopsticks are supple and continuous with nice bends, and the twisted noodles in the broth overlap plausibly. The submerged noodles are somewhat flat and uniform, and the lifted bundle is a bit parallel and rigid."
+              },
+              "toppings": {
+                "score": 0.7,
+                "reason": "Variety is good: tofu cubes with sesame, bok choy with veins, shiitake with scoring, corn, bamboo shoots, nori and scallion rings. The nori looks like stiff gridded cards, and the red blobs and scallion rings are somewhat symbolic."
+              },
+              "bowl": {
+                "score": 0.65,
+                "reason": "The elliptical rim has a gold edge and highlights, and the inner wall reads with depth. The base is dark and ambiguous, with a faint offset ring that looks slightly detached, and the material is only moderately convincing."
+              },
+              "broth": {
+                "score": 0.6,
+                "reason": "The broth is a rich red-brown with a sheen and reflected rings, and the ingredients sit in it. The red chili blobs look pasted on and glossy, and the surface is a bit flat and murky."
+              },
+              "steam": {
+                "score": 0.5,
+                "reason": "Faint translucent vertical wisps drift and change across frames, and they don't hide the food. They are subtle, streaky and fairly mechanical, with a hazy block at the top."
+              },
+              "composition": {
+                "score": 0.75,
+                "reason": "The bowl is centered as a clear focal point on a dark, atmospheric background, with a pleasant warm palette and green accents. The chopsticks and nori add dynamism, and there is no clutter or text."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "Tofu, mushrooms, bok choy, corn, bamboo shoots, nori and scallions are all plant-based, with no visible meat or egg. The red broth could be ambiguous."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 0.9
+          },
+          "veganFailed": false
+        },
+        {
+          "model": "openrouter/z-ai/glm-5.3-flash",
+          "effort": "default",
+          "scores": {
+            "noodles": 0.6666666666666666,
+            "toppings": 0.65,
+            "bowl": 0.8,
+            "broth": 0.7166666666666667,
+            "steam": 0.7666666666666667,
+            "composition": 0.8166666666666667
+          },
+          "reward": 0.7241666666666667,
+          "sampleStdDev": 0.03971250852481284,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.6,
+                "reason": "The chopstick-lifted bundle reads well: golden wavy strands with sesame specks and believable bends. But in-broth noodles are sparse, uniformly thin squiggly lines lying flat on the surface, and the lifted strands taper to points rather than merging into the broth \u2014 stylized but somewhat wire-like."
+              },
+              "toppings": {
+                "score": 0.6,
+                "reason": "Good variety: tofu cubes with speckles, corn kernels, bamboo strips, scallion rings, scored mushroom caps, bok choy half. Defects: two large glossy red plastic-like spheres, rigid grid-patterned rectangles standing in for nori sheets, a flat disc with a star/spiral pattern, and a glossy blob-like dark green leaf."
+              },
+              "bowl": {
+                "score": 0.8,
+                "reason": "Coherent dark lacquer bowl with a consistent gold-rimmed ellipse, smooth wall gradients with a left highlight, a visible foot ring, and a grounded shadow beneath. Slightly flat/elliptical foot and a faint vertical seam on the left wall, but no broken geometry or perspective clash."
+              },
+              "broth": {
+                "score": 0.7,
+                "reason": "Deep red broth with darker edge shading, faint sheen curves near the rim and soft shadows under tofu/corn that suggest sitting in liquid. Still fairly flat: ingredients mostly rest on top of the surface rather than appearing submerged, and the surface lacks richer texture/depth."
+              },
+              "steam": {
+                "score": 0.8,
+                "reason": "Translucent gray wisps rise from the soup and clearly change shape between desktop-1/2/3 and the pointer frames, showing genuine animation; they fade gradually and never obscure the food. Slightly uniform, parallel vertical plumes keep it from scoring higher."
+              },
+              "composition": {
+                "score": 0.8,
+                "reason": "Centered, balanced focal dish on a warm dark vignette; no text, UI or clutter; chopsticks and nori add asymmetry. Minor issues: a redundant second chopstick pair crossing at top right and mechanically vertical steam bands; the warm glow does not substitute for food detail."
+              },
+              "vegan": {
+                "score": 0.5,
+                "reason": "Mostly plant-based appearance: tofu, bok choy, corn, bamboo, scallions, mushrooms, nori. However, the dark disc with a white asterisk/spiral pattern strongly resembles a naruto fish cake, which is ambiguous enough to lower compliance; no other animal ingredients are clearly visible."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.8,
+                "reason": "Chopstick-lifted bundle shows supple continuous strands with gentle bends and coherent gathering into the broth; in-broth wavy strands with sesame read well in the stylized style, though the hang is fairly parallel/straight and in-broth strands are a bit flat."
+              },
+              "toppings": {
+                "score": 0.7,
+                "reason": "Good variety: sesame-topped tofu cubes, striated bamboo shoots, cross-hatched mushroom caps, bok choy halves, corn, scallion rings and nori sheets, all readable. Defects: two glossy red orbs read as plastic spheres, and the red scribble around the scallions looks messy."
+              },
+              "bowl": {
+                "score": 0.8,
+                "reason": "Coherent shallow lacquer bowl with consistent rim ellipse, gold trim, inner ring, highlighted exterior wall and a grounded foot/shadow; chopsticks rest believably on the rim. Minor oddity: nori sheets overlap the rim edge ambiguously at left."
+              },
+              "broth": {
+                "score": 0.75,
+                "reason": "Dark mahogany liquid with restrained sheen, inner-rim shadow depth, floating oil dots and believable ingredient contact/occlusion; somewhat murky in places, making the surface read less liquid than brighter broths."
+              },
+              "steam": {
+                "score": 0.8,
+                "reason": "Normal frames at ~1s, ~3.4s, ~5.5s and pointer frames show translucent irregular wisps whose shapes and positions change over time (left-side streaks appear, shift and fade), rising without obscuring the food; reduced-motion frames sensibly omit it."
+              },
+              "composition": {
+                "score": 0.8,
+                "reason": "Centered focal bowl on a warm dark vignette, balanced diagonal chopsticks, steam and soft glow; no clutter or text. On mobile the bowl is small with large empty dark margins, slightly weakening the presentation."
+              },
+              "vegan": {
+                "score": 0.9,
+                "reason": "Visible items (tofu, mushrooms, bok choy, corn, scallion, chili, bamboo shoots, nori, noodles) are plausibly plant-based; the dark disc with a light asterisk marking is mildly ambiguous but reads more like a scored mushroom cap than a fish cake."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.6,
+                "reason": "Lifted chopstick bundle hangs with mostly straight, parallel, uniformly thick strands that read slightly wire-like, and in-broth noodles are flat repetitive squiggles; still coherent with some curves and believable immersion."
+              },
+              "toppings": {
+                "score": 0.65,
+                "reason": "Good variety: bok choy, scored mushrooms, tofu cubes, bamboo, corn, scallion/chili rings, sesame, nori. But nori reads as rigid grid-lined panels leaning on the rim and the glossy red sphere is plastic-like; shapes are clean yet simplified."
+              },
+              "bowl": {
+                "score": 0.8,
+                "reason": "Coherent lacquer bowl with consistent elliptical rim, gold trim, interior depth, streaked body highlights and a grounded base/shadow; perspective is internally consistent, only mildly shallow for ramen."
+              },
+              "broth": {
+                "score": 0.7,
+                "reason": "Glossy dark red broth with restrained sheen and rim-hugging ripple arcs; toppings sit with contact shadows, though the thin concentric rim lines and flat surface shading look slightly artificial."
+              },
+              "steam": {
+                "score": 0.7,
+                "reason": "Translucent wisps clearly change shape and position across desktop-1/2/3, so motion is animated, but plumes are fairly uniform vertical bands with mechanical regularity rather than organic curling wisps."
+              },
+              "composition": {
+                "score": 0.85,
+                "reason": "Polished dark scene: bowl is a clear focal point, chopsticks lead the eye upper-right, warm palette against moody background, no text or clutter; minor awkwardness from the leaning nori and hard-cropped chopstick ends."
+              },
+              "vegan": {
+                "score": 0.6,
+                "reason": "Tofu, bok choy, mushrooms, bamboo, corn, scallion, chili and nori are plant-based; one dark disc with a white asterisk pattern is ambiguous (could read as a narutomaki-like fishcake), so not full credit."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 0.6666666666666666
+          },
+          "veganFailed": false
+        }
+      ],
+      "standaloneViolations": [],
+      "complianceViolations": [],
+      "diagnostics": {
+        "vegan": 0.8555555555555555,
+        "veganFailed": false
+      },
+      "performance": {
+        "frameIntervalMedianMs": 150.04999999999927,
+        "frameIntervalP95Ms": 166.70000000000073,
+        "desktopHorizontalOverflow": false,
+        "mobileHorizontalOverflow": false,
+        "reducedHorizontalOverflow": false
+      }
+    },
+    {
+      "artifactSha256": "704cd34268c9d801f4ec5811b4172a2c0b7549db8485531ce8a2957875f476b5",
+      "gradedAt": "2026-10-16T00:44:39.739313+00:00",
+      "scores": {
+        "standalone": 1.0,
+        "procedural": 1.0,
+        "noodles": 0.5422222222222223,
+        "toppings": 0.6833333333333333,
+        "bowl": 0.7833333333333333,
+        "broth": 0.6222222222222222,
+        "steam": 0.6411111111111111,
+        "composition": 0.8077777777777778
+      },
+      "reward": 0.0,
+      "runId": "google/gemini-4-argon/high",
+      "rewardStdDev": 0.045049766719501255,
+      "judgeResults": [
+        {
+          "model": "openrouter/openai/gpt-6.1-sol",
+          "effort": "low",
+          "scores": {
+            "noodles": 0.49333333333333335,
+            "toppings": 0.6233333333333333,
+            "bowl": 0.86,
+            "broth": 0.5666666666666667,
+            "steam": 0.5833333333333333,
+            "composition": 0.8466666666666667
+          },
+          "reward": 0.6553333333333333,
+          "sampleStdDev": 0.005008326400438942,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.48,
+                "reason": "Visible golden strands overlap beneath the toppings, but mostly form broad, flat parallel ribbons with angular bends rather than supple, rounded noodles."
+              },
+              "toppings": {
+                "score": 0.64,
+                "reason": "Scallion rings, corn, a scored mushroom and veined greens provide readable variety. Repeated crosshatched slices look stamped, nori resembles rigid rectangular cards, and many small garnishes are overly spherical and glossy."
+              },
+              "bowl": {
+                "score": 0.86,
+                "reason": "The continuous elliptical rim, decorated inner wall, ribbed dark exterior and grounded foot create coherent depth and convincing lacquer-like highlights. No material construction defect is observed."
+              },
+              "broth": {
+                "score": 0.57,
+                "reason": "Warm orange shading and scattered oil-like highlights suggest rich broth, but the surface is rather solid and matte; several ingredients and droplets appear suspended above it rather than immersed."
+              },
+              "steam": {
+                "score": 0.6,
+                "reason": "Normal frames show changing translucent plumes rising above the soup while leaving the food readable. The numerous broad, sharply bounded ribbon shapes feel repetitive and sheet-like rather than softly dispersing wisps."
+              },
+              "composition": {
+                "score": 0.86,
+                "reason": "Warm food colors stand out clearly against the dark wooden setting, with a balanced spoon-and-chopstick arrangement and no distracting text or UI. Mobile framing leaves somewhat excessive empty space above the dish."
+              },
+              "vegan": {
+                "score": 0,
+                "reason": "Two unmistakable egg halves with white surrounds and orange yolks are visible among the toppings."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.5,
+                "reason": "Visible golden strands have continuous bends and some overlap, but mostly read as flat, parallel ribbons beneath the toppings rather than a supple, voluminous noodle nest."
+              },
+              "toppings": {
+                "score": 0.62,
+                "reason": "Scallion rings, corn, scored mushroom cap and veined greens are readable and varied. However, nori resembles rigid rectangular cards, the crosshatched slices are repetitive, and scattered glossy spheres look artificial."
+              },
+              "bowl": {
+                "score": 0.86,
+                "reason": "A coherent elliptical rim, patterned inner wall, shaded ribbed exterior and grounded foot establish convincing depth and support. Layered edge highlights communicate thickness; no material construction defect is observed."
+              },
+              "broth": {
+                "score": 0.57,
+                "reason": "Warm orange shading and small highlights suggest rich soup, but the surface is unusually uniform and solid-looking. Strong topping shadows and raised droplets make much of the garnish appear suspended above it rather than immersed."
+              },
+              "steam": {
+                "score": 0.57,
+                "reason": "Normal frames show changing translucent plumes emerging above the soup. Their broad, repeated leaf-shaped ribbons and accumulated haze look more mechanical than irregular rising wisps."
+              },
+              "composition": {
+                "score": 0.84,
+                "reason": "The warm focal bowl contrasts clearly with the dark wooden setting, with chopsticks and spoon providing balanced diagonals and no distracting UI or text. Mobile framing leaves considerable unused space above the dish."
+              },
+              "vegan": {
+                "score": 0,
+                "reason": "Two unmistakable egg halves with orange yolks and white surrounds are visible among the toppings."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.5,
+                "reason": "Visible golden strands have consistent thickness and some curved overlaps, but are mostly obscured and read as a flattened bundle of broad, stiff ribbons rather than supple noodles."
+              },
+              "toppings": {
+                "score": 0.61,
+                "reason": "Scallion rings, corn, veined greens and a scored mushroom are readable and varied. However, nori resembles rigid rectangular cards, crosshatched slices are repetitive, and numerous glossy orange beads look artificial."
+              },
+              "bowl": {
+                "score": 0.86,
+                "reason": "The continuous elliptical rim, patterned inner wall, shaded ribbed exterior and grounded foot form a coherent vessel with convincing depth. Minor refinement could improve the subdued ceramic highlights."
+              },
+              "broth": {
+                "score": 0.56,
+                "reason": "Warm orange shading and scattered oil-like highlights suggest rich broth, but the surface is unusually flat and opaque, with several ingredients and beads appearing suspended above it rather than immersed."
+              },
+              "steam": {
+                "score": 0.58,
+                "reason": "Normal frames show changing translucent plumes rising above the soup. Their broad, repeated leaf-shaped bands and dense overlap resemble layered gauze more than irregular dissipating wisps."
+              },
+              "composition": {
+                "score": 0.84,
+                "reason": "Warm food colors stand clearly against a restrained dark wood setting, with chopsticks and spoon framing a single focal bowl and no distracting UI. Mobile preserves the arrangement but leaves substantial empty space above."
+              },
+              "vegan": {
+                "score": 0,
+                "reason": "Two unmistakable egg halves with white surrounds and orange yolks are visible among the toppings."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 0
+          },
+          "veganFailed": true
+        },
+        {
+          "model": "openrouter/anthropic/claude-sonnet-5.5",
+          "effort": "low",
+          "scores": {
+            "noodles": 0.48333333333333334,
+            "toppings": 0.6933333333333334,
+            "bowl": 0.7066666666666667,
+            "broth": 0.65,
+            "steam": 0.6066666666666667,
+            "composition": 0.76
+          },
+          "reward": 0.6433333333333333,
+          "sampleStdDev": 0.013012814197295434,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.45,
+                "reason": "Noodles are mostly hidden under toppings. The visible strands near the center are small, thin and tangled, so the noodle mass reads as indistinct and lacks volume."
+              },
+              "toppings": {
+                "score": 0.68,
+                "reason": "Toppings are varied and well drawn: a shiitake with a star pattern, bok choy with white stems, corn, menma, scallions, nori sheets and chili threads. The grilled slices look meat-like. Some pieces are slightly flat and illustrative, but there are no plastic blobs."
+              },
+              "bowl": {
+                "score": 0.7,
+                "reason": "The bowl has a coherent elliptical rim, a patterned red band, a foot ring and a plate. The perspective is consistent and there are rim highlights. The base is dark and somewhat murky, and the bowl's support contact is a little ambiguous."
+              },
+              "broth": {
+                "score": 0.65,
+                "reason": "The orange chili broth has a glossy gradient and floating oil droplets, and toppings sit in it with shadows. It is a bit flat and uniformly saturated, and the red droplets look like beads."
+              },
+              "steam": {
+                "score": 0.6,
+                "reason": "Translucent wisps rise and change shape across the frames. The plumes are somewhat repetitive and mechanical, with overlapping vertical leaf shapes, but they do not hide the food."
+              },
+              "composition": {
+                "score": 0.75,
+                "reason": "The bowl is a central focal point in a dark, moody scene with warm lighting. The chopsticks and plate are balanced and there is no clutter. The bowl's lower half is slightly cramped near the frame bottom."
+              },
+              "vegan": {
+                "score": 0.2,
+                "reason": "Halved soft-boiled eggs with orange yolks are clearly visible, and the grilled slices look meat-like. This reads as non-vegan."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.5,
+                "reason": "Noodles are mostly hidden under toppings; the small visible patch has thin wavy strands but is indistinct and limited in volume."
+              },
+              "toppings": {
+                "score": 0.68,
+                "reason": "Shiitake with a star pattern, bok choy with translucent stems, corn, nori sheets and scallions are readable and varied. The grilled slices look like meat and the menma is crude."
+              },
+              "bowl": {
+                "score": 0.72,
+                "reason": "Coherent wide rim with a patterned red band, a foot, a saucer and a believable perspective. The thickness and highlights are decent. The base is a bit dark and the contact is vague."
+              },
+              "broth": {
+                "score": 0.62,
+                "reason": "Warm orange broth with chili oil droplets and a gradient has depth. It looks somewhat flat and opaque, and ingredient immersion is limited."
+              },
+              "steam": {
+                "score": 0.62,
+                "reason": "Translucent wisps rise and change between frames. They look like repeated overlapping lens shapes, and they are somewhat mechanical and hazy over the toppings."
+              },
+              "composition": {
+                "score": 0.75,
+                "reason": "The bowl is a clear focal point in a dark, warm scene. The chopsticks and the spoon are balanced, and the colors are appetizing. The steam slightly obscures the bowl's left side."
+              },
+              "vegan": {
+                "score": 0.1,
+                "reason": "Soft-boiled egg halves are clearly visible, and the grilled slices look like meat, so the bowl does not look vegan."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.5,
+                "reason": "Noodles are mostly hidden in a small central cluster under toppings. Thin wavy strands are visible but flat and indistinct, with little volume and no strands lifting from the broth."
+              },
+              "toppings": {
+                "score": 0.72,
+                "reason": "Variety is good: a shiitake with a star pattern, nori sheets, bok choy with white stems, corn, scallion rings, menma and chili threads. Textures are fairly polished. The grilled-looking slices are ambiguous and resemble meat, and the nori reads as stiff cards."
+              },
+              "bowl": {
+                "score": 0.7,
+                "reason": "The bowl has a coherent elliptical rim, a patterned red inner band, a stepped base and a plate with a reflection. Thickness and ceramic highlights are convincing. The rim is a little heavy and the base slightly narrow, but there is no major distortion."
+              },
+              "broth": {
+                "score": 0.68,
+                "reason": "Orange broth has a gradient, droplets of chili oil and some depth. The surface is slightly flat and opaque, and the toppings sit on it with soft contact shadows. It is appetizing but somewhat uniform."
+              },
+              "steam": {
+                "score": 0.6,
+                "reason": "Translucent wisps rise and shift between frames. The plumes are repetitive, overlapping and mechanical, and a bit broad, partly veiling the bowl rim. Motion is evident but not very organic."
+              },
+              "composition": {
+                "score": 0.78,
+                "reason": "The bowl is a clear focal point in a dark, moody scene. The warm orange palette is balanced against a dark background, and the chopsticks and spoon add interest. The bowl is slightly low and off-center, and the steam fills the top."
+              },
+              "vegan": {
+                "score": 0.2,
+                "reason": "Halved soft-boiled eggs with orange yolks are clearly visible, and the grilled slices look like meat. Both make the bowl non-vegan in appearance."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 0.16666666666666669
+          },
+          "veganFailed": false
+        },
+        {
+          "model": "openrouter/z-ai/glm-5.3-flash",
+          "effort": "default",
+          "scores": {
+            "noodles": 0.65,
+            "toppings": 0.7333333333333333,
+            "bowl": 0.7833333333333333,
+            "broth": 0.65,
+            "steam": 0.7333333333333333,
+            "composition": 0.8166666666666667
+          },
+          "reward": 0.7266666666666667,
+          "sampleStdDev": 0.04502314219746698,
+          "judgments": [
+            {
+              "noodles": {
+                "score": 0.65,
+                "reason": "Yellow strands are continuous with plausible waviness and coherent layering under the narutomaki and eggs, but the noodle mass is sparse and reads as flat painted ribbons spread on the surface rather than a supple, voluminous mound."
+              },
+              "toppings": {
+                "score": 0.7,
+                "reason": "Good variety and mostly readable: halved eggs with orange yolks, a star-patterned narutomaki, bamboo shoots, corn, bok choy, scallion rings, chili threads, sesame and standing nori sheets with texture. Defects: the three grilled slices are repetitive identical flat discs with stamped crosshatch marks, and the eggs look slightly glossy/plastic."
+              },
+              "bowl": {
+                "score": 0.8,
+                "reason": "Coherent high-angle bowl: dark exterior, decorative red inner band, elliptical rim with a left-edge highlight, offset broth ellipse consistent with the viewpoint, and a centered footed base resting on a woven mat. Only minor shortfall is the slightly narrow foot and soft wall definition at the front."
+              },
+              "broth": {
+                "score": 0.6,
+                "reason": "The orange-red surface has gradient tone, darker smudges, glossy chili-oil beads and scattered sesame, but reads fairly matte and solid with little liquid sheen or depth, and toppings show weak occlusion/immersion shadows."
+              },
+              "steam": {
+                "score": 0.8,
+                "reason": "Translucent irregular wisps rise from the soup and clearly change shape and position across desktop-1/2/3 and pointer frames, showing real motion without hiding the food. Slight mechanical quality from several similar parallel plumes forming a curtain."
+              },
+              "composition": {
+                "score": 0.8,
+                "reason": "Balanced warm scene: bowl as clear focal point on a placemat with chopsticks, steam filling the upper frame, subtle wood-grain background and restrained bokeh, no text or clutter; mobile crop keeps the dish readable. Background glow does not substitute for the slightly flat broth but presentation is cohesive."
+              },
+              "vegan": {
+                "score": 0.0,
+                "reason": "Clearly animal-derived toppings are visible: two halved boiled eggs with yolks and a narutomaki fish cake (the grilled disc slices also read as meat-based chashu), so compliance fails regardless of quality."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.6,
+                "reason": "Pale wavy strands are visible around the eggs and center, with plausible curvature, but they are thin, sparse and largely buried under toppings; much of the noodle body reads as indistinct pale mass rather than coherent strands."
+              },
+              "toppings": {
+                "score": 0.65,
+                "reason": "Good variety: crosshatched chashu-like slices, a scored dark cap, bamboo shoots, greens, nori sheets, scallion rings, corn and chili threads. Defects: the egg halves are glossy plastic-like domes, the chashu discs read as flat cookies, and scattered red oil beads look like polished spheres."
+              },
+              "bowl": {
+                "score": 0.75,
+                "reason": "Coherent wide bowl with a patterned red rim band, visible interior wall, dark foot resting on a saucer with shadow; ellipse perspective is consistent at the high viewing angle. Minor flatness in the foot/saucer join."
+              },
+              "broth": {
+                "score": 0.65,
+                "reason": "Orange broth with edge shading, oil droplets and a mild sheen; eggs and greens show contact shadows. Surface reads slightly flat and toppings sit somewhat pasted-on in places, but immersion is broadly believable."
+              },
+              "steam": {
+                "score": 0.7,
+                "reason": "Translucent gray wisps rise from the soup and clearly change shape across desktop-1/2/3 and pointer frames, fading without hiding the food; the plumes are somewhat parallel and mechanically repeated in form."
+              },
+              "composition": {
+                "score": 0.8,
+                "reason": "Centered bowl as clear focal point on a warm dark atmospheric ground, chopsticks and spoon anchored below, no clutter or UI. Mobile frame leaves generous empty headroom but keeps the dish readable."
+              },
+              "vegan": {
+                "score": 0,
+                "reason": "Two unmistakable soft-boiled egg halves with orange yolks sit in the bowl, an animal-derived topping, so vegan compliance fails."
+              }
+            },
+            {
+              "noodles": {
+                "score": 0.7,
+                "reason": "Pale yellow strands are visible between the eggs and greens with gentle bends and coherent flow, but they are partially buried, read a bit flat/ribbon-like, and the noodle mass is sparse relative to the bowl."
+              },
+              "toppings": {
+                "score": 0.85,
+                "reason": "Rich, readable variety: grill-marked chashu-style slices, shiitake with star gill pattern, leafy greens with vein detail, corn, scallion rings, chili threads, bamboo shoots, patterned nori sheets and halved eggs with glossy yolks; only minor weakness is the scattered glossy red beads reading slightly like plastic droplets."
+              },
+              "bowl": {
+                "score": 0.8,
+                "reason": "Wide donburi with coherent elliptical rim, decorative red inner band, dark footed pedestal and consistent high-angle perspective; the resting ladle contacts the rim plausibly, with only minor stiffness at the rim-to-foot transition."
+              },
+              "broth": {
+                "score": 0.7,
+                "reason": "Appetizing orange-red surface with gradient depth, sheen and scattered chili-oil droplets, and toppings cast contact shadows into the liquid; however the surface is fairly flat and uniform, with items reading more pasted-on than immersed."
+              },
+              "steam": {
+                "score": 0.7,
+                "reason": "Translucent wisps clearly change shape and position across the time-ordered desktop frames, rising and fading without hiding food, but the many near-identical parallel plume shapes look somewhat mechanical and repetitive."
+              },
+              "composition": {
+                "score": 0.85,
+                "reason": "Balanced dark atmospheric scene with warm rim light, centered focal dish, chopsticks and ladle arranged cleanly, no clutter or text; mobile framing leaves a large empty dark region above the bowl, a minor imbalance."
+              },
+              "vegan": {
+                "score": 0,
+                "reason": "Two unmistakable soft-boiled egg halves with round yolks are prominent toppings, clearly animal-derived, so vegan compliance fails despite otherwise plant-forward ingredients."
+              }
+            }
+          ],
+          "diagnostics": {
+            "vegan": 0.0
+          },
+          "veganFailed": true
+        }
+      ],
+      "standaloneViolations": [],
+      "complianceViolations": [],
+      "diagnostics": {
+        "vegan": 0.05555555555555556,
+        "veganFailed": true
+      },
+      "performance": {
+        "frameIntervalMedianMs": 116.79999999999927,
+        "frameIntervalP95Ms": 133.3000000000011,
+        "desktopHorizontalOverflow": false,
+        "mobileHorizontalOverflow": false,
+        "reducedHorizontalOverflow": false
+      }
     }
   ]
 }
