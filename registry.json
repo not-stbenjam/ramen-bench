@@ -71,6 +71,8 @@
     "openai/gpt-5.5/high/run.json",
     "openai/gpt-5.5/medium/run.json",
     "openai/gpt-5.5/low/run.json",
+    "google/gemini-4-argon/medium/run.json",
+    "google/gemini-4-argon/low/run.json",
     "google/gemini-3.8-flash/high/run.json",
     "google/gemini-3.8-flash/medium/run.json",
     "google/gemini-3.8-flash/low/run.json",
@@ -124,6 +126,7 @@
     "openai/gpt-6.1-sol": "2026-10-01T00:09:25.308784Z",
     "mistralai/mistral-large-4-0": "2026-10-06T15:56:15.512371Z",
     "anthropic/haiku-5.5": "2026-10-08T21:21:50.929650Z",
-    "meta/muse-wonder-1.0": "2026-10-12T19:58:06.304563Z"
+    "meta/muse-wonder-1.0": "2026-10-12T19:58:06.304563Z",
+    "google/gemini-4-argon": "2026-10-15T23:32:48.380332Z"
   }
 }
